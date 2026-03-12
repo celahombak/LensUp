@@ -1,186 +1,160 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>LensUp — Sign In</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --black: #0a0a0a; --white: #f5f2ee; --gold: #c9a96e;
-      --gold-light: #e8d5b0; --dark: #1a1714; --dark2: #141210;
-      --mid: #6b6560; --border: rgba(201,169,110,0.15);
+      --black: #080808; --white: #f0ede8; --dark: #111010; --dark2: #181615;
+      --mid: #5a5550; --border: rgba(255,255,255,0.07);
+      --gold: #e8b84b; --gold2: #f5d07a; --red: #ff4444; --green: #00e676;
     }
     html, body { height: 100%; }
-    body {
-      background: var(--black); color: var(--white);
-      font-family: 'DM Sans', sans-serif; font-weight: 300;
-      min-height: 100vh; display: flex; flex-direction: column;
-    }
+    body { background: var(--black); color: var(--white); font-family: 'DM Sans', sans-serif; font-weight: 300; min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr; }
 
-    /* ── NAV ── */
-    nav {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 1.2rem 3rem; border-bottom: 1px solid var(--border);
-    }
-    .nav-logo { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 900; color: var(--gold); text-decoration: none; }
-    .nav-logo span { color: var(--white); }
-    .nav-link { font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(245,242,238,0.5); text-decoration: none; transition: color 0.2s; }
-    .nav-link:hover { color: var(--gold); }
+    /* ── LEFT PANEL ── */
+    .left-panel { position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; padding: 2.5rem; background: var(--dark); border-right: 1px solid var(--border); }
+    .left-bg { position: absolute; inset: 0; }
+    .left-bg::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 80% 60% at 20% 70%, rgba(232,184,75,0.08) 0%, transparent 60%), radial-gradient(ellipse 60% 40% at 80% 20%, rgba(0,212,255,0.04) 0%, transparent 60%); }
+    .left-grid { position: absolute; inset: 0; opacity: 0.035; background-image: linear-gradient(rgba(232,184,75,1) 1px, transparent 1px), linear-gradient(90deg, rgba(232,184,75,1) 1px, transparent 1px); background-size: 60px 60px; }
 
-    /* ── LAYOUT ── */
-    .auth-wrap {
-      flex: 1; display: flex; align-items: center; justify-content: center;
-      padding: 3rem 1.5rem;
-    }
-    .auth-card {
-      width: 100%; max-width: 420px;
-      background: var(--dark); border: 1px solid var(--border);
-      border-radius: 4px; overflow: hidden;
-      animation: fadeUp 0.5s ease both;
-    }
+    .left-top { position: relative; }
+    .logo { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 0.08em; color: var(--gold); text-decoration: none; display: block; margin-bottom: 3rem; }
+    .logo span { color: var(--white); }
 
-    /* ── CARD HEADER ── */
-    .auth-header {
-      padding: 2rem 2rem 1.5rem;
-      border-bottom: 1px solid var(--border);
-      text-align: center;
-    }
-    .auth-logo { font-size: 2rem; margin-bottom: 0.8rem; }
-    .auth-header h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.6rem; font-weight: 900; margin-bottom: 0.3rem;
-    }
-    .auth-header h1 em { font-style: italic; color: var(--gold); }
-    .auth-header p { font-size: 0.85rem; color: rgba(245,242,238,0.45); }
+    .left-headline { position: relative; }
+    .left-tag { font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem; }
+    .live-dot { width: 6px; height: 6px; background: var(--red); border-radius: 50%; animation: pulse 1.5s ease-in-out infinite; flex-shrink: 0; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+    .left-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(3.5rem, 6vw, 5.5rem); letter-spacing: 0.03em; line-height: 0.9; color: var(--white); margin-bottom: 1.2rem; }
+    .left-title span { color: var(--gold); display: block; }
+    .left-desc { font-size: 0.88rem; line-height: 1.8; color: rgba(240,237,232,0.45); max-width: 340px; }
 
-    /* ── FORM ── */
-    .auth-body { padding: 1.8rem 2rem; }
-    .form-group { margin-bottom: 1.2rem; }
-    .form-label {
-      display: block; font-size: 0.75rem; letter-spacing: 0.1em;
-      text-transform: uppercase; color: var(--gold);
-      margin-bottom: 0.5rem;
-    }
-    .form-input {
-      width: 100%; background: var(--black); border: 1px solid var(--border);
-      color: var(--white); padding: 0.8rem 1rem;
-      border-radius: 2px; font-family: 'DM Sans', sans-serif;
-      font-size: 0.9rem; outline: none; transition: border-color 0.2s;
-    }
-    .form-input:focus { border-color: var(--gold); }
-    .form-input::placeholder { color: rgba(245,242,238,0.2); }
+    /* Theme card */
+    .theme-card { position: relative; margin-top: 2.5rem; background: rgba(232,184,75,0.06); border: 1px solid rgba(232,184,75,0.2); border-left: 3px solid var(--gold); padding: 1.2rem 1.5rem; }
+    .theme-week { font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.4rem; }
+    .theme-name { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; letter-spacing: 0.05em; margin-bottom: 0.2rem; }
+    .theme-desc { font-size: 0.75rem; color: rgba(240,237,232,0.4); }
 
-    .btn-submit {
-      width: 100%; background: var(--gold); color: var(--black);
-      border: none; padding: 0.9rem; border-radius: 2px;
-      font-family: 'DM Sans', sans-serif; font-size: 0.88rem;
-      font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
-      cursor: pointer; transition: background 0.2s; margin-top: 0.5rem;
-    }
-    .btn-submit:hover:not(:disabled) { background: var(--gold-light); }
-    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+    /* Mini leaderboard */
+    .mini-lb { position: relative; margin-top: 1.5rem; }
+    .mini-lb-title { font-size: 0.6rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--mid); margin-bottom: 0.8rem; }
+    .mini-lb-row { display: flex; align-items: center; gap: 0.8rem; padding: 0.55rem 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .mini-lb-row:last-child { border-bottom: none; }
+    .mini-rank { font-family: 'Bebas Neue', sans-serif; font-size: 0.9rem; width: 18px; text-align: center; color: var(--mid); flex-shrink: 0; }
+    .mini-rank.r1 { color: var(--gold); }
+    .mini-name { flex: 1; font-size: 0.78rem; }
+    .mini-score { font-family: 'Bebas Neue', sans-serif; font-size: 1rem; color: var(--green); }
 
-    .form-footer {
-      text-align: center; margin-top: 1.2rem;
-      font-size: 0.82rem; color: rgba(245,242,238,0.4);
-    }
-    .form-footer a { color: var(--gold); text-decoration: none; }
-    .form-footer a:hover { text-decoration: underline; }
+    .left-bottom { position: relative; }
+    .left-bottom p { font-size: 0.7rem; color: var(--mid); }
 
-    .forgot-link {
-      display: block; text-align: right; font-size: 0.75rem;
-      color: rgba(245,242,238,0.35); text-decoration: none;
-      margin-top: 0.3rem; transition: color 0.2s;
-    }
+    /* ── RIGHT PANEL ── */
+    .right-panel { display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 3rem 2rem; background: var(--black); }
+    .auth-box { width: 100%; max-width: 380px; animation: fadeUp 0.5s ease both; }
+
+    .auth-box-title { font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; letter-spacing: 0.05em; margin-bottom: 0.3rem; }
+    .auth-box-sub { font-size: 0.82rem; color: rgba(240,237,232,0.4); margin-bottom: 2rem; }
+
+    /* FORM */
+    .form-group { margin-bottom: 1.1rem; }
+    .form-label { display: block; font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(240,237,232,0.5); margin-bottom: 0.5rem; }
+    .form-input { width: 100%; background: var(--dark); border: 1px solid var(--border); color: var(--white); padding: 0.85rem 1rem; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; outline: none; transition: border-color 0.2s; border-radius: 0; }
+    .form-input:focus { border-color: var(--gold); background: var(--dark2); }
+    .form-input::placeholder { color: rgba(240,237,232,0.18); }
+
+    .forgot-link { display: block; text-align: right; font-size: 0.7rem; color: var(--mid); text-decoration: none; margin-top: 0.4rem; transition: color 0.2s; }
     .forgot-link:hover { color: var(--gold); }
 
-    /* ── ERROR / SUCCESS ── */
-    .alert {
-      padding: 0.8rem 1rem; border-radius: 2px;
-      font-size: 0.82rem; line-height: 1.5; margin-bottom: 1.2rem;
-      display: none;
-    }
+    .btn-submit { width: 100%; background: var(--gold); color: var(--black); border: none; padding: 0.95rem; font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; letter-spacing: 0.12em; cursor: pointer; transition: all 0.2s; margin-top: 0.5rem; clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%); }
+    .btn-submit:hover:not(:disabled) { background: var(--gold2); transform: translateY(-1px); }
+    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .auth-footer { text-align: center; margin-top: 1.5rem; font-size: 0.78rem; color: rgba(240,237,232,0.35); }
+    .auth-footer a { color: var(--gold); text-decoration: none; font-weight: 500; }
+    .auth-footer a:hover { color: var(--gold2); }
+
+    /* ALERTS */
+    .alert { padding: 0.75rem 1rem; font-size: 0.8rem; line-height: 1.5; margin-bottom: 1.2rem; display: none; border-left: 3px solid; }
     .alert.show { display: block; }
-    .alert-error { background: rgba(200,80,80,0.1); border: 1px solid rgba(200,80,80,0.25); color: #f08080; }
-    .alert-success { background: rgba(126,207,126,0.08); border: 1px solid rgba(126,207,126,0.2); color: #7ecf7e; }
+    .alert-error { background: rgba(255,68,68,0.08); border-color: var(--red); color: #ff8080; }
+    .alert-success { background: rgba(0,230,118,0.07); border-color: var(--green); color: var(--green); }
 
-    /* ── DIVIDER ── */
-    .divider {
-      display: flex; align-items: center; gap: 1rem;
-      margin: 1.2rem 0; color: rgba(245,242,238,0.2); font-size: 0.75rem;
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+    @media (max-width: 768px) {
+      body { grid-template-columns: 1fr; }
+      .left-panel { display: none; }
+      .right-panel { padding: 3rem 1.5rem; min-height: 100vh; }
     }
-    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-
-    /* ── GUEST LINK ── */
-    .btn-guest {
-      width: 100%; background: none; border: 1px solid var(--border);
-      color: rgba(245,242,238,0.6); padding: 0.8rem;
-      border-radius: 2px; font-family: 'DM Sans', sans-serif;
-      font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase;
-      cursor: pointer; transition: all 0.2s; text-decoration: none;
-      display: block; text-align: center;
-    }
-    .btn-guest:hover { border-color: rgba(201,169,110,0.35); color: var(--white); }
-
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-    @media (max-width: 480px) { nav { padding: 1rem 1.2rem; } .auth-body { padding: 1.4rem; } .auth-header { padding: 1.5rem 1.4rem 1.2rem; } }
   </style>
 </head>
 <body>
 
-  <nav>
-    <a href="index.html" class="nav-logo">Lens<span>Up</span></a>
-    <a href="register.html" class="nav-link">Create Account →</a>
-  </nav>
+  <!-- LEFT -->
+  <div class="left-panel">
+    <div class="left-bg"></div>
+    <div class="left-grid"></div>
+    <div class="left-top">
+      <a href="index.html" class="logo">Lens<span>Up</span></a>
+      <div class="left-headline">
+        <div class="left-tag"><span class="live-dot"></span> Week 1 Challenge Active</div>
+        <div class="left-title">Shoot.<br/><span>Compete.</span><br/>Improve.</div>
+        <p class="left-desc">A year-long photography quest with weekly themes, AI scoring, and a leaderboard that keeps you honest.</p>
+      </div>
+      <div class="theme-card">
+        <div class="theme-week">📅 This Week's Theme</div>
+        <div class="theme-name">Golden Hour</div>
+        <div class="theme-desc">Capture the magic of the first or last hour of sunlight</div>
+      </div>
+      <div class="mini-lb">
+        <div class="mini-lb-title">Today's Top Shots</div>
+        <div class="mini-lb-row"><span class="mini-rank r1">1</span><span class="mini-name">Ahmad R.</span><span class="mini-score">9.4</span></div>
+        <div class="mini-lb-row"><span class="mini-rank">2</span><span class="mini-name">Sarah K.</span><span class="mini-score">9.1</span></div>
+        <div class="mini-lb-row"><span class="mini-rank">3</span><span class="mini-name">Faiz M.</span><span class="mini-score">8.7</span></div>
+      </div>
+    </div>
+    <div class="left-bottom">
+      <p>© 2026 LensUp · Powered by Claude AI</p>
+    </div>
+  </div>
 
-  <div class="auth-wrap">
-    <div class="auth-card">
+  <!-- RIGHT -->
+  <div class="right-panel">
+    <div class="auth-box">
+      <div class="auth-box-title">Welcome Back</div>
+      <div class="auth-box-sub">Sign in to submit your shot and climb the leaderboard</div>
 
-      <div class="auth-header">
-        <div class="auth-logo">📷</div>
-        <h1>Welcome <em>Back</em></h1>
-        <p>Sign in to access your gallery and analysis history</p>
+      <div class="alert alert-error" id="errorAlert"></div>
+      <div class="alert alert-success" id="successAlert"></div>
+
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-input" id="emailInput" placeholder="you@example.com"/>
       </div>
 
-      <div class="auth-body">
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input type="password" class="form-input" id="passwordInput" placeholder="Your password" onkeydown="if(event.key==='Enter') signIn()"/>
+        <a href="#" class="forgot-link" onclick="forgotPassword()">Forgot password?</a>
+      </div>
 
-        <div class="alert alert-error" id="errorAlert"></div>
-        <div class="alert alert-success" id="successAlert"></div>
+      <button class="btn-submit" id="submitBtn" onclick="signIn()">Sign In →</button>
 
-        <div class="form-group">
-          <label class="form-label">Email</label>
-          <input type="email" class="form-input" id="emailInput" placeholder="you@example.com" />
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Password</label>
-          <input type="password" class="form-input" id="passwordInput" placeholder="Your password"
-            onkeydown="if(event.key==='Enter') signIn()" />
-          <a href="#" class="forgot-link" onclick="forgotPassword()">Forgot password?</a>
-        </div>
-
-        <button class="btn-submit" id="submitBtn" onclick="signIn()">Sign In</button>
-
-        <div class="form-footer">
-          Don't have an account? <a href="register.html">Create one — invite required</a>
-        </div>
-
+      <div class="auth-footer">
+        No account? <a href="register.html">Join the challenge →</a>
       </div>
     </div>
   </div>
 
   <script>
     initSupabase();
-
-    // Redirect if already logged in
-    (async () => {
-      const user = await getUser();
-      if (user) window.location.href = 'app.html';
-    })();
+    (async () => { const user = await getUser(); if (user) window.location.href = 'app.html'; })();
 
     function showError(msg) {
       const el = document.getElementById('errorAlert');
@@ -192,28 +166,17 @@
       el.textContent = msg; el.classList.add('show');
       document.getElementById('errorAlert').classList.remove('show');
     }
-    function clearAlerts() {
-      document.getElementById('errorAlert').classList.remove('show');
-      document.getElementById('successAlert').classList.remove('show');
-    }
 
     async function signIn() {
       const email = document.getElementById('emailInput').value.trim();
       const password = document.getElementById('passwordInput').value;
       const btn = document.getElementById('submitBtn');
-
       if (!email || !password) { showError('Please enter your email and password.'); return; }
-
-      clearAlerts();
-      btn.disabled = true;
-      btn.textContent = 'Signing in…';
-
+      btn.disabled = true; btn.textContent = 'Signing in…';
       const { data, error } = await sb.auth.signInWithPassword({ email, password });
-
       if (error) {
         showError(error.message || 'Sign in failed. Please check your credentials.');
-        btn.disabled = false;
-        btn.textContent = 'Sign In';
+        btn.disabled = false; btn.textContent = 'Sign In →';
       } else {
         showSuccess('Signed in! Redirecting…');
         setTimeout(() => window.location.href = 'app.html', 800);
@@ -222,10 +185,10 @@
 
     async function forgotPassword() {
       const email = document.getElementById('emailInput').value.trim();
-      if (!email) { showError('Enter your email address first, then click Forgot Password.'); return; }
+      if (!email) { showError('Enter your email first, then click Forgot Password.'); return; }
       const { error } = await sb.auth.resetPasswordForEmail(email);
       if (error) { showError(error.message); }
-      else { showSuccess('Password reset email sent — check your inbox.'); }
+      else { showSuccess('Reset email sent — check your inbox.'); }
     }
   </script>
 </body>

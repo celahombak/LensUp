@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>LensUp — Analyse Your Photo</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase.js"></script>
   <style>
@@ -13,7 +13,7 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --black: #0a0a0a;
+      --black: #080808;
       --white: #f5f2ee;
       --gold: #c9a96e;
       --gold-light: #e8d5b0;
@@ -48,7 +48,7 @@
       position: sticky; top: 0; z-index: 100;
       backdrop-filter: blur(10px);
     }
-    .nav-logo { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 900; color: var(--gold); text-decoration: none; }
+    .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; letter-spacing: 0.04em; color: var(--gold); text-decoration: none; }
     .nav-logo span { color: var(--white); }
     .nav-links { display: flex; align-items: center; gap: 2rem; flex-wrap: wrap; }
     .nav-link { font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(245,242,238,0.5); text-decoration: none; transition: color 0.2s; }
@@ -59,7 +59,7 @@
 
     .app-header { margin-bottom: 2.5rem; }
     .app-tag { display: inline-block; color: var(--gold); font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 0.6rem; }
-    .app-header h1 { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 900; line-height: 1.1; }
+    .app-header h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(1.8rem, 4vw, 2.6rem); letter-spacing: 0.04em; line-height: 1.1; }
     .app-header h1 em { font-style: italic; color: var(--gold); }
     .app-header p { margin-top: 0.6rem; color: rgba(245,242,238,0.45); font-size: 0.88rem; line-height: 1.7; }
 
@@ -81,8 +81,8 @@
     .drop-sub span { color: var(--gold); }
 
     #preview-wrap { margin-top: 1.2rem; }
-    #preview-img { max-width: 100%; max-height: 280px; border-radius: 4px; border: 1px solid var(--border); display: block; }
-    .preview-filename { font-size: 0.75rem; color: var(--mid); margin-top: 0.5rem; }
+    #preview-img { width: 100%; height: 260px; object-fit: contain; border-radius: 6px; border: 1px solid var(--border); display: block; background: var(--dark2); }
+    .preview-filename { font-size: 0.75rem; color: var(--mid); margin-top: 0.6rem; text-align: center; }
     .btn-remove-file { background: none; border: none; cursor: pointer; color: var(--mid); font-size: 0.75rem; margin-top: 0.4rem; padding: 0; transition: color 0.2s; }
     .btn-remove-file:hover { color: #f08080; }
 
@@ -155,14 +155,14 @@
     }
     .result-overall-left { display: flex; align-items: center; gap: 1rem; }
     .overall-big {
-      font-family: 'Playfair Display', serif;
-      font-size: 3.5rem; font-weight: 900;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 3.5rem; letter-spacing: 0.04em;
       color: var(--gold); line-height: 1;
     }
     .overall-denom { font-size: 1.1rem; color: var(--mid); align-self: flex-end; margin-bottom: 0.3rem; }
     .overall-label-wrap { }
     .overall-verdict {
-      font-family: 'Playfair Display', serif;
+      font-family: 'Bebas Neue', sans-serif;
       font-size: 1.1rem; font-weight: 700;
       margin-bottom: 0.2rem;
     }
@@ -218,8 +218,8 @@
     }
     .category-icon { font-size: 1.3rem; }
     .category-score-badge {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.1rem; font-weight: 900;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem; letter-spacing: 0.04em;
       padding: 0.1rem 0.5rem;
       border-radius: 4px;
       background: rgba(255,255,255,0.05);
@@ -246,7 +246,7 @@
       margin-bottom: 1.5rem;
     }
     .improvements-title {
-      font-family: 'Playfair Display', serif;
+      font-family: 'Bebas Neue', sans-serif;
       font-size: 1.1rem; font-weight: 700;
       margin-bottom: 1.3rem;
       display: flex; align-items: center; gap: 0.6rem;
@@ -288,7 +288,7 @@
     /* ── HISTORY ── */
     .history-section { margin-top: 4rem; }
     .history-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
-    .history-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; }
+    .history-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem; font-weight: 700; }
     .btn-clear { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mid); background: none; border: none; cursor: pointer; transition: color 0.2s; }
     .btn-clear:hover { color: #f08080; }
     .history-empty { text-align: center; padding: 3rem; border: 1px dashed var(--border); border-radius: 8px; color: rgba(245,242,238,0.3); font-size: 0.85rem; }
@@ -297,7 +297,7 @@
     .history-item:hover { border-color: rgba(201,169,110,0.35); }
     .history-item-url { font-size: 0.8rem; color: rgba(245,242,238,0.5); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 400px; flex: 1; }
     .history-item-meta { display: flex; align-items: center; gap: 1rem; flex-shrink: 0; }
-    .history-score { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--gold); font-weight: 700; }
+    .history-score { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; color: var(--gold); font-weight: 700; }
     .history-date { font-size: 0.72rem; color: var(--mid); }
     .history-item-del { background: none; border: none; color: var(--mid); cursor: pointer; font-size: 1rem; transition: color 0.2s; padding: 0 0.3rem; }
     .history-item-del:hover { color: #f08080; }
@@ -327,6 +327,7 @@
     <div class="nav-links">
       <a href="leaderboard.html" class="nav-link">🏆 Leaderboard</a>
       <a href="learn.html" class="nav-link">Learn</a>
+      <a href="app.html" class="nav-link active">Analyse</a>
       <a href="gallery.html" class="nav-link">Gallery</a>
       <a href="profile.html" class="nav-link">Profile</a>
       <span id="navAuthArea"></span>
@@ -757,15 +758,14 @@
       return new Promise(resolve => {
         const img = new Image();
         img.onload = () => {
-          const canvas = document.createElement('canvas');
-          const MAX = 200;
+          const MAX = 600;
           let w = img.width, h = img.height;
           if (w > h && w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
           else if (h > MAX) { w = Math.round(w * MAX / h); h = MAX; }
+          const canvas = document.createElement('canvas');
           canvas.width = w; canvas.height = h;
           canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-          // Return just the base64 part, no prefix
-          const b64 = canvas.toDataURL('image/jpeg', 0.6).split(',')[1];
+          const b64 = canvas.toDataURL('image/jpeg', 0.85).split(',')[1];
           resolve(b64);
         };
         img.onerror = () => resolve(null);
