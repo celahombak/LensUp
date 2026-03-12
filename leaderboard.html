@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LensUp — Leaderboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --black: #0a0a0a; --white: #f5f2ee; --gold: #c9a96e;
+      --gold-light: #e8d5b0; --dark: #1a1714; --dark2: #141210;
+      --mid: #6b6560; --border: rgba(201,169,110,0.15);
+    }
+    html { scroll-behavior: smooth; }
+    body { background: var(--black); color: var(--white); font-family: 'DM Sans', sans-serif; font-weight: 300; min-height: 100vh; }
+
+    /* NAV */
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 1.2rem 3rem; border-bottom: 1px solid var(--border); background: rgba(10,10,10,0.97); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px); }
+    .nav-logo { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 900; color: var(--gold); text-decoration: none; }
+    .nav-logo span { color: var(--white); }
+    .nav-links { display: flex; align-items: center; gap: 2rem; flex-wrap: wrap; }
+    .nav-link { font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(245,242,238,0.5); text-decoration: none; transition: color 0.2s; }
+    .nav-link:hover, .nav-link.active { color: var(--gold); }
+
+    /* LAYOUT */
+    .wrap { max-width: 860px; margin: 0 auto; padding: 3rem 2rem 6rem; }
+
+    /* HEADER */
+    .page-tag { display: inline-block; color: var(--gold); font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 0.6rem; }
+    .page-header { margin-bottom: 0.6rem; }
+    .page-header h1 { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 900; line-height: 1.1; }
+    .page-header h1 em { font-style: italic; color: var(--gold); }
+    .page-sub { color: rgba(245,242,238,0.4); font-size: 0.88rem; margin-bottom: 2.5rem; }
+
+    /* TOP 3 PODIUM */
+    .podium { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 2.5rem; }
+    .podium-card {
+      background: var(--dark); border: 1px solid var(--border);
+      border-radius: 8px; padding: 1.5rem 1rem;
+      text-align: center; position: relative;
+      transition: border-color 0.2s;
+    }
+    .podium-card.rank-1 { border-color: rgba(201,169,110,0.4); background: linear-gradient(135deg, rgba(201,169,110,0.08) 0%, var(--dark) 60%); }
+    .podium-card.rank-2 { border-color: rgba(192,192,192,0.25); }
+    .podium-card.rank-3 { border-color: rgba(205,127,50,0.25); }
+    .podium-crown { font-size: 1.8rem; margin-bottom: 0.5rem; display: block; }
+    .podium-avatar { font-size: 2rem; margin-bottom: 0.5rem; display: block; }
+    .podium-name { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.3rem; }
+    .podium-score { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 900; color: var(--gold); line-height: 1; }
+    .podium-score-label { font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mid); margin-top: 0.2rem; }
+    .podium-analyses { font-size: 0.72rem; color: var(--mid); margin-top: 0.5rem; }
+    .rank-badge { position: absolute; top: 0.8rem; right: 0.8rem; font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mid); }
+
+    /* FULL TABLE */
+    .table-wrap { background: var(--dark); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    .table-header { padding: 1.2rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .table-title { font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); }
+    .table-count { font-size: 0.75rem; color: var(--mid); }
+
+    .lb-row {
+      display: grid;
+      grid-template-columns: 48px 1fr 80px 80px 70px;
+      align-items: center; gap: 1rem;
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid rgba(201,169,110,0.06);
+      transition: background 0.15s;
+    }
+    .lb-row:last-child { border-bottom: none; }
+    .lb-row:hover { background: rgba(201,169,110,0.03); }
+    .lb-row.top-row { background: rgba(201,169,110,0.04); }
+
+    .lb-rank { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: var(--mid); text-align: center; }
+    .lb-rank.gold { color: var(--gold); }
+    .lb-rank.silver { color: #c0c0c0; }
+    .lb-rank.bronze { color: #cd7f32; }
+
+    .lb-user { display: flex; align-items: center; gap: 0.8rem; min-width: 0; }
+    .lb-avatar { font-size: 1.4rem; flex-shrink: 0; }
+    .lb-name { font-size: 0.88rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .lb-you { font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold); margin-left: 0.4rem; vertical-align: middle; }
+
+    .lb-best { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; color: var(--gold); text-align: center; }
+    .lb-avg { font-size: 0.85rem; color: rgba(245,242,238,0.5); text-align: center; }
+    .lb-total { font-size: 0.78rem; color: var(--mid); text-align: center; }
+
+    .col-header { display: grid; grid-template-columns: 48px 1fr 80px 80px 70px; gap: 1rem; padding: 0.6rem 1.5rem; background: var(--dark2); }
+    .col-h { font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--mid); text-align: center; }
+    .col-h:nth-child(2) { text-align: left; }
+
+    /* LOADING / EMPTY */
+    .lb-loading { text-align: center; padding: 4rem 2rem; color: rgba(245,242,238,0.3); font-size: 0.88rem; }
+    .lb-spinner { width: 32px; height: 32px; border: 2px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 1rem; }
+    .lb-empty { text-align: center; padding: 4rem 2rem; color: rgba(245,242,238,0.3); font-size: 0.88rem; line-height: 1.8; }
+
+    /* YOUR RANK BANNER */
+    .your-rank-banner {
+      background: rgba(201,169,110,0.07); border: 1px solid rgba(201,169,110,0.2);
+      border-radius: 8px; padding: 1rem 1.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.8rem;
+    }
+    .your-rank-banner.hidden { display: none; }
+    .your-rank-left { display: flex; align-items: center; gap: 0.8rem; }
+    .your-rank-label { font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); }
+    .your-rank-val { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 900; color: var(--white); }
+    .your-rank-sub { font-size: 0.78rem; color: var(--mid); }
+    .btn-analyse-link { background: var(--gold); color: var(--black); border: none; padding: 0.6rem 1.2rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none; transition: background 0.2s; }
+    .btn-analyse-link:hover { background: var(--gold-light); }
+
+    /* REFRESH */
+    .refresh-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+    .btn-refresh { background: none; border: 1px solid var(--border); color: var(--mid); padding: 0.4rem 0.9rem; border-radius: 4px; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
+    .btn-refresh:hover { border-color: var(--gold); color: var(--gold); }
+    .last-updated { font-size: 0.72rem; color: var(--mid); }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+    @media (max-width: 600px) {
+      nav { padding: 1rem 1.2rem; }
+      .wrap { padding: 2rem 1rem 4rem; }
+      .podium { grid-template-columns: 1fr; }
+      .lb-row, .col-header { grid-template-columns: 40px 1fr 60px 60px; }
+      .lb-total, .col-h:last-child { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="index.html" class="nav-logo">Lens<span>Up</span></a>
+    <div class="nav-links">
+      <a href="leaderboard.html" class="nav-link active">🏆 Leaderboard</a>
+      <a href="learn.html" class="nav-link">Learn</a>
+      <a href="app.html" class="nav-link">Analyse</a>
+      <a href="gallery.html" class="nav-link">Gallery</a>
+      <a href="profile.html" class="nav-link">Profile</a>
+      <span id="navAuthArea"></span>
+    </div>
+  </nav>
+
+  <div class="wrap">
+
+    <div class="page-tag">Community Rankings</div>
+    <div class="page-header">
+      <h1>The <em>Leaderboard</em></h1>
+    </div>
+    <p class="page-sub">Ranked by best single score. Avg score used as tiebreaker.</p>
+
+    <!-- Your Rank Banner -->
+    <div class="your-rank-banner hidden" id="yourRankBanner">
+      <div class="your-rank-left">
+        <div>
+          <div class="your-rank-label">Your Rank</div>
+          <div class="your-rank-val" id="yourRankVal">—</div>
+        </div>
+        <div class="your-rank-sub" id="yourRankSub"></div>
+      </div>
+      <a href="app.html" class="btn-analyse-link">📷 Analyse Now</a>
+    </div>
+
+    <!-- Podium -->
+    <div class="podium" id="podium"></div>
+
+    <!-- Refresh row -->
+    <div class="refresh-row">
+      <span class="last-updated" id="lastUpdated"></span>
+      <button class="btn-refresh" onclick="loadLeaderboard()">↻ Refresh</button>
+    </div>
+
+    <!-- Full Table -->
+    <div class="table-wrap">
+      <div class="table-header">
+        <span class="table-title">All Rankings</span>
+        <span class="table-count" id="tableCount"></span>
+      </div>
+      <div class="col-header">
+        <div class="col-h">#</div>
+        <div class="col-h" style="text-align:left">Photographer</div>
+        <div class="col-h">Best</div>
+        <div class="col-h">Avg</div>
+        <div class="col-h">Shots</div>
+      </div>
+      <div id="lbBody">
+        <div class="lb-loading">
+          <div class="lb-spinner"></div>
+          Loading rankings…
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let currentUser = null;
+
+    async function init() {
+      try {
+        initSupabase();
+        currentUser = await getUser();
+        if (currentUser) renderNavAuth();
+      } catch(e) {}
+      await loadLeaderboard();
+    }
+
+    function renderNavAuth() {
+      const area = document.getElementById('navAuthArea');
+      const name = currentUser.user_metadata?.display_name || currentUser.email.split('@')[0];
+      area.innerHTML = `
+        <span style="font-size:0.78rem;color:rgba(245,242,238,0.35);">Hi, ${name}</span>
+        <button onclick="signOut()" style="font-size:0.78rem;letter-spacing:0.07em;text-transform:uppercase;color:rgba(245,242,238,0.35);background:none;border:none;cursor:pointer;padding:0;font-family:'DM Sans',sans-serif;" onmouseover="this.style.color='#c9a96e'" onmouseout="this.style.color='rgba(245,242,238,0.35)'">Sign Out</button>
+      `;
+    }
+
+    async function loadLeaderboard() {
+      document.getElementById('lbBody').innerHTML = `<div class="lb-loading"><div class="lb-spinner"></div>Loading rankings…</div>`;
+      document.getElementById('podium').innerHTML = '';
+
+      try {
+        const { data, error } = await sb
+          .from('profiles')
+          .select('id, display_name, avatar, best_score, avg_score, total_analyses')
+          .gt('total_analyses', 0)
+          .order('best_score', { ascending: false })
+          .order('avg_score', { ascending: false })
+          .limit(100);
+
+        if (error) throw error;
+        if (!data || data.length === 0) {
+          document.getElementById('lbBody').innerHTML = `<div class="lb-empty">No analyses yet.<br>Be the first to post a score! 📷</div>`;
+          document.getElementById('podium').innerHTML = '';
+          return;
+        }
+
+        renderPodium(data.slice(0, 3));
+        renderTable(data);
+
+        // Your rank
+        if (currentUser) {
+          const myIdx = data.findIndex(p => p.id === currentUser.id);
+          if (myIdx !== -1) {
+            const myProfile = data[myIdx];
+            document.getElementById('yourRankBanner').classList.remove('hidden');
+            document.getElementById('yourRankVal').textContent = `#${myIdx + 1} of ${data.length}`;
+            document.getElementById('yourRankSub').textContent = `Best: ${myProfile.best_score}/10 · Avg: ${myProfile.avg_score}`;
+          }
+        }
+
+        document.getElementById('lastUpdated').textContent = 'Updated ' + new Date().toLocaleTimeString();
+        document.getElementById('tableCount').textContent = data.length + ' photographers';
+
+      } catch(err) {
+        document.getElementById('lbBody').innerHTML = `<div class="lb-empty">Failed to load leaderboard.<br>Please try again.</div>`;
+      }
+    }
+
+    function renderPodium(top) {
+      const crowns = ['🥇', '🥈', '🥉'];
+      const rankClass = ['rank-1', 'rank-2', 'rank-3'];
+      // Reorder: 2nd, 1st, 3rd for visual podium effect
+      const order = top.length >= 3 ? [top[1], top[0], top[2]] : top.length === 2 ? [top[1], top[0]] : [top[0]];
+      const orderRanks = top.length >= 3 ? [1, 0, 2] : top.length === 2 ? [1, 0] : [0];
+
+      document.getElementById('podium').innerHTML = order.map((p, i) => {
+        const realRank = orderRanks[i];
+        const isYou = currentUser && p.id === currentUser.id;
+        return `
+          <div class="podium-card ${rankClass[realRank]}">
+            <span class="rank-badge">#${realRank + 1}</span>
+            <span class="podium-crown">${crowns[realRank]}</span>
+            <span class="podium-avatar">${p.avatar || '📷'}</span>
+            <div class="podium-name">${p.display_name}${isYou ? ' <span style="color:var(--gold);font-size:0.65rem;">YOU</span>' : ''}</div>
+            <div class="podium-score">${p.best_score}</div>
+            <div class="podium-score-label">Best Score</div>
+            <div class="podium-analyses">${p.total_analyses} shot${p.total_analyses !== 1 ? 's' : ''} · avg ${p.avg_score}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderTable(data) {
+      const rankColors = ['gold', 'silver', 'bronze'];
+      document.getElementById('lbBody').innerHTML = data.map((p, i) => {
+        const isYou = currentUser && p.id === currentUser.id;
+        const rankClass = i < 3 ? rankColors[i] : '';
+        return `
+          <div class="lb-row ${i < 3 ? 'top-row' : ''}">
+            <div class="lb-rank ${rankClass}">${i + 1}</div>
+            <div class="lb-user">
+              <span class="lb-avatar">${p.avatar || '📷'}</span>
+              <span class="lb-name">${p.display_name}${isYou ? '<span class="lb-you">you</span>' : ''}</span>
+            </div>
+            <div class="lb-best">${p.best_score}</div>
+            <div class="lb-avg">${p.avg_score}</div>
+            <div class="lb-total">${p.total_analyses}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    init();
+  </script>
+</body>
+</html>
