@@ -1,1498 +1,500 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LensUp</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
-<style>
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-:root{
-  --bg:#0f0e0c;
-  --s1:#1a1814;
-  --s2:#242018;
-  --s3:#2e2a22;
-  --border:#3a342a;
-  --border2:#4a4238;
-  --ink:#f0ebe3;
-  --ink2:#c8bfb0;
-  --muted:#7a7060;
-  --muted2:#5a5248;
-  --amber:#e8a030;
-  --amber2:#c8841a;
-  --amberbg:rgba(232,160,48,.1);
-  --green:#5a9448;
-  --greenbg:rgba(90,148,72,.1);
-  --red:#c04848;
-  --redbg:rgba(192,72,72,.1);
-}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LensUp — AI Photo Analysis</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html,body{height:100%;background:#080706;font-family:'DM Sans',sans-serif;color:var(--ink)}
-body{display:flex;align-items:center;justify-content:center;min-height:100vh}
+    :root {
+      --black: #0a0a0a;
+      --white: #f5f2ee;
+      --cream: #ede9e3;
+      --gold: #c9a96e;
+      --gold-light: #e8d5b0;
+      --dark: #1a1714;
+      --mid: #6b6560;
+    }
 
-/* ── PHONE SHELL ── */
-.phone{
-  width:390px;height:844px;
-  background:var(--bg);
-  border-radius:48px;overflow:hidden;
-  position:relative;display:flex;flex-direction:column;
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,.08),
-    0 0 0 10px #0a0908,
-    0 0 0 11px rgba(255,255,255,.04),
-    0 80px 240px rgba(0,0,0,.9);
-}
-.notch{
-  position:absolute;top:0;left:50%;transform:translateX(-50%);
-  width:126px;height:34px;background:#080706;
-  border-radius:0 0 20px 20px;z-index:100
-}
-.statusbar{
-  height:50px;display:flex;align-items:flex-end;
-  justify-content:space-between;padding:0 24px 10px;
-  font-size:12px;font-weight:600;color:var(--ink2);
-  flex-shrink:0;position:relative;z-index:10
-}
+    html { scroll-behavior: smooth; }
 
-/* ── SCREENS ── */
-.screen{
-  position:absolute;inset:0;
-  display:flex;flex-direction:column;
-  opacity:0;pointer-events:none;
-  transition:opacity .22s ease
-}
-.screen.active{opacity:1;pointer-events:all}
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+    }
 
-/* ── SCROLL AREA ── */
-.scroll{flex:1;overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
-.scroll::-webkit-scrollbar{display:none}
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.4rem 4rem;
+      background: rgba(10,10,10,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(201,169,110,0.15);
+    }
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem; font-weight: 900;
+      color: var(--gold);
+      letter-spacing: 0.02em;
+    }
+    .nav-logo span { color: var(--white); }
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+    .nav-links a {
+      color: var(--white); text-decoration: none;
+      font-size: 0.85rem; font-weight: 400;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      opacity: 0.7; transition: opacity 0.2s;
+    }
+    .nav-links a:hover { opacity: 1; color: var(--gold); }
+    .nav-cta {
+      background: var(--gold); color: var(--black);
+      padding: 0.6rem 1.5rem; border-radius: 2px;
+      text-decoration: none; font-size: 0.8rem;
+      font-weight: 500; letter-spacing: 0.1em;
+      text-transform: uppercase; transition: background 0.2s;
+    }
+    .nav-cta:hover { background: var(--gold-light); }
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+    .hamburger span { width: 24px; height: 2px; background: var(--white); display: block; transition: 0.3s; }
 
-/* ── BOTTOM NAV ── */
-.nav{
-  height:80px;background:var(--s1);
-  border-top:1px solid var(--border);
-  display:flex;align-items:center;
-  padding:0 8px 16px;flex-shrink:0;
-  position:relative
-}
-.nav-tab{
-  flex:1;display:flex;flex-direction:column;
-  align-items:center;gap:4px;
-  padding:8px 0;border:none;background:none;cursor:pointer
-}
-.nav-tab svg{width:20px;height:20px;stroke:var(--muted);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:stroke .2s}
-.nav-tab span{font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);transition:color .2s;font-family:'DM Sans',sans-serif}
-.nav-tab.on svg{stroke:var(--amber)}
-.nav-tab.on span{color:var(--amber)}
-.fab{
-  width:52px;height:52px;border-radius:16px;
-  background:var(--amber);border:none;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  margin-top:-16px;flex-shrink:0;
-  box-shadow:0 8px 28px rgba(232,160,48,.35);
-  transition:all .15s
-}
-.fab:active{transform:scale(.93)}
-.fab svg{width:22px;height:22px;stroke:#0f0e0c;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex; align-items: center;
+      padding: 8rem 4rem 4rem;
+      position: relative; overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 60% 60% at 70% 50%, rgba(201,169,110,0.07) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 20% 80%, rgba(201,169,110,0.04) 0%, transparent 60%);
+    }
+    .hero-grid {
+      position: absolute; inset: 0; opacity: 0.03;
+      background-image: linear-gradient(var(--gold) 1px, transparent 1px),
+                        linear-gradient(90deg, var(--gold) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+    .hero-content { position: relative; max-width: 680px; }
+    .hero-tag {
+      display: inline-block;
+      border: 1px solid rgba(201,169,110,0.4);
+      color: var(--gold); font-size: 0.72rem;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      padding: 0.4rem 1rem; margin-bottom: 2rem;
+      animation: fadeUp 0.8s ease both;
+    }
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3rem, 7vw, 5.5rem);
+      font-weight: 900; line-height: 1.05;
+      margin-bottom: 1.5rem;
+      animation: fadeUp 0.8s 0.15s ease both;
+    }
+    .hero h1 em {
+      font-style: italic; color: var(--gold);
+    }
+    .hero p {
+      font-size: 1.1rem; line-height: 1.8;
+      color: rgba(245,242,238,0.65);
+      max-width: 500px; margin-bottom: 2.5rem;
+      animation: fadeUp 0.8s 0.3s ease both;
+    }
+    .hero-actions {
+      display: flex; gap: 1rem; align-items: center;
+      animation: fadeUp 0.8s 0.45s ease both;
+      flex-wrap: wrap;
+    }
+    .btn-primary {
+      background: var(--gold); color: var(--black);
+      padding: 0.9rem 2.2rem; border-radius: 2px;
+      text-decoration: none; font-size: 0.85rem;
+      font-weight: 500; letter-spacing: 0.1em;
+      text-transform: uppercase; transition: all 0.2s;
+      display: inline-block;
+    }
+    .btn-primary:hover { background: var(--gold-light); transform: translateY(-1px); }
+    .btn-ghost {
+      color: var(--white); text-decoration: none;
+      font-size: 0.85rem; letter-spacing: 0.08em;
+      text-transform: uppercase; opacity: 0.6;
+      display: flex; align-items: center; gap: 0.5rem;
+      transition: opacity 0.2s;
+    }
+    .btn-ghost:hover { opacity: 1; }
+    .btn-ghost::after { content: '→'; }
 
-/* ── COMMON COMPONENTS ── */
-.card{background:var(--s1);border:1px solid var(--border);border-radius:16px}
-.pill{display:inline-flex;align-items:center;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:6px}
-.pill-amber{background:var(--amberbg);color:var(--amber)}
-.pill-green{background:var(--greenbg);color:var(--green)}
-.pill-red{background:var(--redbg);color:var(--red)}
-.field{
-  width:100%;padding:13px 16px;
-  background:var(--s2);border:1.5px solid var(--border);border-radius:12px;
-  font-family:'DM Sans',sans-serif;font-size:14px;color:var(--ink);outline:none;
-  transition:border-color .2s
-}
-.field:focus{border-color:var(--amber);background:var(--s3)}
-.field::placeholder{color:var(--muted)}
-.btn{
-  width:100%;padding:14px;border-radius:12px;border:none;cursor:pointer;
-  font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;
-  transition:all .15s
-}
-.btn-primary{background:var(--amber);color:#0f0e0c}
-.btn-primary:hover{background:var(--amber2)}
-.btn-primary:active{transform:scale(.98)}
-.btn-ghost{background:var(--s2);color:var(--ink2);border:1.5px solid var(--border)}
-.btn-ghost:active{background:var(--s3)}
-.lbl{font-size:10px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:8px}
+    .hero-visual {
+      position: absolute; right: 4rem; top: 50%;
+      transform: translateY(-50%);
+      display: flex; flex-direction: column; gap: 1rem;
+      animation: fadeIn 1.2s 0.6s ease both;
+    }
+    .photo-card {
+      width: 220px; background: var(--dark);
+      border: 1px solid rgba(201,169,110,0.15);
+      border-radius: 4px; overflow: hidden;
+      position: relative;
+    }
+    .photo-card:nth-child(2) { margin-left: 40px; }
+    .photo-card-img {
+      width: 100%; height: 140px;
+      background: linear-gradient(135deg, #2a2520, #1a1714);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.5rem; opacity: 0.4;
+    }
+    .photo-card-body { padding: 0.8rem; }
+    .photo-card-label {
+      font-size: 0.65rem; color: var(--gold);
+      letter-spacing: 0.15em; text-transform: uppercase;
+      margin-bottom: 0.3rem;
+    }
+    .photo-card-text {
+      font-size: 0.75rem; color: rgba(245,242,238,0.5);
+      line-height: 1.5;
+    }
+    .score-badge {
+      position: absolute; top: 0.6rem; right: 0.6rem;
+      background: var(--gold); color: var(--black);
+      font-size: 0.7rem; font-weight: 500;
+      padding: 0.2rem 0.5rem; border-radius: 2px;
+    }
 
-/* ── TOAST ── */
-.toast-wrap{
-  position:absolute;top:58px;left:16px;right:16px;z-index:999;
-  pointer-events:none
-}
-.toast{
-  background:var(--s3);color:var(--ink);border:1px solid var(--border);
-  border-radius:10px;padding:11px 16px;font-size:13px;font-weight:500;
-  text-align:center;
-  opacity:0;transform:translateY(-8px);
-  transition:all .25s
-}
-.toast.show{opacity:1;transform:translateY(0)}
+    /* ── STATS ── */
+    .stats {
+      padding: 3rem 4rem;
+      border-top: 1px solid rgba(201,169,110,0.1);
+      border-bottom: 1px solid rgba(201,169,110,0.1);
+      display: flex; justify-content: center; gap: 5rem;
+      flex-wrap: wrap;
+    }
+    .stat { text-align: center; }
+    .stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem; color: var(--gold);
+      font-weight: 700; display: block;
+    }
+    .stat-label {
+      font-size: 0.75rem; letter-spacing: 0.12em;
+      text-transform: uppercase; opacity: 0.5;
+      margin-top: 0.3rem;
+    }
 
-/* ── LOADER ── */
-.loader{
-  position:absolute;inset:0;background:rgba(15,14,12,.88);
-  display:none;align-items:center;justify-content:center;
-  flex-direction:column;gap:16px;z-index:800
-}
-.loader.on{display:flex}
-.spinner{
-  width:40px;height:40px;
-  border:2.5px solid var(--border2);
-  border-top-color:var(--amber);
-  border-radius:50%;
-  animation:spin .7s linear infinite
-}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loader-msg{font-size:13px;color:var(--muted);animation:pulse 1.5s ease infinite}
-@keyframes pulse{0%,100%{opacity:.3}50%{opacity:1}}
+    /* ── HOW IT WORKS ── */
+    .section { padding: 6rem 4rem; }
+    .section-tag {
+      display: inline-block;
+      color: var(--gold); font-size: 0.72rem;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 900; line-height: 1.15;
+      margin-bottom: 1rem;
+    }
+    .section-sub {
+      color: rgba(245,242,238,0.55);
+      font-size: 1rem; line-height: 1.8;
+      max-width: 480px; margin-bottom: 3.5rem;
+    }
 
-/* ── MODAL OVERLAY ── */
-.overlay{
-  position:absolute;inset:0;background:rgba(8,7,6,.6);
-  z-index:500;display:none;align-items:flex-end
-}
-.overlay.open{display:flex}
-.sheet{
-  background:var(--s1);border-radius:24px 24px 0 0;
-  width:100%;max-height:92%;overflow-y:auto;
-  border-top:1px solid var(--border);
-  animation:sheetup .28s cubic-bezier(.16,1,.3,1)
-}
-@keyframes sheetup{from{transform:translateY(100%)}to{transform:none}}
-.sheet-pull{width:36px;height:3px;background:var(--border2);border-radius:2px;margin:14px auto 20px}
-.sheet-hdr{
-  padding:0 20px 16px;display:flex;align-items:center;
-  justify-content:space-between;border-bottom:1px solid var(--border)
-}
-.sheet-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--ink)}
-.close-btn{
-  width:30px;height:30px;border-radius:8px;background:var(--s2);
-  border:none;cursor:pointer;display:flex;align-items:center;justify-content:center
-}
-.close-btn svg{width:14px;height:14px;stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round}
+    .steps { display: flex; gap: 2rem; flex-wrap: wrap; }
+    .step {
+      flex: 1; min-width: 220px;
+      padding: 2rem;
+      background: var(--dark);
+      border: 1px solid rgba(201,169,110,0.1);
+      border-radius: 4px;
+      position: relative;
+      transition: border-color 0.3s;
+    }
+    .step:hover { border-color: rgba(201,169,110,0.35); }
+    .step-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 3.5rem; font-weight: 900;
+      color: rgba(201,169,110,0.12);
+      line-height: 1; margin-bottom: 1rem;
+    }
+    .step-icon { font-size: 1.8rem; margin-bottom: 1rem; }
+    .step h3 {
+      font-size: 1rem; font-weight: 500;
+      margin-bottom: 0.6rem; letter-spacing: 0.03em;
+    }
+    .step p {
+      font-size: 0.85rem; line-height: 1.7;
+      color: rgba(245,242,238,0.5);
+    }
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   SCREEN: LOGIN
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-#s-login{background:var(--bg);padding-top:50px}
-.login-top{
-  flex:1;display:flex;flex-direction:column;
-  align-items:flex-start;justify-content:flex-end;
-  padding:32px 32px 36px;position:relative;overflow:hidden
-}
-/* decorative background */
-.login-glow{
-  position:absolute;width:260px;height:260px;border-radius:50%;
-  background:radial-gradient(circle,rgba(232,160,48,.15) 0%,transparent 70%);
-  top:-60px;right:-60px;pointer-events:none
-}
-.login-grid{
-  position:absolute;inset:0;pointer-events:none;
-  background-image:
-    linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
-  background-size:36px 36px
-}
-.login-badge{
-  font-size:10px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;
-  color:var(--amber);margin-bottom:16px;
-  animation:fadeup .5s .1s both ease
-}
-.login-logo{
-  font-family:'Syne',sans-serif;font-size:52px;font-weight:800;
-  color:var(--ink);letter-spacing:-.04em;line-height:1;
-  animation:fadeup .5s .2s both ease
-}
-.login-logo .dot{color:var(--amber)}
-.login-sub{
-  font-size:14px;color:var(--muted);margin-top:12px;line-height:1.6;
-  animation:fadeup .5s .3s both ease
-}
-@keyframes fadeup{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+    /* ── FEATURES ── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5px;
+      background: rgba(201,169,110,0.1);
+      border: 1px solid rgba(201,169,110,0.1);
+    }
+    .feature {
+      padding: 2.5rem;
+      background: var(--black);
+      transition: background 0.3s;
+    }
+    .feature:hover { background: var(--dark); }
+    .feature-icon {
+      font-size: 1.8rem; margin-bottom: 1.2rem;
+      display: block;
+    }
+    .feature h3 {
+      font-size: 1rem; font-weight: 500;
+      margin-bottom: 0.6rem;
+      letter-spacing: 0.03em;
+    }
+    .feature p {
+      font-size: 0.85rem; line-height: 1.7;
+      color: rgba(245,242,238,0.5);
+    }
 
-.login-form{
-  background:var(--s1);border-radius:28px 28px 0 0;
-  border-top:1px solid var(--border);
-  padding:28px 28px 36px;flex-shrink:0
-}
-.login-form-h{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--ink);margin-bottom:4px}
-.login-form-sub{font-size:13px;color:var(--muted);margin-bottom:22px}
-.social-row{display:flex;flex-direction:column;gap:10px;margin-bottom:18px}
-.social-btn{
-  display:flex;align-items:center;gap:12px;padding:13px 16px;
-  background:var(--s2);border:1.5px solid var(--border);border-radius:12px;
-  font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;color:var(--ink2);
-  cursor:pointer;transition:all .15s
-}
-.social-btn:hover{border-color:var(--border2);background:var(--s3)}
-.social-btn .ico{width:20px;height:20px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
-.social-btn .arr{margin-left:auto;font-size:16px;color:var(--muted)}
-.or-row{display:flex;align-items:center;gap:12px;margin:0 0 16px}
-.or-line{flex:1;height:1px;background:var(--border)}
-.or-txt{font-size:11px;font-weight:500;color:var(--muted2);letter-spacing:.08em;text-transform:uppercase}
-.login-form .field{margin-bottom:10px}
+    /* ── CTA SECTION ── */
+    .cta-section {
+      padding: 6rem 4rem;
+      text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .cta-section::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 50% 80% at 50% 50%, rgba(201,169,110,0.08) 0%, transparent 70%);
+    }
+    .cta-section > * { position: relative; }
+    .cta-section .section-title { max-width: 560px; margin: 0 auto 1rem; }
+    .cta-section .section-sub { margin: 0 auto 2.5rem; text-align: center; }
+    .cta-big {
+      background: var(--gold); color: var(--black);
+      padding: 1.1rem 3rem; border-radius: 2px;
+      text-decoration: none; font-size: 0.9rem;
+      font-weight: 500; letter-spacing: 0.1em;
+      text-transform: uppercase; transition: all 0.2s;
+      display: inline-block;
+    }
+    .cta-big:hover { background: var(--gold-light); transform: translateY(-2px); }
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   SCREEN: SETUP
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-#s-setup{background:var(--bg)}
-.setup-top{
-  padding:58px 24px 22px;
-  background:var(--s1);border-bottom:1px solid var(--border);flex-shrink:0
-}
-.setup-eyebrow{font-size:10px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--amber);margin-bottom:10px}
-.setup-h{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--ink);letter-spacing:-.02em;line-height:1.2}
-.setup-body{flex:1;overflow-y:auto;padding:22px 24px 0;scrollbar-width:none}
-.setup-body::-webkit-scrollbar{display:none}
-.av-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:4px}
-.av-cell{
-  aspect-ratio:1;border-radius:12px;
-  background:var(--s2);border:1.5px solid var(--border);
-  display:flex;align-items:center;justify-content:center;
-  font-size:22px;cursor:pointer;transition:all .15s
-}
-.av-cell.on{border-color:var(--amber);background:var(--amberbg)}
-.setup-foot{padding:16px 24px 28px;background:var(--s1);border-top:1px solid var(--border);flex-shrink:0}
+    /* ── FOOTER ── */
+    footer {
+      padding: 2rem 4rem;
+      border-top: 1px solid rgba(201,169,110,0.1);
+      display: flex; align-items: center;
+      justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+    }
+    .footer-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem; color: var(--gold); font-weight: 900;
+    }
+    .footer-logo span { color: var(--white); }
+    footer p {
+      font-size: 0.8rem; opacity: 0.4;
+      letter-spacing: 0.05em;
+    }
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   SCREEN: MAIN APP
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-#s-app{background:var(--bg)}
-.app-inner{flex:1;overflow:hidden;display:flex;flex-direction:column}
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
 
-/* tabs */
-.tab-content{display:none;flex:1;overflow-y:auto;scrollbar-width:none}
-.tab-content::-webkit-scrollbar{display:none}
-.tab-content.on{display:block}
+    /* ── MOBILE ── */
+    @media (max-width: 768px) {
+      nav { padding: 1.2rem 1.5rem; }
+      .nav-links, .nav-cta { display: none; }
+      .hamburger { display: flex; }
+      .hero { padding: 7rem 1.5rem 3rem; min-height: auto; }
+      .hero-visual { display: none; }
+      .stats { padding: 2.5rem 1.5rem; gap: 2rem; }
+      .section { padding: 4rem 1.5rem; }
+      .steps { flex-direction: column; }
+      .cta-section { padding: 4rem 1.5rem; }
+      footer { padding: 2rem 1.5rem; flex-direction: column; text-align: center; }
+    }
 
-/* PAGE HEADER */
-.pg-hdr{
-  padding:16px 20px 14px;
-  background:var(--s1);border-bottom:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;
-  position:sticky;top:0;z-index:20;flex-shrink:0
-}
-.pg-logo{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--ink);letter-spacing:-.02em}
-.pg-logo .dot{color:var(--amber)}
-.pg-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--ink)}
-.icon-btn{
-  width:34px;height:34px;border-radius:9px;
-  background:var(--s2);border:1px solid var(--border);
-  display:flex;align-items:center;justify-content:center;cursor:pointer
-}
-.icon-btn svg{width:16px;height:16px;stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-
-/* ── FEED ── */
-.stories-row{
-  display:flex;gap:12px;padding:14px 20px;
-  overflow-x:auto;scrollbar-width:none;
-  background:var(--s1);border-bottom:1px solid var(--border)
-}
-.stories-row::-webkit-scrollbar{display:none}
-.story{display:flex;flex-direction:column;align-items:center;gap:5px;flex-shrink:0;cursor:pointer}
-.story-ring{
-  width:52px;height:52px;border-radius:16px;padding:2.5px;
-  background:linear-gradient(135deg,var(--amber),#f0c060)
-}
-.story-ring.seen{background:var(--border)}
-.story-av{
-  width:100%;height:100%;border-radius:13px;
-  background:var(--s3);display:flex;align-items:center;
-  justify-content:center;font-size:20px;
-  border:2px solid var(--bg)
-}
-.story-lbl{font-size:9px;font-weight:500;color:var(--muted);max-width:52px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.story-add .story-ring{background:none;border:1.5px dashed var(--border2);padding:0}
-.story-add .story-av{border:none;font-size:18px;color:var(--muted)}
-
-.post{background:var(--s1);border-bottom:1px solid var(--border)}
-.post-hdr{padding:12px 16px;display:flex;align-items:center;gap:10px}
-.post-av{
-  width:34px;height:34px;border-radius:10px;
-  background:var(--s3);border:1px solid var(--border);
-  display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0
-}
-.post-info{flex:1}
-.post-name{font-size:13px;font-weight:600;color:var(--ink)}
-.post-meta{font-size:11px;color:var(--muted);margin-top:1px}
-.post-score{font-size:13px;font-weight:700;padding:4px 10px;border-radius:20px;letter-spacing:-.01em}
-.post-img{
-  width:100%;aspect-ratio:1;background:var(--s3);
-  display:flex;align-items:center;justify-content:center;
-  font-size:56px;position:relative;overflow:hidden;cursor:pointer
-}
-.post-img img{width:100%;height:100%;object-fit:cover;display:block}
-.post-badge{
-  position:absolute;bottom:10px;right:10px;
-  background:rgba(15,14,12,.8);backdrop-filter:blur(8px);
-  font-size:12px;font-weight:700;color:var(--ink);
-  padding:5px 10px;border-radius:8px;border:1px solid var(--border)
-}
-.post-actions{padding:10px 16px 6px;display:flex;align-items:center;gap:14px}
-.act{
-  display:flex;align-items:center;gap:5px;
-  font-size:12px;font-weight:500;color:var(--muted);
-  border:none;background:none;cursor:pointer;font-family:'DM Sans',sans-serif
-}
-.act svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;flex-shrink:0}
-.act.liked{color:var(--red)}
-.act.liked svg{fill:var(--red);stroke:var(--red)}
-.post-cap{padding:2px 16px 14px}
-.cap-name{font-size:13px;font-weight:600;color:var(--ink)}
-.cap-txt{font-size:13px;color:var(--muted);line-height:1.5}
-
-.empty-state{padding:72px 28px;text-align:center}
-.empty-icon{font-size:48px;margin-bottom:14px}
-.empty-h{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--ink);margin-bottom:6px}
-.empty-sub{font-size:13px;color:var(--muted);line-height:1.6}
-
-/* ── RANKINGS ── */
-.rank-tabs{
-  display:flex;margin:16px 20px;
-  background:var(--s2);border-radius:10px;padding:3px;border:1px solid var(--border)
-}
-.rtab{
-  flex:1;padding:8px;border-radius:8px;
-  font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
-  border:none;background:none;color:var(--muted);cursor:pointer;
-  transition:all .18s;font-family:'DM Sans',sans-serif
-}
-.rtab.on{background:var(--s3);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.3)}
-.podium-wrap{margin:0 20px 16px}
-.podium-card{background:var(--s1);border-radius:18px;padding:22px 16px;border:1px solid var(--border)}
-.podium-row{display:flex;align-items:flex-end;justify-content:center;gap:8px}
-.pod{display:flex;flex-direction:column;align-items:center;gap:5px}
-.pod-av{border-radius:12px;background:var(--s3);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center}
-.pod1 .pod-av{width:58px;height:58px;font-size:26px;border-color:var(--amber)}
-.pod2 .pod-av,.pod3 .pod-av{width:44px;height:44px;font-size:20px}
-.pod-name{font-size:10px;font-weight:500;color:var(--muted);max-width:62px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.pod-score{font-size:15px;font-weight:700;color:var(--ink);letter-spacing:-.01em}
-.pod1 .pod-score{font-size:19px;color:var(--amber)}
-.pod-bar{height:4px;border-radius:2px;margin-top:2px}
-.pod1 .pod-bar{background:var(--amber);width:54px}
-.pod2 .pod-bar,.pod3 .pod-bar{background:var(--border2);width:40px}
-.rank-list{padding:0 20px 20px;display:flex;flex-direction:column;gap:6px}
-.rank-row{
-  background:var(--s1);border-radius:12px;padding:12px 14px;
-  display:flex;align-items:center;gap:11px;border:1px solid var(--border)
-}
-.rank-row.me{border-color:rgba(232,160,48,.3);background:var(--amberbg)}
-.rank-pos{font-size:14px;font-weight:700;width:22px;text-align:center;color:var(--muted2);flex-shrink:0}
-.rank-av{width:36px;height:36px;border-radius:10px;background:var(--s3);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;border:1px solid var(--border)}
-.rank-info{flex:1}
-.rank-name{font-size:13px;font-weight:600;color:var(--ink)}
-.rank-sub{font-size:11px;color:var(--muted);margin-top:1px}
-.rank-score{font-size:17px;font-weight:700;color:var(--amber);letter-spacing:-.02em}
-.you-tag{display:inline-block;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:var(--amberbg);color:var(--amber);padding:2px 5px;border-radius:4px;margin-left:5px}
-
-/* ── LEARN ── */
-.learn-banner{
-  margin:16px 20px;border-radius:16px;
-  background:linear-gradient(135deg,var(--s2) 0%,var(--s3) 100%);
-  border:1px solid var(--border);padding:20px;
-  display:flex;align-items:center;gap:14px;position:relative;overflow:hidden
-}
-.learn-banner::after{
-  content:'◎';position:absolute;right:-8px;bottom:-20px;
-  font-size:100px;color:rgba(232,160,48,.06);pointer-events:none
-}
-.banner-ico{
-  width:44px;height:44px;border-radius:12px;
-  background:var(--amberbg);border:1px solid rgba(232,160,48,.2);
-  display:flex;align-items:center;justify-content:center;flex-shrink:0
-}
-.banner-ico svg{width:20px;height:20px;stroke:var(--amber);fill:none;stroke-width:2;stroke-linecap:round}
-.banner-h{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--ink);margin-bottom:3px}
-.banner-sub{font-size:11px;color:var(--muted);line-height:1.5}
-.learn-cats{display:flex;gap:7px;padding:0 20px 14px;overflow-x:auto;scrollbar-width:none}
-.learn-cats::-webkit-scrollbar{display:none}
-.cat-btn{
-  padding:7px 14px;border-radius:20px;font-size:11px;font-weight:600;
-  letter-spacing:.06em;text-transform:uppercase;background:var(--s2);
-  border:1.5px solid var(--border);color:var(--muted);
-  white-space:nowrap;cursor:pointer;flex-shrink:0;font-family:'DM Sans',sans-serif;
-  transition:all .15s
-}
-.cat-btn.on{background:var(--amber);border-color:var(--amber);color:#0f0e0c}
-.lessons{padding:0 20px 24px;display:flex;flex-direction:column;gap:8px}
-.lesson-card{
-  background:var(--s1);border:1px solid var(--border);border-radius:12px;
-  padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;
-  transition:border-color .15s
-}
-.lesson-card:active{background:var(--s2)}
-.lesson-ico{
-  width:42px;height:42px;border-radius:11px;
-  display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0
-}
-.lic-a{background:rgba(232,160,48,.1)}
-.lic-b{background:rgba(90,148,72,.1)}
-.lic-c{background:rgba(60,120,200,.1)}
-.lic-d{background:rgba(180,80,160,.1)}
-.lesson-body{flex:1}
-.lesson-h{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:2px}
-.lesson-sub{font-size:11px;color:var(--muted);line-height:1.4}
-.lvl{font-size:9px;font-weight:600;padding:3px 7px;border-radius:5px;letter-spacing:.04em;text-transform:uppercase}
-.lvl-beg{background:var(--greenbg);color:var(--green)}
-.lvl-mid{background:rgba(60,120,200,.1);color:#5a9aE0}
-.lvl-adv{background:var(--redbg);color:var(--red)}
-
-/* ── PROFILE ── */
-.prof-hdr{
-  background:var(--s1);border-bottom:1px solid var(--border);
-  padding:52px 20px 20px;display:flex;align-items:flex-end;gap:16px;flex-shrink:0
-}
-.prof-av-big{
-  width:72px;height:72px;border-radius:20px;
-  background:var(--s3);border:2px solid var(--border);
-  display:flex;align-items:center;justify-content:center;font-size:32px;flex-shrink:0
-}
-.prof-name{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--ink);letter-spacing:-.02em}
-.prof-handle{font-size:12px;color:var(--muted);margin-top:3px}
-.prof-stats{
-  display:flex;background:var(--s1);border-bottom:1px solid var(--border);flex-shrink:0
-}
-.pstat{flex:1;padding:16px 0;text-align:center;border-right:1px solid var(--border)}
-.pstat:last-child{border-right:none}
-.pstat-val{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--amber);letter-spacing:-.02em}
-.pstat-lbl{font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:2px}
-.gal-hdr{padding:16px 20px 10px;font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
-.gal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
-.gal-cell{
-  aspect-ratio:1;background:var(--s3);
-  display:flex;align-items:center;justify-content:center;
-  font-size:28px;position:relative;overflow:hidden;cursor:pointer
-}
-.gal-cell img{width:100%;height:100%;object-fit:cover}
-.gal-score{
-  position:absolute;bottom:4px;right:4px;
-  background:rgba(15,14,12,.8);font-size:10px;font-weight:700;
-  padding:2px 5px;border-radius:4px;color:var(--ink)
-}
-.prof-empty{padding:36px 20px;text-align:center;color:var(--muted);font-size:13px;line-height:1.7}
-
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   UPLOAD SHEET
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-.drop-zone{
-  margin:16px 20px;border-radius:14px;
-  border:1.5px dashed var(--border2);background:var(--s2);
-  min-height:180px;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:10px;
-  cursor:pointer;padding:28px;transition:all .2s
-}
-.drop-zone.drag{border-color:var(--amber);background:var(--amberbg)}
-.drop-zone.filled{border-color:var(--amber);padding:0;overflow:hidden}
-.drop-zone img{width:100%;max-height:220px;object-fit:contain;border-radius:12px;display:block}
-.dz-icon{
-  width:44px;height:44px;border-radius:12px;background:var(--s3);
-  display:flex;align-items:center;justify-content:center
-}
-.dz-icon svg{width:20px;height:20px;stroke:var(--muted);fill:none;stroke-width:1.8;stroke-linecap:round}
-.dz-h{font-size:14px;font-weight:500;color:var(--ink2)}
-.dz-sub{font-size:11px;color:var(--muted);text-align:center}
-.cap-textarea{
-  margin:0 20px 14px;padding:12px 14px;
-  background:var(--s2);border:1.5px solid var(--border);border-radius:12px;
-  font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink);
-  outline:none;resize:none;width:calc(100% - 40px);
-  transition:border-color .2s
-}
-.cap-textarea:focus{border-color:var(--amber)}
-.cap-textarea::placeholder{color:var(--muted)}
-.upload-actions{padding:0 20px 16px;display:flex;flex-direction:column;gap:8px}
-
-/* AI RESULT */
-.result-wrap{padding:0 20px 4px;display:none}
-.result-wrap.on{display:block}
-.score-card{
-  background:var(--s2);border:1px solid var(--border);border-radius:16px;
-  padding:18px;display:flex;align-items:center;gap:16px;margin-bottom:12px
-}
-.ring-wrap{position:relative;width:68px;height:68px;flex-shrink:0}
-.ring-svg{transform:rotate(-90deg)}
-.ring-num-wrap{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.ring-num{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--ink);line-height:1;letter-spacing:-.02em}
-.ring-den{font-size:9px;color:var(--muted);font-weight:500}
-.score-meta .score-lbl{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--ink);margin-bottom:4px}
-.score-meta .score-fb{font-size:11px;color:var(--muted);line-height:1.55}
-.breakdown{background:var(--s2);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:12px}
-.section-lbl{font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
-.br-row{margin-bottom:11px}
-.br-row:last-child{margin-bottom:0}
-.br-top{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:5px}
-.br-top span:last-child{font-weight:600;color:var(--ink)}
-.br-track{height:3px;background:var(--s3);border-radius:10px;overflow:hidden}
-.br-fill{height:100%;border-radius:10px;width:0;transition:width 1.2s cubic-bezier(.16,1,.3,1)}
-.brf-hi{background:linear-gradient(90deg,#4a8838,#70b850)}
-.brf-mid{background:linear-gradient(90deg,var(--amber),#f0c060)}
-.brf-lo{background:linear-gradient(90deg,#a83838,#d06060)}
-.tips-card{background:var(--s2);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:14px}
-.tip-row{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
-.tip-row:first-of-type{padding-top:0}
-.tip-row:last-child{border:none;padding-bottom:0}
-.tip-num{
-  width:20px;height:20px;border-radius:6px;background:var(--amberbg);
-  color:var(--amber);display:flex;align-items:center;justify-content:center;
-  font-size:10px;font-weight:700;flex-shrink:0
-}
-.tip-body strong{font-size:12px;font-weight:600;color:var(--ink);display:block;margin-bottom:2px}
-.tip-body span{font-size:11px;color:var(--muted);line-height:1.5}
-.err-msg{
-  margin:0 20px 12px;padding:11px 14px;border-radius:10px;
-  background:var(--redbg);border:1px solid rgba(192,72,72,.2);
-  font-size:12px;color:var(--red);display:none
-}
-.err-msg.on{display:block}
-
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   LESSON MODAL
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-.lesson-modal{
-  position:absolute;inset:0;background:var(--bg);
-  z-index:600;display:none;flex-direction:column
-}
-.lesson-modal.open{display:flex;animation:sheetup .28s cubic-bezier(.16,1,.3,1)}
-.lm-hdr{
-  padding:52px 20px 16px;background:var(--s1);
-  border-bottom:1px solid var(--border);flex-shrink:0;
-  display:flex;align-items:center;gap:12px
-}
-.lm-back{
-  width:34px;height:34px;border-radius:9px;background:var(--s2);
-  border:1px solid var(--border);display:flex;align-items:center;
-  justify-content:center;cursor:pointer;flex-shrink:0
-}
-.lm-back svg{width:16px;height:16px;stroke:var(--ink2);fill:none;stroke-width:2;stroke-linecap:round}
-.lm-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;color:var(--ink)}
-.lm-body{flex:1;overflow-y:auto;padding:22px 20px 32px;scrollbar-width:none}
-.lm-body::-webkit-scrollbar{display:none}
-.lm-body h4{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--ink);margin:20px 0 8px}
-.lm-body h4:first-child{margin-top:0}
-.lm-body p{font-size:13px;color:var(--muted);line-height:1.75;margin-bottom:12px}
-.lm-body ul{padding-left:18px;margin-bottom:12px}
-.lm-body li{font-size:13px;color:var(--muted);line-height:1.75;margin-bottom:4px}
-.lm-body strong{color:var(--ink2)}
-.lm-callout{
-  background:var(--amberbg);border-left:2px solid var(--amber);
-  padding:12px 14px;border-radius:0 10px 10px 0;margin:12px 0
-}
-.lm-callout p{color:var(--ink2)!important;margin:0!important}
-
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   POST DETAIL SHEET
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-.detail-img-wrap{
-  margin:0 20px 14px;border-radius:14px;overflow:hidden;
-  background:var(--s3);min-height:140px;
-  display:flex;align-items:center;justify-content:center;font-size:56px
-}
-.detail-img-wrap img{width:100%;max-height:240px;object-fit:contain}
-.detail-body-wrap{padding:0 20px 28px}
-.d-user{display:flex;align-items:center;gap:10px;margin-bottom:14px}
-.d-av{width:34px;height:34px;border-radius:10px;background:var(--s3);display:flex;align-items:center;justify-content:center;font-size:17px;border:1px solid var(--border)}
-.d-name{font-size:13px;font-weight:600;color:var(--ink)}
-.d-time{font-size:11px;color:var(--muted)}
-.d-score-row{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
-.d-big{font-family:'Syne',sans-serif;font-size:52px;font-weight:800;color:var(--amber);line-height:1;letter-spacing:-.04em}
-.d-big small{font-size:18px;color:var(--muted);font-weight:400}
-.d-lbl{font-size:13px;color:var(--muted);margin-top:8px}
-.d-fb{font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:16px}
-</style>
+    /* Mobile nav open state */
+    nav.open .nav-links {
+      display: flex; flex-direction: column;
+      position: absolute; top: 100%; left: 0; right: 0;
+      background: var(--black);
+      padding: 1.5rem; gap: 1.5rem;
+      border-bottom: 1px solid rgba(201,169,110,0.15);
+    }
+    nav.open .nav-cta {
+      display: block; margin: 0 1.5rem 1.5rem;
+    }
+  </style>
 </head>
 <body>
-<div class="phone">
-  <div class="notch"></div>
-  <div class="statusbar">
-    <span id="clock" style="font-size:14px;font-weight:600;letter-spacing:-.01em">9:41</span>
-    <span style="font-size:11px;opacity:.6">▲▲ WiFi 🔋</span>
-  </div>
 
-  <!-- TOAST -->
-  <div class="toast-wrap"><div class="toast" id="toast"></div></div>
-
-  <!-- LOADER -->
-  <div class="loader" id="loader">
-    <div class="spinner"></div>
-    <div class="loader-msg" id="loader-msg">Analysing your photo…</div>
-  </div>
-
-  <!-- LESSON MODAL -->
-  <div class="lesson-modal" id="lesson-modal">
-    <div class="lm-hdr">
-      <button class="lm-back" onclick="closeLesson()">
-        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-      </button>
-      <div class="lm-title" id="lesson-title"></div>
+  <!-- NAV -->
+  <nav id="navbar">
+    <div class="nav-logo">Lens<span>Up</span></div>
+    <ul class="nav-links">
+      <li><a href="#how">How it works</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="learn.html">Learn</a></li>
+      <li><a href="gallery.html">Gallery</a></li>
+      <li><a href="profile.html">Profile</a></li>
+    </ul>
+    <a href="app.html" class="nav-cta">Try LensUp</a>
+    <div class="hamburger" onclick="toggleNav()">
+      <span></span><span></span><span></span>
     </div>
-    <div class="lm-body" id="lesson-body"></div>
-  </div>
+  </nav>
 
-  <!-- UPLOAD OVERLAY -->
-  <div class="overlay" id="upload-overlay" onclick="if(event.target===this)closeUpload()">
-    <div class="sheet">
-      <div class="sheet-pull"></div>
-      <div class="sheet-hdr">
-        <div class="sheet-title">New Post</div>
-        <button class="close-btn" onclick="closeUpload()">
-          <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-content">
+      <div class="hero-tag">AI-Powered Photo Analysis</div>
+      <h1>See Your Photos<br/>Through <em>Smarter</em><br/>Eyes</h1>
+      <p>Paste any public photo link and get instant AI-powered analysis — composition, lighting, mood, and professional improvement tips.</p>
+      <div class="hero-actions">
+        <a href="app.html" class="btn-primary">Analyse a Photo</a>
+        <a href="#how" class="btn-ghost">See how it works</a>
       </div>
-      <!-- drop zone -->
-      <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-inp').click()">
-        <div class="dz-icon">
-          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-        </div>
-        <div class="dz-h">Tap to add a photo</div>
-        <div class="dz-sub">JPG · PNG · HEIC</div>
-      </div>
-      <input type="file" id="file-inp" accept="image/*" style="display:none">
-      <textarea class="cap-textarea" id="cap-inp" placeholder="Write a caption… (optional)" rows="2"></textarea>
-      <div class="err-msg" id="err-msg"></div>
-      <!-- AI result -->
-      <div class="result-wrap" id="result-wrap">
-        <div class="score-card">
-          <div class="ring-wrap">
-            <svg class="ring-svg" width="68" height="68" viewBox="0 0 68 68">
-              <circle cx="34" cy="34" r="28" fill="none" stroke="#2e2a22" stroke-width="5"/>
-              <circle id="ring-arc" cx="34" cy="34" r="28" fill="none" stroke="#e8a030" stroke-width="5"
-                stroke-linecap="round" stroke-dasharray="175.9" stroke-dashoffset="175.9"
-                style="transition:stroke-dashoffset 1.3s cubic-bezier(.16,1,.3,1)"/>
-            </svg>
-            <div class="ring-num-wrap">
-              <div class="ring-num" id="ring-num">—</div>
-              <div class="ring-den">/10</div>
-            </div>
-          </div>
-          <div class="score-meta">
-            <div class="score-lbl" id="score-lbl">Analysing…</div>
-            <div class="score-fb" id="score-fb"></div>
-          </div>
-        </div>
-        <div class="breakdown">
-          <div class="section-lbl">Breakdown</div>
-          <div id="breakdown-rows"></div>
-        </div>
-        <div class="tips-card">
-          <div class="section-lbl">How to improve</div>
-          <div id="tips-rows"></div>
-        </div>
-        <div class="upload-actions">
-          <button class="btn btn-primary" id="share-btn" onclick="sharePost()">Share to Feed</button>
+    </div>
+    <div class="hero-visual">
+      <div class="photo-card">
+        <div class="photo-card-img">🌅</div>
+        <div class="score-badge">9.2</div>
+        <div class="photo-card-body">
+          <div class="photo-card-label">Composition</div>
+          <div class="photo-card-text">Strong rule of thirds with excellent horizon balance.</div>
         </div>
       </div>
+      <div class="photo-card">
+        <div class="photo-card-img">🏙️</div>
+        <div class="score-badge">8.5</div>
+        <div class="photo-card-body">
+          <div class="photo-card-label">Lighting</div>
+          <div class="photo-card-text">Golden hour tones enhance the urban depth.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat">
+      <span class="stat-num">7</span>
+      <div class="stat-label">Analysis Dimensions</div>
+    </div>
+    <div class="stat">
+      <span class="stat-num">~5s</span>
+      <div class="stat-label">Per Analysis</div>
+    </div>
+    <div class="stat">
+      <span class="stat-num">Free</span>
+      <div class="stat-label">To Use</div>
+    </div>
+    <div class="stat">
+      <span class="stat-num">AI</span>
+      <div class="stat-label">Powered by Claude</div>
     </div>
   </div>
 
-  <!-- POST DETAIL OVERLAY -->
-  <div class="overlay" id="detail-overlay" onclick="if(event.target===this)this.classList.remove('open')">
-    <div class="sheet">
-      <div class="sheet-pull"></div>
-      <div class="detail-img-wrap" id="detail-img"></div>
-      <div class="detail-body-wrap" id="detail-body"></div>
-    </div>
-  </div>
-
-  <!-- ━━━━ SCREEN: LOGIN ━━━━ -->
-  <div class="screen active" id="s-login">
-    <div class="login-top">
-      <div class="login-glow"></div>
-      <div class="login-grid"></div>
-      <div class="login-badge">Photography · AI · Community</div>
-      <div class="login-logo">Lens<span class="dot">Up</span></div>
-      <div class="login-sub">Upload your shots, get instant AI feedback,<br>and grow alongside your friends.</div>
-    </div>
-    <div class="login-form">
-      <div class="login-form-h">Sign in to continue</div>
-      <div class="login-form-sub">Join your friends and start getting scored.</div>
-      <div class="social-row">
-        <button class="social-btn" onclick="goSetup()">
-          <div class="ico">🌐</div>
-          <span>Continue with Google</span>
-          <div class="arr">›</div>
-        </button>
-        <button class="social-btn" onclick="goSetup()">
-          <div class="ico">🍎</div>
-          <span>Continue with Apple</span>
-          <div class="arr">›</div>
-        </button>
+  <!-- HOW IT WORKS -->
+  <section class="section" id="how">
+    <div class="section-tag">How it works</div>
+    <h2 class="section-title">Three Steps to<br/>Better Photos</h2>
+    <p class="section-sub">No account. No upload. Just paste a link and get professional-grade feedback instantly.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-icon">🔗</div>
+        <h3>Paste Your Photo Link</h3>
+        <p>Copy any public image URL — from Imgur, Google Drive, Dropbox, or any direct image link ending in .jpg or .png.</p>
       </div>
-      <div class="or-row"><div class="or-line"></div><div class="or-txt">or</div><div class="or-line"></div></div>
-      <input class="field" id="email-inp" type="email" placeholder="Email address" style="margin-bottom:10px">
-      <button class="btn btn-primary" onclick="goSetup()">Continue with Email</button>
-    </div>
-  </div>
-
-  <!-- ━━━━ SCREEN: SETUP ━━━━ -->
-  <div class="screen" id="s-setup">
-    <div class="setup-top">
-      <div class="setup-eyebrow">Step 1 of 1</div>
-      <div class="setup-h">Create your<br>profile</div>
-    </div>
-    <div class="setup-body" id="setup-body">
-      <span class="lbl" style="margin-top:4px">Pick an avatar</span>
-      <div class="av-grid" id="av-grid">
-        <div class="av-cell on" data-v="📸">📸</div>
-        <div class="av-cell" data-v="🦅">🦅</div>
-        <div class="av-cell" data-v="🌙">🌙</div>
-        <div class="av-cell" data-v="🔥">🔥</div>
-        <div class="av-cell" data-v="🌊">🌊</div>
-        <div class="av-cell" data-v="⚡">⚡</div>
-        <div class="av-cell" data-v="🎯">🎯</div>
-        <div class="av-cell" data-v="🌸">🌸</div>
-        <div class="av-cell" data-v="🐉">🐉</div>
-        <div class="av-cell" data-v="🎨">🎨</div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-icon">⚡</div>
+        <h3>AI Analyses Instantly</h3>
+        <p>Our Claude-powered engine evaluates composition, lighting, colour, mood, focus, and more in seconds.</p>
       </div>
-      <span class="lbl" style="margin-top:20px">Display name</span>
-      <input class="field" id="name-inp" placeholder="e.g. Sarah Tan" style="margin-bottom:16px">
-      <span class="lbl">Username</span>
-      <input class="field" id="user-inp" placeholder="@yourhandle" style="margin-bottom:16px">
-    </div>
-    <div class="setup-foot">
-      <button class="btn btn-primary" onclick="createProfile()">Create Profile</button>
-    </div>
-  </div>
-
-  <!-- ━━━━ SCREEN: APP ━━━━ -->
-  <div class="screen" id="s-app">
-    <div class="app-inner">
-
-      <!-- FEED TAB -->
-      <div class="tab-content on" id="tab-feed">
-        <div class="pg-hdr" style="position:sticky;top:0;z-index:20">
-          <div class="pg-logo">Lens<span class="dot">Up</span></div>
-          <div style="display:flex;gap:6px">
-            <button class="icon-btn" onclick="showToast('Search coming soon')">
-              <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            </button>
-            <button class="icon-btn" onclick="showToast('No new notifications')">
-              <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-            </button>
-          </div>
-        </div>
-        <div class="stories-row" id="stories-row"></div>
-        <div id="feed-posts"></div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-icon">📈</div>
+        <h3>Get Actionable Feedback</h3>
+        <p>Receive a detailed score and specific tips you can apply immediately to level up your photography.</p>
       </div>
-
-      <!-- RANKINGS TAB -->
-      <div class="tab-content" id="tab-ranks">
-        <div class="pg-hdr">
-          <div class="pg-title">Rankings</div>
-        </div>
-        <div class="rank-tabs">
-          <button class="rtab on" onclick="switchRankTab('today',this)">Today</button>
-          <button class="rtab" onclick="switchRankTab('week',this)">This Week</button>
-          <button class="rtab" onclick="switchRankTab('all',this)">All Time</button>
-        </div>
-        <div class="podium-wrap">
-          <div class="podium-card"><div class="podium-row" id="podium"></div></div>
-        </div>
-        <div class="rank-list" id="rank-list"></div>
-      </div>
-
-      <!-- LEARN TAB -->
-      <div class="tab-content" id="tab-learn">
-        <div class="pg-hdr">
-          <div class="pg-title">Learn</div>
-        </div>
-        <div class="learn-banner">
-          <div class="banner-ico">
-            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          </div>
-          <div>
-            <div class="banner-h">12 photography lessons</div>
-            <div class="banner-sub">Better technique → higher AI scores. Learn what the AI is actually looking for.</div>
-          </div>
-        </div>
-        <div class="learn-cats" id="learn-cats">
-          <button class="cat-btn on" onclick="filterCat('all',this)">All</button>
-          <button class="cat-btn" onclick="filterCat('basics',this)">Basics</button>
-          <button class="cat-btn" onclick="filterCat('mobile',this)">Mobile</button>
-          <button class="cat-btn" onclick="filterCat('light',this)">Lighting</button>
-          <button class="cat-btn" onclick="filterCat('advanced',this)">Advanced</button>
-        </div>
-        <div class="lessons" id="lesson-list"></div>
-      </div>
-
-      <!-- PROFILE TAB -->
-      <div class="tab-content" id="tab-profile">
-        <div id="profile-content"></div>
-      </div>
-
     </div>
+  </section>
 
-    <!-- BOTTOM NAV -->
-    <div class="nav">
-      <button class="nav-tab on" onclick="switchTab('feed',this)">
-        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        <span>Feed</span>
-      </button>
-      <button class="nav-tab" onclick="switchTab('ranks',this)">
-        <svg viewBox="0 0 24 24"><polyline points="18 20 18 10"/><polyline points="12 20 12 4"/><polyline points="6 20 6 14"/></svg>
-        <span>Ranks</span>
-      </button>
-      <button class="fab" onclick="openUpload()">
-        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-      </button>
-      <button class="nav-tab" onclick="switchTab('learn',this)">
-        <svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-        <span>Learn</span>
-      </button>
-      <button class="nav-tab" onclick="switchTab('profile',this)">
-        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        <span>Profile</span>
-      </button>
+  <!-- FEATURES -->
+  <section class="section" id="features" style="padding-top:0">
+    <div class="section-tag">Features</div>
+    <h2 class="section-title">Everything You Need<br/>to Grow as a Photographer</h2>
+    <p class="section-sub">LensUp gives you the honest, detailed critique that most photographers never get.</p>
+    <div class="features-grid">
+      <div class="feature">
+        <span class="feature-icon">🎯</span>
+        <h3>Composition Score</h3>
+        <p>Rule of thirds, leading lines, framing, symmetry — scored and explained in plain language.</p>
+      </div>
+      <div class="feature">
+        <span class="feature-icon">💡</span>
+        <h3>Lighting Analysis</h3>
+        <p>Understand your light source, shadows, exposure, and how they affect the overall feel of your shot.</p>
+      </div>
+      <div class="feature">
+        <span class="feature-icon">🎨</span>
+        <h3>Colour & Mood</h3>
+        <p>Discover the emotional tone of your palette and how to use colour more intentionally.</p>
+      </div>
+      <div class="feature">
+        <span class="feature-icon">🔍</span>
+        <h3>Focus & Sharpness</h3>
+        <p>Get feedback on depth of field, subject clarity, and whether your focal point serves the story.</p>
+      </div>
+      <div class="feature">
+        <span class="feature-icon">📝</span>
+        <h3>Pro Improvement Tips</h3>
+        <p>Specific, actionable suggestions — not vague praise. Real advice you can use on your next shoot.</p>
+      </div>
+      <div class="feature">
+        <span class="feature-icon">📂</span>
+        <h3>Local History</h3>
+        <p>Your past analyses are saved in your browser. Review your progress anytime, no account needed.</p>
+      </div>
     </div>
-  </div>
+  </section>
 
-</div><!-- /phone -->
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="section-tag">Get started</div>
+    <h2 class="section-title">Ready to See What Your Photos Are Really Saying?</h2>
+    <p class="section-sub">Paste a link. Get your analysis. No sign-up required.</p>
+    <a href="app.html" class="cta-big">Analyse My Photo Now</a>
+  </section>
 
-<script>
-'use strict';
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">Lens<span>Up</span></div>
+    <p>© 2025 LensUp · AI-Powered Photo Analysis · Powered by Claude</p>
+  </footer>
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   CONFIG — paste your key here
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-const API_KEY = 'YOUR_API_KEY_HERE'; // get free key at console.anthropic.com
-
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   STATE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-let ME = null;
-let POSTS = [];
-let PENDING = null; // {result, imgSrc}
-let LEARN_CAT = 'all';
-
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   SEED DATA
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-const DEMO_USERS = [
-  { name:'Daniel Tan',   handle:'@dan.frames', av:'🔥' },
-  { name:'Nurul Hana',   handle:'@nrhana',     av:'🌙' },
-  { name:'Amir Razif',   handle:'@amir_shots', av:'🦅' },
-  { name:'Siti Zara',    handle:'@zarasnaps',  av:'🌊' },
-  { name:'Khairul A.',   handle:'@kazri',      av:'🎯' },
-];
-const DEMO_POSTS = [
-  { name:'Daniel Tan',  handle:'@dan.frames', av:'🔥', icon:'🌅', score:9.1, label:'Outstanding',  feedback:'Exceptional golden hour rim lighting. Warm tones are cohesive and the subject separation is superb.',                    ts:Date.now()-7200000,   likes:14, liked:false, cap:'Morning light hits different 🌅', scores:{comp:9,light:10,focus:8,colour:9} },
-  { name:'Nurul Hana',  handle:'@nrhana',     av:'🌙', icon:'🏙️', score:7.8, label:'Great Shot',    feedback:'Strong leading lines guide the eye through the frame. Some background clutter reduces the overall impact slightly.',  ts:Date.now()-18000000,  likes:9,  liked:false, cap:'KL streets at dusk',            scores:{comp:8,light:7,focus:8,colour:8} },
-  { name:'Amir Razif',  handle:'@amir_shots', av:'🦅', icon:'🌿', score:8.4, label:'Impressive',    feedback:'Beautiful natural framing with overhanging branches. Colour palette is harmonious and subject isolation is excellent.', ts:Date.now()-28800000,  likes:21, liked:false, cap:'Taman Botani 🌿',               scores:{comp:9,light:8,focus:8,colour:9} },
-  { name:'Siti Zara',   handle:'@zarasnaps',  av:'🌊', icon:'🍜', score:6.9, label:'Good Work',     feedback:'Appealing subject and nice colours but highlights are slightly blown. Tap directly on the food to expose correctly.',   ts:Date.now()-43200000,  likes:6,  liked:false, cap:'Nasi lemak > everything 😌',    scores:{comp:7,light:6,focus:8,colour:6} },
-];
-const LESSONS = [
-  { id:'thirds',   cat:'basics',   ico:'⊞', lic:'lic-a', title:'Rule of Thirds',         sub:'The foundation of great composition',   lvl:'beg',
-    body:`<h4>What It Is</h4><p>Divide the frame into nine equal parts with two horizontal and two vertical lines. Place your subject at one of the four intersection points — not dead centre.</p><h4>How to Apply</h4><ul><li>Enable the grid in your camera settings</li><li>Put horizons on the top or bottom line, never the middle</li><li>Eyes and faces belong along the upper horizontal line</li><li>Lone subjects sit best at a left or right power point</li></ul><div class="lm-callout"><p>💡 Once it feels natural, break it deliberately — dead-centre can be powerful when it signals intentional symmetry.</p></div>` },
-  { id:'lines',    cat:'basics',   ico:'⟶', lic:'lic-b', title:'Leading Lines',           sub:'Direct the viewer\'s eye through the frame', lvl:'beg',
-    body:`<h4>Lines as Directors</h4><p>Roads, rivers, staircases, walls — any line that carries the eye from the edge toward your subject creates depth and purpose.</p><ul><li><strong>Converging:</strong> Lines meeting at a vanishing point — tunnels, corridors</li><li><strong>Curved:</strong> S-curves feel organic. Rivers, winding paths</li><li><strong>Diagonal:</strong> More dynamic than horizontal lines, adds energy</li><li><strong>Implied:</strong> A gaze or pointing finger also leads the eye</li></ul><div class="lm-callout"><p>💡 Before raising your phone, look down. Leading lines are usually right at your feet.</p></div>` },
-  { id:'framing',  cat:'basics',   ico:'◎', lic:'lic-c', title:'Natural Framing',         sub:'Use the environment as a picture frame',  lvl:'beg',
-    body:`<h4>Frames Within Frames</h4><p>Doorways, arches, windows, overhanging branches — these natural frames surround your subject, add depth, and guide the eye to what matters.</p><ul><li>Archways and doorways — most accessible</li><li>Overhanging foliage — adds warmth and organic depth</li><li>Windows — intimate quality</li><li>People in foreground as a partial side frame</li></ul>` },
-  { id:'expose',   cat:'mobile',   ico:'☀️', lic:'lic-a', title:'Expose for Your Subject', sub:'The most common phone photography mistake', lvl:'beg',
-    body:`<h4>Why Shots Look Wrong</h4><p>Your phone averages light across the whole scene. Stand someone in front of a bright window and the camera silhouettes them. The fix takes one tap.</p><ul><li>Tap directly on your subject's face or body</li><li>iPhone: tap then drag the ☀️ slider to fine-tune</li><li>Android: tap to focus, use the EV slider that appears</li></ul><div class="lm-callout"><p>💡 For portraits, always tap the face. Even if the background blows out slightly — skin tones matter most.</p></div>` },
-  { id:'aeaf',     cat:'mobile',   ico:'🔒', lic:'lic-b', title:'Lock Focus & Exposure',   sub:'Compose freely without the camera re-guessing', lvl:'beg',
-    body:`<h4>AE/AF Lock</h4><p>Long-press anywhere in the viewfinder to lock both autofocus and auto-exposure. On iPhone you'll see "AE/AF LOCK". Now re-compose freely without the camera resetting.</p><ul><li>Off-centre compositions — lock on subject, then slide to reframe</li><li>Moving subjects you need to pre-focus on</li><li>Low light where focus keeps hunting</li></ul>` },
-  { id:'raw',      cat:'mobile',   ico:'📐', lic:'lic-d', title:'Shoot RAW or ProRAW',     sub:'More data means better editing results',  lvl:'mid',
-    body:`<h4>What RAW Does</h4><p>JPEG compresses and discards data. RAW preserves everything the sensor captured — far more latitude to recover highlights and lift shadows in editing.</p><ul><li><strong>iPhone 12 Pro+:</strong> Settings → Camera → Formats → Apple ProRAW</li><li><strong>Android:</strong> Pro / Manual mode → switch output to RAW</li><li><strong>Google Pixel:</strong> Camera → More → Pro → RAW+</li></ul><div class="lm-callout"><p>💡 RAW files are 10–25MB vs 3MB for JPEG. Worth every megabyte for editing freedom.</p></div>` },
-  { id:'golden',   cat:'light',    ico:'🌅', lic:'lic-a', title:'Golden Hour',             sub:'The magic window every photographer chases', lvl:'beg',
-    body:`<h4>Why It Works</h4><p>Within an hour of sunrise or sunset, light travels through far more atmosphere. Warm reds and golds dominate. Everything glows, shadows go long and dramatic.</p><ul><li>Side-light your subject for a warm rim light</li><li>Shoot into the sun for dreamy backlighting and silhouettes</li><li>Look for lens flare — embrace it or block with your hand</li></ul><div class="lm-callout"><p>💡 Use PhotoPills to know the exact golden hour direction at your location.</p></div>` },
-  { id:'overcast', cat:'light',    ico:'☁️', lic:'lic-c', title:'Overcast Light',          sub:'Clouds are the world\'s biggest softbox',  lvl:'beg',
-    body:`<h4>Why Cloudy Days Win</h4><p>An overcast sky diffuses harsh sunlight across the entire sky dome — like a giant softbox. Soft shadows, lower contrast, richer colours, no harsh under-eye shadows.</p><ul><li><strong>Portraits:</strong> Skin looks even and flattering</li><li><strong>Macro / flowers:</strong> No blown highlights, colours saturate beautifully</li><li><strong>Forests:</strong> No harsh dappled light patches</li></ul>` },
-  { id:'window',   cat:'light',    ico:'▣',  lic:'lic-a', title:'Window Light Portraits',  sub:'Free studio lighting in your own home',   lvl:'beg',
-    body:`<h4>The Best Free Light Source</h4><p>A large window provides directional, soft, diffused light comparable to a professional softbox — for free.</p><ul><li><strong>Facing window:</strong> Flat, even. Great for products</li><li><strong>45° to window:</strong> Classic Rembrandt lighting. Flattering for faces</li><li><strong>Side-on:</strong> Split lighting — dramatic and moody</li><li><strong>Back to window:</strong> Rim light with beautiful hair glow</li></ul><div class="lm-callout"><p>💡 A white foam board opposite the window bounces light back and fills shadows beautifully.</p></div>` },
-  { id:'negative', cat:'advanced', ico:'◈',  lic:'lic-b', title:'Negative Space',          sub:'The power of what you deliberately leave out', lvl:'adv',
-    body:`<h4>Emptiness as Composition</h4><p>Negative space — sky, calm water, plain walls — gives the viewer's eye room to breathe and makes your subject feel significant.</p><p>A single figure against a vast sky often reads as more powerful than the same figure in a busy scene. Restraint is a compositional choice.</p><div class="lm-callout"><p>💡 Minimal photos score higher because they signal intent. A clean background says "I chose this."</p></div>` },
-  { id:'blue',     cat:'advanced', ico:'🌆', lic:'lic-c', title:'Blue Hour',               sub:'The most underused 20 minutes in photography', lvl:'adv',
-    body:`<h4>After the Sun Sets</h4><p>Blue hour is just before sunrise and just after sunset. The sky glows deep saturated blue while artificial lights create a stunning warm-cool contrast.</p><ul><li>Use a stable surface — slow shutter speeds required</li><li>Use a timer to eliminate camera shake</li><li>Shoot RAW for maximum colour latitude</li><li>Arrive before sunset — blue hour lasts only 20–30 minutes</li></ul>` },
-  { id:'colour',   cat:'advanced', ico:'⊠',  lic:'lic-d', title:'Colour Harmony',          sub:'Make photos feel intentional, not accidental', lvl:'adv',
-    body:`<h4>Why Some Photos "Feel Right"</h4><p>Photos with intentional colour relationships look designed, not just captured. Three main harmonies:</p><ul><li><strong>Complementary (blue + orange):</strong> High contrast, vibrant. Sunsets over water</li><li><strong>Analogous (blue + teal + green):</strong> Calming, cohesive. Oceans, forests</li><li><strong>Monochromatic:</strong> Sophisticated, elegant. Desert, fog, snow</li></ul><div class="lm-callout"><p>💡 The strongest photos work with two to three colours maximum.</p></div>` },
-];
-
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   CLOCK
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-function tickClock() {
-  const n = new Date();
-  document.getElementById('clock').textContent =
-    String(n.getHours()).padStart(2,'0') + ':' + String(n.getMinutes()).padStart(2,'0');
-}
-tickClock();
-setInterval(tickClock, 15000);
-
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   PERSISTENCE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-async function save() {
-  try { await window.storage.set('lu3', JSON.stringify({ ME, POSTS })); } catch(e) {}
-}
-async function load() {
-  try {
-    const r = await window.storage.get('lu3');
-    if (r && r.value) {
-      const d = JSON.parse(r.value);
-      ME = d.ME || null;
-      POSTS = d.POSTS || [];
+  <script>
+    function toggleNav() {
+      document.getElementById('navbar').classList.toggle('open');
     }
-  } catch(e) {}
-}
-
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   TOAST
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-let toastTimer;
-function showToast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
-}
-
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   SCREENS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
-
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   LOGIN → SETUP
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-function goSetup() {
-  showScreen('s-setup');
-}
-
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   AVATAR PICKER
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-document.getElementById('av-grid').addEventListener('click', function(e) {
-  const cell = e.target.closest('.av-cell');
-  if (!cell) return;
-  this.querySelectorAll('.av-cell').forEach(c => c.classList.remove('on'));
-  cell.classList.add('on');
-});
-
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   CREATE PROFILE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-function createProfile() {
-  const name = document.getElementById('name-inp').value.trim();
-  const user = document.getElementById('user-inp').value.trim();
-  const av   = document.querySelector('.av-cell.on')?.dataset.v || '📸';
-  if (!name) { showToast('Please enter your display name'); return; }
-  if (!user) { showToast('Please enter a username'); return; }
-  ME = { name, handle: user.startsWith('@') ? user : '@' + user, av, pts: 0 };
-  save();
-  launchApp();
-}
-
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   LAUNCH APP
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-function launchApp() {
-  showScreen('s-app');
-  renderFeed();
-  renderRankings();
-  renderLessons();
-  renderProfile();
-}
-
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   TAB SWITCHING
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-function switchTab(name, btn) {
-  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('on'));
-  document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('on'));
-  document.getElementById('tab-' + name).classList.add('on');
-  btn.classList.add('on');
-  if (name === 'ranks')   renderRankings();
-  if (name === 'profile') renderProfile();
-}
-
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   FEED
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-function timeAgo(ts) {
-  const s = (Date.now() - ts) / 1000;
-  if (s < 60)    return 'just now';
-  if (s < 3600)  return Math.floor(s / 60) + 'm ago';
-  if (s < 86400) return Math.floor(s / 3600) + 'h ago';
-  return Math.floor(s / 86400) + 'd ago';
-}
-
-function renderFeed() {
-  // Stories
-  const sr = document.getElementById('stories-row');
-  const ppl = ME ? [ME, ...DEMO_USERS] : DEMO_USERS;
-  sr.innerHTML = `
-    <div class="story story-add" onclick="openUpload()">
-      <div class="story-ring seen"><div class="story-av" style="font-size:22px">＋</div></div>
-      <div class="story-lbl">You</div>
-    </div>` +
-    ppl.map((u, i) => `
-    <div class="story">
-      <div class="story-ring ${i > 1 ? 'seen' : ''}"><div class="story-av">${u.av}</div></div>
-      <div class="story-lbl">${u.name.split(' ')[0]}</div>
-    </div>`).join('');
-
-  // Posts — combine mine + demo, sorted newest first
-  const allPosts = [...POSTS, ...DEMO_POSTS].sort((a, b) => b.ts - a.ts);
-  const fp = document.getElementById('feed-posts');
-
-  if (!allPosts.length) {
-    fp.innerHTML = `<div class="empty-state">
-      <div class="empty-icon">📭</div>
-      <div class="empty-h">Nothing here yet</div>
-      <div class="empty-sub">Be the first to share a photo<br>and get an AI score.</div>
-    </div>`;
-    return;
-  }
-
-  fp.innerHTML = allPosts.map((p, i) => {
-    const isUserPost = POSTS.includes(p);
-    const realIdx = POSTS.indexOf(p);
-    const sc = p.score >= 8.5 ? 'pill-green' : p.score >= 6.5 ? 'pill-amber' : 'pill-red';
-    return `<div class="post">
-      <div class="post-hdr">
-        <div class="post-av">${p.av}</div>
-        <div class="post-info">
-          <div class="post-name">${p.name}</div>
-          <div class="post-meta">${p.handle} · ${timeAgo(p.ts)}</div>
-        </div>
-        <div class="pill ${sc} post-score">${p.score.toFixed(1)}</div>
-      </div>
-      <div class="post-img" onclick="openDetail(${i}, ${realIdx})">
-        ${p.img ? `<img src="${p.img}" alt="">` : `<span>${p.icon || '📷'}</span>`}
-        <div class="post-badge">${p.score.toFixed(1)} · ${p.label}</div>
-      </div>
-      <div class="post-actions">
-        <button class="act ${p.liked ? 'liked' : ''}" onclick="toggleLike(${i}, ${POSTS.indexOf(p)})">
-          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-          ${p.likes || 0}
-        </button>
-        <button class="act" onclick="openDetail(${i}, ${POSTS.indexOf(p)})">
-          <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-          See full score
-        </button>
-      </div>
-      <div class="post-cap">
-        <span class="cap-name">${p.name} </span>
-        <span class="cap-txt">${p.cap || ''}</span>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function toggleLike(feedIdx, postsIdx) {
-  const allPosts = [...POSTS, ...DEMO_POSTS].sort((a, b) => b.ts - a.ts);
-  const p = allPosts[feedIdx];
-  if (!p) return;
-  p.liked = !p.liked;
-  p.likes = (p.likes || 0) + (p.liked ? 1 : -1);
-  if (postsIdx >= 0) save();
-  renderFeed();
-}
-
-function openDetail(feedIdx, postsIdx) {
-  const allPosts = [...POSTS, ...DEMO_POSTS].sort((a, b) => b.ts - a.ts);
-  const p = allPosts[feedIdx];
-  if (!p) return;
-
-  const dimg = document.getElementById('detail-img');
-  dimg.innerHTML = p.img ? `<img src="${p.img}" alt="">` : `<span>${p.icon || '📷'}</span>`;
-
-  const sc = p.scores || { comp: p.score, light: p.score, focus: p.score, colour: p.score };
-  const dims = [['Composition', sc.comp], ['Lighting', sc.light], ['Subject Focus', sc.focus], ['Colour & Exposure', sc.colour]];
-
-  document.getElementById('detail-body').innerHTML = `
-    <div class="d-user">
-      <div class="d-av">${p.av}</div>
-      <div><div class="d-name">${p.name}</div><div class="d-time">${new Date(p.ts).toLocaleString('en-MY')}</div></div>
-    </div>
-    <div class="d-score-row">
-      <div class="d-big">${p.score.toFixed(1)}<small>/10</small></div>
-      <div class="d-lbl">${p.label || ''}</div>
-    </div>
-    <div class="d-fb">${p.feedback || ''}</div>
-    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:18px">
-      ${dims.map(([l, v]) => {
-        const cls = v >= 8 ? 'brf-hi' : v >= 6.5 ? 'brf-mid' : 'brf-lo';
-        return `<div>
-          <div class="br-top"><span>${l}</span><span>${Number(v).toFixed(1)}</span></div>
-          <div class="br-track"><div class="br-fill ${cls}" style="width:${v * 10}%;height:100%;border-radius:10px"></div></div>
-        </div>`;
-      }).join('')}
-    </div>
-    <button class="btn btn-ghost" style="margin-bottom:28px" onclick="document.getElementById('detail-overlay').classList.remove('open')">Close</button>
-  `;
-  document.getElementById('detail-overlay').classList.add('open');
-}
-
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   RANKINGS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-function switchRankTab(key, btn) {
-  document.querySelectorAll('.rtab').forEach(b => b.classList.remove('on'));
-  btn.classList.add('on');
-  renderRankings();
-}
-
-function renderRankings() {
-  const myPosts = POSTS.filter(p => p.isMe);
-  const myAvg   = myPosts.length ? (myPosts.reduce((s, p) => s + p.score, 0) / myPosts.length) : 0;
-
-  const list = [
-    ...(ME ? [{ name: ME.name, handle: ME.handle, av: ME.av, avg: myAvg, count: myPosts.length, pts: ME.pts || 0, isMe: true }] : []),
-    { name:'Daniel Tan',  handle:'@dan.frames', av:'🔥', avg: 8.9, count: 12, pts: 24, isMe: false },
-    { name:'Amir Razif',  handle:'@amir_shots', av:'🦅', avg: 8.4, count: 9,  pts: 18, isMe: false },
-    { name:'Nurul Hana',  handle:'@nrhana',     av:'🌙', avg: 7.8, count: 11, pts: 22, isMe: false },
-    { name:'Khairul A.',  handle:'@kazri',      av:'🎯', avg: 7.5, count: 7,  pts: 14, isMe: false },
-    { name:'Siti Zara',   handle:'@zarasnaps',  av:'🌊', avg: 6.9, count: 8,  pts: 16, isMe: false },
-  ].sort((a, b) => b.avg - a.avg);
-
-  // Podium (top 3)
-  const top3 = list.slice(0, 3);
-  const podOrder = top3.length >= 2 ? [top3[1], top3[0], top3[2]] : top3;
-  const podCls   = ['pod2', 'pod1', 'pod3'];
-  const medals   = ['🥈', '🥇', '🥉'];
-
-  document.getElementById('podium').innerHTML = podOrder.map((u, i) => u ? `
-    <div class="pod ${podCls[i]}">
-      ${i === 1 ? `<div style="font-size:15px">🥇</div>` : ''}
-      <div class="pod-av" style="${i !== 1 ? 'width:44px;height:44px;font-size:20px' : 'width:58px;height:58px;font-size:26px'}">${u.av}</div>
-      ${i !== 1 ? `<div style="font-size:13px">${medals[i]}</div>` : ''}
-      <div class="pod-name">${u.name.split(' ')[0]}</div>
-      <div class="pod-score">${u.avg.toFixed(1)}</div>
-      <div class="pod-bar"></div>
-    </div>` : '').join('');
-
-  // Rest of the list
-  document.getElementById('rank-list').innerHTML = list.slice(3).map((u, i) => `
-    <div class="rank-row ${u.isMe ? 'me' : ''}">
-      <div class="rank-pos">${i + 4}</div>
-      <div class="rank-av">${u.av}</div>
-      <div class="rank-info">
-        <div class="rank-name">${u.name}${u.isMe ? '<span class="you-tag">you</span>' : ''}</div>
-        <div class="rank-sub">${u.count} photo${u.count !== 1 ? 's' : ''} · ${u.pts} pts</div>
-      </div>
-      <div class="rank-score">${u.avg.toFixed(1)}</div>
-    </div>`).join('');
-}
-
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   LEARN
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-function renderLessons() {
-  const els = document.getElementById('lesson-list');
-  if (!els) return;
-  const filtered = LEARN_CAT === 'all' ? LESSONS : LESSONS.filter(l => l.cat === LEARN_CAT);
-  els.innerHTML = filtered.map(l => `
-    <div class="lesson-card" onclick="openLesson('${l.id}')">
-      <div class="lesson-ico ${l.lic}">${l.ico}</div>
-      <div class="lesson-body">
-        <div class="lesson-h">${l.title}</div>
-        <div class="lesson-sub">${l.sub}</div>
-      </div>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">
-        <div class="lvl ${l.lvl === 'beg' ? 'lvl-beg' : l.lvl === 'mid' ? 'lvl-mid' : 'lvl-adv'}">${l.lvl === 'beg' ? 'Beginner' : l.lvl === 'mid' ? 'Intermediate' : 'Advanced'}</div>
-        <span style="font-size:14px;color:var(--muted)">›</span>
-      </div>
-    </div>`).join('');
-}
-
-function filterCat(cat, btn) {
-  LEARN_CAT = cat;
-  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('on'));
-  btn.classList.add('on');
-  renderLessons();
-}
-
-function openLesson(id) {
-  const l = LESSONS.find(x => x.id === id);
-  if (!l) return;
-  document.getElementById('lesson-title').textContent = l.title;
-  document.getElementById('lesson-body').innerHTML = l.body;
-  document.getElementById('lesson-modal').classList.add('open');
-}
-function closeLesson() {
-  document.getElementById('lesson-modal').classList.remove('open');
-}
-
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   PROFILE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-function renderProfile() {
-  const el = document.getElementById('profile-content');
-  if (!el || !ME) return;
-  const mine  = POSTS.filter(p => p.isMe);
-  const avg   = mine.length ? (mine.reduce((s, p) => s + p.score, 0) / mine.length).toFixed(1) : '—';
-  el.innerHTML = `
-    <div class="prof-hdr">
-      <div class="prof-av-big">${ME.av}</div>
-      <div>
-        <div class="prof-name">${ME.name}</div>
-        <div class="prof-handle">${ME.handle}</div>
-      </div>
-    </div>
-    <div class="prof-stats">
-      <div class="pstat"><div class="pstat-val">${ME.pts || 0}</div><div class="pstat-lbl">Points</div></div>
-      <div class="pstat"><div class="pstat-val">${mine.length}</div><div class="pstat-lbl">Photos</div></div>
-      <div class="pstat"><div class="pstat-val">${avg}</div><div class="pstat-lbl">Avg Score</div></div>
-    </div>
-    <div class="gal-hdr">My Photos</div>
-    ${mine.length
-      ? `<div class="gal-grid">${mine.map((p, i) => `
-          <div class="gal-cell" onclick="openDetail(${[...POSTS,...DEMO_POSTS].sort((a,b)=>b.ts-a.ts).indexOf(p)}, ${i})">
-            ${p.img ? `<img src="${p.img}" alt="">` : `<span>${p.icon || '📷'}</span>`}
-            <div class="gal-score">${p.score.toFixed(1)}</div>
-          </div>`).join('')}</div>`
-      : `<div class="prof-empty">No photos yet.<br>Tap the camera button to post your first shot.</div>`
-    }`;
-}
-
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   UPLOAD
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-function openUpload() {
-  // Reset state
-  const dz = document.getElementById('drop-zone');
-  dz.classList.remove('filled', 'drag');
-  dz.onclick = () => document.getElementById('file-inp').click();
-  dz.innerHTML = `
-    <div class="dz-icon">
-      <svg viewBox="0 0 24 24" width="20" height="20" stroke="var(--muted)" fill="none" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-    </div>
-    <div class="dz-h">Tap to add a photo</div>
-    <div class="dz-sub">JPG · PNG · HEIC</div>`;
-  document.getElementById('cap-inp').value = '';
-  document.getElementById('err-msg').className = 'err-msg';
-  document.getElementById('result-wrap').className = 'result-wrap';
-  document.getElementById('ring-arc').style.strokeDashoffset = '175.9';
-  document.getElementById('file-inp').value = '';
-  PENDING = null;
-  document.getElementById('upload-overlay').classList.add('open');
-}
-function closeUpload() {
-  document.getElementById('upload-overlay').classList.remove('open');
-}
-
-// File input
-document.getElementById('file-inp').addEventListener('change', function() {
-  if (this.files[0]) handleFile(this.files[0]);
-});
-
-// Drag & drop
-const dz = document.getElementById('drop-zone');
-dz.addEventListener('dragover',  e => { e.preventDefault(); dz.classList.add('drag'); });
-dz.addEventListener('dragleave', () => dz.classList.remove('drag'));
-dz.addEventListener('drop', e => {
-  e.preventDefault();
-  dz.classList.remove('drag');
-  const f = e.dataTransfer.files[0];
-  if (f && f.type.startsWith('image/')) handleFile(f);
-});
-
-function handleFile(file) {
-  const reader = new FileReader();
-  reader.onload = e => {
-    const src = e.target.result;
-    const dz  = document.getElementById('drop-zone');
-    dz.classList.add('filled');
-    dz.innerHTML = `<img src="${src}" alt="">`;
-    dz.onclick = null;
-    document.getElementById('result-wrap').className = 'result-wrap';
-    document.getElementById('err-msg').className = 'err-msg';
-    analysePhoto(src.split(',')[1], file.type, src);
-  };
-  reader.readAsDataURL(file);
-}
-
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   AI ANALYSIS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-const LOADER_MSGS = [
-  'Examining composition…',
-  'Reading the light…',
-  'Analysing colour balance…',
-  'Evaluating technique…',
-  'Writing your tips…',
-];
-let loaderInterval;
-
-function startLoader() {
-  let i = 0;
-  document.getElementById('loader-msg').textContent = LOADER_MSGS[0];
-  document.getElementById('loader').classList.add('on');
-  loaderInterval = setInterval(() => {
-    i = (i + 1) % LOADER_MSGS.length;
-    document.getElementById('loader-msg').textContent = LOADER_MSGS[i];
-  }, 1800);
-}
-function stopLoader() {
-  document.getElementById('loader').classList.remove('on');
-  clearInterval(loaderInterval);
-}
-
-async function analysePhoto(b64, mime, srcUrl) {
-  // Check API key
-  if (!API_KEY || API_KEY === 'YOUR_API_KEY_HERE') {
-    showErr('No API key found. Open LensUp.html in a text editor, find API_KEY at the top of the script, and replace YOUR_API_KEY_HERE with your key from console.anthropic.com');
-    return;
-  }
-
-  startLoader();
-
-  const prompt = `You are an expert photography coach. Analyse this photo carefully and return ONLY a valid JSON object — no markdown, no code fences, no explanation before or after:
-{"scores":{"comp":7,"light":7,"focus":7,"colour":7},"overall":7.0,"label":"Good Shot","feedback":"2-3 sentences of honest, specific feedback about what works and what doesn't.","tips":[{"t":"Tip title","b":"2-sentence actionable advice."},{"t":"Tip title","b":"2-sentence actionable advice."},{"t":"Tip title","b":"2-sentence actionable advice."}]}
-Rules: scores are integers 1-10, overall is a float with one decimal, label is one of: Needs Work / Decent Shot / Good Shot / Great Shot / Impressive / Outstanding. Be encouraging but honest.`;
-
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': API_KEY,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-calls': 'true',
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 900,
-        messages: [{
-          role: 'user',
-          content: [
-            { type: 'image', source: { type: 'base64', media_type: mime, data: b64 } },
-            { type: 'text',  text: prompt }
-          ]
-        }]
-      })
-    });
-
-    stopLoader();
-    const data = await res.json();
-
-    if (data.error) {
-      showErr('API error: ' + data.error.message);
-      return;
-    }
-
-    const raw = data.content?.find(b => b.type === 'text')?.text || '';
-    // Strip any accidental markdown fences
-    const clean = raw.replace(/```[a-z]*\n?/gi, '').trim();
-    const result = JSON.parse(clean);
-    PENDING = { result, srcUrl };
-    renderResult(result);
-
-  } catch (err) {
-    stopLoader();
-    if (err instanceof SyntaxError) {
-      showErr('Could not parse AI response. Please try again.');
-    } else {
-      showErr('Request failed: ' + err.message);
-    }
-  }
-}
-
-function showErr(msg) {
-  const el = document.getElementById('err-msg');
-  el.textContent = msg;
-  el.className = 'err-msg on';
-}
-
-function renderResult(r) {
-  // Animate score ring
-  const circumference = 175.9;
-  const offset = circumference - (r.overall / 10) * circumference;
-  document.getElementById('ring-arc').style.strokeDashoffset = offset;
-  document.getElementById('ring-num').textContent = r.overall.toFixed(1);
-  document.getElementById('score-lbl').textContent = r.label;
-  document.getElementById('score-fb').textContent  = r.feedback;
-
-  // Breakdown bars
-  const dims = [
-    ['Composition',      r.scores.comp],
-    ['Lighting',         r.scores.light],
-    ['Subject Focus',    r.scores.focus],
-    ['Colour & Exposure',r.scores.colour],
-  ];
-  document.getElementById('breakdown-rows').innerHTML = dims.map(([l, v]) => {
-    const cls = v >= 8 ? 'brf-hi' : v >= 6.5 ? 'brf-mid' : 'brf-lo';
-    return `<div class="br-row">
-      <div class="br-top"><span>${l}</span><span>${v}/10</span></div>
-      <div class="br-track"><div class="br-fill ${cls}" data-w="${v * 10}" style="width:0"></div></div>
-    </div>`;
-  }).join('');
-  // Animate bars after paint
-  setTimeout(() => {
-    document.querySelectorAll('.br-fill[data-w]').forEach(el => {
-      el.style.width = el.dataset.w + '%';
-    });
-  }, 80);
-
-  // Tips
-  document.getElementById('tips-rows').innerHTML = r.tips.map((t, i) => `
-    <div class="tip-row">
-      <div class="tip-num">${i + 1}</div>
-      <div class="tip-body"><strong>${t.t}</strong><span>${t.b}</span></div>
-    </div>`).join('');
-
-  document.getElementById('result-wrap').className = 'result-wrap on';
-  // Scroll sheet to result
-  setTimeout(() => {
-    document.querySelector('#upload-overlay .sheet').scrollTo({ top: 9999, behavior: 'smooth' });
-  }, 100);
-}
-
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   SHARE POST
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-function sharePost() {
-  if (!PENDING || !ME) return;
-  const { result, srcUrl } = PENDING;
-  const post = {
-    name:     ME.name,
-    handle:   ME.handle,
-    av:       ME.av,
-    img:      srcUrl,
-    icon:     '📸',
-    score:    result.overall,
-    label:    result.label,
-    feedback: result.feedback,
-    scores:   result.scores,
-    cap:      document.getElementById('cap-inp').value.trim(),
-    ts:       Date.now(),
-    likes:    0,
-    liked:    false,
-    isMe:     true,
-  };
-  POSTS.unshift(post);
-  ME.pts = (ME.pts || 0) + 1;
-  PENDING = null;
-  save();
-  closeUpload();
-  renderFeed();
-  renderRankings();
-  renderProfile();
-  showToast('Posted! Your friends can see your score ✨');
-}
-
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   INIT
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-(async function init() {
-  await load();
-  if (ME) {
-    launchApp();
-  }
-  // lessons always pre-render even before login (they're static)
-  renderLessons();
-})();
-</script>
+  </script>
 </body>
 </html>

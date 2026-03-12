@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LensUp — Create Account</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --black: #0a0a0a; --white: #f5f2ee; --gold: #c9a96e;
+      --gold-light: #e8d5b0; --dark: #1a1714; --dark2: #141210;
+      --mid: #6b6560; --border: rgba(201,169,110,0.15);
+    }
+    html, body { height: 100%; }
+    body {
+      background: var(--black); color: var(--white);
+      font-family: 'DM Sans', sans-serif; font-weight: 300;
+      min-height: 100vh; display: flex; flex-direction: column;
+    }
+    nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.2rem 3rem; border-bottom: 1px solid var(--border);
+    }
+    .nav-logo { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 900; color: var(--gold); text-decoration: none; }
+    .nav-logo span { color: var(--white); }
+    .nav-link { font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(245,242,238,0.5); text-decoration: none; transition: color 0.2s; }
+    .nav-link:hover { color: var(--gold); }
+    .auth-wrap { flex: 1; display: flex; align-items: center; justify-content: center; padding: 3rem 1.5rem; }
+    .auth-card { width: 100%; max-width: 420px; background: var(--dark); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; animation: fadeUp 0.5s ease both; }
+    .auth-header { padding: 2rem 2rem 1.5rem; border-bottom: 1px solid var(--border); text-align: center; }
+    .auth-logo { font-size: 2rem; margin-bottom: 0.8rem; }
+    .auth-header h1 { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 900; margin-bottom: 0.3rem; }
+    .auth-header h1 em { font-style: italic; color: var(--gold); }
+    .auth-header p { font-size: 0.85rem; color: rgba(245,242,238,0.45); }
+    .auth-body { padding: 1.8rem 2rem; }
+    .form-group { margin-bottom: 1.2rem; }
+    .form-label { display: block; font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.5rem; }
+    .form-input { width: 100%; background: var(--black); border: 1px solid var(--border); color: var(--white); padding: 0.8rem 1rem; border-radius: 2px; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; outline: none; transition: border-color 0.2s; }
+    .form-input:focus { border-color: var(--gold); }
+    .form-input::placeholder { color: rgba(245,242,238,0.2); }
+    .btn-submit { width: 100%; background: var(--gold); color: var(--black); border: none; padding: 0.9rem; border-radius: 2px; font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: background 0.2s; margin-top: 0.5rem; }
+    .btn-submit:hover:not(:disabled) { background: var(--gold-light); }
+    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+    .form-footer { text-align: center; margin-top: 1.2rem; font-size: 0.82rem; color: rgba(245,242,238,0.4); }
+    .form-footer a { color: var(--gold); text-decoration: none; }
+    .form-footer a:hover { text-decoration: underline; }
+    .alert { padding: 0.8rem 1rem; border-radius: 2px; font-size: 0.82rem; line-height: 1.5; margin-bottom: 1.2rem; display: none; }
+    .alert.show { display: block; }
+    .alert-error { background: rgba(200,80,80,0.1); border: 1px solid rgba(200,80,80,0.25); color: #f08080; }
+    .alert-success { background: rgba(126,207,126,0.08); border: 1px solid rgba(126,207,126,0.2); color: #7ecf7e; }
+    .password-hint { font-size: 0.72rem; color: rgba(245,242,238,0.3); margin-top: 0.3rem; }
+    .strength-bar { height: 3px; background: var(--border); border-radius: 2px; margin-top: 0.5rem; overflow: hidden; }
+    .strength-fill { height: 100%; border-radius: 2px; transition: width 0.3s, background 0.3s; width: 0%; }
+    .terms { font-size: 0.75rem; color: rgba(245,242,238,0.3); line-height: 1.6; margin-top: 0.8rem; text-align: center; }
+    .divider { display: flex; align-items: center; gap: 1rem; margin: 1.2rem 0; color: rgba(245,242,238,0.2); font-size: 0.75rem; }
+    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .btn-guest { width: 100%; background: none; border: 1px solid var(--border); color: rgba(245,242,238,0.6); padding: 0.8rem; border-radius: 2px; font-family: 'DM Sans', sans-serif; font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; text-decoration: none; display: block; text-align: center; }
+    .btn-guest:hover { border-color: rgba(201,169,110,0.35); color: var(--white); }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @media (max-width: 480px) { nav { padding: 1rem 1.2rem; } .auth-body { padding: 1.4rem; } .auth-header { padding: 1.5rem 1.4rem 1.2rem; } }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="index.html" class="nav-logo">Lens<span>Up</span></a>
+    <a href="login.html" class="nav-link">← Sign In</a>
+  </nav>
+
+  <div class="auth-wrap">
+    <div class="auth-card">
+
+      <div class="auth-header">
+        <div class="auth-logo">🌅</div>
+        <h1>Start <em>Shooting</em></h1>
+        <p>Create a free account to save your analyses across all devices</p>
+      </div>
+
+      <div class="auth-body">
+
+        <div class="alert alert-error" id="errorAlert"></div>
+        <div class="alert alert-success" id="successAlert"></div>
+
+        <div class="form-group">
+          <label class="form-label">Display Name</label>
+          <input type="text" class="form-input" id="nameInput" placeholder="Your name" maxlength="40" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-input" id="emailInput" placeholder="you@example.com" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" class="form-input" id="passwordInput"
+            placeholder="At least 6 characters" oninput="checkStrength(this.value)" />
+          <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+          <div class="password-hint" id="strengthLabel">Enter a password</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Confirm Password</label>
+          <input type="password" class="form-input" id="confirmInput"
+            placeholder="Repeat your password" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Invite Code</label>
+          <input type="text" class="form-input" id="inviteInput"
+            placeholder="Enter your invite code"
+            onkeydown="if(event.key==='Enter') register()"
+            style="letter-spacing:0.12em;text-transform:uppercase;" />
+          <div class="password-hint">Don't have a code? Request one from the app owner.</div>
+        </div>
+
+        <button class="btn-submit" id="submitBtn" onclick="register()">Create Account</button>
+
+        <div class="terms">By creating an account you agree to use LensUp responsibly.</div>
+
+        <div class="form-footer">
+          Already have an account? <a href="login.html">Sign in</a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    initSupabase();
+
+    // Redirect if already logged in
+    (async () => {
+      const user = await getUser();
+      if (user) window.location.href = 'app.html';
+    })();
+
+    function showError(msg) {
+      const el = document.getElementById('errorAlert');
+      el.textContent = msg; el.classList.add('show');
+      document.getElementById('successAlert').classList.remove('show');
+    }
+    function showSuccess(msg) {
+      const el = document.getElementById('successAlert');
+      el.textContent = msg; el.classList.add('show');
+      document.getElementById('errorAlert').classList.remove('show');
+    }
+
+    function checkStrength(val) {
+      const fill = document.getElementById('strengthFill');
+      const label = document.getElementById('strengthLabel');
+      if (!val) { fill.style.width = '0%'; label.textContent = 'Enter a password'; return; }
+      let score = 0;
+      if (val.length >= 6) score++;
+      if (val.length >= 10) score++;
+      if (/[A-Z]/.test(val)) score++;
+      if (/[0-9]/.test(val)) score++;
+      if (/[^A-Za-z0-9]/.test(val)) score++;
+      const levels = [
+        { pct: '20%', color: '#f08080', text: 'Very weak' },
+        { pct: '40%', color: '#f0a070', text: 'Weak' },
+        { pct: '60%', color: '#c9a96e', text: 'Fair' },
+        { pct: '80%', color: '#a8c87e', text: 'Good' },
+        { pct: '100%', color: '#7ecf7e', text: 'Strong' },
+      ];
+      const lvl = levels[Math.min(score - 1, 4)] || levels[0];
+      fill.style.width = lvl.pct;
+      fill.style.background = lvl.color;
+      label.textContent = lvl.text;
+    }
+
+    async function register() {
+      const name = document.getElementById('nameInput').value.trim();
+      const email = document.getElementById('emailInput').value.trim();
+      const password = document.getElementById('passwordInput').value;
+      const confirm = document.getElementById('confirmInput').value;
+      const invite = document.getElementById('inviteInput').value.trim().toUpperCase();
+      const btn = document.getElementById('submitBtn');
+
+      if (!name) { showError('Please enter your display name.'); return; }
+      if (!email) { showError('Please enter your email address.'); return; }
+      if (password.length < 6) { showError('Password must be at least 6 characters.'); return; }
+      if (password !== confirm) { showError('Passwords do not match.'); return; }
+      if (!invite) { showError('Please enter your invite code.'); return; }
+      if (invite !== INVITE_CODE) { showError('Invalid invite code. Please check with the app owner.'); return; }
+
+      btn.disabled = true;
+      btn.textContent = 'Creating account…';
+
+      const { data, error } = await sb.auth.signUp({
+        email,
+        password,
+        options: { data: { display_name: name } }
+      });
+
+      if (error) {
+        showError(error.message || 'Registration failed. Please try again.');
+        btn.disabled = false;
+        btn.textContent = 'Create Account';
+      } else {
+        // Save name locally too
+        localStorage.setItem('lensup_name', name);
+        showSuccess('Account created! Check your email to confirm, then sign in.');
+        btn.textContent = 'Account Created ✓';
+        setTimeout(() => window.location.href = 'login.html', 3000);
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LensUp — My Profile</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black: #0a0a0a;
+      --white: #f5f2ee;
+      --gold: #c9a96e;
+      --gold-light: #e8d5b0;
+      --dark: #1a1714;
+      --dark2: #141210;
+      --mid: #6b6560;
+      --border: rgba(201,169,110,0.15);
+      --green: #7ecf7e;
+      --red: #f08080;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--black); color: var(--white);
+      font-family: 'DM Sans', sans-serif; font-weight: 300;
+      min-height: 100vh;
+    }
+
+    /* ── NAV ── */
+    nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.2rem 3rem; border-bottom: 1px solid var(--border);
+      background: rgba(10,10,10,0.95); position: sticky; top: 0; z-index: 100;
+      flex-wrap: wrap; gap: 0.8rem;
+    }
+    .nav-logo { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 900; color: var(--gold); text-decoration: none; }
+    .nav-logo span { color: var(--white); }
+    .nav-links { display: flex; gap: 2rem; list-style: none; align-items: center; }
+    .nav-links a { color: rgba(245,242,238,0.6); text-decoration: none; font-size: 0.82rem; letter-spacing: 0.07em; text-transform: uppercase; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--white); }
+    .nav-links a.active { color: var(--gold); }
+    .nav-cta { background: var(--gold); color: var(--black); padding: 0.55rem 1.3rem; border-radius: 2px; text-decoration: none; font-size: 0.78rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; transition: background 0.2s; }
+    .nav-cta:hover { background: var(--gold-light); }
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; }
+    .hamburger span { width: 24px; height: 2px; background: var(--white); display: block; }
+
+    /* ── PAGE HERO ── */
+    .page-hero {
+      padding: 4rem 3rem 3rem; border-bottom: 1px solid var(--border);
+      position: relative; overflow: hidden;
+    }
+    .page-hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 50% 100% at 80% 50%, rgba(201,169,110,0.05) 0%, transparent 70%); }
+    .hero-inner { position: relative; display: flex; align-items: center; gap: 2.5rem; flex-wrap: wrap; }
+    .avatar {
+      width: 90px; height: 90px; border-radius: 50%;
+      background: var(--dark); border: 2px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.5rem; flex-shrink: 0; position: relative;
+      cursor: pointer; transition: border-color 0.2s;
+    }
+    .avatar:hover { border-color: var(--gold); }
+    .avatar-edit {
+      position: absolute; bottom: 0; right: 0;
+      width: 26px; height: 26px; background: var(--gold);
+      border-radius: 50%; display: flex; align-items: center;
+      justify-content: center; font-size: 0.65rem;
+    }
+    .hero-info { flex: 1; }
+    .page-tag { display: inline-block; color: var(--gold); font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 0.5rem; }
+    .hero-name {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 900;
+      line-height: 1.1; margin-bottom: 0.3rem;
+    }
+    .hero-name em { font-style: italic; color: var(--gold); }
+    .hero-sub { color: rgba(245,242,238,0.45); font-size: 0.88rem; }
+    .hero-badges { display: flex; gap: 0.6rem; margin-top: 1rem; flex-wrap: wrap; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      padding: 0.3rem 0.8rem; border-radius: 2px;
+      font-size: 0.72rem; letter-spacing: 0.06em;
+      border: 1px solid var(--border);
+    }
+    .badge-gold { background: rgba(201,169,110,0.1); color: var(--gold); border-color: rgba(201,169,110,0.25); }
+    .badge-green { background: rgba(126,207,126,0.08); color: var(--green); border-color: rgba(126,207,126,0.2); }
+    .badge-blue { background: rgba(100,150,255,0.08); color: #8ab4f8; border-color: rgba(100,150,255,0.2); }
+
+    /* ── MAIN LAYOUT ── */
+    .profile-wrap {
+      max-width: 1000px; margin: 0 auto;
+      padding: 3rem 2rem 5rem;
+      display: grid; grid-template-columns: 1fr 320px;
+      gap: 2rem; align-items: start;
+    }
+
+    /* ── SECTION ── */
+    .section { margin-bottom: 2rem; }
+    .section-title {
+      font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 1.2rem;
+      display: flex; align-items: center; gap: 0.6rem;
+    }
+    .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    /* ── STAT CARDS ── */
+    .stat-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr);
+      gap: 1rem; margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: var(--dark); border: 1px solid var(--border);
+      border-radius: 4px; padding: 1.4rem;
+      transition: border-color 0.2s;
+    }
+    .stat-card:hover { border-color: rgba(201,169,110,0.3); }
+    .stat-card-icon { font-size: 1.3rem; margin-bottom: 0.7rem; display: block; }
+    .stat-card-val {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem; font-weight: 900; color: var(--gold);
+      line-height: 1; margin-bottom: 0.2rem;
+    }
+    .stat-card-label { font-size: 0.75rem; color: var(--mid); letter-spacing: 0.06em; }
+
+    /* ── SCORE BREAKDOWN ── */
+    .score-breakdown { margin-bottom: 2rem; }
+    .breakdown-row {
+      display: flex; align-items: center; gap: 1rem;
+      padding: 0.8rem 0; border-bottom: 1px solid rgba(201,169,110,0.06);
+    }
+    .breakdown-row:last-child { border-bottom: none; }
+    .breakdown-label { font-size: 0.8rem; width: 100px; flex-shrink: 0; color: rgba(245,242,238,0.65); }
+    .breakdown-bar-wrap { flex: 1; height: 4px; background: rgba(201,169,110,0.08); border-radius: 2px; overflow: hidden; }
+    .breakdown-bar { height: 100%; border-radius: 2px; transition: width 1.2s ease; background: var(--gold); }
+    .breakdown-val { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; color: var(--gold); width: 30px; text-align: right; flex-shrink: 0; }
+
+    /* ── PROGRESS CHART ── */
+    .progress-chart {
+      background: var(--dark); border: 1px solid var(--border);
+      border-radius: 4px; padding: 1.5rem; margin-bottom: 2rem;
+    }
+    .chart-title { font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mid); margin-bottom: 1.2rem; }
+    .chart-area {
+      height: 120px; position: relative;
+      display: flex; align-items: flex-end; gap: 6px;
+    }
+    .chart-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.3rem; }
+    .chart-bar {
+      width: 100%; border-radius: 2px 2px 0 0;
+      background: var(--gold); opacity: 0.7;
+      transition: all 0.3s; cursor: default;
+      position: relative; min-height: 4px;
+    }
+    .chart-bar:hover { opacity: 1; }
+    .chart-bar-tip {
+      position: absolute; bottom: calc(100% + 6px); left: 50%;
+      transform: translateX(-50%);
+      background: var(--dark2); border: 1px solid var(--border);
+      padding: 0.2rem 0.5rem; border-radius: 2px;
+      font-size: 0.7rem; color: var(--gold); white-space: nowrap;
+      pointer-events: none; opacity: 0; transition: opacity 0.2s;
+    }
+    .chart-bar:hover .chart-bar-tip { opacity: 1; }
+    .chart-label { font-size: 0.6rem; color: var(--mid); text-align: center; }
+    .chart-empty { text-align: center; color: rgba(245,242,238,0.25); font-size: 0.85rem; padding: 2rem 0; width: 100%; }
+
+    /* ── BEST PHOTO ── */
+    .best-photo-card {
+      background: var(--dark); border: 1px solid var(--border);
+      border-radius: 4px; overflow: hidden; margin-bottom: 2rem;
+      cursor: pointer; transition: border-color 0.2s; text-decoration: none; display: block;
+    }
+    .best-photo-card:hover { border-color: rgba(201,169,110,0.35); }
+    .best-photo-img { width: 100%; height: 180px; object-fit: cover; display: block; background: var(--dark2); }
+    .best-photo-placeholder { width: 100%; height: 180px; background: var(--dark2); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; opacity: 0.2; }
+    .best-photo-body { padding: 1.2rem; display: flex; align-items: center; justify-content: space-between; }
+    .best-photo-score { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 900; color: var(--green); }
+    .best-photo-label { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mid); }
+    .best-photo-summary { font-size: 0.8rem; line-height: 1.6; color: rgba(245,242,238,0.45); flex: 1; padding-left: 1.2rem; }
+
+    /* ── RIGHT COLUMN ── */
+    .right-col { display: flex; flex-direction: column; gap: 1.5rem; }
+
+    /* ── SETTINGS CARD ── */
+    .settings-card {
+      background: var(--dark); border: 1px solid var(--border);
+      border-radius: 4px; overflow: hidden;
+    }
+    .settings-header {
+      padding: 1rem 1.4rem; border-bottom: 1px solid var(--border);
+      font-size: 0.72rem; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--gold);
+    }
+    .settings-row {
+      padding: 1rem 1.4rem; border-bottom: 1px solid rgba(201,169,110,0.06);
+      display: flex; flex-direction: column; gap: 0.5rem;
+    }
+    .settings-row:last-child { border-bottom: none; }
+    .settings-label { font-size: 0.78rem; font-weight: 500; color: rgba(245,242,238,0.8); }
+    .settings-sub { font-size: 0.73rem; color: var(--mid); line-height: 1.5; }
+    .settings-input {
+      background: var(--black); border: 1px solid var(--border);
+      color: var(--white); padding: 0.6rem 0.9rem;
+      border-radius: 2px; font-family: 'DM Sans', sans-serif;
+      font-size: 0.82rem; outline: none; width: 100%;
+      transition: border-color 0.2s;
+    }
+    .settings-input:focus { border-color: var(--gold); }
+    .settings-input-mono { font-family: monospace; font-size: 0.75rem; }
+    .settings-actions { display: flex; gap: 0.5rem; margin-top: 0.3rem; flex-wrap: wrap; }
+    .btn-sm {
+      background: var(--gold); color: var(--black); border: none;
+      padding: 0.5rem 1rem; border-radius: 2px; cursor: pointer;
+      font-family: 'DM Sans', sans-serif; font-size: 0.73rem;
+      font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+      transition: background 0.2s;
+    }
+    .btn-sm:hover { background: var(--gold-light); }
+    .btn-sm-ghost {
+      background: none; color: var(--mid); border: 1px solid var(--border);
+      padding: 0.5rem 1rem; border-radius: 2px; cursor: pointer;
+      font-family: 'DM Sans', sans-serif; font-size: 0.73rem;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      transition: all 0.2s;
+    }
+    .btn-sm-ghost:hover { border-color: rgba(201,169,110,0.35); color: var(--white); }
+    .btn-sm-danger {
+      background: none; color: rgba(200,80,80,0.6);
+      border: 1px solid rgba(200,80,80,0.2); padding: 0.5rem 1rem;
+      border-radius: 2px; cursor: pointer;
+      font-family: 'DM Sans', sans-serif; font-size: 0.73rem;
+      letter-spacing: 0.08em; text-transform: uppercase; transition: all 0.2s;
+    }
+    .btn-sm-danger:hover { border-color: rgba(200,80,80,0.5); color: var(--red); }
+    .api-key-status {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      font-size: 0.72rem; padding: 0.25rem 0.6rem; border-radius: 2px;
+    }
+    .api-key-status.set { background: rgba(126,207,126,0.1); color: var(--green); }
+    .api-key-status.notset { background: rgba(201,169,110,0.1); color: var(--gold); }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+    /* ── QUICK LINKS ── */
+    .quick-links { display: flex; flex-direction: column; gap: 0.4rem; }
+    .quick-link {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.8rem 1.4rem; background: var(--dark);
+      border: 1px solid var(--border); border-radius: 4px;
+      text-decoration: none; color: var(--white);
+      font-size: 0.82rem; transition: border-color 0.2s;
+    }
+    .quick-link:hover { border-color: rgba(201,169,110,0.35); color: var(--gold); }
+    .quick-link-icon { font-size: 1rem; }
+    .quick-link-arrow { color: var(--mid); font-size: 0.8rem; }
+
+    /* ── DANGER ZONE ── */
+    .danger-zone {
+      background: rgba(200,80,80,0.04);
+      border: 1px solid rgba(200,80,80,0.15);
+      border-radius: 4px; padding: 1.2rem 1.4rem;
+    }
+    .danger-title { font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(200,80,80,0.7); margin-bottom: 0.6rem; }
+    .danger-sub { font-size: 0.78rem; color: var(--mid); line-height: 1.5; margin-bottom: 1rem; }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(100px);
+      background: var(--dark); border: 1px solid var(--border);
+      border-radius: 4px; padding: 0.8rem 1.5rem;
+      font-size: 0.82rem; color: var(--white);
+      transition: transform 0.3s ease; z-index: 300;
+      display: flex; align-items: center; gap: 0.6rem;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.success { border-color: rgba(126,207,126,0.3); }
+    .toast.error { border-color: rgba(200,80,80,0.3); }
+
+    /* ── EMPTY PROFILE ── */
+    .no-data { color: rgba(245,242,238,0.3); font-size: 0.85rem; font-style: italic; padding: 1rem 0; }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .animate { animation: fadeUp 0.5s ease both; }
+
+    /* ── MOBILE ── */
+    @media (max-width: 768px) {
+      nav { padding: 1rem 1.2rem; }
+      .nav-links { display: none; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; background: var(--black); padding: 1.2rem 1.5rem; gap: 1.2rem; border-bottom: 1px solid var(--border); }
+      .nav-links.open { display: flex; }
+      .nav-cta { display: none; }
+      .hamburger { display: flex; }
+      .page-hero { padding: 2.5rem 1.5rem 2rem; }
+      .profile-wrap { grid-template-columns: 1fr; padding: 2rem 1rem 4rem; }
+      .stat-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav id="navbar">
+    <a href="index.html" class="nav-logo">Lens<span>Up</span></a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="learn.html">Learn</a></li>
+      <li><a href="gallery.html">Gallery</a></li>
+      <li><a href="profile.html" class="active">Profile</a></li>
+    </ul>
+    <a href="app.html" class="nav-cta">Analyse Photo</a>
+    <button class="hamburger" onclick="toggleNav()">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- PAGE HERO -->
+  <div class="page-hero">
+    <div class="hero-inner">
+      <div class="avatar" onclick="changeEmoji()" title="Click to change avatar">
+        <span id="avatarEmoji">📷</span>
+        <div class="avatar-edit">✏️</div>
+      </div>
+      <div class="hero-info">
+        <div class="page-tag">Your Profile</div>
+        <div class="hero-name" id="heroName">Photographer</div>
+        <div class="hero-sub" id="heroSub">Member since today · LensUp</div>
+        <div class="hero-badges" id="heroBadges"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="profile-wrap">
+
+    <!-- LEFT COLUMN -->
+    <div class="left-col">
+
+      <!-- STATS -->
+      <div class="section animate">
+        <div class="section-title">Your Stats</div>
+        <div class="stat-grid" id="statGrid">
+          <div class="stat-card">
+            <span class="stat-card-icon">📸</span>
+            <div class="stat-card-val" id="statTotal">0</div>
+            <div class="stat-card-label">Total Analyses</div>
+          </div>
+          <div class="stat-card">
+            <span class="stat-card-icon">⭐</span>
+            <div class="stat-card-val" id="statAvg">—</div>
+            <div class="stat-card-label">Average Score</div>
+          </div>
+          <div class="stat-card">
+            <span class="stat-card-icon">🏆</span>
+            <div class="stat-card-val" id="statBest">—</div>
+            <div class="stat-card-label">Best Score</div>
+          </div>
+          <div class="stat-card">
+            <span class="stat-card-icon">📈</span>
+            <div class="stat-card-val" id="statTrend">—</div>
+            <div class="stat-card-label">Recent Trend</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCORE BREAKDOWN ── -->
+      <div class="section animate" style="animation-delay:0.1s">
+        <div class="section-title">Average Score Breakdown</div>
+        <div class="score-breakdown" id="scoreBreakdown">
+          <div class="no-data">Analyse some photos to see your score breakdown.</div>
+        </div>
+      </div>
+
+      <!-- PROGRESS CHART -->
+      <div class="section animate" style="animation-delay:0.15s">
+        <div class="section-title">Score History</div>
+        <div class="progress-chart">
+          <div class="chart-title">Last 10 analyses — overall score</div>
+          <div class="chart-area" id="chartArea">
+            <div class="chart-empty">No history yet — start analysing photos!</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BEST PHOTO -->
+      <div class="section animate" style="animation-delay:0.2s" id="bestPhotoSection">
+        <div class="section-title">Best Photo</div>
+        <div id="bestPhotoWrap"></div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div class="right-col">
+
+      <!-- DISPLAY NAME + AVATAR -->
+      <div class="settings-card animate" style="animation-delay:0.05s">
+        <div class="settings-header">👤 Display Settings</div>
+        <div class="settings-row">
+          <div class="settings-label">Display Name</div>
+          <input type="text" class="settings-input" id="displayNameInput" placeholder="Your name" maxlength="40" />
+          <div class="settings-actions">
+            <button class="btn-sm" onclick="saveName()">Save Name</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUICK LINKS -->
+      <div class="animate" style="animation-delay:0.15s">
+        <div class="section-title">Quick Links</div>
+        <div class="quick-links">
+          <a href="app.html" class="quick-link">
+            <span><span class="quick-link-icon">⚡</span> &nbsp;Analyse a Photo</span>
+            <span class="quick-link-arrow">→</span>
+          </a>
+          <a href="gallery.html" class="quick-link">
+            <span><span class="quick-link-icon">🖼️</span> &nbsp;My Gallery</span>
+            <span class="quick-link-arrow">→</span>
+          </a>
+          <a href="learn.html" class="quick-link">
+            <span><span class="quick-link-icon">📚</span> &nbsp;Learn Photography</span>
+            <span class="quick-link-arrow">→</span>
+          </a>
+          <a href="https://console.anthropic.com" target="_blank" class="quick-link">
+            <span><span class="quick-link-icon">🔑</span> &nbsp;Anthropic Console</span>
+            <span class="quick-link-arrow">↗</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- DANGER ZONE -->
+      <div class="danger-zone animate" style="animation-delay:0.2s">
+        <div class="danger-title">⚠️ Danger Zone</div>
+        <div class="danger-sub">Permanently delete all your local data including history and settings. This cannot be undone.</div>
+        <button class="btn-sm-danger" onclick="clearAllData()">Delete All My Data</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <!-- FOOTER -->
+  <footer style="padding:2rem 3rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
+    <div style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--gold);font-weight:900;">Lens<span style="color:var(--white)">Up</span></div>
+    <p style="font-size:0.78rem;opacity:0.4;">© 2025 LensUp · AI-Powered Photo Analysis</p>
+  </footer>
+
+  <script>
+    // ── NAV ──
+    function toggleNav() {
+      document.getElementById('navLinks').classList.toggle('open');
+    }
+
+    // ── TOAST ──
+    let toastTimer;
+    function showToast(msg, type = 'success') {
+      const t = document.getElementById('toast');
+      t.textContent = (type === 'success' ? '✓ ' : '✕ ') + msg;
+      t.className = `toast ${type} show`;
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+    }
+
+    // ── DATA ──
+    function getHistory() {
+      try { return JSON.parse(localStorage.getItem('lensup_history') || '[]'); }
+      catch { return []; }
+    }
+
+    function scoreClass(n) {
+      if (n >= 8) return '#7ecf7e';
+      if (n >= 5) return '#c9a96e';
+      return '#f0a070';
+    }
+
+    // ── DISPLAY NAME ──
+    function loadName() {
+      const name = localStorage.getItem('lensup_name') || '';
+      document.getElementById('displayNameInput').value = name;
+      document.getElementById('heroName').textContent = name || 'Photographer';
+    }
+
+    function saveName() {
+      const name = document.getElementById('displayNameInput').value.trim();
+      localStorage.setItem('lensup_name', name);
+      document.getElementById('heroName').textContent = name || 'Photographer';
+      showToast('Name saved!');
+    }
+
+    // ── AVATAR EMOJI ──
+    const emojis = ['📷','🎞️','🌅','🦋','🌿','🏔️','🎨','🌊','🦅','🌸','⭐','🔥'];
+    let emojiIdx = 0;
+    function loadAvatar() {
+      const saved = localStorage.getItem('lensup_avatar');
+      if (saved) {
+        emojiIdx = emojis.indexOf(saved);
+        if (emojiIdx < 0) emojiIdx = 0;
+        document.getElementById('avatarEmoji').textContent = saved;
+      }
+    }
+    function changeEmoji() {
+      emojiIdx = (emojiIdx + 1) % emojis.length;
+      const emoji = emojis[emojiIdx];
+      document.getElementById('avatarEmoji').textContent = emoji;
+      localStorage.setItem('lensup_avatar', emoji);
+      showToast('Avatar updated!');
+    }
+
+    // ── STATS ──
+    function loadStats() {
+      const hist = getHistory();
+      const total = hist.length;
+
+      document.getElementById('statTotal').textContent = total;
+
+      if (total === 0) {
+        document.getElementById('statAvg').textContent = '—';
+        document.getElementById('statBest').textContent = '—';
+        document.getElementById('statTrend').textContent = '—';
+        document.getElementById('heroSub').textContent = 'Just getting started · LensUp';
+        return;
+      }
+
+      const scores = hist.map(i => i.result.overall);
+      const avg = (scores.reduce((a,b) => a+b, 0) / scores.length).toFixed(1);
+      const best = Math.max(...scores);
+
+      document.getElementById('statAvg').textContent = avg;
+      document.getElementById('statBest').textContent = best;
+
+      // Trend: compare last 3 vs previous 3
+      if (scores.length >= 4) {
+        const recent = scores.slice(0, Math.min(3, scores.length));
+        const older = scores.slice(Math.min(3, scores.length), Math.min(6, scores.length));
+        if (older.length > 0) {
+          const recentAvg = recent.reduce((a,b)=>a+b,0)/recent.length;
+          const olderAvg = older.reduce((a,b)=>a+b,0)/older.length;
+          const diff = recentAvg - olderAvg;
+          const trendEl = document.getElementById('statTrend');
+          if (diff > 0.3) { trendEl.textContent = '↑ ' + diff.toFixed(1); trendEl.style.color = '#7ecf7e'; }
+          else if (diff < -0.3) { trendEl.textContent = '↓ ' + Math.abs(diff).toFixed(1); trendEl.style.color = '#f08080'; }
+          else { trendEl.textContent = '→ Stable'; trendEl.style.color = 'var(--gold)'; }
+        } else {
+          document.getElementById('statTrend').textContent = '—';
+        }
+      } else {
+        document.getElementById('statTrend').textContent = '—';
+      }
+
+      // Sub text
+      const joined = new Date(hist[hist.length - 1].date).toLocaleDateString('en-GB', { month:'long', year:'numeric' });
+      document.getElementById('heroSub').textContent = `Member since ${joined} · ${total} photo${total !== 1 ? 's' : ''} analysed`;
+    }
+
+    // ── BADGES ──
+    function loadBadges() {
+      const hist = getHistory();
+      const badges = [];
+      const total = hist.length;
+      const best = total ? Math.max(...hist.map(i => i.result.overall)) : 0;
+      const avg = total ? hist.reduce((s,i) => s+i.result.overall, 0)/total : 0;
+
+      if (total >= 1)  badges.push({ label: 'First Shot', icon: '📷', cls: 'badge-blue' });
+      if (total >= 5)  badges.push({ label: '5 Analyses', icon: '⚡', cls: 'badge-blue' });
+      if (total >= 20) badges.push({ label: '20 Analyses', icon: '🔥', cls: 'badge-gold' });
+      if (best >= 8)   badges.push({ label: 'High Scorer', icon: '🏆', cls: 'badge-gold' });
+      if (best >= 9)   badges.push({ label: 'Elite Shot', icon: '💎', cls: 'badge-gold' });
+      if (avg >= 7)    badges.push({ label: 'Consistent', icon: '📈', cls: 'badge-green' });
+
+      const container = document.getElementById('heroBadges');
+      if (badges.length === 0) {
+        container.innerHTML = '<span style="font-size:0.78rem;color:var(--mid);">Analyse photos to earn badges</span>';
+      } else {
+        container.innerHTML = badges.map(b =>
+          `<span class="badge ${b.cls}">${b.icon} ${b.label}</span>`
+        ).join('');
+      }
+    }
+
+    // ── SCORE BREAKDOWN ──
+    function loadBreakdown() {
+      const hist = getHistory();
+      const container = document.getElementById('scoreBreakdown');
+      if (hist.length === 0) {
+        container.innerHTML = '<div class="no-data">Analyse some photos to see your score breakdown.</div>';
+        return;
+      }
+
+      const dims = ['composition','lighting','colour','focus','mood'];
+      const labels = { composition:'Composition', lighting:'Lighting', colour:'Colour', focus:'Focus', mood:'Mood' };
+      const avgs = {};
+      dims.forEach(d => {
+        avgs[d] = (hist.reduce((s,i) => s + i.result.scores[d], 0) / hist.length).toFixed(1);
+      });
+
+      container.innerHTML = dims.map(d => `
+        <div class="breakdown-row">
+          <div class="breakdown-label">${labels[d]}</div>
+          <div class="breakdown-bar-wrap">
+            <div class="breakdown-bar" style="width:${avgs[d]*10}%;background:${scoreClass(parseFloat(avgs[d]))}"></div>
+          </div>
+          <div class="breakdown-val" style="color:${scoreClass(parseFloat(avgs[d]))}">${avgs[d]}</div>
+        </div>
+      `).join('');
+    }
+
+    // ── PROGRESS CHART ──
+    function loadChart() {
+      const hist = getHistory();
+      const container = document.getElementById('chartArea');
+      if (hist.length === 0) {
+        container.innerHTML = '<div class="chart-empty">No history yet — start analysing photos!</div>';
+        return;
+      }
+
+      const last10 = [...hist].slice(0, 10).reverse();
+      const maxScore = 10;
+
+      container.innerHTML = last10.map((item, i) => {
+        const score = item.result.overall;
+        const heightPct = (score / maxScore) * 100;
+        const date = new Date(item.date).toLocaleDateString('en-GB', { day:'numeric', month:'short' });
+        return `
+          <div class="chart-bar-wrap">
+            <div class="chart-bar" style="height:${heightPct}%;background:${scoreClass(score)}">
+              <div class="chart-bar-tip">${score}/10 · ${date}</div>
+            </div>
+            <div class="chart-label">${score}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ── BEST PHOTO ──
+    function loadBestPhoto() {
+      const hist = getHistory();
+      const wrap = document.getElementById('bestPhotoWrap');
+      if (hist.length === 0) {
+        wrap.innerHTML = '<div class="no-data">Your best shot will appear here after your first analysis.</div>';
+        return;
+      }
+
+      const best = [...hist].sort((a,b) => b.result.overall - a.result.overall)[0];
+      const isUrl = best.url && best.url.startsWith('http');
+
+      wrap.innerHTML = `
+        <a href="gallery.html" class="best-photo-card">
+          ${isUrl
+            ? `<img class="best-photo-img" src="${best.url}" alt="Best photo" onerror="this.outerHTML='<div class=\\'best-photo-placeholder\\'>🏆</div>'">`
+            : `<div class="best-photo-placeholder">🏆</div>`}
+          <div class="best-photo-body">
+            <div>
+              <div class="best-photo-score">${best.result.overall}</div>
+              <div class="best-photo-label">/ 10 · Best Score</div>
+            </div>
+            <div class="best-photo-summary">${best.result.summary}</div>
+          </div>
+        </a>
+      `;
+    }
+
+    // ── CLEAR ALL DATA ──
+    function clearAllData() {
+      if (!confirm('Delete ALL your LensUp data? This includes your history, name, API key, and settings. This cannot be undone.')) return;
+      ['lensup_history','lensup_name','lensup_avatar'].forEach(k => localStorage.removeItem(k));
+      showToast('All data cleared');
+      setTimeout(() => location.reload(), 1000);
+    }
+
+    // ── INIT ──
+    async function init() {
+      initSupabase();
+      const user = await getUser();
+      if (!user) {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      // Update nav with sign out
+      const navLinks = document.getElementById('navLinks');
+      const li = document.createElement('li');
+      li.innerHTML = `<a href="#" onclick="signOut()" style="color:rgba(245,242,238,0.4)!important;">Sign Out</a>`;
+      navLinks.appendChild(li);
+
+      // Show email in hero
+      document.getElementById('heroSub').textContent = user.email + ' · LensUp';
+
+      // Load cloud data
+      const { data, error } = await getAnalyses(user);
+      if (!error && data && data.length > 0) {
+        const cloudItems = data.map(dbRowToResult);
+        localStorage.setItem('lensup_history', JSON.stringify(cloudItems.slice(0, 20)));
+      }
+
+      loadName();
+      loadAvatar();
+      loadStats();
+      loadBadges();
+      loadBreakdown();
+      loadChart();
+      loadBestPhoto();
+    }
+
+    init();
+  </script>
+</body>
+</html>

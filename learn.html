@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LensUp — Learn Photography</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black: #0a0a0a;
+      --white: #f5f2ee;
+      --gold: #c9a96e;
+      --gold-light: #e8d5b0;
+      --dark: #1a1714;
+      --dark2: #141210;
+      --mid: #6b6560;
+      --border: rgba(201,169,110,0.15);
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      min-height: 100vh;
+    }
+
+    /* ── NAV ── */
+    nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.2rem 3rem;
+      border-bottom: 1px solid var(--border);
+      background: rgba(10,10,10,0.95);
+      position: sticky; top: 0; z-index: 100;
+      flex-wrap: wrap; gap: 0.8rem;
+    }
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem; font-weight: 900;
+      color: var(--gold); text-decoration: none;
+    }
+    .nav-logo span { color: var(--white); }
+    .nav-links { display: flex; gap: 2rem; list-style: none; align-items: center; }
+    .nav-links a {
+      color: rgba(245,242,238,0.6); text-decoration: none;
+      font-size: 0.82rem; letter-spacing: 0.07em;
+      text-transform: uppercase; transition: color 0.2s;
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--gold); }
+    .nav-cta {
+      background: var(--gold); color: var(--black);
+      padding: 0.55rem 1.3rem; border-radius: 2px;
+      text-decoration: none; font-size: 0.78rem;
+      font-weight: 500; letter-spacing: 0.1em;
+      text-transform: uppercase; transition: background 0.2s;
+    }
+    .nav-cta:hover { background: var(--gold-light); }
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; }
+    .hamburger span { width: 24px; height: 2px; background: var(--white); display: block; }
+
+    /* ── HERO ── */
+    .page-hero {
+      padding: 4rem 3rem 3rem;
+      border-bottom: 1px solid var(--border);
+      position: relative; overflow: hidden;
+    }
+    .page-hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 50% 100% at 80% 50%, rgba(201,169,110,0.05) 0%, transparent 70%);
+    }
+    .page-hero-inner { position: relative; max-width: 600px; }
+    .page-tag {
+      display: inline-block; color: var(--gold);
+      font-size: 0.7rem; letter-spacing: 0.2em;
+      text-transform: uppercase; margin-bottom: 0.8rem;
+    }
+    .page-hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 900; line-height: 1.1;
+      margin-bottom: 0.8rem;
+    }
+    .page-hero h1 em { font-style: italic; color: var(--gold); }
+    .page-hero p {
+      color: rgba(245,242,238,0.55);
+      font-size: 0.95rem; line-height: 1.8;
+    }
+
+    /* ── LAYOUT ── */
+    .learn-wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 3rem 2rem 5rem;
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 3rem;
+      align-items: start;
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      position: sticky; top: 80px;
+    }
+    .sidebar-title {
+      font-size: 0.68rem; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--mid);
+      margin-bottom: 1rem;
+    }
+    .sidebar-nav { list-style: none; }
+    .sidebar-nav li { margin-bottom: 0.15rem; }
+    .sidebar-nav a {
+      display: block; padding: 0.45rem 0.8rem;
+      color: rgba(245,242,238,0.5); text-decoration: none;
+      font-size: 0.82rem; border-radius: 2px;
+      border-left: 2px solid transparent;
+      transition: all 0.2s; line-height: 1.4;
+    }
+    .sidebar-nav a:hover { color: var(--white); background: rgba(201,169,110,0.05); }
+    .sidebar-nav a.active { color: var(--gold); border-left-color: var(--gold); background: rgba(201,169,110,0.06); }
+    .sidebar-divider { height: 1px; background: var(--border); margin: 0.8rem 0; }
+
+    /* ── CONTENT ── */
+    .content { min-width: 0; }
+
+    .chapter {
+      margin-bottom: 4rem;
+      scroll-margin-top: 100px;
+    }
+    .chapter-header {
+      display: flex; align-items: center; gap: 1rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .chapter-icon { font-size: 1.8rem; }
+    .chapter-meta {}
+    .chapter-num {
+      font-size: 0.68rem; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--gold);
+      margin-bottom: 0.2rem;
+    }
+    .chapter h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem; font-weight: 900;
+    }
+
+    .chapter p {
+      font-size: 0.92rem; line-height: 1.85;
+      color: rgba(245,242,238,0.7);
+      margin-bottom: 1.2rem;
+    }
+    .chapter p:last-child { margin-bottom: 0; }
+
+    .chapter h3 {
+      font-size: 0.95rem; font-weight: 500;
+      color: var(--white); margin: 1.8rem 0 0.6rem;
+      letter-spacing: 0.02em;
+    }
+
+    /* ── TIP CARDS ── */
+    .tip-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem; margin: 1.5rem 0;
+    }
+    .tip-card {
+      background: var(--dark);
+      border: 1px solid var(--border);
+      border-radius: 4px; padding: 1.4rem;
+      transition: border-color 0.2s;
+    }
+    .tip-card:hover { border-color: rgba(201,169,110,0.35); }
+    .tip-card-icon { font-size: 1.4rem; margin-bottom: 0.7rem; display: block; }
+    .tip-card h4 {
+      font-size: 0.88rem; font-weight: 500;
+      margin-bottom: 0.4rem;
+    }
+    .tip-card p {
+      font-size: 0.8rem; line-height: 1.6;
+      color: rgba(245,242,238,0.5); margin: 0;
+    }
+
+    /* ── RULE VISUAL ── */
+    .rule-visual {
+      background: var(--dark);
+      border: 1px solid var(--border);
+      border-radius: 4px; padding: 1.5rem;
+      margin: 1.5rem 0;
+      display: flex; align-items: center;
+      justify-content: center;
+    }
+    .grid-demo {
+      width: 240px; height: 160px;
+      border: 2px solid rgba(201,169,110,0.4);
+      position: relative; border-radius: 2px;
+      background: linear-gradient(135deg, #1e1a16, #2a2520);
+    }
+    .grid-line-v {
+      position: absolute; top: 0; bottom: 0;
+      width: 1px; background: rgba(201,169,110,0.5);
+    }
+    .grid-line-h {
+      position: absolute; left: 0; right: 0;
+      height: 1px; background: rgba(201,169,110,0.5);
+    }
+    .grid-dot {
+      position: absolute; width: 8px; height: 8px;
+      background: var(--gold); border-radius: 50%;
+      transform: translate(-50%, -50%);
+    }
+    .grid-label {
+      font-size: 0.68rem; color: var(--gold);
+      letter-spacing: 0.1em; text-transform: uppercase;
+      margin-left: 1.5rem;
+    }
+
+    /* ── CALLOUT ── */
+    .callout {
+      background: rgba(201,169,110,0.06);
+      border-left: 3px solid var(--gold);
+      padding: 1.2rem 1.5rem;
+      border-radius: 0 4px 4px 0;
+      margin: 1.5rem 0;
+    }
+    .callout-label {
+      font-size: 0.68rem; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--gold);
+      margin-bottom: 0.4rem;
+    }
+    .callout p {
+      font-size: 0.85rem; line-height: 1.7;
+      color: rgba(245,242,238,0.75); margin: 0;
+    }
+
+    /* ── SCORE TABLE ── */
+    .score-table {
+      width: 100%; border-collapse: collapse;
+      margin: 1.5rem 0; font-size: 0.85rem;
+    }
+    .score-table th {
+      text-align: left; padding: 0.7rem 1rem;
+      font-size: 0.68rem; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--gold);
+      border-bottom: 1px solid var(--border);
+    }
+    .score-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid rgba(201,169,110,0.07);
+      color: rgba(245,242,238,0.7); line-height: 1.5;
+      vertical-align: top;
+    }
+    .score-table tr:last-child td { border-bottom: none; }
+    .score-table tr:hover td { background: rgba(201,169,110,0.03); }
+    .badge {
+      display: inline-block; padding: 0.15rem 0.5rem;
+      border-radius: 2px; font-size: 0.7rem;
+      font-weight: 500; letter-spacing: 0.05em;
+    }
+    .badge-gold { background: rgba(201,169,110,0.15); color: var(--gold); }
+    .badge-green { background: rgba(100,200,100,0.12); color: #7ecf7e; }
+    .badge-blue { background: rgba(100,150,255,0.12); color: #8ab4f8; }
+
+    /* ── GLOSSARY ── */
+    .glossary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1rem; margin-top: 1.5rem;
+    }
+    .glossary-item {
+      background: var(--dark);
+      border: 1px solid var(--border);
+      border-radius: 4px; padding: 1.2rem 1.4rem;
+    }
+    .glossary-term {
+      font-size: 0.9rem; font-weight: 500;
+      color: var(--gold); margin-bottom: 0.4rem;
+    }
+    .glossary-def {
+      font-size: 0.82rem; line-height: 1.6;
+      color: rgba(245,242,238,0.55);
+    }
+
+    /* ── CTA BANNER ── */
+    .cta-banner {
+      background: var(--dark);
+      border: 1px solid var(--border);
+      border-radius: 4px; padding: 2rem;
+      text-align: center; margin-top: 2rem;
+    }
+    .cta-banner h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem; margin-bottom: 0.5rem;
+    }
+    .cta-banner p {
+      font-size: 0.85rem; color: rgba(245,242,238,0.5);
+      margin-bottom: 1.2rem;
+    }
+    .btn-gold {
+      background: var(--gold); color: var(--black);
+      padding: 0.75rem 2rem; border-radius: 2px;
+      text-decoration: none; font-size: 0.82rem;
+      font-weight: 500; letter-spacing: 0.1em;
+      text-transform: uppercase; transition: background 0.2s;
+      display: inline-block;
+    }
+    .btn-gold:hover { background: var(--gold-light); }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 2rem 3rem;
+      border-top: 1px solid var(--border);
+      display: flex; align-items: center;
+      justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+    }
+    .footer-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem; color: var(--gold); font-weight: 900;
+    }
+    .footer-logo span { color: var(--white); }
+    footer p { font-size: 0.78rem; opacity: 0.4; }
+
+    /* ── MOBILE ── */
+    @media (max-width: 768px) {
+      nav { padding: 1rem 1.2rem; }
+      .nav-links { display: none; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; background: var(--black); padding: 1.2rem 1.5rem; gap: 1.2rem; border-bottom: 1px solid var(--border); }
+      .nav-links.open { display: flex; }
+      .nav-cta { display: none; }
+      .hamburger { display: flex; }
+      .page-hero { padding: 2.5rem 1.5rem 2rem; }
+      .learn-wrap { grid-template-columns: 1fr; padding: 2rem 1.2rem 4rem; gap: 0; }
+      .sidebar { display: none; }
+      footer { padding: 1.5rem; flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav id="navbar">
+    <a href="index.html" class="nav-logo">Lens<span>Up</span></a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="learn.html" class="active">Learn</a></li>
+      <li><a href="gallery.html">Gallery</a></li>
+      <li><a href="profile.html">Profile</a></li>
+    </ul>
+    <a href="app.html" class="nav-cta">Analyse Photo</a>
+    <button class="hamburger" onclick="toggleNav()">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- HERO -->
+  <div class="page-hero">
+    <div class="page-hero-inner">
+      <div class="page-tag">Photography School</div>
+      <h1>Learn to Shoot<br/>Like a <em>Pro</em></h1>
+      <p>Everything you need to understand what makes a great photo — from the basics to what Claude AI looks for when analysing your shots.</p>
+    </div>
+  </div>
+
+  <div class="learn-wrap">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-title">Chapters</div>
+      <ul class="sidebar-nav">
+        <li><a href="#composition" class="active">01 · Composition</a></li>
+        <li><a href="#lighting">02 · Lighting</a></li>
+        <li><a href="#colour">03 · Colour & Mood</a></li>
+        <li><a href="#focus">04 · Focus & Depth</a></li>
+        <li><a href="#scores">05 · Understanding Scores</a></li>
+        <li><a href="#tips">06 · Quick Win Tips</a></li>
+        <div class="sidebar-divider"></div>
+        <li><a href="#glossary">Glossary</a></li>
+      </ul>
+    </aside>
+
+    <!-- CONTENT -->
+    <main class="content">
+
+      <!-- CHAPTER 1: COMPOSITION -->
+      <div class="chapter" id="composition">
+        <div class="chapter-header">
+          <div class="chapter-icon">🎯</div>
+          <div class="chapter-meta">
+            <div class="chapter-num">Chapter 01</div>
+            <h2>Composition</h2>
+          </div>
+        </div>
+
+        <p>Composition is how you arrange the elements inside your frame. It's the single most powerful tool a photographer has — and unlike lighting or gear, it costs nothing. A well-composed photo guides the viewer's eye exactly where you want it to go.</p>
+
+        <h3>The Rule of Thirds</h3>
+        <p>Imagine dividing your frame into a 3×3 grid. The four points where the lines intersect are called "power points." Placing your subject on one of these points — rather than dead centre — creates natural tension and visual interest.</p>
+
+        <div class="rule-visual">
+          <div class="grid-demo">
+            <div class="grid-line-v" style="left:33.3%"></div>
+            <div class="grid-line-v" style="left:66.6%"></div>
+            <div class="grid-line-h" style="top:33.3%"></div>
+            <div class="grid-line-h" style="top:66.6%"></div>
+            <div class="grid-dot" style="left:33.3%;top:33.3%"></div>
+            <div class="grid-dot" style="left:66.6%;top:33.3%"></div>
+            <div class="grid-dot" style="left:33.3%;top:66.6%"></div>
+            <div class="grid-dot" style="left:66.6%;top:66.6%"></div>
+          </div>
+          <div class="grid-label">Place subjects<br/>on power points</div>
+        </div>
+
+        <div class="callout">
+          <div class="callout-label">💡 Pro Tip</div>
+          <p>Most smartphones have a grid overlay built into the camera app. Turn it on in settings — it's the fastest way to train your eye for the rule of thirds.</p>
+        </div>
+
+        <h3>Leading Lines</h3>
+        <p>Roads, fences, rivers, stairways — any line that draws the eye from the foreground into the background creates depth and guides the viewer through the image. The strongest leading lines point toward your subject.</p>
+
+        <h3>Framing</h3>
+        <p>Use natural elements like doorways, windows, archways, or tree branches to frame your subject. This creates layers in the image and adds a sense of depth that flat compositions lack.</p>
+
+        <h3>Negative Space</h3>
+        <p>Leaving empty space around your subject isn't wasted space — it gives the eye room to breathe and makes the subject feel more powerful. Minimalist compositions with strong negative space often score very well.</p>
+
+        <div class="tip-grid">
+          <div class="tip-card">
+            <span class="tip-card-icon">📐</span>
+            <h4>Rule of Thirds</h4>
+            <p>Off-centre subjects create visual tension and feel more dynamic.</p>
+          </div>
+          <div class="tip-card">
+            <span class="tip-card-icon">↗️</span>
+            <h4>Leading Lines</h4>
+            <p>Draw the eye through the frame toward your main subject.</p>
+          </div>
+          <div class="tip-card">
+            <span class="tip-card-icon">🪟</span>
+            <h4>Framing</h4>
+            <p>Use natural elements to frame and isolate your subject.</p>
+          </div>
+          <div class="tip-card">
+            <span class="tip-card-icon">⬜</span>
+            <h4>Negative Space</h4>
+            <p>Empty space isn't wasted — it makes subjects pop.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHAPTER 2: LIGHTING -->
+      <div class="chapter" id="lighting">
+        <div class="chapter-header">
+          <div class="chapter-icon">💡</div>
+          <div class="chapter-meta">
+            <div class="chapter-num">Chapter 02</div>
+            <h2>Lighting</h2>
+          </div>
+        </div>
+
+        <p>Photography literally means "writing with light." The quality, direction, and colour of light determines the mood, texture, and drama of your image more than any other single factor.</p>
+
+        <h3>Golden Hour</h3>
+        <p>The hour after sunrise and the hour before sunset produce warm, soft, directional light that flatters almost any subject. Shadows are long, colours are rich, and the light has a natural glow that's nearly impossible to replicate artificially. If you can only shoot at one time of day, shoot golden hour.</p>
+
+        <h3>Hard vs Soft Light</h3>
+        <p>Hard light (midday sun, bare flash) creates strong shadows and high contrast — great for dramatic, graphic images. Soft light (overcast sky, window light, diffused flash) creates gentle gradients and flattering skin tones. Neither is better — they serve different stories.</p>
+
+        <h3>Light Direction</h3>
+        <p>Front lighting is flat and safe. Side lighting (also called Rembrandt lighting) creates shadows that reveal texture and depth. Backlighting creates silhouettes and rim light — dramatic but requires careful exposure. Understanding where your light source is coming from is the first step to controlling it.</p>
+
+        <div class="callout">
+          <div class="callout-label">💡 Pro Tip</div>
+          <p>Overcast days are a photographer's best friend for portraits. The entire sky becomes one giant soft box, giving you even, flattering light from everywhere with no harsh shadows.</p>
+        </div>
+
+        <h3>Exposure Triangle</h3>
+        <p>If you're shooting with a camera or advanced phone settings, three factors control exposure: <strong style="color:var(--white)">ISO</strong> (sensor sensitivity), <strong style="color:var(--white)">Aperture</strong> (how much light enters), and <strong style="color:var(--white)">Shutter Speed</strong> (how long the sensor is exposed). Balancing these three is the foundation of technical photography.</p>
+
+        <div class="tip-grid">
+          <div class="tip-card">
+            <span class="tip-card-icon">🌅</span>
+            <h4>Golden Hour</h4>
+            <p>Warm, soft light just after sunrise or before sunset.</p>
+          </div>
+          <div class="tip-card">
+            <span class="tip-card-icon">☁️</span>
+            <h4>Overcast = Soft Box</h4>
+            <p>Clouds diffuse sunlight into perfect portrait lighting.</p>
+          </div>
+          <div class="tip-card">
+            <span class="tip-card-icon">🔦</span>
+            <h4>Side Lighting</h4>
+            <p>Reveals texture and adds dramatic depth to any subject.</p>
+          </div>
+          <div class="tip-card">
+            <span class="tip-card-icon">🌑</span>
+            <h4>Backlighting</h4>
+            <p>Creates silhouettes and glowing rim light effects.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHAPTER 3: COLOUR & MOOD -->
+      <div class="chapter" id="colour">
+        <div class="chapter-header">
+          <div class="chapter-icon">🎨</div>
+          <div class="chapter-meta">
+            <div class="chapter-num">Chapter 03</div>
+            <h2>Colour & Mood</h2>
+          </div>
+        </div>
+
+        <p>Colour is one of the most emotionally powerful tools in photography. Viewers feel colour before they consciously process it. A deliberate colour palette can make a technically average photo feel unforgettable.</p>
+
+        <h3>Warm vs Cool Tones</h3>
+        <p>Warm tones (oranges, reds, yellows) feel energetic, intimate, and inviting. Cool tones (blues, greens, purples) feel calm, distant, and melancholic. Most great photos lean intentionally one way or the other rather than sitting neutrally in the middle.</p>
+
+        <h3>Colour Harmony</h3>
+        <p>Complementary colours (opposite on the colour wheel, like orange and blue) create vibrant contrast. Analogous colours (neighbours on the wheel, like yellow, orange, and red) feel harmonious and natural. Both work — the key is being intentional rather than accidental.</p>
+
+        <h3>Colour as Story</h3>
+        <p>Think about what story your colours are telling. Desaturated, faded tones feel nostalgic. Rich, vibrant saturation feels bold and modern. Moody, dark tones feel cinematic. Before editing, ask yourself: what feeling do I want this photo to create?</p>
+
+        <div class="callout">
+          <div class="callout-label">💡 Pro Tip</div>
+          <p>The most iconic travel photos often have a single dominant colour that ties the whole frame together. Look for scenes where one colour dominates — yellow tuk-tuks, a red door, a blue boat — and simplify around it.</p>
+        </div>
+      </div>
+
+      <!-- CHAPTER 4: FOCUS & DEPTH -->
+      <div class="chapter" id="focus">
+        <div class="chapter-header">
+          <div class="chapter-icon">🔍</div>
+          <div class="chapter-meta">
+            <div class="chapter-num">Chapter 04</div>
+            <h2>Focus & Depth of Field</h2>
+          </div>
+        </div>
+
+        <p>Where you focus in a photo is a creative decision, not just a technical one. What's sharp draws the eye. What's blurred recedes. Controlling this separation is one of the most powerful ways to direct attention.</p>
+
+        <h3>Shallow Depth of Field</h3>
+        <p>A wide aperture (low f-number like f/1.8 or f/2.8) blurs the background into a smooth wash called "bokeh." This isolates your subject and is the signature look of portrait photography. The subject is sharp; the world melts away behind it.</p>
+
+        <h3>Deep Depth of Field</h3>
+        <p>A narrow aperture (high f-number like f/11 or f/16) keeps everything sharp from foreground to background. Essential for landscapes, architecture, and street photography where context and environment are part of the story.</p>
+
+        <h3>Focus Points</h3>
+        <p>Always focus on the most important part of your subject. For portraits, that's the eyes — specifically the eye closest to the camera. A photo where the nose is sharp but eyes are blurry feels fundamentally wrong to every viewer, even if they can't explain why.</p>
+
+        <div class="callout">
+          <div class="callout-label">💡 Pro Tip</div>
+          <p>On a smartphone, tap the screen where you want to focus before shooting. Most phones also let you lock focus and exposure separately — look for the AF/AE lock option.</p>
+        </div>
+      </div>
+
+      <!-- CHAPTER 5: UNDERSTANDING SCORES -->
+      <div class="chapter" id="scores">
+        <div class="chapter-header">
+          <div class="chapter-icon">📊</div>
+          <div class="chapter-meta">
+            <div class="chapter-num">Chapter 05</div>
+            <h2>Understanding Your LensUp Scores</h2>
+          </div>
+        </div>
+
+        <p>When you analyse a photo with LensUp, Claude AI evaluates it across five dimensions. Here's exactly what each score means and how to improve it.</p>
+
+        <table class="score-table">
+          <thead>
+            <tr>
+              <th>Score</th>
+              <th>What It Measures</th>
+              <th>How to Improve</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="badge badge-gold">Composition</span></td>
+              <td>How well the frame is arranged — rule of thirds, leading lines, balance, framing</td>
+              <td>Enable grid overlay on your camera app. Slow down before shooting.</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-blue">Lighting</span></td>
+              <td>Quality, direction, and exposure of light — is it flattering, dramatic, or harsh?</td>
+              <td>Shoot during golden hour. Use shade to soften harsh midday sun.</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-gold">Colour</span></td>
+              <td>Colour palette, harmony, saturation, and whether the tones serve the mood</td>
+              <td>Look for scenes with a dominant colour. Edit with intention, not randomly.</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-green">Focus</span></td>
+              <td>Sharpness of the subject, appropriate depth of field, correct focal point</td>
+              <td>Tap to focus on your subject. For portraits, always focus on the nearest eye.</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-blue">Mood</span></td>
+              <td>Emotional impact — does the photo tell a story or evoke a feeling?</td>
+              <td>Ask "what is this photo about?" before pressing the shutter.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="callout">
+          <div class="callout-label">📈 Score Benchmarks</div>
+          <p><strong style="color:var(--white)">1–4:</strong> Learning phase — focus on one dimension at a time. &nbsp;|&nbsp; <strong style="color:var(--white)">5–7:</strong> Solid foundations — refine and be more intentional. &nbsp;|&nbsp; <strong style="color:var(--white)">8–10:</strong> Strong work — push creative boundaries.</p>
+        </div>
+      </div>
+
+      <!-- CHAPTER 6: QUICK TIPS -->
+      <div class="chapter" id="tips">
+        <div class="chapter-header">
+          <div class="chapter-icon">⚡</div>
+          <div class="chapter-meta">
+            <div class="chapter-num">Chapter 06</div>
+            <h2>Quick Win Tips</h2>
+          </div>
+        </div>
+
+        <p>These are small changes that make an immediate difference to your scores — no new gear required.</p>
+
+        <div class="tip-grid">
+          <div class="tip-card">
+            <span class="tip-card-icon">🔲</span>
+            <h4>Turn on the grid</h4>
+            <p>Camera grid overlay trains your eye for composition without thinking.</p>
+          </div>
+          <div class="tip-card">
+            <span class="tip-card-icon">🚶</span>
+            <h4>Move your feet</h4>
+            <p>Change your angle before zooming. Walking closer or lower changes everything.</p>
+          </div>
+          <div class="tip-card">
+            <span class="tip-card-icon">🧹</span>
+            <h4>Clean the background</h4>
+            <p>Look behind your subject. Remove distractions before shooting, not after.</p>
+          </div>
+          <div class="tip-card">
+            <span class="tip-card-icon">⏱️</span>
+            <h4>Wait for the moment</h4>
+            <p>Set up your composition first, then wait for the right light or action.</p>
+          </div>
+          <div class="tip-card">
+            <span class="tip-card-icon">📏</span>
+            <h4>Get lower</h4>
+            <p>Shooting from eye level is safe. Shooting from knee or ground level is memorable.</p>
+          </div>
+          <div class="tip-card">
+            <span class="tip-card-icon">🔁</span>
+            <h4>Shoot more frames</h4>
+            <p>Pro photographers take dozens of shots of the same scene. Quantity leads to quality.</p>
+          </div>
+          <div class="tip-card">
+            <span class="tip-card-icon">✂️</span>
+            <h4>Crop ruthlessly</h4>
+            <p>A tight crop can rescue a weak composition. Remove anything that doesn't add to the story.</p>
+          </div>
+          <div class="tip-card">
+            <span class="tip-card-icon">🌤️</span>
+            <h4>Embrace bad weather</h4>
+            <p>Fog, rain, and overcast skies create mood that perfect sunny days never can.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- GLOSSARY -->
+      <div class="chapter" id="glossary">
+        <div class="chapter-header">
+          <div class="chapter-icon">📖</div>
+          <div class="chapter-meta">
+            <div class="chapter-num">Reference</div>
+            <h2>Glossary</h2>
+          </div>
+        </div>
+        <p>Key terms you'll encounter in your LensUp analyses and in photography generally.</p>
+        <div class="glossary-grid">
+          <div class="glossary-item">
+            <div class="glossary-term">Aperture</div>
+            <div class="glossary-def">The opening in a lens that controls how much light reaches the sensor. Measured in f-stops (f/1.8, f/8). Lower number = wider opening = more light + blurrier background.</div>
+          </div>
+          <div class="glossary-item">
+            <div class="glossary-term">Bokeh</div>
+            <div class="glossary-def">The aesthetic quality of the out-of-focus blur in a photograph. Creamy, smooth bokeh is highly prized in portrait photography.</div>
+          </div>
+          <div class="glossary-item">
+            <div class="glossary-term">Composition</div>
+            <div class="glossary-def">The arrangement of visual elements within the frame. How you position subjects, lines, shapes, and space relative to each other.</div>
+          </div>
+          <div class="glossary-item">
+            <div class="glossary-term">Depth of Field</div>
+            <div class="glossary-def">The range of distance in a photo that appears acceptably sharp. Shallow DoF = blurry background. Deep DoF = everything sharp.</div>
+          </div>
+          <div class="glossary-item">
+            <div class="glossary-term">Exposure</div>
+            <div class="glossary-def">How bright or dark the final image is. Controlled by ISO, aperture, and shutter speed together — the "exposure triangle."</div>
+          </div>
+          <div class="glossary-item">
+            <div class="glossary-term">Golden Hour</div>
+            <div class="glossary-def">The period shortly after sunrise and before sunset when sunlight is warm, soft, and directional. Considered the best natural light for photography.</div>
+          </div>
+          <div class="glossary-item">
+            <div class="glossary-term">ISO</div>
+            <div class="glossary-def">The sensitivity of the camera sensor to light. Higher ISO brightens images in dark conditions but introduces grain (noise).</div>
+          </div>
+          <div class="glossary-item">
+            <div class="glossary-term">Leading Lines</div>
+            <div class="glossary-def">Lines within the frame (roads, fences, rivers) that guide the viewer's eye toward the main subject or through the image.</div>
+          </div>
+          <div class="glossary-item">
+            <div class="glossary-term">Negative Space</div>
+            <div class="glossary-def">Empty or uncluttered areas around the subject. Gives the eye room to breathe and makes subjects feel more powerful and isolated.</div>
+          </div>
+          <div class="glossary-item">
+            <div class="glossary-term">Rule of Thirds</div>
+            <div class="glossary-def">A compositional guideline that divides the frame into a 3×3 grid. Placing subjects at the intersections creates natural visual balance.</div>
+          </div>
+          <div class="glossary-item">
+            <div class="glossary-term">Shutter Speed</div>
+            <div class="glossary-def">How long the camera sensor is exposed to light. Fast speeds freeze motion; slow speeds create motion blur and light trails.</div>
+          </div>
+          <div class="glossary-item">
+            <div class="glossary-term">White Balance</div>
+            <div class="glossary-def">A camera setting that adjusts colours so whites appear neutral under different light sources (daylight, tungsten, fluorescent).</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CTA BANNER -->
+      <div class="cta-banner">
+        <h3>Ready to Put This Into Practice?</h3>
+        <p>Analyse a photo now and see your scores across all five dimensions.</p>
+        <a href="app.html" class="btn-gold">Analyse a Photo</a>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">Lens<span>Up</span></div>
+    <p>© 2025 LensUp · AI-Powered Photo Analysis</p>
+  </footer>
+
+  <script>
+    function toggleNav() {
+      document.getElementById('navLinks').classList.toggle('open');
+    }
+
+    // Highlight sidebar link on scroll
+    const chapters = document.querySelectorAll('.chapter');
+    const sidebarLinks = document.querySelectorAll('.sidebar-nav a');
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          sidebarLinks.forEach(link => {
+            link.classList.toggle('active', link.getAttribute('href') === '#' + entry.target.id);
+          });
+        }
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+
+    chapters.forEach(c => observer.observe(c));
+  </script>
+</body>
+</html>
