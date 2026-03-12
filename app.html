@@ -531,16 +531,16 @@
         const today = new Date().toISOString().split('T')[0];
         const { data } = await sb
           .from('analyses')
-          .select('id, created_at')
+          .select('id')
           .eq('user_id', currentUser.id)
           .gte('created_at', `${today}T00:00:00.000Z`)
           .lte('created_at', `${today}T23:59:59.999Z`);
 
-        if (data && data.length >= 1) {
-          showDailyBanner();
-        }
+        const count = data ? data.length : 0;
+        if (count >= 3) showDailyBanner();
+        // Under 3 — banner stays hidden
       } catch(e) {
-        // Silently fail — don't block the page
+        // Silently fail
       }
     }
 
@@ -586,29 +586,30 @@
       if (!allowed.includes(file.type)) { showError('Please select a JPG, PNG, WEBP, or GIF image.'); return; }
       if (file.size > 5 * 1024 * 1024) { showError('Image must be under 5MB.'); return; }
       hideError();
-      // Compress image before sending to reduce token usage
       const reader = new FileReader();
       reader.onload = (e) => {
+        const originalDataUrl = e.target.result;
         const img = new Image();
         img.onload = () => {
-          const canvas = document.createElement('canvas');
-          // Max 800px on longest side
-          const MAX = 800;
-          let w = img.width, h = img.height;
-          if (w > h && w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
-          else if (h > MAX) { w = Math.round(w * MAX / h); h = MAX; }
-          canvas.width = w; canvas.height = h;
-          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-          const compressed = canvas.toDataURL('image/jpeg', 0.75);
-          uploadedFileBase64 = compressed.split(',')[1];
+          // ── Version 1: For AI analysis — max 1024px, good quality
+          const analysisCanvas = document.createElement('canvas');
+          const ANALYSIS_MAX = 1024;
+          let aw = img.width, ah = img.height;
+          if (aw > ah && aw > ANALYSIS_MAX) { ah = Math.round(ah * ANALYSIS_MAX / aw); aw = ANALYSIS_MAX; }
+          else if (ah > ANALYSIS_MAX) { aw = Math.round(aw * ANALYSIS_MAX / ah); ah = ANALYSIS_MAX; }
+          analysisCanvas.width = aw; analysisCanvas.height = ah;
+          analysisCanvas.getContext('2d').drawImage(img, 0, 0, aw, ah);
+          uploadedFileBase64 = analysisCanvas.toDataURL('image/jpeg', 0.92).split(',')[1];
           uploadedMediaType = 'image/jpeg';
-          currentPreviewUrl = e.target.result; // show original for preview
-          document.getElementById('preview-img').src = e.target.result;
-          document.getElementById('previewFilename').textContent = file.name + ' · compressed for analysis';
+
+          // ── Version 2: Original for display preview
+          currentPreviewUrl = originalDataUrl;
+          document.getElementById('preview-img').src = originalDataUrl;
+          document.getElementById('previewFilename').textContent = file.name + ' · ' + (file.size / 1024).toFixed(0) + ' KB';
           document.getElementById('preview-wrap').style.display = 'block';
           checkAnalyseBtns();
         };
-        img.src = e.target.result;
+        img.src = originalDataUrl;
       };
       reader.readAsDataURL(file);
     }
