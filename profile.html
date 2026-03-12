@@ -479,12 +479,15 @@
 
     // ── INIT ──
     async function init() {
-      const timeout = setTimeout(() => { window.location.href = 'login.html'; }, 5000);
       try {
         initSupabase();
+
+        // Wait for Supabase session to restore
+        await new Promise(resolve => setTimeout(resolve, 300));
+
         currentUser = await getUser();
-        clearTimeout(timeout);
         if (!currentUser) { window.location.href = 'login.html'; return; }
+
         document.body.classList.add('auth-ready');
         renderNavAuth();
 
@@ -502,8 +505,8 @@
         loadChart();
         loadBestPhoto();
       } catch(err) {
-        clearTimeout(timeout);
-        window.location.href = 'login.html';
+        console.error('Profile init error:', err);
+        document.body.classList.add('auth-ready');
       }
     }
 

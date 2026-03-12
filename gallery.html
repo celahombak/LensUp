@@ -508,12 +508,15 @@
 
     // ── INIT ──
     async function init() {
-      const timeout = setTimeout(() => { window.location.href = 'login.html'; }, 5000);
       try {
         initSupabase();
+
+        // Wait for Supabase session to restore (important on first load)
+        await new Promise(resolve => setTimeout(resolve, 300));
+
         currentUser = await getUser();
-        clearTimeout(timeout);
         if (!currentUser) { window.location.href = 'login.html'; return; }
+
         document.body.classList.add('auth-ready');
         renderNavAuth();
 
@@ -524,8 +527,10 @@
         }
         renderGallery();
       } catch(err) {
-        clearTimeout(timeout);
-        window.location.href = 'login.html';
+        console.error('Gallery init error:', err);
+        // Don't redirect on error — show empty state instead
+        document.body.classList.add('auth-ready');
+        renderGallery();
       }
     }
 
