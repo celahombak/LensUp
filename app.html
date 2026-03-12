@@ -691,7 +691,8 @@
 
       try {
         // Call our Vercel serverless function — API key is safe on the server
-        const response = await fetch('/api/analyse', {
+        const apiBase = window.location.origin;
+        const response = await fetch(`${apiBase}/api/analyse`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ imageContent })
