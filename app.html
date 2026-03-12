@@ -88,12 +88,7 @@
 
     .input-label { font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.8rem; display: block; }
     .url-row { display: flex; gap: 0.8rem; margin-bottom: 1rem; flex-wrap: wrap; }
-    .url-input { flex: 1; min-width: 200px; background: var(--black); border: 1px solid var(--border); color: var(--white); padding: 0.85rem 1.1rem; border-radius: 4px; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; outline: none; transition: border-color 0.2s; }
-    .url-input:focus { border-color: var(--gold); }
-    .url-input::placeholder { color: rgba(245,242,238,0.2); }
 
-    #url-preview-wrap { margin-top: 1rem; }
-    #url-preview-img { max-width: 100%; max-height: 240px; border-radius: 4px; border: 1px solid var(--border); display: block; }
 
     .btn-analyse { background: var(--gold); color: var(--black); border: none; padding: 0.85rem 2rem; border-radius: 4px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; transition: all 0.2s; white-space: nowrap; }
     .btn-analyse:hover:not(:disabled) { background: var(--gold-light); transform: translateY(-1px); }
@@ -379,11 +374,6 @@
 
     <!-- INPUT CARD -->
     <div class="input-card">
-      <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('upload')">📁 Upload File</button>
-        <button class="tab-btn" onclick="switchTab('url')">🔗 Paste URL</button>
-      </div>
-
       <div class="tab-panel active" id="tab-upload">
         <div class="drop-zone" id="dropZone"
           ondragover="handleDragOver(event)"
@@ -402,16 +392,7 @@
         <button class="btn-analyse btn-analyse-full" id="analyseBtnUpload" onclick="analysePhoto()" disabled>Analyse Photo</button>
       </div>
 
-      <div class="tab-panel" id="tab-url">
-        <label class="input-label">Image URL</label>
-        <div class="url-row">
-          <input type="url" class="url-input" id="imageUrl" placeholder="https://example.com/photo.jpg" oninput="handleUrlInput(this.value)" />
-          <button class="btn-analyse" id="analyseBtnUrl" onclick="analysePhoto()" disabled>Analyse</button>
-        </div>
-        <div id="url-preview-wrap" style="display:none">
-          <img id="url-preview-img" src="" alt="Preview" />
-        </div>
-      </div>
+
     </div>
 
     <!-- LOADING -->
@@ -484,7 +465,6 @@
 
   <script>
     let currentResult = null;
-    let activeTab = 'upload';
     let uploadedFileBase64 = null;
     let uploadedMediaType = null;
     let currentPreviewUrl = null;
@@ -588,16 +568,7 @@
       setInterval(updateCountdown, 60000);
     }
 
-    // ── TABS ──
-    function switchTab(tab) {
-      activeTab = tab;
-      document.querySelectorAll('.tab-btn').forEach((b, i) => {
-        b.classList.toggle('active', (i === 0 && tab === 'upload') || (i === 1 && tab === 'url'));
-      });
-      document.getElementById('tab-upload').classList.toggle('active', tab === 'upload');
-      document.getElementById('tab-url').classList.toggle('active', tab === 'url');
-      hideError(); hideResult();
-    }
+
 
     // ── FILE UPLOAD ──
     function handleDragOver(e) { e.preventDefault(); document.getElementById('dropZone').classList.add('dragover'); }
@@ -651,41 +622,19 @@
       checkAnalyseBtns();
     }
 
-    function handleUrlInput(val) {
-      checkAnalyseBtns();
-      const preview = document.getElementById('url-preview-wrap');
-      const img = document.getElementById('url-preview-img');
-      if (val && isImageUrl(val)) {
-        img.src = val;
-        img.onload = () => { preview.style.display = 'block'; currentPreviewUrl = val; };
-        img.onerror = () => { preview.style.display = 'none'; currentPreviewUrl = null; };
-      } else { preview.style.display = 'none'; currentPreviewUrl = null; }
-    }
 
-    function isImageUrl(url) {
-      try { new URL(url); return /\.(jpg|jpeg|png|webp|gif)(\?.*)?$/i.test(url); }
-      catch { return false; }
-    }
 
     function checkAnalyseBtns() {
       document.getElementById('analyseBtnUpload').disabled = !uploadedFileBase64;
-      document.getElementById('analyseBtnUrl').disabled = !document.getElementById('imageUrl').value.trim();
     }
 
     // ── ANALYSE ──
     async function analysePhoto() {
       let imageContent, historyLabel;
 
-      if (activeTab === 'upload') {
-        if (!uploadedFileBase64) return showError('Please select an image to upload.');
-        imageContent = { type: 'image', source: { type: 'base64', media_type: uploadedMediaType, data: uploadedFileBase64 } };
-        historyLabel = document.getElementById('previewFilename').textContent || 'Uploaded file';
-      } else {
-        const url = document.getElementById('imageUrl').value.trim();
-        if (!url) return showError('Please enter an image URL.');
-        imageContent = { type: 'image', source: { type: 'url', url } };
-        historyLabel = url;
-      }
+      if (!uploadedFileBase64) return showError('Please select an image to upload.');
+      imageContent = { type: 'image', source: { type: 'base64', media_type: uploadedMediaType, data: uploadedFileBase64 } };
+      historyLabel = document.getElementById('previewFilename').textContent || 'Uploaded file';
 
       hideError(); hideResult(); showLoading(true);
 
@@ -725,7 +674,12 @@
           return;
         }
 
-        currentResult = { url: historyLabel, previewUrl: currentPreviewUrl, result: parsed, date: new Date().toISOString() };
+        // Generate small thumbnail for storage (200px, low quality)
+        let thumbnail = null;
+        if (uploadedFileBase64) {
+          thumbnail = await generateThumbnail(currentPreviewUrl);
+        }
+        currentResult = { url: historyLabel, previewUrl: currentPreviewUrl, thumbnail, result: parsed, date: new Date().toISOString() };
         await saveToHistory(currentResult);
         showResult(currentResult);
 
@@ -853,7 +807,6 @@
     function showLoading(on) {
       document.getElementById('loading').classList.toggle('active', on);
       document.getElementById('analyseBtnUpload').disabled = on;
-      document.getElementById('analyseBtnUrl').disabled = on;
     }
     function showError(msg) {
       document.getElementById('errorMsg').textContent = msg;
@@ -867,12 +820,34 @@
       catch { return []; }
     }
 
+    // ── GENERATE THUMBNAIL ──
+    async function generateThumbnail(dataUrl) {
+      return new Promise(resolve => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX = 200;
+          let w = img.width, h = img.height;
+          if (w > h && w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
+          else if (h > MAX) { w = Math.round(w * MAX / h); h = MAX; }
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          // Return just the base64 part, no prefix
+          const b64 = canvas.toDataURL('image/jpeg', 0.6).split(',')[1];
+          resolve(b64);
+        };
+        img.onerror = () => resolve(null);
+        img.src = dataUrl;
+      });
+    }
+
     async function saveToHistory(entry) {
       const hist = getHistory();
+      // Store thumbnail in localStorage too for instant display
       hist.unshift(entry);
       localStorage.setItem('lensup_history', JSON.stringify(hist.slice(0, 20)));
       if (currentUser) {
-        const { error } = await saveAnalysis(currentUser, entry.url, entry.result);
+        const { error } = await saveAnalysis(currentUser, entry.url, entry.result, entry.thumbnail);
         if (error) console.warn('Supabase save failed:', error.message);
       }
       renderHistory();

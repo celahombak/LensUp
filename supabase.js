@@ -39,18 +39,20 @@ async function signOut() {
 
 // ── Analysis Helpers ──
 
-async function saveAnalysis(user, url, result) {
+async function saveAnalysis(user, url, result, thumbnail) {
   const { data, error } = await sb.from('analyses').insert({
     user_id: user.id,
     image_url: url,
+    thumbnail: thumbnail || null,
     overall: result.overall,
+    subject_focus: result.scores.subject_focus,
+    color_contrast: result.scores.color_contrast,
     composition: result.scores.composition,
     lighting: result.scores.lighting,
-    colour: result.scores.colour,
-    focus: result.scores.focus,
-    mood: result.scores.mood,
+    background_blur: result.scores.background_blur,
+    framing: result.scores.framing,
+    category_notes: result.category_notes,
     summary: result.summary,
-    strengths: result.strengths,
     improvements: result.improvements,
     technical: result.technical
   });
@@ -76,16 +78,19 @@ function dbRowToResult(row) {
   return {
     id: row.id,
     url: row.image_url,
+    previewUrl: row.thumbnail ? `data:image/jpeg;base64,${row.thumbnail}` : null,
     date: row.created_at,
     result: {
       overall: row.overall,
       scores: {
+        subject_focus: row.subject_focus,
+        color_contrast: row.color_contrast,
         composition: row.composition,
         lighting: row.lighting,
-        colour: row.colour,
-        focus: row.focus,
-        mood: row.mood
+        background_blur: row.background_blur,
+        framing: row.framing
       },
+      category_notes: row.category_notes || {},
       summary: row.summary,
       strengths: row.strengths,
       improvements: row.improvements,
