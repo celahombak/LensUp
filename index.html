@@ -225,7 +225,7 @@
     <div class="hero-scanline"></div>
     <div class="hero-inner">
       <div class="hero-left">
-        <div class="hero-live-badge"><span class="live-dot"></span> Week 1 Challenge Active</div>
+        <div class="hero-live-badge" id="heroLiveBadge"><span class="live-dot"></span> Loading…</div>
         <h1>
           Shoot.<br/>
           <span class="line2">Score.</span>
@@ -234,8 +234,8 @@
         <p class="hero-desc">A year-long photography quest. Weekly themes. Daily submissions. AI scoring. One leaderboard to rule them all.</p>
         <div class="hero-theme-card">
           <div class="hero-theme-label">📅 This Week's Theme</div>
-          <div class="hero-theme-name">Golden Hour</div>
-          <div class="hero-theme-sub">Capture the magic of the first or last hour of sunlight</div>
+          <div class="hero-theme-name" id="heroThemeName">—</div>
+          <div class="hero-theme-sub" id="heroThemeSub"></div>
           <div class="hero-theme-timer">
             <div class="timer-unit"><span class="timer-num" id="timerD">—</span><span class="timer-label">Days</span></div>
             <div class="timer-unit"><span class="timer-num" id="timerH">—</span><span class="timer-label">Hrs</span></div>
@@ -253,35 +253,8 @@
             <span class="lb-title">🏆 Today's Top Shots</span>
             <span class="lb-live"><span class="live-dot"></span> Live</span>
           </div>
-          <div class="lb-row gold-row">
-            <span class="lb-rank r1">1</span>
-            <div class="lb-photo">🌅</div>
-            <div class="lb-info"><div class="lb-name">Ahmad R.</div><div class="lb-theme">Golden Hour</div></div>
-            <span class="lb-score s-high">9.4</span>
-          </div>
-          <div class="lb-row">
-            <span class="lb-rank r2">2</span>
-            <div class="lb-photo">🌄</div>
-            <div class="lb-info"><div class="lb-name">Sarah K.</div><div class="lb-theme">Golden Hour</div></div>
-            <span class="lb-score s-high">9.1</span>
-          </div>
-          <div class="lb-row">
-            <span class="lb-rank r3">3</span>
-            <div class="lb-photo">☀️</div>
-            <div class="lb-info"><div class="lb-name">Faiz M.</div><div class="lb-theme">Golden Hour</div></div>
-            <span class="lb-score s-mid">8.7</span>
-          </div>
-          <div class="lb-row">
-            <span class="lb-rank" style="color:var(--mid)">4</span>
-            <div class="lb-photo">🏙️</div>
-            <div class="lb-info"><div class="lb-name">Lina C.</div><div class="lb-theme">Golden Hour</div></div>
-            <span class="lb-score s-mid">8.2</span>
-          </div>
-          <div class="lb-row">
-            <span class="lb-rank" style="color:var(--mid)">5</span>
-            <div class="lb-photo">🌿</div>
-            <div class="lb-info"><div class="lb-name">Reza T.</div><div class="lb-theme">Golden Hour</div></div>
-            <span class="lb-score s-mid">7.9</span>
+          <div id="lbPreviewRows">
+            <div style="text-align:center;padding:2rem;color:rgba(240,237,232,0.3);font-size:0.8rem;">Loading…</div>
           </div>
         </div>
       </div>
@@ -291,13 +264,13 @@
   <!-- TICKER -->
   <div class="ticker">
     <div class="ticker-inner">
-      <span class="ticker-item">📷 Week 1: Golden Hour</span><span class="ticker-sep">·</span>
+      <span class="ticker-item" id="tickerTheme">📷 LensUp Weekly Challenge</span><span class="ticker-sep">·</span>
       <span class="ticker-item">🏆 Leaderboard Updated Daily</span><span class="ticker-sep">·</span>
       <span class="ticker-item">🤖 AI-Powered Scoring</span><span class="ticker-sep">·</span>
       <span class="ticker-item">📈 Track Your Progress</span><span class="ticker-sep">·</span>
       <span class="ticker-item">🎯 52 Weekly Challenges</span><span class="ticker-sep">·</span>
       <span class="ticker-item">🔥 1 Submission Per Day</span><span class="ticker-sep">·</span>
-      <span class="ticker-item">📷 Week 1: Golden Hour</span><span class="ticker-sep">·</span>
+      <span class="ticker-item" id="tickerTheme2">📷 LensUp Weekly Challenge</span><span class="ticker-sep">·</span>
       <span class="ticker-item">🏆 Leaderboard Updated Daily</span><span class="ticker-sep">·</span>
       <span class="ticker-item">🤖 AI-Powered Scoring</span><span class="ticker-sep">·</span>
       <span class="ticker-item">📈 Track Your Progress</span><span class="ticker-sep">·</span>
@@ -357,34 +330,8 @@
       <span class="section-tag">Upcoming Challenges</span>
       <h2 class="section-title">What's Coming</h2>
       <p class="section-sub">Themes are designed to push your creative limits. No two weeks are the same.</p>
-      <div class="challenge-grid">
-        <div class="challenge-card c1">
-          <div class="challenge-week" style="color:var(--gold)">Week 1 · Active Now</div>
-          <div class="challenge-name">Golden Hour</div>
-          <div class="challenge-desc">Capture the warmth of the first or last hour of light. Chase that magic window when everything glows.</div>
-          <div class="challenge-meta">
-            <span class="challenge-tag" style="border-color:rgba(232,184,75,0.3);color:var(--gold)">🔥 Active</span>
-            <span class="challenge-tag">Landscape · Portrait</span>
-          </div>
-        </div>
-        <div class="challenge-card c2">
-          <div class="challenge-week" style="color:var(--cyan)">Week 2 · Coming Soon</div>
-          <div class="challenge-name">Reflections</div>
-          <div class="challenge-desc">Water, glass, mirrors, puddles. Find the world doubled and make it more interesting than the original.</div>
-          <div class="challenge-meta">
-            <span class="challenge-tag" style="border-color:rgba(0,212,255,0.3);color:var(--cyan)">Upcoming</span>
-            <span class="challenge-tag">Abstract · Street</span>
-          </div>
-        </div>
-        <div class="challenge-card c3">
-          <div class="challenge-week" style="color:var(--purple)">Week 3 · Coming Soon</div>
-          <div class="challenge-name">Street Life</div>
-          <div class="challenge-desc">The city never sleeps. Capture the energy, the faces, the moments that happen when nobody's watching.</div>
-          <div class="challenge-meta">
-            <span class="challenge-tag" style="border-color:rgba(180,75,255,0.3);color:var(--purple)">Upcoming</span>
-            <span class="challenge-tag">Street · Documentary</span>
-          </div>
-        </div>
+      <div class="challenge-grid" id="challengeGrid">
+        <div style="grid-column:1/-1;text-align:center;padding:3rem;color:rgba(240,237,232,0.3);font-size:0.85rem;">Loading challenges…</div>
       </div>
     </div>
   </section>
@@ -459,14 +406,24 @@
     <p>© 2026 LensUp · Photography Challenge Platform · Powered by Claude AI</p>
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // Countdown to next Sunday midnight
-    function updateTimer() {
-      const now = new Date();
-      const nextSunday = new Date();
-      nextSunday.setDate(now.getDate() + (7 - now.getDay()));
-      nextSunday.setHours(23, 59, 59, 0);
-      const diff = nextSunday - now;
+    const SUPABASE_URL     = 'https://sjjgzuaeqcbtvrnmquex.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqamd6dWFlcWNidHZybm1xdWV4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyMDYzNjIsImV4cCI6MjA4ODc4MjM2Mn0.RRRjWxamVkzTZbEn6FwL3-6bvhFw6njXjnk9Bsu5TiI';
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let activeTheme = null;
+    let timerInterval = null;
+
+    // ── TIMER ──
+    function updateTimer(endsAt) {
+      const diff = new Date(endsAt) - new Date();
+      if (diff <= 0) {
+        document.getElementById('timerD').textContent = '0';
+        document.getElementById('timerH').textContent = '00';
+        document.getElementById('timerM').textContent = '00';
+        return;
+      }
       const d = Math.floor(diff / 86400000);
       const h = Math.floor((diff % 86400000) / 3600000);
       const m = Math.floor((diff % 3600000) / 60000);
@@ -474,8 +431,138 @@
       document.getElementById('timerH').textContent = String(h).padStart(2,'0');
       document.getElementById('timerM').textContent = String(m).padStart(2,'0');
     }
-    updateTimer();
-    setInterval(updateTimer, 60000);
+
+    // ── LOAD ACTIVE THEME ──
+    async function loadTheme() {
+      const now = new Date().toISOString();
+      const { data, error } = await sb
+        .from('themes')
+        .select('*')
+        .eq('is_active', true)
+        .lte('starts_at', now)
+        .gte('ends_at', now)
+        .limit(1)
+        .single();
+
+      if (error || !data) {
+        document.getElementById('heroLiveBadge').innerHTML = '<span class="live-dot"></span> No Active Challenge';
+        document.getElementById('heroThemeName').textContent = 'Coming Soon';
+        document.getElementById('heroThemeSub').textContent = 'Check back soon for the next weekly theme.';
+        return;
+      }
+
+      activeTheme = data;
+      document.getElementById('heroLiveBadge').innerHTML = `<span class="live-dot"></span> Week ${data.week_number} Challenge Active`;
+      document.getElementById('heroThemeName').textContent = data.name;
+      document.getElementById('heroThemeSub').textContent = data.description || '';
+
+      // Ticker
+      const tickerText = `📷 Week ${data.week_number}: ${data.name}`;
+      document.getElementById('tickerTheme').textContent = tickerText;
+      document.getElementById('tickerTheme2').textContent = tickerText;
+
+      // Timer
+      updateTimer(data.ends_at);
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => updateTimer(data.ends_at), 60000);
+    }
+
+    // ── LOAD LEADERBOARD PREVIEW ──
+    async function loadLeaderboardPreview() {
+      const rankColors = ['r1','r2','r3'];
+      const rankEmojis = ['🥇','🥈','🥉'];
+      try {
+        const { data, error } = await sb
+          .from('analyses')
+          .select('user_id, display_name, overall, theme_name, created_at')
+          .order('overall', { ascending: false })
+          .limit(20);
+
+        if (error || !data || !data.length) {
+          document.getElementById('lbPreviewRows').innerHTML =
+            '<div style="text-align:center;padding:2rem;color:rgba(240,237,232,0.25);font-size:0.78rem;">Be the first to submit a shot!</div>';
+          return;
+        }
+
+        // Dedupe — best score per user
+        const seen = {};
+        const top = [];
+        for (const row of data) {
+          if (!seen[row.user_id]) { seen[row.user_id] = true; top.push(row); }
+          if (top.length >= 5) break;
+        }
+
+        const scoreClass = s => s >= 8 ? 's-high' : s >= 6 ? 's-mid' : '';
+
+        document.getElementById('lbPreviewRows').innerHTML = top.map((row, i) => `
+          <div class="lb-row ${i === 0 ? 'gold-row' : ''}">
+            <span class="lb-rank ${rankColors[i] || ''}" style="${i >= 3 ? 'color:var(--mid)' : ''}">${i + 1}</span>
+            <div class="lb-photo">${rankEmojis[i] || '📷'}</div>
+            <div class="lb-info">
+              <div class="lb-name">${row.display_name || 'Anonymous'}</div>
+              <div class="lb-theme">${row.theme_name || '—'}</div>
+            </div>
+            <span class="lb-score ${scoreClass(row.overall)}">${row.overall}</span>
+          </div>
+        `).join('');
+      } catch(e) {
+        document.getElementById('lbPreviewRows').innerHTML =
+          '<div style="text-align:center;padding:1.5rem;color:rgba(240,237,232,0.2);font-size:0.78rem;">Could not load scores</div>';
+      }
+    }
+
+    // ── LOAD UPCOMING CHALLENGES ──
+    async function loadChallenges() {
+      const cardColors = ['c1','c2','c3'];
+      const accentColors = ['var(--gold)','var(--cyan)','var(--purple)'];
+      try {
+        const { data, error } = await sb
+          .from('themes')
+          .select('*')
+          .order('week_number', { ascending: true })
+          .limit(6);
+
+        if (error || !data || !data.length) {
+          document.getElementById('challengeGrid').innerHTML =
+            '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:rgba(240,237,232,0.3);font-size:0.85rem;">No challenges found.</div>';
+          return;
+        }
+
+        const now = new Date();
+        document.getElementById('challengeGrid').innerHTML = data.slice(0, 3).map((t, i) => {
+          const isActive = t.is_active && new Date(t.starts_at) <= now && new Date(t.ends_at) >= now;
+          const isPast   = new Date(t.ends_at) < now;
+          const color    = accentColors[i] || accentColors[0];
+          const statusLabel = isActive ? '🔥 Active Now' : isPast ? '✅ Completed' : '⏳ Coming Soon';
+          const statusStyle = isActive
+            ? `border-color:rgba(232,184,75,0.3);color:var(--gold)`
+            : isPast
+              ? `border-color:rgba(0,230,118,0.2);color:var(--green)`
+              : `border-color:rgba(255,255,255,0.1);color:rgba(240,237,232,0.4)`;
+
+          return `
+            <div class="challenge-card ${cardColors[i] || 'c1'}">
+              <div class="challenge-week" style="color:${color}">Week ${t.week_number} · ${isActive ? 'Active Now' : isPast ? 'Completed' : 'Coming Soon'}</div>
+              <div class="challenge-name">${t.name}</div>
+              <div class="challenge-desc">${t.description || ''}</div>
+              <div class="challenge-meta">
+                <span class="challenge-tag" style="${statusStyle}">${statusLabel}</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } catch(e) {
+        document.getElementById('challengeGrid').innerHTML =
+          '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:rgba(240,237,232,0.3);font-size:0.85rem;">Could not load challenges.</div>';
+      }
+    }
+
+    // ── INIT ──
+    async function init() {
+      await Promise.all([loadTheme(), loadLeaderboardPreview(), loadChallenges()]);
+    }
+
+    init();
   </script>
 </body>
 </html>
