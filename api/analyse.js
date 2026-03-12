@@ -47,7 +47,7 @@ module.exports = async (req, res) => {
   );
 
   const todayAnalyses = await limitRes.json();
-  if (Array.isArray(todayAnalyses) && todayAnalyses.length >= 1) {
+  if (Array.isArray(todayAnalyses) && todayAnalyses.length >= 3) {
     return res.status(429).json({
       error: 'daily_limit',
       message: "You've used your analysis for today. Come back tomorrow! 📅"

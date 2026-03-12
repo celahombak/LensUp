@@ -29,37 +29,13 @@
     }
 
     /* ── NAV ── */
-    nav {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 1.2rem 3rem;
-      border-bottom: 1px solid var(--border);
-      background: rgba(10,10,10,0.95);
-      position: sticky; top: 0; z-index: 100;
-      flex-wrap: wrap; gap: 0.8rem;
-    }
-    .nav-logo {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.4rem; font-weight: 900;
-      color: var(--gold); text-decoration: none;
-    }
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 1.2rem 3rem; border-bottom: 1px solid var(--border); background: rgba(10,10,10,0.97); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px); }
+    .nav-logo { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 900; color: var(--gold); text-decoration: none; }
     .nav-logo span { color: var(--white); }
-    .nav-links { display: flex; gap: 2rem; list-style: none; align-items: center; }
-    .nav-links a {
-      color: rgba(245,242,238,0.6); text-decoration: none;
-      font-size: 0.82rem; letter-spacing: 0.07em;
-      text-transform: uppercase; transition: color 0.2s;
-    }
-    .nav-links a:hover, .nav-links a.active { color: var(--gold); }
-    .nav-cta {
-      background: var(--gold); color: var(--black);
-      padding: 0.55rem 1.3rem; border-radius: 2px;
-      text-decoration: none; font-size: 0.78rem;
-      font-weight: 500; letter-spacing: 0.1em;
-      text-transform: uppercase; transition: background 0.2s;
-    }
-    .nav-cta:hover { background: var(--gold-light); }
-    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; }
-    .hamburger span { width: 24px; height: 2px; background: var(--white); display: block; }
+    .nav-links { display: flex; align-items: center; gap: 2rem; flex-wrap: wrap; }
+    .nav-link { font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(245,242,238,0.5); text-decoration: none; transition: color 0.2s; }
+    .nav-link:hover { color: var(--gold); }
+    .nav-link.active { color: var(--gold); }
 
     /* ── HERO ── */
     .page-hero {
@@ -340,17 +316,16 @@
 <body>
 
   <!-- NAV -->
-  <nav id="navbar">
+  <nav>
     <a href="index.html" class="nav-logo">Lens<span>Up</span></a>
-    <ul class="nav-links" id="navLinks">
-      <li><a href="learn.html" class="active">Learn</a></li>
-      <li><a href="gallery.html">Gallery</a></li>
-      <li><a href="profile.html">Profile</a></li>
-    </ul>
-    <a href="app.html" class="nav-cta">Analyse Photo</a>
-    <button class="hamburger" onclick="toggleNav()">
-      <span></span><span></span><span></span>
-    </button>
+    <div class="nav-links">
+      <a href="leaderboard.html" class="nav-link">🏆 Leaderboard</a>
+      <a href="learn.html" class="nav-link active">Learn</a>
+      <a href="app.html" class="nav-link">Analyse</a>
+      <a href="gallery.html" class="nav-link">Gallery</a>
+      <a href="profile.html" class="nav-link">Profile</a>
+      <span id="navAuthArea"></span>
+    </div>
   </nav>
 
   <!-- HERO -->
