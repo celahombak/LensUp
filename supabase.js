@@ -37,6 +37,20 @@ async function signOut() {
   window.location.href = 'login.html';
 }
 
+// ── Theme Helpers ──
+
+async function getActiveTheme() {
+  const { data, error } = await sb
+    .from('themes')
+    .select('*')
+    .eq('is_active', true)
+    .lte('starts_at', new Date().toISOString())
+    .gte('ends_at', new Date().toISOString())
+    .limit(1)
+    .single();
+  return error ? null : data;
+}
+
 // ── Analysis Helpers ──
 
 async function saveAnalysis(user, url, result, thumbnail) {
@@ -52,6 +66,9 @@ async function saveAnalysis(user, url, result, thumbnail) {
     lighting: result.scores.lighting,
     background_blur: result.scores.background_blur,
     framing: result.scores.framing,
+    theme_relevance: result.scores.theme_relevance || null,
+    theme_id: result.themeId || null,
+    theme_name: result.themeName || null,
     category_notes: result.category_notes,
     summary: result.summary,
     improvements: result.improvements,

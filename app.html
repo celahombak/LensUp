@@ -54,6 +54,20 @@
     .nav-link { font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(245,242,238,0.5); text-decoration: none; transition: color 0.2s; }
     .nav-link:hover { color: var(--gold); }
 
+    /* ── THEME BANNER ── */
+    .theme-banner { background: rgba(232,184,75,0.06); border: 1px solid rgba(232,184,75,0.2); border-left: 3px solid var(--gold); padding: 1rem 1.5rem; margin-bottom: 1.8rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.8rem; animation: fadeUp 0.4s ease both; }
+    .theme-banner.hidden { display: none; }
+    .theme-banner-left { display: flex; align-items: center; gap: 1rem; }
+    .theme-banner-icon { font-size: 1.4rem; flex-shrink: 0; }
+    .theme-banner-week { font-size: 0.6rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.25rem; }
+    .theme-banner-name { font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; letter-spacing: 0.05em; line-height: 1; margin-bottom: 0.2rem; }
+    .theme-banner-desc { font-size: 0.75rem; color: rgba(240,237,232,0.45); line-height: 1.5; max-width: 480px; }
+    .theme-banner-right { text-align: right; flex-shrink: 0; }
+    .theme-banner-timer-label { font-size: 0.6rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--mid); margin-bottom: 0.2rem; }
+    .theme-banner-timer { font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem; letter-spacing: 0.06em; color: var(--gold); }
+    .theme-no-active { background: var(--dark); border: 1px solid var(--border); padding: 1rem 1.5rem; margin-bottom: 1.8rem; display: none; font-size: 0.82rem; color: rgba(240,237,232,0.35); text-align: center; }
+    .theme-no-active.visible { display: block; }
+
     /* ── LAYOUT ── */
     .app-wrap { max-width: 960px; margin: 0 auto; padding: 3rem 2rem 6rem; }
 
@@ -337,13 +351,27 @@
   <div class="app-wrap">
 
     <div class="app-header">
-      <div class="app-tag">Photo Analysis Tool</div>
-      <h1>Analyse Your <em>Photo</em></h1>
-      <p>Upload a real photo to get instant AI-powered feedback across 6 categories.</p>
+      <div class="app-tag">📷 Submit Your Shot</div>
+      <h1>Submit Your <em>Photo</em></h1>
+      <p>Upload your best shot for this week's challenge. AI scores it across 6 categories plus theme relevance.</p>
     </div>
 
-    <!-- DAILY LIMIT BANNER -->
-
+    <!-- THEME BANNER -->
+    <div class="theme-banner hidden" id="themeBanner">
+      <div class="theme-banner-left">
+        <div class="theme-banner-icon">📅</div>
+        <div>
+          <div class="theme-banner-week" id="themeWeekLabel">Week —</div>
+          <div class="theme-banner-name" id="themeNameLabel">Loading…</div>
+          <div class="theme-banner-desc" id="themeDescLabel"></div>
+        </div>
+      </div>
+      <div class="theme-banner-right">
+        <div class="theme-banner-timer-label">Ends in</div>
+        <div class="theme-banner-timer" id="themeTimer">—</div>
+      </div>
+    </div>
+    <div class="theme-no-active" id="themeNoActive">No active challenge this week. Check back soon!</div>
 
     <!-- INPUT CARD -->
     <div class="input-card">
@@ -439,6 +467,7 @@
   <script>
     let currentResult = null;
     let uploadedFileBase64 = null;
+    let activeTheme = null;
     let uploadedMediaType = null;
     let currentPreviewUrl = null;
     let currentUser = null;
@@ -481,6 +510,7 @@
         if (!currentUser) { window.location.href = 'login.html'; return; }
         document.body.classList.add('auth-ready');
         renderNavAuth();
+        loadTheme();
         renderHistory();
       } catch (err) {
         clearTimeout(timeout);
@@ -583,7 +613,11 @@
             'Content-Type': 'application/json',
             ...(token ? { 'Authorization': `Bearer ${token}` } : {})
           },
-          body: JSON.stringify({ imageContent })
+          body: JSON.stringify({
+            imageContent,
+            themeId:   activeTheme?.id   || null,
+            themeName: activeTheme?.name || null
+          })
         });
 
         const rawText = await response.text();
@@ -643,13 +677,17 @@
         photoEl.innerHTML = `<div class="result-photo-placeholder">📷<span>No preview</span></div>`;
       }
 
-      // Score bars
+      // Score bars — include theme_relevance if present
       const barsEl = document.getElementById('scoreBars');
-      barsEl.innerHTML = CATEGORIES.map(cat => {
+      const displayCats = [...CATEGORIES];
+      if (r.scores?.theme_relevance && activeTheme) {
+        displayCats.push({ key: 'theme_relevance', label: `Theme: ${activeTheme.name}`, icon: '📅', color: 'var(--gold)' });
+      }
+      barsEl.innerHTML = displayCats.map(cat => {
         const score = r.scores[cat.key] || 0;
         return `
           <div class="score-bar-row">
-            <div class="score-bar-label">${cat.label}</div>
+            <div class="score-bar-label">${cat.icon} ${cat.label}</div>
             <div class="score-bar-track">
               <div class="score-bar-fill" style="background:${cat.color}" data-width="${score * 10}%"></div>
             </div>
@@ -669,9 +707,13 @@
       // Summary
       document.getElementById('resultSummary').innerHTML = `<p>${r.summary}</p>`;
 
-      // Category cards
+      // Category cards — include theme_relevance if present
       const gridEl = document.getElementById('categoryGrid');
-      gridEl.innerHTML = CATEGORIES.map(cat => {
+      const gridCats = [...CATEGORIES];
+      if (r.scores?.theme_relevance && activeTheme) {
+        gridCats.push({ key: 'theme_relevance', label: `Theme: ${activeTheme.name}`, icon: '📅', color: 'var(--gold)' });
+      }
+      gridEl.innerHTML = gridCats.map(cat => {
         const score = r.scores[cat.key] || 0;
         const tag = getCategoryTag(score);
         const desc = r.category_notes?.[cat.key] || '';
@@ -839,6 +881,34 @@
           section.appendChild(hint);
         }
       }
+    }
+
+    // ── LOAD THEME ──
+    async function loadTheme() {
+      try {
+        activeTheme = await getActiveTheme();
+        if (activeTheme) {
+          document.getElementById('themeBanner').classList.remove('hidden');
+          document.getElementById('themeWeekLabel').textContent = `Week ${activeTheme.week_number} · Active Challenge`;
+          document.getElementById('themeNameLabel').textContent = activeTheme.name;
+          document.getElementById('themeDescLabel').textContent = activeTheme.description || '';
+          updateThemeTimer(activeTheme.ends_at);
+          setInterval(() => updateThemeTimer(activeTheme.ends_at), 60000);
+        } else {
+          document.getElementById('themeNoActive').classList.add('visible');
+        }
+      } catch(e) {
+        console.warn('Could not load theme:', e);
+      }
+    }
+
+    function updateThemeTimer(endsAt) {
+      const diff = new Date(endsAt) - new Date();
+      if (diff <= 0) { document.getElementById('themeTimer').textContent = 'Ended'; return; }
+      const d = Math.floor(diff / 86400000);
+      const h = Math.floor((diff % 86400000) / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      document.getElementById('themeTimer').textContent = d > 0 ? `${d}d ${h}h` : `${h}h ${m}m`;
     }
 
     init();
