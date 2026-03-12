@@ -136,6 +136,93 @@
       .profile-wrap { grid-template-columns: 1fr; padding: 2rem 1rem 4rem; }
       .stat-grid { grid-template-columns: repeat(2, 1fr); }
     }
+
+    /* ═══════════════════════════════════════
+       MOBILE NAV — shared across all pages
+    ═══════════════════════════════════════ */
+
+    /* Hide desktop nav links on mobile, show burger */
+    .nav-burger { display: none; background: none; border: none; cursor: pointer; padding: 0.4rem; color: var(--white); flex-direction: column; gap: 5px; align-items: center; justify-content: center; }
+    .nav-burger span { display: block; width: 22px; height: 2px; background: var(--white); transition: all 0.3s; border-radius: 2px; }
+    .nav-burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .nav-burger.open span:nth-child(2) { opacity: 0; }
+    .nav-burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* Overlay menu */
+    .mobile-menu {
+      display: none;
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(8,8,8,0.98);
+      z-index: 99;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      backdrop-filter: blur(16px);
+    }
+    .mobile-menu.open { display: flex; animation: menuFadeIn 0.2s ease both; }
+    @keyframes menuFadeIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+    .mobile-menu-close {
+      position: absolute; top: 1.2rem; right: 1.5rem;
+      background: none; border: none; color: var(--mid);
+      font-size: 1.5rem; cursor: pointer; padding: 0.4rem;
+      transition: color 0.2s;
+    }
+    .mobile-menu-close:hover { color: var(--white); }
+    .mobile-menu-logo {
+      font-family: 'Bebas Neue', sans-serif; font-size: 2rem;
+      letter-spacing: 0.08em; color: var(--gold);
+      margin-bottom: 2.5rem;
+    }
+    .mobile-menu-logo span { color: var(--white); }
+    .mobile-menu a {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem; letter-spacing: 0.06em;
+      color: rgba(240,237,232,0.55); text-decoration: none;
+      padding: 0.7rem 2rem; transition: color 0.2s;
+      text-align: center;
+    }
+    .mobile-menu a:hover, .mobile-menu a.active { color: var(--gold); }
+    .mobile-menu-divider { width: 40px; height: 1px; background: var(--border); margin: 0.8rem 0; }
+    .mobile-menu-auth { margin-top: 1.5rem; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mid); text-align: center; }
+    .mobile-menu-auth span { color: rgba(240,237,232,0.5); display: block; margin-bottom: 0.8rem; font-size: 0.72rem; }
+    .mobile-menu-signout { background: none; border: 1px solid var(--border); color: var(--mid); padding: 0.5rem 1.5rem; font-family: 'DM Sans', sans-serif; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+    .mobile-menu-signout:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* Bottom nav bar */
+    .bottom-nav {
+      display: none;
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: rgba(10,10,10,0.97);
+      border-top: 1px solid var(--border);
+      backdrop-filter: blur(16px);
+      z-index: 98;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    .bottom-nav-inner { display: flex; align-items: stretch; }
+    .bottom-nav-item {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 0.6rem 0.3rem;
+      text-decoration: none;
+      color: rgba(240,237,232,0.35);
+      font-size: 0.55rem; letter-spacing: 0.08em;
+      text-transform: uppercase; gap: 0.25rem;
+      transition: color 0.2s;
+      border-top: 2px solid transparent;
+    }
+    .bottom-nav-item:hover { color: rgba(240,237,232,0.7); }
+    .bottom-nav-item.active { color: var(--gold); border-top-color: var(--gold); }
+    .bottom-nav-icon { font-size: 1.25rem; line-height: 1; }
+
+    /* Add bottom padding to page body so content isn't hidden behind bottom nav */
+    @media (max-width: 768px) {
+      .nav-burger { display: flex; }
+      .nav-links { display: none !important; }
+      nav { padding: 0.9rem 1.2rem; }
+      .bottom-nav { display: block; }
+      body { padding-bottom: 60px; }
+    }
   </style>
 </head>
 <body>
@@ -152,6 +239,23 @@
       <span id="navAuthArea"></span>
     </div>
   </nav>
+
+  <!-- MOBILE OVERLAY MENU -->
+  <div class="mobile-menu" id="mobileMenu">
+    <button class="mobile-menu-close" onclick="closeMobileMenu()">✕</button>
+    <div class="mobile-menu-logo">Lens<span>Up</span></div>
+    <a href="compete.html" class="">⚔️ Challenge</a>
+    <a href="app.html" class="">📷 Analyse</a>
+    <a href="leaderboard.html" class="">🏆 Leaderboard</a>
+    <a href="gallery.html" class="">🖼️ Gallery</a>
+    <a href="profile.html" class="profile active">👤 Profile</a>
+    <a href="learn.html" class="">📚 Learn</a>
+    <div class="mobile-menu-divider"></div>
+    <div class="mobile-menu-auth">
+      <span id="mobileMenuUser"></span>
+      <button class="mobile-menu-signout" onclick="signOut()">Sign Out</button>
+    </div>
+  </div>
 
   <!-- HERO -->
   <div class="page-hero">
@@ -510,6 +614,26 @@
         document.body.classList.add('auth-ready');
       }
     }
+
+    // ── MOBILE MENU ──
+    function openMobileMenu() {
+      document.getElementById('mobileMenu').classList.add('open');
+      document.body.style.overflow = 'hidden';
+      // Fill in username
+      if (typeof currentUser !== 'undefined' && currentUser) {
+        const name = currentUser.user_metadata?.display_name || currentUser.email?.split('@')[0] || '';
+        const el = document.getElementById('mobileMenuUser');
+        if (el) el.textContent = 'Hi, ' + name;
+      }
+    }
+    function closeMobileMenu() {
+      document.getElementById('mobileMenu').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    // Close on escape
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeMobileMenu();
+    });
 
     init();
   </script>
