@@ -305,24 +305,7 @@
     @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
 
     /* ── DAILY LIMIT BANNER ── */
-    .daily-banner {
-      display: none;
-      background: rgba(201,169,110,0.07);
-      border: 1px solid rgba(201,169,110,0.25);
-      border-radius: 8px; padding: 1.2rem 1.5rem;
-      margin-bottom: 1.5rem;
-      display: flex; align-items: center;
-      justify-content: space-between; gap: 1rem;
-      flex-wrap: wrap; animation: fadeUp 0.4s ease both;
-    }
-    .daily-banner.hidden { display: none !important; }
-    .daily-banner-left { display: flex; align-items: center; gap: 0.8rem; }
-    .daily-banner-icon { font-size: 1.4rem; }
-    .daily-banner-text { }
-    .daily-banner-title { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.2rem; color: var(--gold); }
-    .daily-banner-sub { font-size: 0.78rem; color: rgba(245,242,238,0.5); line-height: 1.5; }
-    .daily-banner-time { font-size: 0.78rem; color: rgba(245,242,238,0.35); text-align: right; flex-shrink: 0; }
-    .daily-banner-time strong { display: block; font-size: 1.1rem; color: var(--gold); font-family: 'Playfair Display', serif; }
+
 
     @media (max-width: 700px) {
       nav { padding: 1rem 1.2rem; }
@@ -359,18 +342,7 @@
     </div>
 
     <!-- DAILY LIMIT BANNER -->
-    <div class="daily-banner hidden" id="dailyBanner">
-      <div class="daily-banner-left">
-        <div class="daily-banner-icon">📅</div>
-        <div class="daily-banner-text">
-          <div class="daily-banner-title">You've used your analysis for today!</div>
-          <div class="daily-banner-sub">Come back tomorrow to analyse another photo. Your results are saved in your <a href="gallery.html" style="color:var(--gold);">Gallery</a>.</div>
-        </div>
-      </div>
-      <div class="daily-banner-time">
-        Resets in<strong id="resetCountdown">—</strong>
-      </div>
-    </div>
+
 
     <!-- INPUT CARD -->
     <div class="input-card">
@@ -509,7 +481,6 @@
         document.body.classList.add('auth-ready');
         renderNavAuth();
         renderHistory();
-        await checkDailyLimit();
       } catch (err) {
         clearTimeout(timeout);
         window.location.href = 'login.html';
@@ -526,47 +497,7 @@
     }
 
     // ── DAILY LIMIT CHECK ──
-    async function checkDailyLimit() {
-      try {
-        const today = new Date().toISOString().split('T')[0];
-        const { data } = await sb
-          .from('analyses')
-          .select('id')
-          .eq('user_id', currentUser.id)
-          .gte('created_at', `${today}T00:00:00.000Z`)
-          .lte('created_at', `${today}T23:59:59.999Z`);
 
-        const count = data ? data.length : 0;
-        if (count >= 3) showDailyBanner();
-        // Under 3 — banner stays hidden
-      } catch(e) {
-        // Silently fail
-      }
-    }
-
-    function showDailyBanner() {
-      const banner = document.getElementById('dailyBanner');
-      banner.classList.remove('hidden');
-
-      // Disable analyse buttons
-      document.getElementById('analyseBtnUpload').disabled = true;
-      document.getElementById('analyseBtnUrl').disabled = true;
-      document.getElementById('analyseBtnUpload').title = "Come back tomorrow!";
-      document.getElementById('analyseBtnUrl').title = "Come back tomorrow!";
-
-      // Countdown to midnight
-      function updateCountdown() {
-        const now = new Date();
-        const midnight = new Date();
-        midnight.setHours(24, 0, 0, 0);
-        const diff = midnight - now;
-        const h = Math.floor(diff / 3600000);
-        const m = Math.floor((diff % 3600000) / 60000);
-        document.getElementById('resetCountdown').textContent = `${h}h ${m}m`;
-      }
-      updateCountdown();
-      setInterval(updateCountdown, 60000);
-    }
 
 
 
