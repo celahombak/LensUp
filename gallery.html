@@ -8,6 +8,8 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase.js"></script>
   <style>
+    body { visibility: hidden; }
+    body.auth-ready { visibility: visible; }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
@@ -500,6 +502,8 @@
         window.location.href = 'login.html';
         return;
       }
+      // Auth confirmed — show page
+      document.body.classList.add('auth-ready');
 
       // Update nav with sign out
       const navLinks = document.getElementById('navLinks');
