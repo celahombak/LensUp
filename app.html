@@ -543,17 +543,28 @@
 
     // ── INIT ──
     async function init() {
-      initSupabase();
-      currentUser = await getUser();
-      // Require login — redirect guests
-      if (!currentUser) {
+      // Safety fallback — if auth hangs for 5 seconds, redirect to login
+      const timeout = setTimeout(() => {
         window.location.href = 'login.html';
-        return;
+      }, 5000);
+
+      try {
+        initSupabase();
+        currentUser = await getUser();
+        clearTimeout(timeout);
+
+        if (!currentUser) {
+          window.location.href = 'login.html';
+          return;
+        }
+        // Auth confirmed — show page
+        document.body.classList.add('auth-ready');
+        renderNavAuth();
+        renderHistory();
+      } catch (err) {
+        clearTimeout(timeout);
+        window.location.href = 'login.html';
       }
-      // Auth confirmed — show page
-      document.body.classList.add('auth-ready');
-      renderNavAuth();
-      renderHistory();
     }
 
     // ── NAV AUTH ──
@@ -662,8 +673,6 @@
 
     // ── ANALYSE ──
     async function analysePhoto() {
-      const apiKey = getApiKey();
-
       let imageContent;
       let historyLabel;
 
