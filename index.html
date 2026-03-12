@@ -1,500 +1,481 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>LensUp — AI Photo Analysis</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <title>LensUp — The Photography Challenge Platform</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,900;1,700&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --black: #0a0a0a;
-      --white: #f5f2ee;
-      --cream: #ede9e3;
-      --gold: #c9a96e;
-      --gold-light: #e8d5b0;
-      --dark: #1a1714;
-      --mid: #6b6560;
+      --black: #080808;
+      --white: #f0ede8;
+      --dark: #111010;
+      --dark2: #181615;
+      --mid: #5a5550;
+      --border: rgba(255,255,255,0.07);
+      --gold: #e8b84b;
+      --gold2: #f5d07a;
+      --red: #ff4444;
+      --orange: #ff7a1a;
+      --cyan: #00d4ff;
+      --green: #00e676;
+      --purple: #b44bff;
     }
-
     html { scroll-behavior: smooth; }
-
-    body {
-      background: var(--black);
-      color: var(--white);
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 300;
-      overflow-x: hidden;
-    }
+    body { background: var(--black); color: var(--white); font-family: 'DM Sans', sans-serif; font-weight: 300; overflow-x: hidden; }
 
     /* ── NAV ── */
-    nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 1.4rem 4rem;
-      background: rgba(10,10,10,0.85);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(201,169,110,0.15);
-    }
-    .nav-logo {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.5rem; font-weight: 900;
-      color: var(--gold);
-      letter-spacing: 0.02em;
-    }
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 200; display: flex; align-items: center; justify-content: space-between; padding: 1.2rem 3rem; background: rgba(8,8,8,0.92); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); }
+    .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; letter-spacing: 0.08em; color: var(--gold); text-decoration: none; }
     .nav-logo span { color: var(--white); }
-    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
-    .nav-links a {
-      color: var(--white); text-decoration: none;
-      font-size: 0.85rem; font-weight: 400;
-      letter-spacing: 0.08em; text-transform: uppercase;
-      opacity: 0.7; transition: opacity 0.2s;
-    }
-    .nav-links a:hover { opacity: 1; color: var(--gold); }
-    .nav-cta {
-      background: var(--gold); color: var(--black);
-      padding: 0.6rem 1.5rem; border-radius: 2px;
-      text-decoration: none; font-size: 0.8rem;
-      font-weight: 500; letter-spacing: 0.1em;
-      text-transform: uppercase; transition: background 0.2s;
-    }
-    .nav-cta:hover { background: var(--gold-light); }
-    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
-    .hamburger span { width: 24px; height: 2px; background: var(--white); display: block; transition: 0.3s; }
+    .nav-links { display: flex; align-items: center; gap: 2.5rem; list-style: none; }
+    .nav-links a { color: rgba(240,237,232,0.5); text-decoration: none; font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--gold); }
+    .nav-cta { background: var(--gold); color: var(--black); padding: 0.6rem 1.6rem; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; text-decoration: none; transition: all 0.2s; clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%); }
+    .nav-cta:hover { background: var(--gold2); transform: translateY(-1px); }
 
     /* ── HERO ── */
-    .hero {
-      min-height: 100vh;
-      display: flex; align-items: center;
-      padding: 8rem 4rem 4rem;
-      position: relative; overflow: hidden;
-    }
-    .hero-bg {
-      position: absolute; inset: 0;
-      background:
-        radial-gradient(ellipse 60% 60% at 70% 50%, rgba(201,169,110,0.07) 0%, transparent 70%),
-        radial-gradient(ellipse 40% 40% at 20% 80%, rgba(201,169,110,0.04) 0%, transparent 60%);
-    }
-    .hero-grid {
-      position: absolute; inset: 0; opacity: 0.03;
-      background-image: linear-gradient(var(--gold) 1px, transparent 1px),
-                        linear-gradient(90deg, var(--gold) 1px, transparent 1px);
-      background-size: 60px 60px;
-    }
-    .hero-content { position: relative; max-width: 680px; }
-    .hero-tag {
-      display: inline-block;
-      border: 1px solid rgba(201,169,110,0.4);
-      color: var(--gold); font-size: 0.72rem;
-      letter-spacing: 0.2em; text-transform: uppercase;
-      padding: 0.4rem 1rem; margin-bottom: 2rem;
-      animation: fadeUp 0.8s ease both;
-    }
-    .hero h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(3rem, 7vw, 5.5rem);
-      font-weight: 900; line-height: 1.05;
-      margin-bottom: 1.5rem;
-      animation: fadeUp 0.8s 0.15s ease both;
-    }
-    .hero h1 em {
-      font-style: italic; color: var(--gold);
-    }
-    .hero p {
-      font-size: 1.1rem; line-height: 1.8;
-      color: rgba(245,242,238,0.65);
-      max-width: 500px; margin-bottom: 2.5rem;
-      animation: fadeUp 0.8s 0.3s ease both;
-    }
-    .hero-actions {
-      display: flex; gap: 1rem; align-items: center;
-      animation: fadeUp 0.8s 0.45s ease both;
-      flex-wrap: wrap;
-    }
-    .btn-primary {
-      background: var(--gold); color: var(--black);
-      padding: 0.9rem 2.2rem; border-radius: 2px;
-      text-decoration: none; font-size: 0.85rem;
-      font-weight: 500; letter-spacing: 0.1em;
-      text-transform: uppercase; transition: all 0.2s;
-      display: inline-block;
-    }
-    .btn-primary:hover { background: var(--gold-light); transform: translateY(-1px); }
-    .btn-ghost {
-      color: var(--white); text-decoration: none;
-      font-size: 0.85rem; letter-spacing: 0.08em;
-      text-transform: uppercase; opacity: 0.6;
-      display: flex; align-items: center; gap: 0.5rem;
-      transition: opacity 0.2s;
-    }
+    .hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 8rem 3rem 4rem; position: relative; overflow: hidden; }
+
+    /* Animated background */
+    .hero-bg { position: absolute; inset: 0; }
+    .hero-bg::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 70% 60% at 20% 60%, rgba(232,184,75,0.06) 0%, transparent 60%), radial-gradient(ellipse 50% 50% at 80% 30%, rgba(0,212,255,0.04) 0%, transparent 60%), radial-gradient(ellipse 40% 40% at 60% 80%, rgba(180,75,255,0.04) 0%, transparent 60%); }
+    .hero-grid { position: absolute; inset: 0; opacity: 0.04; background-image: linear-gradient(rgba(232,184,75,0.8) 1px, transparent 1px), linear-gradient(90deg, rgba(232,184,75,0.8) 1px, transparent 1px); background-size: 80px 80px; }
+    .hero-scanline { position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--gold), transparent); animation: scan 4s ease-in-out infinite; opacity: 0.4; }
+    @keyframes scan { 0%,100% { top: 0%; opacity: 0; } 10% { opacity: 0.4; } 90% { opacity: 0.4; } 50% { top: 100%; } }
+
+    .hero-inner { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; max-width: 1200px; margin: 0 auto; width: 100%; }
+
+    /* Left side */
+    .hero-left {}
+    .hero-live-badge { display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255,68,68,0.12); border: 1px solid rgba(255,68,68,0.3); color: var(--red); padding: 0.35rem 0.9rem; font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1.8rem; animation: fadeUp 0.6s ease both; }
+    .live-dot { width: 6px; height: 6px; background: var(--red); border-radius: 50%; animation: pulse 1.5s ease-in-out infinite; }
+    @keyframes pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.7); } }
+
+    .hero h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(4rem, 8vw, 7rem); line-height: 0.92; letter-spacing: 0.03em; margin-bottom: 1.5rem; animation: fadeUp 0.6s 0.1s ease both; }
+    .hero h1 .line2 { color: var(--gold); display: block; }
+    .hero h1 .line3 { color: rgba(240,237,232,0.25); display: block; font-size: 0.6em; letter-spacing: 0.08em; }
+
+    .hero-desc { font-size: 1rem; line-height: 1.8; color: rgba(240,237,232,0.55); max-width: 440px; margin-bottom: 2rem; animation: fadeUp 0.6s 0.2s ease both; }
+
+    .hero-theme-card { background: var(--dark2); border: 1px solid var(--border); border-left: 3px solid var(--gold); padding: 1.2rem 1.5rem; margin-bottom: 2rem; animation: fadeUp 0.6s 0.3s ease both; }
+    .hero-theme-label { font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.4rem; }
+    .hero-theme-name { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; letter-spacing: 0.05em; margin-bottom: 0.3rem; }
+    .hero-theme-sub { font-size: 0.78rem; color: rgba(240,237,232,0.4); }
+    .hero-theme-timer { display: flex; gap: 1rem; margin-top: 0.8rem; }
+    .timer-unit { text-align: center; }
+    .timer-num { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; color: var(--gold); line-height: 1; display: block; }
+    .timer-label { font-size: 0.55rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mid); }
+
+    .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; animation: fadeUp 0.6s 0.4s ease both; }
+    .btn-primary { background: var(--gold); color: var(--black); padding: 0.9rem 2.2rem; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; text-decoration: none; transition: all 0.2s; display: inline-block; clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%); }
+    .btn-primary:hover { background: var(--gold2); transform: translateY(-2px); }
+    .btn-ghost { color: var(--white); text-decoration: none; font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.5; display: flex; align-items: center; gap: 0.4rem; transition: opacity 0.2s; padding: 0.9rem 0; }
     .btn-ghost:hover { opacity: 1; }
-    .btn-ghost::after { content: '→'; }
 
-    .hero-visual {
-      position: absolute; right: 4rem; top: 50%;
-      transform: translateY(-50%);
-      display: flex; flex-direction: column; gap: 1rem;
-      animation: fadeIn 1.2s 0.6s ease both;
-    }
-    .photo-card {
-      width: 220px; background: var(--dark);
-      border: 1px solid rgba(201,169,110,0.15);
-      border-radius: 4px; overflow: hidden;
-      position: relative;
-    }
-    .photo-card:nth-child(2) { margin-left: 40px; }
-    .photo-card-img {
-      width: 100%; height: 140px;
-      background: linear-gradient(135deg, #2a2520, #1a1714);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 2.5rem; opacity: 0.4;
-    }
-    .photo-card-body { padding: 0.8rem; }
-    .photo-card-label {
-      font-size: 0.65rem; color: var(--gold);
-      letter-spacing: 0.15em; text-transform: uppercase;
-      margin-bottom: 0.3rem;
-    }
-    .photo-card-text {
-      font-size: 0.75rem; color: rgba(245,242,238,0.5);
-      line-height: 1.5;
-    }
-    .score-badge {
-      position: absolute; top: 0.6rem; right: 0.6rem;
-      background: var(--gold); color: var(--black);
-      font-size: 0.7rem; font-weight: 500;
-      padding: 0.2rem 0.5rem; border-radius: 2px;
-    }
+    /* Right side — leaderboard preview */
+    .hero-right { animation: fadeUp 0.6s 0.5s ease both; }
+    .leaderboard-preview { background: var(--dark); border: 1px solid var(--border); overflow: hidden; }
+    .lb-header { padding: 1rem 1.4rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .lb-title { font-family: 'Bebas Neue', sans-serif; font-size: 1rem; letter-spacing: 0.1em; color: var(--gold); }
+    .lb-live { font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--red); display: flex; align-items: center; gap: 0.4rem; }
+    .lb-row { display: flex; align-items: center; gap: 1rem; padding: 0.9rem 1.4rem; border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.2s; }
+    .lb-row:hover { background: rgba(232,184,75,0.04); }
+    .lb-row.gold-row { background: rgba(232,184,75,0.06); border-left: 2px solid var(--gold); }
+    .lb-rank { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; width: 24px; text-align: center; }
+    .lb-rank.r1 { color: var(--gold); }
+    .lb-rank.r2 { color: #c0c0c0; }
+    .lb-rank.r3 { color: #cd7f32; }
+    .lb-photo { width: 42px; height: 42px; background: var(--dark2); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; overflow: hidden; }
+    .lb-info { flex: 1; }
+    .lb-name { font-size: 0.82rem; font-weight: 500; margin-bottom: 0.1rem; }
+    .lb-theme { font-size: 0.68rem; color: var(--mid); }
+    .lb-score { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; }
+    .lb-score.s-high { color: var(--green); }
+    .lb-score.s-mid { color: var(--gold); }
 
-    /* ── STATS ── */
-    .stats {
-      padding: 3rem 4rem;
-      border-top: 1px solid rgba(201,169,110,0.1);
-      border-bottom: 1px solid rgba(201,169,110,0.1);
-      display: flex; justify-content: center; gap: 5rem;
-      flex-wrap: wrap;
-    }
-    .stat { text-align: center; }
-    .stat-num {
-      font-family: 'Playfair Display', serif;
-      font-size: 2.2rem; color: var(--gold);
-      font-weight: 700; display: block;
-    }
-    .stat-label {
-      font-size: 0.75rem; letter-spacing: 0.12em;
-      text-transform: uppercase; opacity: 0.5;
-      margin-top: 0.3rem;
-    }
+    /* ── TICKER ── */
+    .ticker { background: var(--gold); color: var(--black); padding: 0.6rem 0; overflow: hidden; white-space: nowrap; }
+    .ticker-inner { display: inline-flex; gap: 0; animation: ticker 25s linear infinite; }
+    .ticker-item { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; padding: 0 2rem; }
+    .ticker-sep { opacity: 0.4; }
+    @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* ── STATS BAR ── */
+    .stats-bar { padding: 3rem; display: flex; justify-content: center; gap: 0; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+    .stat-item { text-align: center; padding: 1rem 3rem; border-right: 1px solid var(--border); }
+    .stat-item:last-child { border-right: none; }
+    .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 2.8rem; letter-spacing: 0.04em; display: block; line-height: 1; }
+    .stat-label { font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--mid); margin-top: 0.3rem; }
 
     /* ── HOW IT WORKS ── */
-    .section { padding: 6rem 4rem; }
-    .section-tag {
-      display: inline-block;
-      color: var(--gold); font-size: 0.72rem;
-      letter-spacing: 0.2em; text-transform: uppercase;
-      margin-bottom: 1rem;
-    }
-    .section-title {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(2rem, 4vw, 3rem);
-      font-weight: 900; line-height: 1.15;
-      margin-bottom: 1rem;
-    }
-    .section-sub {
-      color: rgba(245,242,238,0.55);
-      font-size: 1rem; line-height: 1.8;
-      max-width: 480px; margin-bottom: 3.5rem;
-    }
+    .section { padding: 6rem 3rem; max-width: 1200px; margin: 0 auto; }
+    .section-tag { font-size: 0.68rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.8rem; display: block; }
+    .section-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2.5rem, 5vw, 4rem); letter-spacing: 0.04em; line-height: 1; margin-bottom: 1rem; }
+    .section-sub { color: rgba(240,237,232,0.45); font-size: 0.95rem; line-height: 1.8; max-width: 480px; margin-bottom: 3rem; }
 
-    .steps { display: flex; gap: 2rem; flex-wrap: wrap; }
-    .step {
-      flex: 1; min-width: 220px;
-      padding: 2rem;
-      background: var(--dark);
-      border: 1px solid rgba(201,169,110,0.1);
-      border-radius: 4px;
-      position: relative;
-      transition: border-color 0.3s;
-    }
-    .step:hover { border-color: rgba(201,169,110,0.35); }
-    .step-num {
-      font-family: 'Playfair Display', serif;
-      font-size: 3.5rem; font-weight: 900;
-      color: rgba(201,169,110,0.12);
-      line-height: 1; margin-bottom: 1rem;
-    }
-    .step-icon { font-size: 1.8rem; margin-bottom: 1rem; }
-    .step h3 {
-      font-size: 1rem; font-weight: 500;
-      margin-bottom: 0.6rem; letter-spacing: 0.03em;
-    }
-    .step p {
-      font-size: 0.85rem; line-height: 1.7;
-      color: rgba(245,242,238,0.5);
-    }
+    .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border: 1px solid var(--border); }
+    .step { padding: 2.5rem 2rem; border-right: 1px solid var(--border); position: relative; transition: background 0.3s; }
+    .step:last-child { border-right: none; }
+    .step:hover { background: var(--dark2); }
+    .step-num { font-family: 'Bebas Neue', sans-serif; font-size: 4rem; color: rgba(232,184,75,0.1); line-height: 1; margin-bottom: 1rem; }
+    .step-icon { font-size: 1.6rem; margin-bottom: 1rem; display: block; }
+    .step h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.6rem; letter-spacing: 0.02em; }
+    .step p { font-size: 0.82rem; line-height: 1.7; color: rgba(240,237,232,0.45); }
+    .step-arrow { position: absolute; right: -12px; top: 50%; transform: translateY(-50%); width: 24px; height: 24px; background: var(--black); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.65rem; color: var(--gold); z-index: 1; }
+    .step:last-child .step-arrow { display: none; }
 
-    /* ── FEATURES ── */
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1.5px;
-      background: rgba(201,169,110,0.1);
-      border: 1px solid rgba(201,169,110,0.1);
-    }
-    .feature {
-      padding: 2.5rem;
-      background: var(--black);
-      transition: background 0.3s;
-    }
-    .feature:hover { background: var(--dark); }
-    .feature-icon {
-      font-size: 1.8rem; margin-bottom: 1.2rem;
-      display: block;
-    }
-    .feature h3 {
-      font-size: 1rem; font-weight: 500;
-      margin-bottom: 0.6rem;
-      letter-spacing: 0.03em;
-    }
-    .feature p {
-      font-size: 0.85rem; line-height: 1.7;
-      color: rgba(245,242,238,0.5);
-    }
+    /* ── CHALLENGE PREVIEW ── */
+    .challenges-section { padding: 6rem 3rem; background: var(--dark); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .challenges-inner { max-width: 1200px; margin: 0 auto; }
+    .challenge-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); margin-top: 3rem; }
+    .challenge-card { background: var(--black); padding: 2rem; transition: background 0.3s; position: relative; overflow: hidden; }
+    .challenge-card::before { content: ''; position: absolute; inset: 0; opacity: 0; transition: opacity 0.3s; }
+    .challenge-card.c1::before { background: radial-gradient(ellipse at top left, rgba(232,184,75,0.08), transparent 60%); }
+    .challenge-card.c2::before { background: radial-gradient(ellipse at top left, rgba(0,212,255,0.06), transparent 60%); }
+    .challenge-card.c3::before { background: radial-gradient(ellipse at top left, rgba(180,75,255,0.06), transparent 60%); }
+    .challenge-card:hover { background: var(--dark2); }
+    .challenge-card:hover::before { opacity: 1; }
+    .challenge-week { font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 0.6rem; }
+    .challenge-name { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 0.04em; margin-bottom: 0.5rem; }
+    .challenge-desc { font-size: 0.82rem; line-height: 1.7; color: rgba(240,237,232,0.45); margin-bottom: 1.2rem; }
+    .challenge-meta { display: flex; gap: 1rem; }
+    .challenge-tag { font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.25rem 0.7rem; border: 1px solid var(--border); color: rgba(240,237,232,0.4); }
 
-    /* ── CTA SECTION ── */
-    .cta-section {
-      padding: 6rem 4rem;
-      text-align: center;
-      position: relative; overflow: hidden;
-    }
-    .cta-section::before {
-      content: '';
-      position: absolute; inset: 0;
-      background: radial-gradient(ellipse 50% 80% at 50% 50%, rgba(201,169,110,0.08) 0%, transparent 70%);
-    }
+    /* ── SCORING ── */
+    .scoring-section { padding: 6rem 3rem; max-width: 1200px; margin: 0 auto; }
+    .scoring-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; margin-top: 3rem; }
+    .score-categories { display: flex; flex-direction: column; gap: 0.8rem; }
+    .score-cat { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.2rem; background: var(--dark); border: 1px solid var(--border); transition: border-color 0.2s; }
+    .score-cat:hover { border-color: rgba(232,184,75,0.3); }
+    .score-cat-icon { font-size: 1.1rem; width: 28px; text-align: center; }
+    .score-cat-info { flex: 1; }
+    .score-cat-name { font-size: 0.82rem; font-weight: 500; margin-bottom: 0.2rem; }
+    .score-cat-desc { font-size: 0.72rem; color: var(--mid); }
+    .score-cat-bar { width: 80px; height: 4px; background: rgba(255,255,255,0.06); overflow: hidden; }
+    .score-cat-fill { height: 100%; transition: width 1s ease; }
+    .score-right { }
+    .score-sample { background: var(--dark); border: 1px solid var(--border); padding: 2rem; }
+    .score-sample-title { font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--mid); margin-bottom: 1.2rem; }
+    .score-overall { font-family: 'Bebas Neue', sans-serif; font-size: 5rem; color: var(--gold); line-height: 1; margin-bottom: 0.3rem; }
+    .score-overall span { font-size: 1.5rem; color: var(--mid); }
+    .score-verdict { font-size: 0.85rem; color: var(--gold); margin-bottom: 1.5rem; }
+    .score-bars { display: flex; flex-direction: column; gap: 0.6rem; }
+    .score-bar-row { display: flex; align-items: center; gap: 0.8rem; }
+    .score-bar-label { font-size: 0.68rem; width: 90px; color: rgba(240,237,232,0.5); text-transform: uppercase; letter-spacing: 0.05em; flex-shrink: 0; }
+    .score-bar-track { flex: 1; height: 4px; background: rgba(255,255,255,0.06); overflow: hidden; }
+    .score-bar-fill { height: 100%; }
+    .score-bar-val { font-size: 0.75rem; font-weight: 600; width: 20px; text-align: right; flex-shrink: 0; }
+
+    /* ── CTA ── */
+    .cta-section { padding: 8rem 3rem; text-align: center; position: relative; overflow: hidden; background: var(--dark); border-top: 1px solid var(--border); }
+    .cta-section::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(232,184,75,0.07) 0%, transparent 70%); }
     .cta-section > * { position: relative; }
-    .cta-section .section-title { max-width: 560px; margin: 0 auto 1rem; }
-    .cta-section .section-sub { margin: 0 auto 2.5rem; text-align: center; }
-    .cta-big {
-      background: var(--gold); color: var(--black);
-      padding: 1.1rem 3rem; border-radius: 2px;
-      text-decoration: none; font-size: 0.9rem;
-      font-weight: 500; letter-spacing: 0.1em;
-      text-transform: uppercase; transition: all 0.2s;
-      display: inline-block;
-    }
-    .cta-big:hover { background: var(--gold-light); transform: translateY(-2px); }
+    .cta-label { font-size: 0.68rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); margin-bottom: 1rem; display: block; }
+    .cta-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(3rem, 7vw, 6rem); letter-spacing: 0.04em; line-height: 1; margin-bottom: 1.2rem; }
+    .cta-title span { color: var(--gold); }
+    .cta-sub { color: rgba(240,237,232,0.45); font-size: 0.95rem; line-height: 1.8; max-width: 460px; margin: 0 auto 2.5rem; }
+    .btn-cta-big { background: var(--gold); color: var(--black); padding: 1.1rem 3.5rem; font-size: 0.88rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; text-decoration: none; transition: all 0.25s; display: inline-block; clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%); }
+    .btn-cta-big:hover { background: var(--gold2); transform: translateY(-3px); box-shadow: 0 12px 40px rgba(232,184,75,0.25); }
 
     /* ── FOOTER ── */
-    footer {
-      padding: 2rem 4rem;
-      border-top: 1px solid rgba(201,169,110,0.1);
-      display: flex; align-items: center;
-      justify-content: space-between; flex-wrap: wrap; gap: 1rem;
-    }
-    .footer-logo {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.2rem; color: var(--gold); font-weight: 900;
-    }
+    footer { padding: 2rem 3rem; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+    .footer-logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; letter-spacing: 0.08em; color: var(--gold); }
     .footer-logo span { color: var(--white); }
-    footer p {
-      font-size: 0.8rem; opacity: 0.4;
-      letter-spacing: 0.05em;
-    }
+    footer p { font-size: 0.75rem; color: var(--mid); letter-spacing: 0.05em; }
 
-    /* ── ANIMATIONS ── */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(24px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* ── MOBILE ── */
-    @media (max-width: 768px) {
-      nav { padding: 1.2rem 1.5rem; }
-      .nav-links, .nav-cta { display: none; }
-      .hamburger { display: flex; }
-      .hero { padding: 7rem 1.5rem 3rem; min-height: auto; }
-      .hero-visual { display: none; }
-      .stats { padding: 2.5rem 1.5rem; gap: 2rem; }
-      .section { padding: 4rem 1.5rem; }
-      .steps { flex-direction: column; }
-      .cta-section { padding: 4rem 1.5rem; }
+    @media (max-width: 900px) {
+      nav { padding: 1rem 1.5rem; }
+      .nav-links { display: none; }
+      .hero { padding: 7rem 1.5rem 3rem; }
+      .hero-inner { grid-template-columns: 1fr; gap: 2rem; }
+      .hero-right { display: none; }
+      .stats-bar { gap: 0; }
+      .stat-item { padding: 1rem 1.5rem; }
+      .section, .scoring-section { padding: 4rem 1.5rem; }
+      .steps { grid-template-columns: 1fr 1fr; }
+      .challenge-grid { grid-template-columns: 1fr; }
+      .scoring-grid { grid-template-columns: 1fr; }
+      .challenges-section { padding: 4rem 1.5rem; }
+      .cta-section { padding: 5rem 1.5rem; }
       footer { padding: 2rem 1.5rem; flex-direction: column; text-align: center; }
-    }
-
-    /* Mobile nav open state */
-    nav.open .nav-links {
-      display: flex; flex-direction: column;
-      position: absolute; top: 100%; left: 0; right: 0;
-      background: var(--black);
-      padding: 1.5rem; gap: 1.5rem;
-      border-bottom: 1px solid rgba(201,169,110,0.15);
-    }
-    nav.open .nav-cta {
-      display: block; margin: 0 1.5rem 1.5rem;
     }
   </style>
 </head>
 <body>
 
-  <!-- NAV -->
-  <nav id="navbar">
-    <div class="nav-logo">Lens<span>Up</span></div>
+  <nav>
+    <a href="index.html" class="nav-logo">Lens<span>Up</span></a>
     <ul class="nav-links">
-      <li><a href="#how">How it works</a></li>
-      <li><a href="#features">Features</a></li>
+      <li><a href="#how">How It Works</a></li>
+      <li><a href="#challenges">Challenges</a></li>
+      <li><a href="leaderboard.html">Leaderboard</a></li>
       <li><a href="learn.html">Learn</a></li>
-      <li><a href="gallery.html">Gallery</a></li>
-      <li><a href="profile.html">Profile</a></li>
     </ul>
-    <a href="login.html" class="nav-cta">Try LensUp</a>
-    <div class="hamburger" onclick="toggleNav()">
-      <span></span><span></span><span></span>
-    </div>
+    <a href="register.html" class="nav-cta">Join the Challenge</a>
   </nav>
 
   <!-- HERO -->
   <section class="hero">
     <div class="hero-bg"></div>
     <div class="hero-grid"></div>
-    <div class="hero-content">
-      <div class="hero-tag">AI-Powered Photo Analysis</div>
-      <h1>See Your Photos<br/>Through <em>Smarter</em><br/>Eyes</h1>
-      <p>Paste any public photo link and get instant AI-powered analysis — composition, lighting, mood, and professional improvement tips.</p>
-      <div class="hero-actions">
-        <a href="login.html" class="btn-primary">Analyse a Photo</a>
-        <a href="#how" class="btn-ghost">See how it works</a>
-      </div>
-    </div>
-    <div class="hero-visual">
-      <div class="photo-card">
-        <div class="photo-card-img">🌅</div>
-        <div class="score-badge">9.2</div>
-        <div class="photo-card-body">
-          <div class="photo-card-label">Composition</div>
-          <div class="photo-card-text">Strong rule of thirds with excellent horizon balance.</div>
+    <div class="hero-scanline"></div>
+    <div class="hero-inner">
+      <div class="hero-left">
+        <div class="hero-live-badge"><span class="live-dot"></span> Week 1 Challenge Active</div>
+        <h1>
+          Shoot.<br/>
+          <span class="line2">Score.</span>
+          <span class="line3">Dominate.</span>
+        </h1>
+        <p class="hero-desc">A year-long photography quest. Weekly themes. Daily submissions. AI scoring. One leaderboard to rule them all.</p>
+        <div class="hero-theme-card">
+          <div class="hero-theme-label">📅 This Week's Theme</div>
+          <div class="hero-theme-name">Golden Hour</div>
+          <div class="hero-theme-sub">Capture the magic of the first or last hour of sunlight</div>
+          <div class="hero-theme-timer">
+            <div class="timer-unit"><span class="timer-num" id="timerD">—</span><span class="timer-label">Days</span></div>
+            <div class="timer-unit"><span class="timer-num" id="timerH">—</span><span class="timer-label">Hrs</span></div>
+            <div class="timer-unit"><span class="timer-num" id="timerM">—</span><span class="timer-label">Min</span></div>
+          </div>
+        </div>
+        <div class="hero-actions">
+          <a href="register.html" class="btn-primary">🎯 Enter This Week</a>
+          <a href="leaderboard.html" class="btn-ghost">View Leaderboard →</a>
         </div>
       </div>
-      <div class="photo-card">
-        <div class="photo-card-img">🏙️</div>
-        <div class="score-badge">8.5</div>
-        <div class="photo-card-body">
-          <div class="photo-card-label">Lighting</div>
-          <div class="photo-card-text">Golden hour tones enhance the urban depth.</div>
+      <div class="hero-right">
+        <div class="leaderboard-preview">
+          <div class="lb-header">
+            <span class="lb-title">🏆 Today's Top Shots</span>
+            <span class="lb-live"><span class="live-dot"></span> Live</span>
+          </div>
+          <div class="lb-row gold-row">
+            <span class="lb-rank r1">1</span>
+            <div class="lb-photo">🌅</div>
+            <div class="lb-info"><div class="lb-name">Ahmad R.</div><div class="lb-theme">Golden Hour</div></div>
+            <span class="lb-score s-high">9.4</span>
+          </div>
+          <div class="lb-row">
+            <span class="lb-rank r2">2</span>
+            <div class="lb-photo">🌄</div>
+            <div class="lb-info"><div class="lb-name">Sarah K.</div><div class="lb-theme">Golden Hour</div></div>
+            <span class="lb-score s-high">9.1</span>
+          </div>
+          <div class="lb-row">
+            <span class="lb-rank r3">3</span>
+            <div class="lb-photo">☀️</div>
+            <div class="lb-info"><div class="lb-name">Faiz M.</div><div class="lb-theme">Golden Hour</div></div>
+            <span class="lb-score s-mid">8.7</span>
+          </div>
+          <div class="lb-row">
+            <span class="lb-rank" style="color:var(--mid)">4</span>
+            <div class="lb-photo">🏙️</div>
+            <div class="lb-info"><div class="lb-name">Lina C.</div><div class="lb-theme">Golden Hour</div></div>
+            <span class="lb-score s-mid">8.2</span>
+          </div>
+          <div class="lb-row">
+            <span class="lb-rank" style="color:var(--mid)">5</span>
+            <div class="lb-photo">🌿</div>
+            <div class="lb-info"><div class="lb-name">Reza T.</div><div class="lb-theme">Golden Hour</div></div>
+            <span class="lb-score s-mid">7.9</span>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
+  <!-- TICKER -->
+  <div class="ticker">
+    <div class="ticker-inner">
+      <span class="ticker-item">📷 Week 1: Golden Hour</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">🏆 Leaderboard Updated Daily</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">🤖 AI-Powered Scoring</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">📈 Track Your Progress</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">🎯 52 Weekly Challenges</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">🔥 1 Submission Per Day</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">📷 Week 1: Golden Hour</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">🏆 Leaderboard Updated Daily</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">🤖 AI-Powered Scoring</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">📈 Track Your Progress</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">🎯 52 Weekly Challenges</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">🔥 1 Submission Per Day</span><span class="ticker-sep">·</span>
+    </div>
+  </div>
+
   <!-- STATS -->
-  <div class="stats">
-    <div class="stat">
-      <span class="stat-num">7</span>
-      <div class="stat-label">Analysis Dimensions</div>
-    </div>
-    <div class="stat">
-      <span class="stat-num">~5s</span>
-      <div class="stat-label">Per Analysis</div>
-    </div>
-    <div class="stat">
-      <span class="stat-num">Free</span>
-      <div class="stat-label">To Use</div>
-    </div>
-    <div class="stat">
-      <span class="stat-num">AI</span>
-      <div class="stat-label">Powered by Claude</div>
-    </div>
+  <div class="stats-bar">
+    <div class="stat-item"><span class="stat-num" style="color:var(--gold)">52</span><div class="stat-label">Weekly Challenges</div></div>
+    <div class="stat-item"><span class="stat-num" style="color:var(--cyan)">6</span><div class="stat-label">Scoring Categories</div></div>
+    <div class="stat-item"><span class="stat-num" style="color:var(--green)">Daily</span><div class="stat-label">Leaderboard Updates</div></div>
+    <div class="stat-item"><span class="stat-num" style="color:var(--purple)">AI</span><div class="stat-label">Powered by Claude</div></div>
   </div>
 
   <!-- HOW IT WORKS -->
   <section class="section" id="how">
-    <div class="section-tag">How it works</div>
-    <h2 class="section-title">Three Steps to<br/>Better Photos</h2>
-    <p class="section-sub">No account. No upload. Just paste a link and get professional-grade feedback instantly.</p>
+    <span class="section-tag">How It Works</span>
+    <h2 class="section-title">Four Steps to the Top</h2>
+    <p class="section-sub">Every week is a new chance to climb the leaderboard. Every photo is a step forward.</p>
     <div class="steps">
       <div class="step">
         <div class="step-num">01</div>
-        <div class="step-icon">🔗</div>
-        <h3>Paste Your Photo Link</h3>
-        <p>Copy any public image URL — from Imgur, Google Drive, Dropbox, or any direct image link ending in .jpg or .png.</p>
+        <span class="step-icon">📅</span>
+        <h3>Get the Theme</h3>
+        <p>Every week a new challenge theme drops. Study it. Plan your shot. Think about what story you want to tell.</p>
+        <div class="step-arrow">→</div>
       </div>
       <div class="step">
         <div class="step-num">02</div>
-        <div class="step-icon">⚡</div>
-        <h3>AI Analyses Instantly</h3>
-        <p>Our Claude-powered engine evaluates composition, lighting, colour, mood, focus, and more in seconds.</p>
+        <span class="step-icon">📷</span>
+        <h3>Submit Your Best Shot</h3>
+        <p>Upload one photo per day. Make it count. The AI scores it across 6 dimensions plus theme relevance.</p>
+        <div class="step-arrow">→</div>
       </div>
       <div class="step">
         <div class="step-num">03</div>
-        <div class="step-icon">📈</div>
-        <h3>Get Actionable Feedback</h3>
-        <p>Receive a detailed score and specific tips you can apply immediately to level up your photography.</p>
+        <span class="step-icon">🤖</span>
+        <h3>Get AI Feedback</h3>
+        <p>Instant detailed scoring on composition, lighting, framing and more. Plus specific tips to improve your next shot.</p>
+        <div class="step-arrow">→</div>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <span class="step-icon">🏆</span>
+        <h3>Climb the Leaderboard</h3>
+        <p>Your best weekly score counts. See where you rank daily. At year end — your full photography journey, documented.</p>
+        <div class="step-arrow">→</div>
       </div>
     </div>
   </section>
 
-  <!-- FEATURES -->
-  <section class="section" id="features" style="padding-top:0">
-    <div class="section-tag">Features</div>
-    <h2 class="section-title">Everything You Need<br/>to Grow as a Photographer</h2>
-    <p class="section-sub">LensUp gives you the honest, detailed critique that most photographers never get.</p>
-    <div class="features-grid">
-      <div class="feature">
-        <span class="feature-icon">🎯</span>
-        <h3>Composition Score</h3>
-        <p>Rule of thirds, leading lines, framing, symmetry — scored and explained in plain language.</p>
+  <!-- CHALLENGES PREVIEW -->
+  <section class="challenges-section" id="challenges">
+    <div class="challenges-inner">
+      <span class="section-tag">Upcoming Challenges</span>
+      <h2 class="section-title">What's Coming</h2>
+      <p class="section-sub">Themes are designed to push your creative limits. No two weeks are the same.</p>
+      <div class="challenge-grid">
+        <div class="challenge-card c1">
+          <div class="challenge-week" style="color:var(--gold)">Week 1 · Active Now</div>
+          <div class="challenge-name">Golden Hour</div>
+          <div class="challenge-desc">Capture the warmth of the first or last hour of light. Chase that magic window when everything glows.</div>
+          <div class="challenge-meta">
+            <span class="challenge-tag" style="border-color:rgba(232,184,75,0.3);color:var(--gold)">🔥 Active</span>
+            <span class="challenge-tag">Landscape · Portrait</span>
+          </div>
+        </div>
+        <div class="challenge-card c2">
+          <div class="challenge-week" style="color:var(--cyan)">Week 2 · Coming Soon</div>
+          <div class="challenge-name">Reflections</div>
+          <div class="challenge-desc">Water, glass, mirrors, puddles. Find the world doubled and make it more interesting than the original.</div>
+          <div class="challenge-meta">
+            <span class="challenge-tag" style="border-color:rgba(0,212,255,0.3);color:var(--cyan)">Upcoming</span>
+            <span class="challenge-tag">Abstract · Street</span>
+          </div>
+        </div>
+        <div class="challenge-card c3">
+          <div class="challenge-week" style="color:var(--purple)">Week 3 · Coming Soon</div>
+          <div class="challenge-name">Street Life</div>
+          <div class="challenge-desc">The city never sleeps. Capture the energy, the faces, the moments that happen when nobody's watching.</div>
+          <div class="challenge-meta">
+            <span class="challenge-tag" style="border-color:rgba(180,75,255,0.3);color:var(--purple)">Upcoming</span>
+            <span class="challenge-tag">Street · Documentary</span>
+          </div>
+        </div>
       </div>
-      <div class="feature">
-        <span class="feature-icon">💡</span>
-        <h3>Lighting Analysis</h3>
-        <p>Understand your light source, shadows, exposure, and how they affect the overall feel of your shot.</p>
+    </div>
+  </section>
+
+  <!-- SCORING -->
+  <section class="scoring-section">
+    <span class="section-tag">AI Scoring System</span>
+    <h2 class="section-title">Scored on What Actually Matters</h2>
+    <p class="section-sub">Not vibes. Not likes. Six objective dimensions scored by AI — the same standard for everyone.</p>
+    <div class="scoring-grid">
+      <div class="score-categories">
+        <div class="score-cat">
+          <span class="score-cat-icon">🎯</span>
+          <div class="score-cat-info"><div class="score-cat-name">Subject Focus</div><div class="score-cat-desc">Is your subject sharp and intentional?</div></div>
+          <div class="score-cat-bar"><div class="score-cat-fill" style="width:88%;background:#60a5fa"></div></div>
+        </div>
+        <div class="score-cat">
+          <span class="score-cat-icon">🎨</span>
+          <div class="score-cat-info"><div class="score-cat-name">Color & Contrast</div><div class="score-cat-desc">Palette harmony and tonal range</div></div>
+          <div class="score-cat-bar"><div class="score-cat-fill" style="width:92%;background:#f472b6"></div></div>
+        </div>
+        <div class="score-cat">
+          <span class="score-cat-icon">📐</span>
+          <div class="score-cat-info"><div class="score-cat-name">Composition</div><div class="score-cat-desc">Rule of thirds, balance, visual flow</div></div>
+          <div class="score-cat-bar"><div class="score-cat-fill" style="width:75%;background:#34d399"></div></div>
+        </div>
+        <div class="score-cat">
+          <span class="score-cat-icon">💡</span>
+          <div class="score-cat-info"><div class="score-cat-name">Lighting</div><div class="score-cat-desc">Quality, direction and mood of light</div></div>
+          <div class="score-cat-bar"><div class="score-cat-fill" style="width:95%;background:#fbbf24"></div></div>
+        </div>
+        <div class="score-cat">
+          <span class="score-cat-icon">✨</span>
+          <div class="score-cat-info"><div class="score-cat-name">Background Blur</div><div class="score-cat-desc">Separation between subject and scene</div></div>
+          <div class="score-cat-bar"><div class="score-cat-fill" style="width:65%;background:#a78bfa"></div></div>
+        </div>
+        <div class="score-cat">
+          <span class="score-cat-icon">✂️</span>
+          <div class="score-cat-info"><div class="score-cat-name">Framing</div><div class="score-cat-desc">How well the subject fills the frame</div></div>
+          <div class="score-cat-bar"><div class="score-cat-fill" style="width:82%;background:#fb923c"></div></div>
+        </div>
       </div>
-      <div class="feature">
-        <span class="feature-icon">🎨</span>
-        <h3>Colour & Mood</h3>
-        <p>Discover the emotional tone of your palette and how to use colour more intentionally.</p>
-      </div>
-      <div class="feature">
-        <span class="feature-icon">🔍</span>
-        <h3>Focus & Sharpness</h3>
-        <p>Get feedback on depth of field, subject clarity, and whether your focal point serves the story.</p>
-      </div>
-      <div class="feature">
-        <span class="feature-icon">📝</span>
-        <h3>Pro Improvement Tips</h3>
-        <p>Specific, actionable suggestions — not vague praise. Real advice you can use on your next shoot.</p>
-      </div>
-      <div class="feature">
-        <span class="feature-icon">📂</span>
-        <h3>Local History</h3>
-        <p>Your past analyses are saved in your browser. Review your progress anytime, no account needed.</p>
+      <div class="score-right">
+        <div class="score-sample">
+          <div class="score-sample-title">Sample Analysis Result</div>
+          <div class="score-overall">9.4<span>/10</span></div>
+          <div class="score-verdict">Mastershot! 🏆</div>
+          <div class="score-bars">
+            <div class="score-bar-row"><span class="score-bar-label">Subject Focus</span><div class="score-bar-track"><div class="score-bar-fill" style="width:90%;background:#60a5fa"></div></div><span class="score-bar-val" style="color:#60a5fa">9</span></div>
+            <div class="score-bar-row"><span class="score-bar-label">Color</span><div class="score-bar-track"><div class="score-bar-fill" style="width:100%;background:#f472b6"></div></div><span class="score-bar-val" style="color:#f472b6">10</span></div>
+            <div class="score-bar-row"><span class="score-bar-label">Composition</span><div class="score-bar-track"><div class="score-bar-fill" style="width:80%;background:#34d399"></div></div><span class="score-bar-val" style="color:#34d399">8</span></div>
+            <div class="score-bar-row"><span class="score-bar-label">Lighting</span><div class="score-bar-track"><div class="score-bar-fill" style="width:100%;background:#fbbf24"></div></div><span class="score-bar-val" style="color:#fbbf24">10</span></div>
+            <div class="score-bar-row"><span class="score-bar-label">BG Blur</span><div class="score-bar-track"><div class="score-bar-fill" style="width:90%;background:#a78bfa"></div></div><span class="score-bar-val" style="color:#a78bfa">9</span></div>
+            <div class="score-bar-row"><span class="score-bar-label">Framing</span><div class="score-bar-track"><div class="score-bar-fill" style="width:90%;background:#fb923c"></div></div><span class="score-bar-val" style="color:#fb923c">9</span></div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
   <!-- CTA -->
   <section class="cta-section">
-    <div class="section-tag">Get started</div>
-    <h2 class="section-title">Ready to See What Your Photos Are Really Saying?</h2>
-    <p class="section-sub">Paste a link. Get your analysis. No sign-up required.</p>
-    <a href="login.html" class="cta-big">Analyse My Photo Now</a>
+    <span class="cta-label">Ready to compete?</span>
+    <h2 class="cta-title">Your Journey<br/><span>Starts This Week</span></h2>
+    <p class="cta-sub">52 themes. 365 days. One leaderboard. Join now and start building your photography legacy.</p>
+    <a href="register.html" class="btn-cta-big">🎯 Join the Challenge — Free</a>
   </section>
 
   <!-- FOOTER -->
   <footer>
     <div class="footer-logo">Lens<span>Up</span></div>
-    <p>© 2025 LensUp · AI-Powered Photo Analysis · Powered by Claude</p>
+    <p>© 2026 LensUp · Photography Challenge Platform · Powered by Claude AI</p>
   </footer>
 
   <script>
-    function toggleNav() {
-      document.getElementById('navbar').classList.toggle('open');
+    // Countdown to next Sunday midnight
+    function updateTimer() {
+      const now = new Date();
+      const nextSunday = new Date();
+      nextSunday.setDate(now.getDate() + (7 - now.getDay()));
+      nextSunday.setHours(23, 59, 59, 0);
+      const diff = nextSunday - now;
+      const d = Math.floor(diff / 86400000);
+      const h = Math.floor((diff % 86400000) / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      document.getElementById('timerD').textContent = d;
+      document.getElementById('timerH').textContent = String(h).padStart(2,'0');
+      document.getElementById('timerM').textContent = String(m).padStart(2,'0');
     }
+    updateTimer();
+    setInterval(updateTimer, 60000);
   </script>
 </body>
 </html>
