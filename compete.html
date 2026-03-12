@@ -117,6 +117,26 @@
     .no-theme-banner { max-width: 960px; margin: 3rem auto; padding: 3rem 2rem; text-align: center; border: 1px solid var(--border); color: rgba(240,237,232,0.35); }
     .no-theme-banner h2 { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; letter-spacing: 0.05em; margin-bottom: 0.8rem; color: var(--white); }
 
+    /* COMING SOON */
+    .coming-section { max-width: 960px; margin: 0 auto; padding: 0 2rem 5rem; }
+    .coming-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.2rem; padding-top: 3rem; border-top: 1px solid var(--border); }
+    .coming-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem; letter-spacing: 0.06em; color: var(--white); }
+    .coming-sub { font-size: 0.72rem; color: var(--mid); margin-left: auto; }
+    .coming-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); }
+    .coming-card { background: var(--dark); padding: 1.8rem 1.5rem; position: relative; overflow: hidden; transition: background 0.2s; }
+    .coming-card:hover { background: var(--dark2); }
+    .coming-card::before { content: ''; position: absolute; inset: 0; opacity: 0; transition: opacity 0.3s; }
+    .coming-card.cc1::before { background: radial-gradient(ellipse at top left, rgba(0,212,255,0.06), transparent 60%); }
+    .coming-card.cc2::before { background: radial-gradient(ellipse at top left, rgba(180,75,255,0.06), transparent 60%); }
+    .coming-card:hover::before { opacity: 1; }
+    .coming-card-week { font-size: 0.6rem; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 0.5rem; }
+    .coming-card-name { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 0.04em; margin-bottom: 0.5rem; }
+    .coming-card-desc { font-size: 0.78rem; line-height: 1.7; color: rgba(240,237,232,0.4); margin-bottom: 1.2rem; }
+    .coming-card-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
+    .coming-countdown-label { font-size: 0.6rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--mid); margin-bottom: 0.2rem; }
+    .coming-countdown { font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem; letter-spacing: 0.06em; }
+    .coming-lock { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mid); border: 1px solid var(--border); padding: 0.3rem 0.8rem; }
+
     @media (max-width: 700px) {
       nav { padding: 1rem 1.2rem; }
       .challenge-hero { padding: 1.8rem 1.2rem 1.5rem; }
@@ -126,6 +146,8 @@
       .modal-body { grid-template-columns: 1fr; }
       .modal-photo { aspect-ratio: 4/3; }
       .modal-scores { border-left: none; border-top: 1px solid var(--border); }
+      .coming-section { padding: 0 1rem 4rem; }
+      .coming-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -184,6 +206,15 @@
     <div id="gridContainer">
       <div class="state-box"><div class="state-spinner"></div>Loading submissions…</div>
     </div>
+  </div>
+
+  <!-- COMING SOON -->
+  <div class="coming-section" id="comingSection" style="display:none">
+    <div class="coming-header">
+      <span class="coming-title">⏳ Coming Up Next</span>
+      <span class="coming-sub">Prepare your shots in advance</span>
+    </div>
+    <div class="coming-grid" id="comingGrid"></div>
   </div>
 
   <!-- MODAL -->
@@ -412,6 +443,48 @@
     function closeModalDirect() { document.getElementById('modalBg').classList.remove('open'); }
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModalDirect(); });
 
+    async function loadUpcoming() {
+      try {
+        const { data, error } = await sb
+          .from('themes')
+          .select('*')
+          .gt('starts_at', new Date().toISOString())
+          .order('starts_at', { ascending: true })
+          .limit(2);
+
+        if (error || !data || !data.length) return;
+
+        const colors  = ['var(--cyan)','var(--purple)'];
+        const classes = ['cc1','cc2'];
+
+        document.getElementById('comingSection').style.display = 'block';
+        document.getElementById('comingGrid').innerHTML = data.map((t, i) => {
+          const diff   = new Date(t.starts_at) - new Date();
+          const d      = Math.floor(diff / 86400000);
+          const h      = Math.floor((diff % 86400000) / 3600000);
+          const countdown = d > 0 ? `Opens in ${d}d ${h}h` : `Opens in ${h}h`;
+          const startDate = new Date(t.starts_at).toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'short' });
+
+          return `
+            <div class="coming-card ${classes[i]}">
+              <div class="coming-card-week" style="color:${colors[i]}">Week ${t.week_number} · Starting ${startDate}</div>
+              <div class="coming-card-name">${t.name}</div>
+              <div class="coming-card-desc">${t.description || ''}</div>
+              <div class="coming-card-footer">
+                <div>
+                  <div class="coming-countdown-label">Opens in</div>
+                  <div class="coming-countdown" style="color:${colors[i]}">${countdown}</div>
+                </div>
+                <div class="coming-lock">🔒 Locked</div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } catch(e) {
+        // fail silently — coming soon is non-critical
+      }
+    }
+
     async function init() {
       try {
         initSupabase();
@@ -421,6 +494,7 @@
         document.body.classList.add('auth-ready');
         renderNavAuth();
         await loadChallenge();
+        loadUpcoming();
       } catch(err) {
         window.location.href = 'login.html';
       }
