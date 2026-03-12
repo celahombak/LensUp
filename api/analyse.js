@@ -13,42 +13,13 @@ module.exports = async (req, res) => {
   const { imageContent } = req.body || {};
   if (!imageContent) return res.status(400).json({ error: 'No image provided' });
 
-  const prompt = `You are an expert photography critic and coach. LensUp only analyses REAL camera-captured photographs.
+  const prompt = `You are a photography critic. Analyse this image.
 
-STEP 1 — VERIFY: Is this a real photograph taken by a physical camera (phone, DSLR, film, etc.)?
-Reject if it is: 3D render, CGI, AI-generated, digital painting, illustration, sketch, screenshot, graphic design, cartoon, or anime.
+First check: is this a real camera photo? If not (3D render, AI art, painting, illustration, screenshot, cartoon), respond ONLY with:
+{"rejected":true,"reason":"<one sentence>"}
 
-If NOT real, respond ONLY with: {"rejected": true, "reason": "<one sentence>"}
-
-STEP 2 — If it IS a real photograph, respond ONLY with this exact JSON (no markdown):
-{
-  "rejected": false,
-  "overall": <1-10>,
-  "scores": {
-    "subject_focus": <1-10>,
-    "color_contrast": <1-10>,
-    "composition": <1-10>,
-    "lighting": <1-10>,
-    "background_blur": <1-10>,
-    "framing": <1-10>
-  },
-  "category_notes": {
-    "subject_focus": "<1-2 sentences on subject sharpness and focus>",
-    "color_contrast": "<1-2 sentences on color palette and contrast>",
-    "composition": "<1-2 sentences on composition and visual balance>",
-    "lighting": "<1-2 sentences on lighting quality and direction>",
-    "background_blur": "<1-2 sentences on background separation and bokeh>",
-    "framing": "<1-2 sentences on crop and framing choices>"
-  },
-  "summary": "<2-3 sentence overall impression>",
-  "improvements": [
-    {"title": "<short action title>", "desc": "<2-3 sentence detailed tip>"},
-    {"title": "<short action title>", "desc": "<2-3 sentence detailed tip>"},
-    {"title": "<short action title>", "desc": "<2-3 sentence detailed tip>"},
-    {"title": "<short action title>", "desc": "<2-3 sentence detailed tip>"}
-  ],
-  "technical": "<1-2 sentences on technical quality: exposure, noise, sharpness>"
-}`;
+If it IS a real photo, respond ONLY with this JSON:
+{"rejected":false,"overall":<1-10>,"scores":{"subject_focus":<1-10>,"color_contrast":<1-10>,"composition":<1-10>,"lighting":<1-10>,"background_blur":<1-10>,"framing":<1-10>},"category_notes":{"subject_focus":"<1 sentence>","color_contrast":"<1 sentence>","composition":"<1 sentence>","lighting":"<1 sentence>","background_blur":"<1 sentence>","framing":"<1 sentence>"},"summary":"<2 sentences>","improvements":[{"title":"<5 words>","desc":"<1 sentence>"},{"title":"<5 words>","desc":"<1 sentence>"},{"title":"<5 words>","desc":"<1 sentence>"}],"technical":"<1 sentence>"}`;
 
   try {
     const claudeRes = await fetch('https://api.anthropic.com/v1/messages', {
@@ -59,8 +30,8 @@ STEP 2 — If it IS a real photograph, respond ONLY with this exact JSON (no mar
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1500,
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 600,
         messages: [{ role: 'user', content: [imageContent, { type: 'text', text: prompt }] }]
       })
     });
