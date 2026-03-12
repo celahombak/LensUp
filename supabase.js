@@ -42,6 +42,7 @@ async function signOut() {
 async function saveAnalysis(user, url, result, thumbnail) {
   const { data, error } = await sb.from('analyses').insert({
     user_id: user.id,
+    display_name: user.user_metadata?.display_name || user.email?.split('@')[0] || 'Anonymous',
     image_url: url,
     thumbnail: thumbnail || null,
     overall: result.overall,

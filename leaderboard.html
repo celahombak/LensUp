@@ -213,10 +213,10 @@
       document.getElementById('podium').innerHTML = '';
 
       try {
-        // Query analyses directly — group by user to get best/avg/total
+        // Query analyses directly — includes display_name saved at submit time
         const { data: rows, error } = await sb
           .from('analyses')
-          .select('user_id, overall')
+          .select('user_id, overall, display_name')
           .order('overall', { ascending: false });
 
         if (error) throw error;
@@ -226,34 +226,25 @@
           return;
         }
 
-        // Group by user_id
+        // Group by user_id — use display_name from the row
         const userMap = {};
         for (const row of rows) {
           const uid = row.user_id;
-          if (!userMap[uid]) userMap[uid] = { user_id: uid, scores: [] };
+          if (!userMap[uid]) userMap[uid] = { user_id: uid, scores: [], name: row.display_name || 'Anonymous' };
           userMap[uid].scores.push(row.overall);
+          // Keep the most recent non-null display_name
+          if (row.display_name) userMap[uid].name = row.display_name;
         }
-
-        // Fetch display names from profiles (or auth metadata)
-        const userIds = Object.keys(userMap);
-        const { data: profiles } = await sb
-          .from('profiles')
-          .select('id, display_name, avatar')
-          .in('id', userIds);
-
-        const profileMap = {};
-        if (profiles) profiles.forEach(p => profileMap[p.id] = p);
 
         // Build ranked list
         const ranked = Object.values(userMap).map(u => {
           const scores = u.scores;
           const best = Math.max(...scores);
           const avg  = (scores.reduce((a,b) => a+b, 0) / scores.length).toFixed(1);
-          const profile = profileMap[u.user_id] || {};
           return {
             id: u.user_id,
-            name: profile.display_name || 'Anonymous',
-            avatar: profile.avatar || '📷',
+            name: u.name,
+            avatar: '📷',
             best,
             avg: parseFloat(avg),
             total: scores.length
