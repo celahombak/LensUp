@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>LensUp — My Gallery</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase.js"></script>
   <style>
@@ -12,7 +12,7 @@
     body.auth-ready { visibility: visible; }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --black: #0a0a0a; --white: #f5f2ee; --gold: #c9a96e;
+      --black: #080808; --white: #f5f2ee; --gold: #c9a96e;
       --gold-light: #e8d5b0; --dark: #1a1714; --dark2: #141210;
       --mid: #6b6560; --border: rgba(201,169,110,0.15);
       --c1: #60a5fa; --c2: #f472b6; --c3: #34d399;
@@ -22,11 +22,11 @@
     body { background: var(--black); color: var(--white); font-family: 'DM Sans', sans-serif; font-weight: 300; min-height: 100vh; }
 
     /* NAV */
-    nav { display: flex; align-items: center; justify-content: space-between; padding: 1.2rem 3rem; border-bottom: 1px solid var(--border); background: rgba(10,10,10,0.97); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px); }
-    .nav-logo { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 900; color: var(--gold); text-decoration: none; }
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 1rem 3rem; border-bottom: 1px solid var(--border); background: rgba(8,8,8,0.97); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(16px); }
+    .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; letter-spacing: 0.08em; color: var(--gold); text-decoration: none; }
     .nav-logo span { color: var(--white); }
     .nav-links { display: flex; align-items: center; gap: 2rem; flex-wrap: wrap; }
-    .nav-link { font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(245,242,238,0.5); text-decoration: none; transition: color 0.2s; }
+    .nav-link { font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(240,237,232,0.45); text-decoration: none; transition: color 0.2s; }
     .nav-link:hover { color: var(--gold); }
     .nav-link.active { color: var(--gold); }
 
@@ -34,12 +34,12 @@
     .page-hero { padding: 3rem 3rem 2.5rem; border-bottom: 1px solid var(--border); background: linear-gradient(135deg, rgba(201,169,110,0.04) 0%, transparent 60%); }
     .page-hero-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 1.5rem; }
     .page-tag { color: var(--gold); font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 0.5rem; display: block; }
-    .page-hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 900; line-height: 1.1; margin-bottom: 0.4rem; }
-    .page-hero h1 em { font-style: italic; color: var(--gold); }
+    .page-hero h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2.5rem, 5vw, 3.8rem); letter-spacing: 0.04em; line-height: 1; margin-bottom: 0.4rem; }
+    .page-hero h1 em { font-style: normal; color: var(--gold); }
     .page-hero p { color: rgba(245,242,238,0.45); font-size: 0.88rem; line-height: 1.7; }
     .hero-stats { display: flex; gap: 2rem; flex-shrink: 0; }
     .hero-stat { text-align: center; }
-    .hero-stat-num { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 900; display: block; }
+    .hero-stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; letter-spacing: 0.04em; display: block; }
     .hero-stat-label { font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--mid); }
 
     /* WRAP */
@@ -63,7 +63,7 @@
     .empty-state { text-align: center; padding: 6rem 2rem; display: none; }
     .empty-state.visible { display: block; }
     .empty-icon { font-size: 3rem; margin-bottom: 1.2rem; opacity: 0.3; display: block; }
-    .empty-state h2 { font-family: 'Playfair Display', serif; font-size: 1.5rem; margin-bottom: 0.6rem; opacity: 0.5; }
+    .empty-state h2 { font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; margin-bottom: 0.6rem; opacity: 0.5; }
     .empty-state p { color: rgba(245,242,238,0.3); font-size: 0.88rem; line-height: 1.7; margin-bottom: 2rem; }
     .btn-gold { background: var(--gold); color: var(--black); padding: 0.8rem 2rem; border-radius: 6px; text-decoration: none; font-size: 0.82rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; transition: background 0.2s; display: inline-block; }
     .btn-gold:hover { background: var(--gold-light); }
@@ -75,11 +75,11 @@
     /* CARD */
     .gallery-card { background: var(--dark); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; cursor: pointer; transition: all 0.25s; animation: fadeUp 0.4s ease both; }
     .gallery-card:hover { border-color: rgba(201,169,110,0.35); transform: translateY(-2px); }
-    .card-image { width: 100%; height: 200px; object-fit: cover; display: block; background: var(--dark2); }
+    .card-image { width: 100%; height: 200px; object-fit: contain; display: block; background: var(--dark2); }
     .card-image-placeholder { width: 100%; height: 200px; background: var(--dark2); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; opacity: 0.15; }
     .card-body { padding: 1.2rem; }
     .card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 0.8rem; }
-    .card-score-big { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 900; line-height: 1; }
+    .card-score-big { font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; letter-spacing: 0.04em; line-height: 1; }
     .card-score-label { font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mid); margin-top: 0.2rem; }
     .card-verdict { font-size: 0.72rem; font-weight: 600; margin-top: 0.2rem; }
     .card-date { font-size: 0.7rem; color: var(--mid); text-align: right; }
@@ -110,18 +110,18 @@
     .modal-overlay.open { display: flex; }
     .modal { background: var(--dark); border: 1px solid var(--border); border-radius: 8px; width: 100%; max-width: 700px; max-height: 90vh; overflow-y: auto; animation: fadeUp 0.3s ease; }
     .modal-header { padding: 1.2rem 1.8rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: var(--dark); z-index: 1; }
-    .modal-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; }
+    .modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; font-weight: 700; }
     .modal-close { background: none; border: none; cursor: pointer; color: var(--mid); font-size: 1.3rem; transition: color 0.2s; }
     .modal-close:hover { color: var(--white); }
-    .modal-image { width: 100%; max-height: 280px; object-fit: cover; display: block; }
+    .modal-image { width: 100%; max-height: 340px; object-fit: contain; display: block; background: var(--dark2); }
     .modal-image-placeholder { width: 100%; height: 160px; background: var(--dark2); display: flex; align-items: center; justify-content: center; font-size: 3rem; opacity: 0.15; }
 
     /* MODAL SCORE SECTION */
     .modal-score-top { display: flex; align-items: center; gap: 1.2rem; padding: 1.5rem 1.8rem; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
-    .modal-overall { font-family: 'Playfair Display', serif; font-size: 3.5rem; font-weight: 900; line-height: 1; }
+    .modal-overall { font-family: 'Bebas Neue', sans-serif; font-size: 3.5rem; letter-spacing: 0.04em; line-height: 1; }
     .modal-overall-denom { font-size: 1rem; color: var(--mid); }
     .modal-verdict-wrap { }
-    .modal-verdict { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; }
+    .modal-verdict { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; font-weight: 700; }
     .modal-verdict-sub { font-size: 0.72rem; color: var(--mid); letter-spacing: 0.06em; margin-top: 0.2rem; }
 
     /* MODAL CATEGORY BARS */

@@ -4,13 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>LensUp — Leaderboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --black: #0a0a0a; --white: #f5f2ee; --gold: #c9a96e;
+      --black: #080808; --white: #f5f2ee; --gold: #c9a96e;
       --gold-light: #e8d5b0; --dark: #1a1714; --dark2: #141210;
       --mid: #6b6560; --border: rgba(201,169,110,0.15);
     }
@@ -19,7 +19,7 @@
 
     /* NAV */
     nav { display: flex; align-items: center; justify-content: space-between; padding: 1.2rem 3rem; border-bottom: 1px solid var(--border); background: rgba(10,10,10,0.97); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px); }
-    .nav-logo { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 900; color: var(--gold); text-decoration: none; }
+    .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; letter-spacing: 0.04em; color: var(--gold); text-decoration: none; }
     .nav-logo span { color: var(--white); }
     .nav-links { display: flex; align-items: center; gap: 2rem; flex-wrap: wrap; }
     .nav-link { font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(245,242,238,0.5); text-decoration: none; transition: color 0.2s; }
@@ -31,7 +31,7 @@
     /* HEADER */
     .page-tag { display: inline-block; color: var(--gold); font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 0.6rem; }
     .page-header { margin-bottom: 0.6rem; }
-    .page-header h1 { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 900; line-height: 1.1; }
+    .page-header h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(1.8rem, 4vw, 2.6rem); letter-spacing: 0.04em; line-height: 1.1; }
     .page-header h1 em { font-style: italic; color: var(--gold); }
     .page-sub { color: rgba(245,242,238,0.4); font-size: 0.88rem; margin-bottom: 2.5rem; }
 
@@ -49,7 +49,7 @@
     .podium-crown { font-size: 1.8rem; margin-bottom: 0.5rem; display: block; }
     .podium-avatar { font-size: 2rem; margin-bottom: 0.5rem; display: block; }
     .podium-name { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.3rem; }
-    .podium-score { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 900; color: var(--gold); line-height: 1; }
+    .podium-score { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 0.04em; color: var(--gold); line-height: 1; }
     .podium-score-label { font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mid); margin-top: 0.2rem; }
     .podium-analyses { font-size: 0.72rem; color: var(--mid); margin-top: 0.5rem; }
     .rank-badge { position: absolute; top: 0.8rem; right: 0.8rem; font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mid); }
@@ -72,7 +72,7 @@
     .lb-row:hover { background: rgba(201,169,110,0.03); }
     .lb-row.top-row { background: rgba(201,169,110,0.04); }
 
-    .lb-rank { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: var(--mid); text-align: center; }
+    .lb-rank { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; font-weight: 700; color: var(--mid); text-align: center; }
     .lb-rank.gold { color: var(--gold); }
     .lb-rank.silver { color: #c0c0c0; }
     .lb-rank.bronze { color: #cd7f32; }
@@ -82,7 +82,7 @@
     .lb-name { font-size: 0.88rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .lb-you { font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold); margin-left: 0.4rem; vertical-align: middle; }
 
-    .lb-best { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; color: var(--gold); text-align: center; }
+    .lb-best { font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem; font-weight: 700; color: var(--gold); text-align: center; }
     .lb-avg { font-size: 0.85rem; color: rgba(245,242,238,0.5); text-align: center; }
     .lb-total { font-size: 0.78rem; color: var(--mid); text-align: center; }
 
@@ -105,7 +105,7 @@
     .your-rank-banner.hidden { display: none; }
     .your-rank-left { display: flex; align-items: center; gap: 0.8rem; }
     .your-rank-label { font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); }
-    .your-rank-val { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 900; color: var(--white); }
+    .your-rank-val { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; letter-spacing: 0.04em; color: var(--white); }
     .your-rank-sub { font-size: 0.78rem; color: var(--mid); }
     .btn-analyse-link { background: var(--gold); color: var(--black); border: none; padding: 0.6rem 1.2rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none; transition: background 0.2s; }
     .btn-analyse-link:hover { background: var(--gold-light); }
