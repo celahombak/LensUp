@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LensUp — Profile</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
+  <style>
+    body { visibility: hidden; }
+    body.auth-ready { visibility: visible; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --black: #080808; --white: #f5f2ee; --gold: #c9a96e;
+      --gold-light: #e8d5b0; --dark: #1a1714; --dark2: #141210;
+      --mid: #6b6560; --border: rgba(201,169,110,0.15);
+      --c1: #60a5fa; --c2: #f472b6; --c3: #34d399;
+      --c4: #fbbf24; --c5: #a78bfa; --c6: #fb923c;
+    }
+    html { scroll-behavior: smooth; }
+    body { background: var(--black); color: var(--white); font-family: 'DM Sans', sans-serif; font-weight: 300; min-height: 100vh; }
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 1rem 3rem; border-bottom: 1px solid var(--border); background: rgba(8,8,8,0.97); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(16px); }
+    .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; letter-spacing: 0.08em; color: var(--gold); text-decoration: none; }
+    .nav-logo span { color: var(--white); }
+    .nav-links { display: flex; align-items: center; gap: 2rem; flex-wrap: wrap; }
+    .nav-link { font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(240,237,232,0.45); text-decoration: none; transition: color 0.2s; }
+    .nav-link:hover, .nav-link.active { color: var(--gold); }
+    .page-hero { padding: 3rem 3rem 2.5rem; border-bottom: 1px solid var(--border); background: linear-gradient(135deg, rgba(201,169,110,0.04) 0%, transparent 60%); }
+    .hero-inner { max-width: 960px; margin: 0 auto; display: flex; align-items: center; gap: 2rem; flex-wrap: wrap; }
+    .avatar { width: 80px; height: 80px; border-radius: 50%; background: var(--dark); border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 2.2rem; flex-shrink: 0; transition: border-color 0.2s; position: relative; }
+    .avatar.editable { cursor: pointer; }
+    .avatar.editable:hover { border-color: var(--gold); }
+    .avatar-edit { position: absolute; bottom: 0; right: 0; width: 22px; height: 22px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; }
+    .hero-info { flex: 1; }
+    .page-tag { color: var(--gold); font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 0.4rem; display: block; }
+    .hero-name { font-family: 'Bebas Neue', sans-serif; font-size: clamp(1.6rem, 3vw, 2.4rem); letter-spacing: 0.04em; line-height: 1.1; margin-bottom: 0.3rem; }
+    .hero-name em { font-style: italic; color: var(--gold); }
+    .hero-sub { color: rgba(245,242,238,0.4); font-size: 0.82rem; margin-bottom: 0.8rem; }
+    .hero-badges { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .badge { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.25rem 0.7rem; border-radius: 20px; font-size: 0.68rem; letter-spacing: 0.06em; border: 1px solid var(--border); }
+    .badge-gold  { background: rgba(201,169,110,0.1);  color: var(--gold); border-color: rgba(201,169,110,0.25); }
+    .badge-green { background: rgba(52,211,153,0.08);  color: #34d399;     border-color: rgba(52,211,153,0.2); }
+    .badge-blue  { background: rgba(96,165,250,0.08);  color: #60a5fa;     border-color: rgba(96,165,250,0.2); }
+    .profile-wrap { max-width: 960px; margin: 0 auto; padding: 2.5rem 2rem 5rem; display: grid; grid-template-columns: 1fr 300px; gap: 2rem; align-items: start; }
+    .section { margin-bottom: 2rem; }
+    .section-title { font-size: 0.68rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); margin-bottom: 1.2rem; display: flex; align-items: center; gap: 0.6rem; }
+    .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 2rem; }
+    .stat-card { background: var(--dark); border: 1px solid var(--border); border-radius: 8px; padding: 1.4rem; transition: border-color 0.2s; }
+    .stat-card:hover { border-color: rgba(201,169,110,0.3); }
+    .stat-card-icon { font-size: 1.2rem; margin-bottom: 0.6rem; display: block; }
+    .stat-card-val { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 0.04em; color: var(--gold); line-height: 1; margin-bottom: 0.2rem; }
+    .stat-card-label { font-size: 0.72rem; color: var(--mid); letter-spacing: 0.06em; }
+    .breakdown-row { display: flex; align-items: center; gap: 1rem; padding: 0.75rem 0; border-bottom: 1px solid rgba(201,169,110,0.06); }
+    .breakdown-row:last-child { border-bottom: none; }
+    .breakdown-icon { font-size: 1rem; flex-shrink: 0; width: 24px; text-align: center; }
+    .breakdown-label { font-size: 0.75rem; width: 110px; flex-shrink: 0; color: rgba(245,242,238,0.6); }
+    .breakdown-bar-wrap { flex: 1; height: 5px; background: rgba(255,255,255,0.05); border-radius: 3px; overflow: hidden; }
+    .breakdown-bar { height: 100%; border-radius: 3px; transition: width 1.2s ease; }
+    .breakdown-val { font-family: 'Bebas Neue', sans-serif; font-size: 1rem; width: 30px; text-align: right; flex-shrink: 0; }
+    .progress-chart { background: var(--dark); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem; }
+    .chart-title { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mid); margin-bottom: 1.2rem; }
+    .chart-area { height: 120px; display: flex; align-items: flex-end; gap: 6px; }
+    .chart-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.3rem; }
+    .chart-bar { width: 100%; border-radius: 3px 3px 0 0; background: var(--gold); opacity: 0.7; transition: opacity 0.2s; cursor: default; position: relative; min-height: 4px; }
+    .chart-bar:hover { opacity: 1; }
+    .chart-bar-tip { position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: var(--dark2); border: 1px solid var(--border); padding: 0.2rem 0.5rem; border-radius: 3px; font-size: 0.68rem; color: var(--gold); white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity 0.2s; }
+    .chart-bar:hover .chart-bar-tip { opacity: 1; }
+    .chart-label { font-size: 0.6rem; color: var(--mid); }
+    .chart-empty { text-align: center; color: rgba(245,242,238,0.25); font-size: 0.85rem; padding: 2rem 0; width: 100%; }
+    .best-photo-card { background: var(--dark); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 2rem; transition: border-color 0.2s; display: block; }
+    .best-photo-card:hover { border-color: rgba(201,169,110,0.35); }
+    .best-photo-img { width: 100%; max-height: 260px; object-fit: contain; display: block; background: var(--dark2); }
+    .best-photo-placeholder { width: 100%; height: 160px; background: var(--dark2); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; opacity: 0.2; }
+    .best-photo-body { padding: 1.2rem; display: flex; align-items: center; gap: 1rem; }
+    .best-photo-score { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 0.04em; color: var(--gold); flex-shrink: 0; }
+    .best-photo-info { flex: 1; }
+    .best-photo-label { font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mid); margin-bottom: 0.3rem; }
+    .best-photo-summary { font-size: 0.78rem; line-height: 1.6; color: rgba(245,242,238,0.45); }
+    .right-col { display: flex; flex-direction: column; gap: 1.2rem; }
+    .settings-card { background: var(--dark); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    .settings-header { padding: 1rem 1.4rem; border-bottom: 1px solid var(--border); font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); }
+    .settings-row { padding: 1rem 1.4rem; border-bottom: 1px solid rgba(201,169,110,0.06); display: flex; flex-direction: column; gap: 0.5rem; }
+    .settings-row:last-child { border-bottom: none; }
+    .settings-label { font-size: 0.8rem; font-weight: 500; color: rgba(245,242,238,0.8); }
+    .settings-sub { font-size: 0.72rem; color: var(--mid); line-height: 1.5; }
+    .settings-input { background: var(--black); border: 1px solid var(--border); color: var(--white); padding: 0.6rem 0.9rem; border-radius: 4px; font-family: 'DM Sans', sans-serif; font-size: 0.82rem; outline: none; width: 100%; transition: border-color 0.2s; }
+    .settings-input:focus { border-color: var(--gold); }
+    .settings-actions { display: flex; gap: 0.5rem; margin-top: 0.3rem; }
+    .btn-sm { background: var(--gold); color: var(--black); border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; transition: background 0.2s; }
+    .btn-sm:hover { background: var(--gold-light); }
+    .quick-links { display: flex; flex-direction: column; gap: 0.5rem; }
+    .quick-link { display: flex; align-items: center; justify-content: space-between; padding: 0.9rem 1.2rem; background: var(--dark); border: 1px solid var(--border); border-radius: 8px; text-decoration: none; color: var(--white); font-size: 0.82rem; transition: border-color 0.2s; }
+    .quick-link:hover { border-color: rgba(201,169,110,0.35); color: var(--gold); }
+    .danger-zone { background: rgba(200,80,80,0.04); border: 1px solid rgba(200,80,80,0.15); border-radius: 8px; padding: 1.2rem 1.4rem; }
+    .danger-title { font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(200,80,80,0.7); margin-bottom: 0.5rem; }
+    .danger-sub { font-size: 0.75rem; color: var(--mid); line-height: 1.5; margin-bottom: 1rem; }
+    .btn-danger { background: none; color: rgba(200,80,80,0.7); border: 1px solid rgba(200,80,80,0.2); padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; transition: all 0.2s; }
+    .btn-danger:hover { border-color: rgba(200,80,80,0.5); color: #f08080; }
+    .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--dark); border: 1px solid var(--border); border-radius: 6px; padding: 0.8rem 1.5rem; font-size: 0.82rem; color: var(--white); transition: transform 0.3s ease; z-index: 300; }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .no-data { color: rgba(245,242,238,0.3); font-size: 0.82rem; font-style: italic; padding: 1rem 0; }
+    @media (max-width: 768px) {
+      nav { padding: 1rem 1.2rem; }
+      .page-hero { padding: 2rem 1.2rem 1.8rem; }
+      .profile-wrap { grid-template-columns: 1fr; padding: 2rem 1rem 4rem; }
+      .stat-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    .nav-burger { display: none; background: none; border: none; cursor: pointer; padding: 0.4rem; color: var(--white); flex-direction: column; gap: 5px; align-items: center; justify-content: center; }
+    .nav-burger span { display: block; width: 22px; height: 2px; background: var(--white); transition: all 0.3s; border-radius: 2px; }
+    .nav-burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .nav-burger.open span:nth-child(2) { opacity: 0; }
+    .nav-burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    .mobile-menu { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(8,8,8,0.98); z-index: 99; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(16px); }
+    .mobile-menu.open { display: flex; animation: menuFadeIn 0.2s ease both; }
+    @keyframes menuFadeIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+    .mobile-menu-close { position: absolute; top: 1.2rem; right: 1.5rem; background: none; border: none; color: var(--mid); font-size: 1.5rem; cursor: pointer; padding: 0.4rem; transition: color 0.2s; }
+    .mobile-menu-close:hover { color: var(--white); }
+    .mobile-menu-logo { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 0.08em; color: var(--gold); margin-bottom: 2.5rem; }
+    .mobile-menu-logo span { color: var(--white); }
+    .mobile-menu a { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 0.06em; color: rgba(240,237,232,0.55); text-decoration: none; padding: 0.7rem 2rem; transition: color 0.2s; text-align: center; }
+    .mobile-menu a:hover, .mobile-menu a.active { color: var(--gold); }
+    .mobile-menu-divider { width: 40px; height: 1px; background: var(--border); margin: 0.8rem 0; }
+    .mobile-menu-auth { margin-top: 1.5rem; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mid); text-align: center; }
+    .mobile-menu-auth span { color: rgba(240,237,232,0.5); display: block; margin-bottom: 0.8rem; font-size: 0.72rem; }
+    .mobile-menu-signout { background: none; border: 1px solid var(--border); color: var(--mid); padding: 0.5rem 1.5rem; font-family: 'DM Sans', sans-serif; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+    .mobile-menu-signout:hover { border-color: var(--gold); color: var(--gold); }
+    .bottom-nav { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10,10,10,0.97); border-top: 1px solid var(--border); backdrop-filter: blur(16px); z-index: 98; padding-bottom: env(safe-area-inset-bottom); }
+    .bottom-nav-inner { display: flex; align-items: stretch; }
+    .bottom-nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0.6rem 0.3rem; text-decoration: none; color: rgba(240,237,232,0.35); font-size: 0.55rem; letter-spacing: 0.08em; text-transform: uppercase; gap: 0.25rem; transition: color 0.2s; border-top: 2px solid transparent; }
+    .bottom-nav-item:hover { color: rgba(240,237,232,0.7); }
+    .bottom-nav-item.active { color: var(--gold); border-top-color: var(--gold); }
+    .bottom-nav-icon { font-size: 1.25rem; line-height: 1; }
+    @media (max-width: 768px) {
+      .nav-burger { display: flex; }
+      .nav-links { display: none !important; }
+      nav { padding: 0.9rem 1.2rem; }
+      .bottom-nav { display: block; }
+      body { padding-bottom: 60px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="index.html" class="nav-logo">Lens<span>Up</span></a>
+    <div class="nav-links">
+      <a href="compete.html" class="nav-link">⚔️ Challenge</a>
+      <a href="leaderboard.html" class="nav-link">🏆 Leaderboard</a>
+      <a href="learn.html" class="nav-link">Learn</a>
+      <a href="app.html" class="nav-link">Analyse</a>
+      <a href="gallery.html" class="nav-link">Gallery</a>
+      <a href="profile.html" class="nav-link active">Profile</a>
+      <span id="navAuthArea"></span>
+    </div>
+    <button class="nav-burger" id="navBurger" onclick="openMobileMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <div class="mobile-menu" id="mobileMenu">
+    <button class="mobile-menu-close" onclick="closeMobileMenu()">✕</button>
+    <div class="mobile-menu-logo">Lens<span>Up</span></div>
+    <a href="compete.html">⚔️ Challenge</a>
+    <a href="app.html">📷 Analyse</a>
+    <a href="leaderboard.html">🏆 Leaderboard</a>
+    <a href="gallery.html">🖼️ Gallery</a>
+    <a href="profile.html" class="active">👤 Profile</a>
+    <a href="learn.html">📚 Learn</a>
+    <div class="mobile-menu-divider"></div>
+    <div class="mobile-menu-auth">
+      <span id="mobileMenuUser"></span>
+      <button class="mobile-menu-signout" onclick="signOut()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="page-hero">
+    <div class="hero-inner">
+      <div class="avatar" id="avatarEl">
+        <span id="avatarEmoji">📷</span>
+      </div>
+      <div class="hero-info">
+        <span class="page-tag" id="pageTag">Your Profile</span>
+        <div class="hero-name" id="heroName"><em>Loading…</em></div>
+        <div class="hero-sub" id="heroSub">Loading stats…</div>
+        <div class="hero-badges" id="heroBadges"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="profile-wrap">
+    <div>
+      <div class="section">
+        <div class="section-title">Stats</div>
+        <div class="stat-grid">
+          <div class="stat-card" style="border-color:rgba(96,165,250,0.25);background:linear-gradient(135deg,rgba(96,165,250,0.06) 0%,var(--dark) 60%)">
+            <span class="stat-card-icon">📸</span>
+            <div class="stat-card-val" id="statTotal" style="color:var(--c1)">—</div>
+            <div class="stat-card-label">Total Analyses</div>
+          </div>
+          <div class="stat-card" style="border-color:rgba(244,114,182,0.25);background:linear-gradient(135deg,rgba(244,114,182,0.06) 0%,var(--dark) 60%)">
+            <span class="stat-card-icon">⭐</span>
+            <div class="stat-card-val" id="statAvg" style="color:var(--c2)">—</div>
+            <div class="stat-card-label">Average Score</div>
+          </div>
+          <div class="stat-card" style="border-color:rgba(201,169,110,0.35);background:linear-gradient(135deg,rgba(201,169,110,0.08) 0%,var(--dark) 60%)">
+            <span class="stat-card-icon">🏆</span>
+            <div class="stat-card-val" id="statBest" style="color:var(--gold)">—</div>
+            <div class="stat-card-label">Best Score</div>
+          </div>
+          <div class="stat-card" style="border-color:rgba(52,211,153,0.25);background:linear-gradient(135deg,rgba(52,211,153,0.06) 0%,var(--dark) 60%)">
+            <span class="stat-card-icon">📈</span>
+            <div class="stat-card-val" id="statTrend" style="color:var(--c3)">—</div>
+            <div class="stat-card-label">Recent Trend</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Average Score by Category</div>
+        <div id="scoreBreakdown"><div class="no-data">Loading…</div></div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Score History</div>
+        <div class="progress-chart">
+          <div class="chart-title">Last 10 analyses — overall score</div>
+          <div class="chart-area" id="chartArea"><div class="chart-empty">Loading…</div></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Best Shot</div>
+        <div id="bestPhotoWrap"><div class="no-data">Loading…</div></div>
+      </div>
+    </div>
+
+    <div class="right-col">
+      <div id="ownProfileSettings">
+        <div class="settings-card">
+          <div class="settings-header">Settings</div>
+          <div class="settings-row">
+            <div class="settings-label">Display Name</div>
+            <input type="text" class="settings-input" id="nameInput" placeholder="Your name" maxlength="30" />
+            <div class="settings-actions">
+              <button class="btn-sm" onclick="saveName()">Save</button>
+            </div>
+          </div>
+          <div class="settings-row">
+            <div class="settings-label">Avatar</div>
+            <div class="settings-sub">Click your avatar above to change it</div>
+          </div>
+        </div>
+        <div class="quick-links">
+          <a href="app.html" class="quick-link"><span>📷 Analyse a Photo</span><span>→</span></a>
+          <a href="gallery.html" class="quick-link"><span>🖼️ My Gallery</span><span>→</span></a>
+          <a href="leaderboard.html" class="quick-link"><span>🏆 Leaderboard</span><span>→</span></a>
+          <a href="learn.html" class="quick-link"><span>📚 Learn Photography</span><span>→</span></a>
+        </div>
+        <div class="danger-zone">
+          <div class="danger-title">Danger Zone</div>
+          <div class="danger-sub">Sign out of your account on this device.</div>
+          <button class="btn-danger" onclick="signOut()">Sign Out</button>
+        </div>
+      </div>
+
+      <div id="publicProfileSidebar" style="display:none;">
+        <div class="quick-links">
+          <a href="leaderboard.html" class="quick-link"><span>🏆 View Leaderboard</span><span>→</span></a>
+          <a href="compete.html" class="quick-link"><span>⚔️ This Week's Challenge</span><span>→</span></a>
+          <a href="profile.html" class="quick-link"><span>👤 My Profile</span><span>→</span></a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <div id="emojiPicker" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;align-items:center;justify-content:center;">
+    <div style="background:var(--dark);border:1px solid var(--border);border-radius:8px;padding:1.5rem;max-width:320px;width:90%;">
+      <div style="font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem;">Choose Avatar</div>
+      <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:0.5rem;" id="emojiGrid"></div>
+      <button onclick="closeEmojiPicker()" style="margin-top:1rem;width:100%;background:none;border:1px solid var(--border);color:var(--mid);padding:0.5rem;border-radius:4px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.08em;">Cancel</button>
+    </div>
+  </div>
+
+  <script>
+    const EMOJIS = ['📷','🎞️','🌅','🌆','🌃','🎨','🖼️','🌸','🦋','🦁','🐺','🦊','🌙','⭐','🔥','💎','🏆','🎯','✨','🚀','🌊','🏔️','🌿','🎭'];
+    const CATEGORIES = [
+      { key: 'subject_focus',   label: 'Subject Focus',    icon: '🎯', color: 'var(--c1)' },
+      { key: 'color_contrast',  label: 'Color & Contrast', icon: '🎨', color: 'var(--c2)' },
+      { key: 'composition',     label: 'Composition',      icon: '📐', color: 'var(--c3)' },
+      { key: 'lighting',        label: 'Lighting',         icon: '💡', color: 'var(--c4)' },
+      { key: 'background_blur', label: 'Background Blur',  icon: '✨', color: 'var(--c5)' },
+      { key: 'framing',         label: 'Framing',          icon: '✂️', color: 'var(--c6)' },
+    ];
+
+    let currentUser   = null;
+    let isOwnProfile  = true;
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
+    function renderNavAuth() {
+      const area = document.getElementById('navAuthArea');
+      const name = currentUser.user_metadata?.display_name || currentUser.email.split('@')[0];
+      area.innerHTML = `
+        <span style="font-size:0.78rem;color:rgba(245,242,238,0.35);">Hi, ${name}</span>
+        <button onclick="signOut()" style="font-size:0.78rem;letter-spacing:0.07em;text-transform:uppercase;color:rgba(245,242,238,0.35);background:none;border:none;cursor:pointer;padding:0;font-family:'DM Sans',sans-serif;" onmouseover="this.style.color='#c9a96e'" onmouseout="this.style.color='rgba(245,242,238,0.35)'">Sign Out</button>
+      `;
+    }
+
+    async function loadProfileData(userId) {
+
+      console.log('🔍 loadProfileData called with userId:', userId);
+      console.log('🔍 supabase instance:', sb ? 'exists' : 'NULL');
+      const { data, error } = await sb
+        .from('analyses')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+      console.log('🔍 query result — data:', data, '| error:', error);
+      if (error) { console.error('❌ Supabase error:', error); return []; }
+      console.log('✅ rows returned:', data?.length);
+      return data || [];
+    }
+
+    function renderHero(data) {
+      const name = data.length > 0
+        ? (data[0].display_name || 'Photographer')
+        : (isOwnProfile
+            ? (currentUser?.user_metadata?.display_name || currentUser?.email?.split('@')[0] || 'Photographer')
+            : 'Photographer');
+
+      document.getElementById('heroName').innerHTML = `<em>${name}</em>`;
+      document.getElementById('pageTag').textContent = isOwnProfile ? 'Your Profile' : 'Photographer Profile';
+
+      if (isOwnProfile) {
+        document.getElementById('nameInput').value = name;
+        const av = document.getElementById('avatarEl');
+        av.classList.add('editable');
+        av.onclick = changeEmoji;
+        av.title = 'Click to change avatar';
+        av.insertAdjacentHTML('beforeend', '<div class="avatar-edit">✏️</div>');
+        document.getElementById('avatarEmoji').textContent = currentUser?.user_metadata?.avatar || '📷';
+      }
+
+      if (data.length === 0) {
+        document.getElementById('heroSub').textContent = isOwnProfile ? 'No analyses yet — upload your first photo!' : 'No analyses yet.';
+        return;
+      }
+      const oldest = new Date(data[data.length - 1].created_at);
+      const joined = oldest.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+      document.getElementById('heroSub').textContent = `Member since ${joined} · ${data.length} photo${data.length !== 1 ? 's' : ''} analysed`;
+    }
+
+    function renderBadges(data) {
+      const total  = data.length;
+      const scores = data.map(r => r.overall || 0);
+      const best   = total ? Math.max(...scores) : 0;
+      const avg    = total ? scores.reduce((a,b) => a+b, 0) / total : 0;
+      const badges = [];
+      if (total >= 1)  badges.push({ label: 'First Shot',  icon: '📷', cls: 'badge-blue' });
+      if (total >= 5)  badges.push({ label: '5 Analyses',  icon: '⚡', cls: 'badge-blue' });
+      if (total >= 20) badges.push({ label: '20 Analyses', icon: '🔥', cls: 'badge-gold' });
+      if (best >= 8)   badges.push({ label: 'High Scorer', icon: '🏆', cls: 'badge-gold' });
+      if (best >= 9)   badges.push({ label: 'Mastershot',  icon: '💎', cls: 'badge-gold' });
+      if (avg  >= 7)   badges.push({ label: 'Consistent',  icon: '📈', cls: 'badge-green' });
+      const el = document.getElementById('heroBadges');
+      el.innerHTML = badges.length
+        ? badges.map(b => `<span class="badge ${b.cls}">${b.icon} ${b.label}</span>`).join('')
+        : '<span style="font-size:0.75rem;color:var(--mid);">Analyse photos to earn badges</span>';
+    }
+
+    function renderStats(data) {
+      const total = data.length;
+      document.getElementById('statTotal').textContent = total;
+      if (total === 0) return;
+      const scores = data.map(r => r.overall || 0);
+      document.getElementById('statAvg').textContent  = (scores.reduce((a,b) => a+b, 0) / total).toFixed(1);
+      document.getElementById('statBest').textContent = Math.max(...scores);
+      if (total >= 4) {
+        const recent = scores.slice(0,3).reduce((a,b) => a+b, 0) / 3;
+        const older  = scores.slice(3,6).reduce((a,b) => a+b, 0) / Math.min(3, scores.slice(3,6).length);
+        const diff   = recent - older;
+        const el     = document.getElementById('statTrend');
+        if (diff > 0.3)       { el.textContent = '↑ ' + diff.toFixed(1); el.style.color = '#34d399'; }
+        else if (diff < -0.3) { el.textContent = '↓ ' + Math.abs(diff).toFixed(1); el.style.color = '#f08080'; }
+        else                  { el.textContent = '→ Stable'; el.style.color = 'var(--gold)'; }
+      }
+    }
+
+    function renderBreakdown(data) {
+      const el = document.getElementById('scoreBreakdown');
+      if (data.length === 0) { el.innerHTML = '<div class="no-data">No analyses yet.</div>'; return; }
+      const avgs = {};
+      CATEGORIES.forEach(cat => {
+        const vals = data.map(r => r[cat.key]).filter(v => v != null);
+        avgs[cat.key] = vals.length ? (vals.reduce((a,b) => a+b, 0) / vals.length).toFixed(1) : '—';
+      });
+      el.innerHTML = CATEGORIES.map(cat => `
+        <div class="breakdown-row">
+          <span class="breakdown-icon">${cat.icon}</span>
+          <div class="breakdown-label">${cat.label}</div>
+          <div class="breakdown-bar-wrap">
+            <div class="breakdown-bar" style="width:${avgs[cat.key] !== '—' ? avgs[cat.key]*10 : 0}%;background:${cat.color}"></div>
+          </div>
+          <div class="breakdown-val" style="color:${cat.color}">${avgs[cat.key]}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderChart(data) {
+      const el = document.getElementById('chartArea');
+      if (data.length === 0) { el.innerHTML = '<div class="chart-empty">No history yet!</div>'; return; }
+      const last10 = [...data].slice(0, 10).reverse();
+      el.innerHTML = last10.map(item => {
+        const score = item.overall || 0;
+        const pct   = (score / 10) * 100;
+        const color = score >= 7 ? 'var(--gold)' : score >= 5 ? '#60a5fa' : '#fb923c';
+        const date  = new Date(item.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+        return `
+          <div class="chart-bar-wrap">
+            <div class="chart-bar" style="height:${pct}%;background:${color}">
+              <div class="chart-bar-tip">${score}/10 · ${date}</div>
+            </div>
+            <div class="chart-label">${score}</div>
+          </div>`;
+      }).join('');
+    }
+
+    function renderBestPhoto(data) {
+      const el = document.getElementById('bestPhotoWrap');
+      if (data.length === 0) { el.innerHTML = '<div class="no-data">No photos yet.</div>'; return; }
+      const best   = [...data].sort((a,b) => (b.overall||0) - (a.overall||0))[0];
+      const imgSrc = best.thumbnail || best.image_url || null;
+      el.innerHTML = `
+        <div class="best-photo-card">
+          ${imgSrc
+            ? `<img class="best-photo-img" src="${imgSrc}" alt="Best photo" onerror="this.outerHTML='<div class=\\'best-photo-placeholder\\'>🏆</div>'">`
+            : `<div class="best-photo-placeholder">🏆</div>`}
+          <div class="best-photo-body">
+            <div class="best-photo-score">${best.overall}</div>
+            <div class="best-photo-info">
+              <div class="best-photo-label">/ 10 · Best Score${best.theme_name ? ' · ' + best.theme_name : ''}</div>
+              <div class="best-photo-summary">${best.summary || ''}</div>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    async function saveName() {
+      const val = document.getElementById('nameInput').value.trim();
+      if (!val) return;
+      const { error } = await sb.auth.updateUser({ data: { display_name: val } });
+      if (error) { showToast('Error saving name'); return; }
+      document.getElementById('heroName').innerHTML = `<em>${val}</em>`;
+      showToast('Name saved!');
+    }
+
+    function changeEmoji() {
+      const grid = document.getElementById('emojiGrid');
+      grid.innerHTML = EMOJIS.map(e =>
+        `<button onclick="selectEmoji('${e}')" style="background:none;border:1px solid var(--border);border-radius:6px;padding:0.5rem;cursor:pointer;font-size:1.4rem;transition:border-color 0.2s;" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border)'">${e}</button>`
+      ).join('');
+      document.getElementById('emojiPicker').style.display = 'flex';
+    }
+    async function selectEmoji(e) {
+      document.getElementById('avatarEmoji').textContent = e;
+      closeEmojiPicker();
+      const { error } = await sb.auth.updateUser({ data: { avatar: e } });
+      if (error) { showToast('Error saving avatar'); return; }
+      showToast('Avatar updated!');
+    }
+    function closeEmojiPicker() { document.getElementById('emojiPicker').style.display = 'none'; }
+
+    function openMobileMenu() {
+      document.getElementById('mobileMenu').classList.add('open');
+      document.body.style.overflow = 'hidden';
+      if (currentUser) {
+        const name = currentUser.user_metadata?.display_name || currentUser.email?.split('@')[0] || '';
+        const el = document.getElementById('mobileMenuUser');
+        if (el) el.textContent = 'Hi, ' + name;
+      }
+    }
+    function closeMobileMenu() {
+      document.getElementById('mobileMenu').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMobileMenu(); });
+
+    async function init() {
+      try {
+        initSupabase();
+        await new Promise(resolve => setTimeout(resolve, 300));
+        currentUser = await getUser();
+        console.log('🔍 currentUser:', currentUser?.id, currentUser?.email);
+        if (!currentUser) { window.location.href = 'login.html'; return; }
+        document.body.classList.add('auth-ready');
+        renderNavAuth();
+
+        const params      = new URLSearchParams(window.location.search);
+        const viewingId   = params.get('user');
+        isOwnProfile      = !viewingId || viewingId === currentUser.id;
+        const targetId    = isOwnProfile ? currentUser.id : viewingId;
+        console.log('🔍 viewingId:', viewingId, '| isOwnProfile:', isOwnProfile, '| targetId:', targetId);
+
+        document.getElementById('ownProfileSettings').style.display   = isOwnProfile  ? ''     : 'none';
+        document.getElementById('publicProfileSidebar').style.display = !isOwnProfile ? 'flex' : 'none';
+
+        const data = await loadProfileData(targetId);
+        console.log('🔍 data length:', data.length);
+
+        renderHero(data);
+        renderBadges(data);
+        renderStats(data);
+        renderBreakdown(data);
+        renderChart(data);
+        renderBestPhoto(data);
+
+      } catch(err) {
+        console.error('❌ Profile init error:', err);
+        document.body.classList.add('auth-ready');
+      }
+    }
+
+    init();
+  </script>
+
+  <div class="bottom-nav">
+    <div class="bottom-nav-inner">
+      <a href="compete.html" class="bottom-nav-item"><span class="bottom-nav-icon">⚔️</span><span>Challenge</span></a>
+      <a href="app.html" class="bottom-nav-item"><span class="bottom-nav-icon">📷</span><span>Analyse</span></a>
+      <a href="leaderboard.html" class="bottom-nav-item"><span class="bottom-nav-icon">🏆</span><span>Ranks</span></a>
+      <a href="gallery.html" class="bottom-nav-item"><span class="bottom-nav-icon">🖼️</span><span>Gallery</span></a>
+      <a href="profile.html" class="bottom-nav-item active"><span class="bottom-nav-icon">👤</span><span>Profile</span></a>
+    </div>
+  </div>
+
+</body>
+</html>
