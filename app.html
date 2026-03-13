@@ -610,6 +610,8 @@
 
     // ── INIT ──
     async function init() {
+      // Clear old localStorage history — no longer used, was causing quota errors
+      try { localStorage.removeItem('lensup_history'); } catch(e) {}
       const timeout = setTimeout(() => { window.location.href = 'login.html'; }, 5000);
       try {
         initSupabase();
@@ -924,30 +926,14 @@
     }
 
     async function saveToHistory(entry) {
-      const hist = getHistory();
-      // Store thumbnail in localStorage too for instant display
-      hist.unshift(entry);
-      localStorage.setItem('lensup_history', JSON.stringify(hist.slice(0, 20)));
       if (currentUser) {
         const { error } = await saveAnalysis(currentUser, entry.url, entry.result, entry.thumbnail);
         if (error) console.warn('Supabase save failed:', error.message);
       }
-      renderHistory();
     }
 
-    function clearHistory() {
-      if (confirm('Clear all local history?')) {
-        localStorage.removeItem('lensup_history');
-        renderHistory();
-      }
-    }
-
-    function deleteHistoryItem(idx) {
-      const hist = getHistory();
-      hist.splice(idx, 1);
-      localStorage.setItem('lensup_history', JSON.stringify(hist));
-      renderHistory();
-    }
+    function clearHistory() {}
+    function deleteHistoryItem(idx) {}
 
     function loadHistoryItem(idx) {
       const item = getHistory()[idx];
