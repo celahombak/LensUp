@@ -58,6 +58,54 @@
     .page-title em { color: var(--gold); font-style: normal; }
     .page-sub { color: rgba(245,242,238,0.45); font-size: 0.9rem; line-height: 1.7; max-width: 520px; }
 
+
+    /* ── STEPPER PROGRESS ── */
+    .stepper-wrap { max-width: 960px; margin: 0 auto; padding: 2.5rem 2rem 0; }
+    .stepper { display: flex; align-items: flex-start; position: relative; }
+    .stepper::before { content: ''; position: absolute; top: 20px; left: 20px; right: 20px; height: 2px; background: var(--border); z-index: 0; }
+    .stepper-filled { position: absolute; top: 20px; left: 20px; height: 2px; background: var(--gold); z-index: 1; transition: width 1s ease; }
+    .step-node { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.6rem; position: relative; z-index: 2; cursor: default; }
+    .step-node-circle { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; transition: all 0.3s; border: 2px solid var(--border); background: var(--black); color: var(--mid); flex-shrink: 0; }
+    .step-node.done   .step-node-circle { background: var(--green);  border-color: var(--green);  color: #080808; }
+    .step-node.active .step-node-circle { background: var(--gold);   border-color: var(--gold);   color: #080808; box-shadow: 0 0 16px rgba(232,184,75,0.4); }
+    .step-node.locked .step-node-circle { opacity: 0.35; }
+    .step-node-label { font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; text-align: center; line-height: 1.4; color: var(--mid); max-width: 70px; }
+    .step-node.active .step-node-label { color: var(--gold); }
+    .step-node.done   .step-node-label { color: var(--green); }
+    .stepper-sub { text-align: center; font-size: 0.72rem; color: rgba(245,242,238,0.25); margin-top: 1rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border); }
+    .stepper-sub span { color: var(--gold); }
+
+    /* ── MODULE ACCORDION ── */
+    .module-block { margin-bottom: 1rem; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    .module-block.mod-active { border-color: rgba(232,184,75,0.3); }
+    .module-toggle { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; padding: 1.5rem 2rem; background: var(--dark); cursor: pointer; transition: background 0.2s; user-select: none; }
+    .module-toggle:hover { background: var(--dark2); }
+    .module-toggle-left { display: flex; align-items: center; gap: 1.2rem; }
+    .module-toggle-num { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; color: var(--gold); opacity: 0.25; line-height: 1; width: 40px; flex-shrink: 0; }
+    .module-toggle-info .module-number { font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.15rem; }
+    .module-toggle-info .module-name { font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem; letter-spacing: 0.04em; }
+    .module-toggle-info .module-desc { font-size: 0.72rem; color: rgba(245,242,238,0.3); margin-top: 0.15rem; }
+    .module-toggle-right { display: flex; align-items: center; gap: 1rem; flex-shrink: 0; }
+    .module-chevron { font-size: 0.8rem; color: var(--mid); transition: transform 0.3s; }
+    .module-body { display: none; border-top: 1px solid var(--border); padding: 1rem; background: rgba(0,0,0,0.2); }
+    .module-body.open { display: block; }
+    .module-block.mod-active .module-body { display: block; }
+    .module-chapter-row { display: flex; align-items: center; gap: 1rem; padding: 0.8rem 1rem; border-radius: 6px; margin-bottom: 0.4rem; background: var(--dark); opacity: 0.6; }
+    .module-chapter-row:last-child { margin-bottom: 0; }
+    .module-ch-num { font-family: 'Bebas Neue', sans-serif; font-size: 1rem; color: var(--mid); width: 28px; flex-shrink: 0; }
+    .module-ch-title { flex: 1; font-size: 0.82rem; color: rgba(245,242,238,0.5); }
+    .module-ch-badge { font-size: 0.62rem; color: var(--mid); }
+
+    @media (max-width: 768px) {
+      .stepper-wrap { padding: 1.5rem 1rem 0; }
+      .step-node-label { font-size: 0.52rem; max-width: 55px; }
+      .step-node-circle { width: 34px; height: 34px; font-size: 0.7rem; }
+      .stepper::before { top: 17px; }
+      .stepper-filled { top: 17px; }
+      .module-toggle { padding: 1.2rem; }
+      .module-body { padding: 0.8rem; }
+    }
+
     /* CURRICULUM */
     .curriculum-wrap { max-width: 960px; margin: 0 auto; padding: 3rem 2rem 6rem; }
     .curriculum-label { font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.6rem; }
@@ -243,14 +291,12 @@
 <nav>
   <a href="index.html" class="nav-logo">Lens<span>Up</span></a>
   <div class="nav-links">
-    <a href="compete.html"     class="nav-link">⚔️ Challenge</a>
-    <a href="leaderboard.html" class="nav-link">🏆 Leaderboard</a>
-    <a href="learn.html"       class="nav-link active">📚 Learn</a>
-    <a href="app.html"         class="nav-link">📷 Analyse</a>
-    <a href="gallery.html"     class="nav-link">🖼️ Gallery</a>
-    <a href="profile.html"     class="nav-link">👤 Profile</a>
-    <span id="navAuthArea"></span>
-  </div>
+      <a href="learn.html" class="nav-link active">📚 Learn</a>
+      <a href="compete.html" class="nav-link">⚔️ Challenge</a>
+      <a href="leaderboard.html" class="nav-link">🏆 Leaderboard</a>
+      <a href="profile.html" class="nav-link">👤 Profile</a>
+      <span id="navAuthArea"></span>
+    </div>
   <button class="nav-burger" id="navBurger" onclick="openMenu()">
     <span></span><span></span><span></span>
   </button>
@@ -281,11 +327,61 @@
   </div>
 </div>
 
+
+<!-- STEPPER -->
+<div class="stepper-wrap">
+  <div class="stepper">
+    <div class="stepper-filled" id="stepperFill" style="width:0%"></div>
+    <div class="step-node active" id="snode1">
+      <div class="step-node-circle">01</div>
+      <div class="step-node-label">Composition</div>
+    </div>
+    <div class="step-node locked" id="snode2">
+      <div class="step-node-circle">02</div>
+      <div class="step-node-label">Light</div>
+    </div>
+    <div class="step-node locked" id="snode3">
+      <div class="step-node-circle">03</div>
+      <div class="step-node-label">Storytelling</div>
+    </div>
+    <div class="step-node locked" id="snode4">
+      <div class="step-node-circle">04</div>
+      <div class="step-node-label">Technical</div>
+    </div>
+    <div class="step-node locked" id="snode5">
+      <div class="step-node-circle">05</div>
+      <div class="step-node-label">Genre</div>
+    </div>
+    <div class="step-node locked" id="snode6">
+      <div class="step-node-circle">06</div>
+      <div class="step-node-label">Post Process</div>
+    </div>
+  </div>
+  <div class="stepper-sub">You are on <span>Module 01 — Composition</span> · 36 chapters total · First 3 free</div>
+</div>
+
 <!-- CURRICULUM -->
 <div class="curriculum-wrap">
 
   <div class="curriculum-label">Composition Series</div>
 
+  <!-- MODULE 01 HEADER -->
+  <div class="module-block mod-active" style="margin-bottom:1.5rem;">
+    <div class="module-toggle" onclick="toggleModule('mod1chapters')">
+      <div class="module-toggle-left">
+        <div class="module-toggle-num">01</div>
+        <div class="module-toggle-info">
+          <div class="module-number">Module 01 · Free to Start</div>
+          <div class="module-name">Composition</div>
+          <div class="module-desc">The foundation of every great photo. 7 chapters — first 3 free.</div>
+        </div>
+      </div>
+      <div class="module-toggle-right">
+        <span class="status-badge status-active">● Active</span>
+        <span class="module-chevron" id="mod1chevron">▲</span>
+      </div>
+    </div>
+    <div class="module-body open" id="mod1chapters">
   <!-- ══ CHAPTER 1 ══ -->
   <div class="chapter-card active-chapter" id="ch1Card">
     <div class="chapter-header" onclick="toggleChapter('ch1')">
@@ -584,84 +680,137 @@
     </div>
   </div>
 
-  <!-- MODULE 2 -->
-  <div class="module-divider">
-    <div class="module-info">
-      <div class="module-number">Module 02</div>
-      <div class="module-name">Light</div>
-      <div class="module-desc">The single biggest factor separating good photos from great ones. 6 chapters.</div>
-    </div>
-    <span class="status-badge status-locked" style="flex-shrink:0">🔒 Locked</span>
-  </div>
-  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">08</div><div class="chapter-info"><div class="chapter-module">Light · Paid</div><div class="chapter-title">Golden Hour</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
-  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">09</div><div class="chapter-info"><div class="chapter-module">Light · Paid</div><div class="chapter-title">Direction of Light</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
-  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">10</div><div class="chapter-info"><div class="chapter-module">Light · Paid</div><div class="chapter-title">Natural vs Artificial Light</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
-  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">11</div><div class="chapter-info"><div class="chapter-module">Light · Paid</div><div class="chapter-title">Shadows as Subject</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
-  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">12</div><div class="chapter-info"><div class="chapter-module">Light · Paid</div><div class="chapter-title">Silhouettes</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
-  <div class="chapter-card locked" style="margin-bottom:2.5rem"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">13</div><div class="chapter-info"><div class="chapter-module">Light · Paid</div><div class="chapter-title">Harsh Midday Light</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
+    </div><!-- /mod1chapters -->
+  </div><!-- /mod1 module-block -->
 
-  <!-- MODULE 3 -->
-  <div class="module-divider">
-    <div class="module-info">
-      <div class="module-number">Module 03</div>
-      <div class="module-name">Subject &amp; Storytelling</div>
-      <div class="module-desc">What the photo is actually about. Intention, emotion, the decisive moment. 6 chapters.</div>
+  <!-- MODULE 02 ACCORDION -->
+  <div class="module-block" style="margin-bottom:1rem;">
+    <div class="module-toggle" onclick="toggleModule('mod2chapters')">
+      <div class="module-toggle-left">
+        <div class="module-toggle-num">02</div>
+        <div class="module-toggle-info">
+          <div class="module-number">Module 02 · Paid</div>
+          <div class="module-name">Light</div>
+          <div class="module-desc">The single biggest factor separating good photos from great ones. 6 chapters.</div>
+        </div>
+      </div>
+      <div class="module-toggle-right">
+        <span class="status-badge status-locked">🔒 Locked</span>
+        <span class="module-chevron" id="mod2chevron">▼</span>
+      </div>
     </div>
-    <span class="status-badge status-locked" style="flex-shrink:0">🔒 Locked</span>
+    <div class="module-body" id="mod2chapters">
+      <div class="module-chapter-row"><div class="module-ch-num">08</div><div class="module-ch-title">Golden Hour</div><div class="module-ch-badge">🔒</div></div>
+      <div class="module-chapter-row"><div class="module-ch-num">09</div><div class="module-ch-title">Direction of Light</div><div class="module-ch-badge">🔒</div></div>
+      <div class="module-chapter-row"><div class="module-ch-num">10</div><div class="module-ch-title">Natural vs Artificial Light</div><div class="module-ch-badge">🔒</div></div>
+      <div class="module-chapter-row"><div class="module-ch-num">11</div><div class="module-ch-title">Shadows as Subject</div><div class="module-ch-badge">🔒</div></div>
+      <div class="module-chapter-row"><div class="module-ch-num">12</div><div class="module-ch-title">Silhouettes</div><div class="module-ch-badge">🔒</div></div>
+      <div class="module-chapter-row"><div class="module-ch-num">13</div><div class="module-ch-title">Harsh Midday Light</div><div class="module-ch-badge">🔒</div></div>
+    </div>
   </div>
-  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">14</div><div class="chapter-info"><div class="chapter-module">Storytelling · Paid</div><div class="chapter-title">Finding Your Subject</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
-  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">15</div><div class="chapter-info"><div class="chapter-module">Storytelling · Paid</div><div class="chapter-title">Eyes &amp; Connection</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
-  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">16</div><div class="chapter-info"><div class="chapter-module">Storytelling · Paid</div><div class="chapter-title">Candid vs Posed</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
-  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">17</div><div class="chapter-info"><div class="chapter-module">Storytelling · Paid</div><div class="chapter-title">The Decisive Moment</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
-  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">18</div><div class="chapter-info"><div class="chapter-module">Storytelling · Paid</div><div class="chapter-title">Environmental Portraits</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
-  <div class="chapter-card locked" style="margin-bottom:2.5rem"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">19</div><div class="chapter-info"><div class="chapter-module">Storytelling · Paid</div><div class="chapter-title">Telling a Story in One Frame</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
 
-  <!-- MODULE 4 -->
-  <div class="module-divider">
-    <div class="module-info">
-      <div class="module-number">Module 04</div>
-      <div class="module-name">Technical Fundamentals</div>
-      <div class="module-desc">Exposure, depth of field, white balance. Understanding your camera, not just pointing it. 6 chapters.</div>
+  <!-- MODULE 03 ACCORDION -->
+  <div class="module-block" style="margin-bottom:1rem;">
+    <div class="module-toggle" onclick="toggleModule('mod3chapters')">
+      <div class="module-toggle-left">
+        <div class="module-toggle-num">03</div>
+        <div class="module-toggle-info">
+          <div class="module-number">Module 03 · Paid</div>
+          <div class="module-name">Subject &amp; Storytelling</div>
+          <div class="module-desc">What the photo is actually about. Intention, emotion, the decisive moment. 6 chapters.</div>
+        </div>
+      </div>
+      <div class="module-toggle-right">
+        <span class="status-badge status-locked">🔒 Locked</span>
+        <span class="module-chevron" id="mod3chevron">▼</span>
+      </div>
     </div>
-    <span class="status-badge status-locked" style="flex-shrink:0">🔒 Locked</span>
+    <div class="module-body" id="mod3chapters">
+      <div class="module-chapter-row"><div class="module-ch-num">14</div><div class="module-ch-title">Finding Your Subject</div><div class="module-ch-badge">🔒</div></div>
+      <div class="module-chapter-row"><div class="module-ch-num">15</div><div class="module-ch-title">Eyes &amp; Connection</div><div class="module-ch-badge">🔒</div></div>
+      <div class="module-chapter-row"><div class="module-ch-num">16</div><div class="module-ch-title">Candid vs Posed</div><div class="module-ch-badge">🔒</div></div>
+      <div class="module-chapter-row"><div class="module-ch-num">17</div><div class="module-ch-title">The Decisive Moment</div><div class="module-ch-badge">🔒</div></div>
+      <div class="module-chapter-row"><div class="module-ch-num">18</div><div class="module-ch-title">Environmental Portraits</div><div class="module-ch-badge">🔒</div></div>
+      <div class="module-chapter-row"><div class="module-ch-num">19</div><div class="module-ch-title">Telling a Story in One Frame</div><div class="module-ch-badge">🔒</div></div>
+    </div>
   </div>
-  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">20</div><div class="chapter-info"><div class="chapter-module">Technical · Paid</div><div class="chapter-title">Exposure Triangle</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
-  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">21</div><div class="chapter-info"><div class="chapter-module">Technical · Paid</div><div class="chapter-title">Depth of Field</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
-  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">22</div><div class="chapter-info"><div class="chapter-module">Technical · Paid</div><div class="chapter-title">Motion Blur vs Freeze</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
-  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">23</div><div class="chapter-info"><div class="chapter-module">Technical · Paid</div><div class="chapter-title">White Balance</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
-  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">24</div><div class="chapter-info"><div class="chapter-module">Technical · Paid</div><div class="chapter-title">Reading the Histogram</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
-  <div class="chapter-card locked" style="margin-bottom:2.5rem"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">25</div><div class="chapter-info"><div class="chapter-module">Technical · Paid</div><div class="chapter-title">RAW vs JPEG</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
 
-  <!-- MODULE 5 -->
-  <div class="module-divider">
-    <div class="module-info">
-      <div class="module-number">Module 05</div>
-      <div class="module-name">Genre Specific</div>
-      <div class="module-desc">Street, food, architecture, night and mobile. Apply everything to real-world photography types. 6 chapters.</div>
+  <!-- MODULE 04 ACCORDION -->
+  <div class="module-block" style="margin-bottom:1rem;">
+    <div class="module-toggle" onclick="toggleModule('mod4chapters')">
+      <div class="module-toggle-left">
+        <div class="module-toggle-num">04</div>
+        <div class="module-toggle-info">
+          <div class="module-number">Module 04 · Paid</div>
+          <div class="module-name">Technical Fundamentals</div>
+          <div class="module-desc">Exposure, depth of field, white balance. Understanding your camera, not just pointing it. 6 chapters.</div>
+        </div>
+      </div>
+      <div class="module-toggle-right">
+        <span class="status-badge status-locked">🔒 Locked</span>
+        <span class="module-chevron" id="mod4chevron">▼</span>
+      </div>
     </div>
-    <span class="status-badge status-locked" style="flex-shrink:0">🔒 Locked</span>
+    <div class="module-body" id="mod4chapters">
+      <div class="module-chapter-row"><div class="module-ch-num">20</div><div class="module-ch-title">Exposure Triangle</div><div class="module-ch-badge">🔒</div></div>
+      <div class="module-chapter-row"><div class="module-ch-num">21</div><div class="module-ch-title">Depth of Field</div><div class="module-ch-badge">🔒</div></div>
+      <div class="module-chapter-row"><div class="module-ch-num">22</div><div class="module-ch-title">Motion Blur vs Freeze</div><div class="module-ch-badge">🔒</div></div>
+      <div class="module-chapter-row"><div class="module-ch-num">23</div><div class="module-ch-title">White Balance</div><div class="module-ch-badge">🔒</div></div>
+      <div class="module-chapter-row"><div class="module-ch-num">24</div><div class="module-ch-title">Reading the Histogram</div><div class="module-ch-badge">🔒</div></div>
+      <div class="module-chapter-row"><div class="module-ch-num">25</div><div class="module-ch-title">RAW vs JPEG</div><div class="module-ch-badge">🔒</div></div>
+    </div>
   </div>
-  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">26</div><div class="chapter-info"><div class="chapter-module">Genre · Paid</div><div class="chapter-title">Street Photography</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
-  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">27</div><div class="chapter-info"><div class="chapter-module">Genre · Paid</div><div class="chapter-title">Food Photography</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
-  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">28</div><div class="chapter-info"><div class="chapter-module">Genre · Paid</div><div class="chapter-title">Architecture</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
-  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">29</div><div class="chapter-info"><div class="chapter-module">Genre · Paid</div><div class="chapter-title">Nature &amp; Macro</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
-  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">30</div><div class="chapter-info"><div class="chapter-module">Genre · Paid</div><div class="chapter-title">Night Photography</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
-  <div class="chapter-card locked" style="margin-bottom:2.5rem"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">31</div><div class="chapter-info"><div class="chapter-module">Genre · Paid</div><div class="chapter-title">Mobile Photography</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
 
-  <!-- MODULE 6 -->
-  <div class="module-divider">
-    <div class="module-info">
-      <div class="module-number">Module 06</div>
-      <div class="module-name">Post-Processing Mindset</div>
-      <div class="module-desc">Not about filters — about intention. Crop, colour grading, developing your visual style. 5 chapters.</div>
+  <!-- MODULE 05 ACCORDION -->
+  <div class="module-block" style="margin-bottom:1rem;">
+    <div class="module-toggle" onclick="toggleModule('mod5chapters')">
+      <div class="module-toggle-left">
+        <div class="module-toggle-num">05</div>
+        <div class="module-toggle-info">
+          <div class="module-number">Module 05 · Paid</div>
+          <div class="module-name">Genre Specific</div>
+          <div class="module-desc">Street, food, architecture, night and mobile. Apply everything to real-world photography types. 6 chapters.</div>
+        </div>
+      </div>
+      <div class="module-toggle-right">
+        <span class="status-badge status-locked">🔒 Locked</span>
+        <span class="module-chevron" id="mod5chevron">▼</span>
+      </div>
     </div>
-    <span class="status-badge status-locked" style="flex-shrink:0">🔒 Locked</span>
+    <div class="module-body" id="mod5chapters">
+      <div class="module-chapter-row"><div class="module-ch-num">26</div><div class="module-ch-title">Street Photography</div><div class="module-ch-badge">🔒</div></div>
+      <div class="module-chapter-row"><div class="module-ch-num">27</div><div class="module-ch-title">Food Photography</div><div class="module-ch-badge">🔒</div></div>
+      <div class="module-chapter-row"><div class="module-ch-num">28</div><div class="module-ch-title">Architecture</div><div class="module-ch-badge">🔒</div></div>
+      <div class="module-chapter-row"><div class="module-ch-num">29</div><div class="module-ch-title">Nature &amp; Macro</div><div class="module-ch-badge">🔒</div></div>
+      <div class="module-chapter-row"><div class="module-ch-num">30</div><div class="module-ch-title">Night Photography</div><div class="module-ch-badge">🔒</div></div>
+      <div class="module-chapter-row"><div class="module-ch-num">31</div><div class="module-ch-title">Mobile Photography</div><div class="module-ch-badge">🔒</div></div>
+    </div>
   </div>
-  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">32</div><div class="chapter-info"><div class="chapter-module">Post-Processing · Paid</div><div class="chapter-title">Crop &amp; Straighten</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
-  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">33</div><div class="chapter-info"><div class="chapter-module">Post-Processing · Paid</div><div class="chapter-title">Exposure Correction</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
-  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">34</div><div class="chapter-info"><div class="chapter-module">Post-Processing · Paid</div><div class="chapter-title">Colour Grading Basics</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
-  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">35</div><div class="chapter-info"><div class="chapter-module">Post-Processing · Paid</div><div class="chapter-title">When to Go Black &amp; White</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
-  <div class="chapter-card locked" style="margin-bottom:2.5rem"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">36</div><div class="chapter-info"><div class="chapter-module">Post-Processing · Paid</div><div class="chapter-title">Developing Your Edit Style</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
+
+  <!-- MODULE 06 ACCORDION -->
+  <div class="module-block" style="margin-bottom:1rem;">
+    <div class="module-toggle" onclick="toggleModule('mod6chapters')">
+      <div class="module-toggle-left">
+        <div class="module-toggle-num">06</div>
+        <div class="module-toggle-info">
+          <div class="module-number">Module 06 · Paid</div>
+          <div class="module-name">Post-Processing Mindset</div>
+          <div class="module-desc">Not about filters — about intention. Crop, colour grading, developing your visual style. 5 chapters.</div>
+        </div>
+      </div>
+      <div class="module-toggle-right">
+        <span class="status-badge status-locked">🔒 Locked</span>
+        <span class="module-chevron" id="mod6chevron">▼</span>
+      </div>
+    </div>
+    <div class="module-body" id="mod6chapters">
+      <div class="module-chapter-row"><div class="module-ch-num">32</div><div class="module-ch-title">Crop &amp; Straighten</div><div class="module-ch-badge">🔒</div></div>
+      <div class="module-chapter-row"><div class="module-ch-num">33</div><div class="module-ch-title">Exposure Correction</div><div class="module-ch-badge">🔒</div></div>
+      <div class="module-chapter-row"><div class="module-ch-num">34</div><div class="module-ch-title">Colour Grading Basics</div><div class="module-ch-badge">🔒</div></div>
+      <div class="module-chapter-row"><div class="module-ch-num">35</div><div class="module-ch-title">When to Go Black &amp; White</div><div class="module-ch-badge">🔒</div></div>
+      <div class="module-chapter-row"><div class="module-ch-num">36</div><div class="module-ch-title">Developing Your Edit Style</div><div class="module-ch-badge">🔒</div></div>
+    </div>
+  </div>
 
   <!-- UNLOCK CTA -->
   <div class="unlock-cta">
@@ -675,15 +824,25 @@
 
 <div class="bottom-nav">
   <div class="bottom-nav-inner">
-    <a href="compete.html"     class="bottom-nav-item"><span class="bottom-nav-icon">⚔️</span><span>Challenge</span></a>
-    <a href="app.html"         class="bottom-nav-item"><span class="bottom-nav-icon">📷</span><span>Analyse</span></a>
-    <a href="leaderboard.html" class="bottom-nav-item"><span class="bottom-nav-icon">🏆</span><span>Ranks</span></a>
-    <a href="gallery.html"     class="bottom-nav-item"><span class="bottom-nav-icon">🖼️</span><span>Gallery</span></a>
-    <a href="profile.html"     class="bottom-nav-item"><span class="bottom-nav-icon">👤</span><span>Profile</span></a>
-  </div>
+      <a href="learn.html" class="bottom-nav-item active"><span class="bottom-nav-icon">📚</span><span>Learn</span></a>
+      <a href="compete.html" class="bottom-nav-item"><span class="bottom-nav-icon">⚔️</span><span>Challenge</span></a>
+      <a href="leaderboard.html" class="bottom-nav-item"><span class="bottom-nav-icon">🏆</span><span>Ranks</span></a>
+      <a href="profile.html" class="bottom-nav-item"><span class="bottom-nav-icon">👤</span><span>Profile</span></a>
+    </div>
 </div>
 
 <script>
+
+  function esc(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#x27;')
+      .replace(/\//g, '&#x2F;');
+  }
   let currentUser  = null;
   let b64Data      = null;
   let mimeType     = null;
@@ -710,6 +869,22 @@
 
   // ── TOGGLE ──
   function toggleChapter(id) { document.getElementById(id + 'Body').classList.toggle('open'); }
+
+  function toggleModule(id) {
+    const body = document.getElementById(id);
+    const num = id.replace('mod','').replace('chapters','');
+    const chevron = document.getElementById('mod' + num + 'chevron');
+    const isOpen = body.classList.contains('open');
+    body.classList.toggle('open', !isOpen);
+    if (chevron) chevron.textContent = isOpen ? '▼' : '▲';
+  }
+
+  function initStepper() {
+    // For now Module 1 is always active — update when modules unlock
+    const fill = document.getElementById('stepperFill');
+    if (fill) fill.style.width = '0%';
+  }
+
 
   // ── FILE ──
   function onFile(file) {

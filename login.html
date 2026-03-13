@@ -141,7 +141,7 @@
       <div class="form-group">
         <label class="form-label">Password</label>
         <input type="password" class="form-input" id="passwordInput" placeholder="Your password" onkeydown="if(event.key==='Enter') signIn()"/>
-        <a href="#" class="forgot-link" onclick="forgotPassword()">Forgot password?</a>
+        <a href="reset-password.html" class="forgot-link">Forgot password?</a>
       </div>
 
       <button class="btn-submit" id="submitBtn" onclick="signIn()">Sign In →</button>
@@ -154,7 +154,7 @@
 
   <script>
     initSupabase();
-    (async () => { const user = await getUser(); if (user) window.location.href = 'app.html'; })();
+    (async () => { const user = await getUser(); if (user) window.location.href = 'learn.html'; })();
 
     function showError(msg) {
       const el = document.getElementById('errorAlert');
@@ -179,7 +179,7 @@
         btn.disabled = false; btn.textContent = 'Sign In →';
       } else {
         showSuccess('Signed in! Redirecting…');
-        setTimeout(() => window.location.href = 'app.html', 800);
+        setTimeout(() => window.location.href = 'learn.html', 800);
       }
     }
 

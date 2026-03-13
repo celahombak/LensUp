@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>LensUp — Join the Challenge</title>
+  <title>LensUp — Create Your Account</title>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase.js"></script>
@@ -96,24 +96,24 @@
     <div class="left-grid"></div>
     <div class="left-top">
       <a href="index.html" class="logo">Lens<span>Up</span></a>
-      <div class="left-title">Your Journey<br/><span>Starts Now.</span></div>
-      <p class="left-desc">Join the photography challenge platform where your skills are tested, scored, and ranked — every single week.</p>
+      <div class="left-title">Learn.<br/><span>Shoot Better.</span></div>
+      <p class="left-desc">Step-by-step chapters. Real photo missions. Honest AI feedback. The fastest way to go from guessing to knowing.</p>
       <div class="perks">
         <div class="perk">
           <span class="perk-icon">📅</span>
-          <div><div class="perk-title">52 Weekly Themes</div><div class="perk-desc">A new creative challenge every week, designed to push your limits and teach new skills.</div></div>
+          <div><div class="perk-title">36 Learning Chapters</div><div class="perk-desc">From Rule of Thirds to Advanced Lighting — structured lessons with real photo missions.</div></div>
         </div>
         <div class="perk">
           <span class="perk-icon">🤖</span>
-          <div><div class="perk-title">AI Scoring on 6 Dimensions</div><div class="perk-desc">Objective feedback on composition, lighting, framing, focus, color and more. No bias.</div></div>
+          <div><div class="perk-title">Honest AI Feedback</div><div class="perk-desc">Every photo scored on exactly the skill you're practising. Know what worked and why.</div></div>
         </div>
         <div class="perk">
           <span class="perk-icon">🏆</span>
-          <div><div class="perk-title">Live Leaderboard</div><div class="perk-desc">See where you rank daily and weekly. Compete with photographers at your level.</div></div>
+          <div><div class="perk-title">Weekly Challenge</div><div class="perk-desc">Apply your skills to weekly themes. Compete on the leaderboard and track your improvement.</div></div>
         </div>
         <div class="perk">
           <span class="perk-icon">📈</span>
-          <div><div class="perk-title">Your Full Year Journey</div><div class="perk-desc">Every submission documented. Track your growth from Week 1 to Week 52.</div></div>
+          <div><div class="perk-title">First 3 Chapters Free</div><div class="perk-desc">Start learning today, no payment needed. Upgrade when you're ready for more.</div></div>
         </div>
       </div>
     </div>
@@ -125,8 +125,8 @@
   <!-- RIGHT -->
   <div class="right-panel">
     <div class="auth-box">
-      <div class="auth-box-title">Join the Challenge</div>
-      <div class="auth-box-sub">Create your free account — invite code required</div>
+      <div class="auth-box-title">Create Account</div>
+      <div class="auth-box-sub">Start your learning journey — first 3 chapters free</div>
 
       <div class="alert alert-error" id="errorAlert"></div>
       <div class="alert alert-success" id="successAlert"></div>
@@ -160,7 +160,7 @@
       </div>
 
       <button class="btn-submit" id="submitBtn" onclick="register()">Create Account →</button>
-      <div class="terms">By joining you agree to use LensUp responsibly and keep it competitive.</div>
+      <div class="terms">By signing up you agree to use LensUp responsibly.</div>
 
       <div class="auth-footer">
         Already have an account? <a href="login.html">Sign in →</a>
@@ -170,7 +170,7 @@
 
   <script>
     initSupabase();
-    (async () => { const user = await getUser(); if (user) window.location.href = 'app.html'; })();
+    (async () => { const user = await getUser(); if (user) window.location.href = 'learn.html'; })();
 
     function showError(msg) {
       const el = document.getElementById('errorAlert');
@@ -236,7 +236,7 @@
         localStorage.setItem('lensup_name', name);
         showSuccess('Account created! Check your email to confirm, then sign in.');
         btn.textContent = 'Account Created ✓';
-        setTimeout(() => window.location.href = 'login.html', 3000);
+        setTimeout(() => window.location.href = 'learn.html', 2000);
       }
     }
   </script>

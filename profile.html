@@ -146,12 +146,10 @@
   <nav>
     <a href="index.html" class="nav-logo">Lens<span>Up</span></a>
     <div class="nav-links">
+      <a href="learn.html" class="nav-link">📚 Learn</a>
       <a href="compete.html" class="nav-link">⚔️ Challenge</a>
       <a href="leaderboard.html" class="nav-link">🏆 Leaderboard</a>
-      <a href="learn.html" class="nav-link">Learn</a>
-      <a href="app.html" class="nav-link">Analyse</a>
-      <a href="gallery.html" class="nav-link">Gallery</a>
-      <a href="profile.html" class="nav-link active">Profile</a>
+      <a href="profile.html" class="nav-link active">👤 Profile</a>
       <span id="navAuthArea"></span>
     </div>
     <button class="nav-burger" id="navBurger" onclick="openMobileMenu()" aria-label="Menu">
@@ -296,7 +294,18 @@
       { key: 'framing',         label: 'Framing',          icon: '✂️', color: 'var(--c6)' },
     ];
 
-    let currentUser   = null;
+  
+  function esc(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#x27;')
+      .replace(/\//g, '&#x2F;');
+  }
+  let currentUser   = null;
     let isOwnProfile  = true;
 
     function showToast(msg) {
@@ -336,7 +345,7 @@
             ? (currentUser?.user_metadata?.display_name || currentUser?.email?.split('@')[0] || 'Photographer')
             : 'Photographer');
 
-      document.getElementById('heroName').innerHTML = `<em>${name}</em>`;
+      document.getElementById('heroName').innerHTML = `<em>${esc(name)}</em>`;
       document.getElementById('pageTag').textContent = isOwnProfile ? 'Your Profile' : 'Photographer Profile';
 
       if (isOwnProfile) {
@@ -533,11 +542,10 @@
 
   <div class="bottom-nav">
     <div class="bottom-nav-inner">
-      <a href="compete.html" class="bottom-nav-item"><span class="bottom-nav-icon">⚔️</span><span>Challenge</span></a>
-      <a href="app.html" class="bottom-nav-item"><span class="bottom-nav-icon">📷</span><span>Analyse</span></a>
+      <a href="learn.html"       class="bottom-nav-item"><span class="bottom-nav-icon">📚</span><span>Learn</span></a>
+      <a href="compete.html"     class="bottom-nav-item"><span class="bottom-nav-icon">⚔️</span><span>Challenge</span></a>
       <a href="leaderboard.html" class="bottom-nav-item"><span class="bottom-nav-icon">🏆</span><span>Ranks</span></a>
-      <a href="gallery.html" class="bottom-nav-item"><span class="bottom-nav-icon">🖼️</span><span>Gallery</span></a>
-      <a href="profile.html" class="bottom-nav-item active"><span class="bottom-nav-icon">👤</span><span>Profile</span></a>
+      <a href="profile.html"     class="bottom-nav-item active"><span class="bottom-nav-icon">👤</span><span>Profile</span></a>
     </div>
   </div>
 
