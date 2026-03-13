@@ -342,7 +342,6 @@
       document.getElementById('pageTag').textContent = isOwnProfile ? 'Your Profile' : 'Photographer Profile';
 
       if (isOwnProfile) {
-        document.getElementById('nameInput').value = name;
         const av = document.getElementById('avatarEl');
         av.classList.add('editable');
         av.onclick = changeEmoji;
