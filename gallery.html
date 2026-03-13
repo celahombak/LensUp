@@ -614,8 +614,13 @@
           </div>`;
       }).join('');
 
-      // Improvements
-      const imps = Array.isArray(r.improvements) ? r.improvements : [];
+      // Improvements — normalise all formats from Supabase
+      let rawImps = r.improvements;
+      if (typeof rawImps === 'string') { try { rawImps = JSON.parse(rawImps); } catch { rawImps = []; } }
+      const imps = (Array.isArray(rawImps) ? rawImps : []).map(i => {
+        if (typeof i === 'object' && i !== null) return i;
+        try { return JSON.parse(i); } catch { return { title: String(i), desc: '' }; }
+      });
       document.getElementById('modalImprovements').innerHTML = imps.length ? `
         <div class="modal-imp-title">✦ <span>How to Improve This Shot</span></div>
         ${imps.map((imp, i) => `
@@ -688,7 +693,6 @@
         const { data, error } = await getAnalyses(currentUser);
         if (!error && data) {
           cloudData = data.map(dbRowToResult);
-          localStorage.setItem('lensup_history', JSON.stringify(cloudData.slice(0,20)));
         }
         renderGallery();
       } catch(err) {
