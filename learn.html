@@ -591,42 +591,430 @@
   </div><!-- /ch1Card -->
 
   <!-- CH2 FREE -->
-  <div class="chapter-card free-chapter">
+  <div class="chapter-card free-chapter" id="ch2Card">
     <div class="chapter-header" onclick="toggleChapter('ch2')">
-      <div class="chapter-num" style="opacity:0.3">02</div>
+      <div class="chapter-num" id="ch2Num" style="opacity:0.3">02</div>
       <div class="chapter-info">
         <div class="chapter-module">Composition · Free</div>
         <div class="chapter-title">Leading Lines</div>
         <div class="chapter-desc">Roads, rivers, fences, shadows — use natural lines in your scene to guide the viewer's eye through the frame with purpose.</div>
       </div>
-      <div class="chapter-meta"><span class="status-badge status-free">◎ Free</span></div>
+      <div class="chapter-meta" id="ch2Meta"><span class="status-badge status-free">◎ Free</span></div>
     </div>
     <div class="chapter-body" id="ch2Body">
-      <div class="coming-soon"><div class="coming-soon-inner">
-        <span class="coming-soon-icon">🔜</span>
-        <div class="coming-soon-text"><strong>Leading Lines</strong> — lesson and mission coming soon. Complete Chapter 1 first.</div>
-      </div></div>
-    </div>
-  </div>
 
-  <!-- CH3 FREE -->
-  <div class="chapter-card free-chapter">
-    <div class="chapter-header" onclick="toggleChapter('ch3')">
-      <div class="chapter-num" style="opacity:0.3">03</div>
+      <!-- LOCKED GATE (shown until Ch1 complete) -->
+      <div id="ch2Gate" class="coming-soon">
+        <div class="coming-soon-inner">
+          <span class="coming-soon-icon">🔒</span>
+          <div class="coming-soon-text">
+            <strong>Complete Chapter 1 — Rule of Thirds first.</strong><br/>
+            Submit 5 photos scoring 7+ on composition. Each shot teaches you to feel the grid before you learn to break it.
+          </div>
+        </div>
+      </div>
+
+      <!-- LESSON (hidden until ch1 done) -->
+      <div id="ch2Content" style="display:none">
+        <div class="lesson-section">
+          <div class="lesson-title">📖 The Lesson</div>
+          <div class="lesson-grid">
+            <div class="lesson-text">
+              <p><strong>Leading lines</strong> are any lines in your scene — roads, fences, rivers, shadows, walls, corridors — that draw the viewer's eye from one part of the frame toward your subject.</p>
+              <p>The power is in <strong>direction and destination</strong>. A line that leads nowhere is just a line. A line that carries the eye to your subject is a composition tool.</p>
+              <p>Lines don't have to be straight. Curves create a slower, more elegant journey through the frame. Diagonal lines add energy and tension. Converging lines — like a road disappearing to a vanishing point — create a powerful sense of depth and distance.</p>
+              <p>Look for lines <strong>before</strong> you look for your subject. Then position yourself so the lines serve the story you want to tell.</p>
+            </div>
+            <div class="lesson-visual">
+              <!-- SVG Diagram — converging road lines -->
+              <div class="thirds-diagram" style="height:160px">
+                <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+                  <rect width="280" height="160" fill="#0e1a14"/>
+                  <!-- Sky -->
+                  <rect width="280" height="70" fill="#0a1520"/>
+                  <!-- Ground -->
+                  <rect y="70" width="280" height="90" fill="#0e1a0a"/>
+                  <!-- Horizon -->
+                  <line x1="0" y1="70" x2="280" y2="70" stroke="rgba(232,184,75,0.15)" stroke-width="1"/>
+                  <!-- Converging road lines -->
+                  <line x1="140" y1="70" x2="20"  y2="160" stroke="rgba(232,184,75,0.7)" stroke-width="2"/>
+                  <line x1="140" y1="70" x2="260" y2="160" stroke="rgba(232,184,75,0.7)" stroke-width="2"/>
+                  <!-- Road centre dashes -->
+                  <line x1="140" y1="80"  x2="140" y2="95"  stroke="rgba(232,184,75,0.3)" stroke-width="1" stroke-dasharray="4,4"/>
+                  <line x1="140" y1="105" x2="140" y2="120" stroke="rgba(232,184,75,0.3)" stroke-width="1" stroke-dasharray="4,4"/>
+                  <line x1="140" y1="130" x2="140" y2="150" stroke="rgba(232,184,75,0.3)" stroke-width="1" stroke-dasharray="4,4"/>
+                  <!-- Vanishing point dot -->
+                  <circle cx="140" cy="70" r="4" fill="rgba(232,184,75,0.9)"/>
+                  <!-- Subject at vanishing point -->
+                  <rect x="134" y="52" width="12" height="18" fill="#2a4a2a" rx="1"/>
+                  <text x="140" y="154" text-anchor="middle" fill="rgba(245,242,238,0.25)" font-size="8" font-family="sans-serif">lines converge — eye travels to subject</text>
+                </svg>
+              </div>
+              <div>
+                <div class="tip-row">
+                  <span class="tip-icon">🛣️</span>
+                  <div class="tip-text"><strong>Natural lines</strong> — roads, paths, fences, rivers, corridors all work</div>
+                </div>
+                <div class="tip-row">
+                  <span class="tip-icon">📐</span>
+                  <div class="tip-text"><strong>Diagonal &gt; Horizontal</strong> — diagonal lines feel dynamic; flat lines feel static</div>
+                </div>
+                <div class="tip-row">
+                  <span class="tip-icon">🎯</span>
+                  <div class="tip-text"><strong>Line needs a destination</strong> — lead the eye toward your subject, not out of frame</div>
+                </div>
+                <div class="tip-row">
+                  <span class="tip-icon">📷</span>
+                  <div class="tip-text"><strong>Get low</strong> — shooting from ground level exaggerates converging lines dramatically</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- EXAMPLES -->
+        <div class="examples-wrap">
+          <div class="example-card good">
+            <div class="example-svg-wrap">
+              <svg viewBox="0 0 300 225" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+                <rect width="300" height="225" fill="#0a1520"/>
+                <rect y="100" width="300" height="125" fill="#0d1a0a"/>
+                <!-- Converging fence lines -->
+                <line x1="150" y1="100" x2="0"   y2="225" stroke="rgba(180,140,80,0.6)" stroke-width="1.5"/>
+                <line x1="150" y1="100" x2="300" y2="225" stroke="rgba(180,140,80,0.6)" stroke-width="1.5"/>
+                <!-- Fence posts diminishing -->
+                <line x1="120" y1="108" x2="100" y2="140" stroke="rgba(180,140,80,0.4)" stroke-width="1"/>
+                <line x1="90"  y1="118" x2="60"  y2="165" stroke="rgba(180,140,80,0.4)" stroke-width="1"/>
+                <line x1="180" y1="108" x2="200" y2="140" stroke="rgba(180,140,80,0.4)" stroke-width="1"/>
+                <line x1="210" y1="118" x2="240" y2="165" stroke="rgba(180,140,80,0.4)" stroke-width="1"/>
+                <!-- Subject at vanishing point -->
+                <circle cx="150" cy="96" r="8" fill="rgba(232,184,75,0.85)"/>
+                <rect x="146" y="78" width="8" height="18" fill="#2a3a2a" rx="1"/>
+                <text x="150" y="218" text-anchor="middle" fill="rgba(245,242,238,0.2)" font-size="9" font-family="sans-serif">fence lines lead directly to the subject</text>
+              </svg>
+            </div>
+            <div class="example-foot">
+              <div class="example-verdict">✓ Leading Lines Applied</div>
+              <div class="example-note">Converging fence guides the eye straight to the subject</div>
+            </div>
+          </div>
+          <div class="example-card bad">
+            <div class="example-svg-wrap">
+              <svg viewBox="0 0 300 225" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+                <rect width="300" height="225" fill="#0a1520"/>
+                <rect y="112" width="300" height="113" fill="#0d1a0a"/>
+                <!-- Horizontal fence — goes nowhere -->
+                <line x1="0" y1="112" x2="300" y2="112" stroke="rgba(180,140,80,0.5)" stroke-width="1.5"/>
+                <line x1="40"  y1="100" x2="40"  y2="124" stroke="rgba(180,140,80,0.3)" stroke-width="1"/>
+                <line x1="90"  y1="100" x2="90"  y2="124" stroke="rgba(180,140,80,0.3)" stroke-width="1"/>
+                <line x1="140" y1="100" x2="140" y2="124" stroke="rgba(180,140,80,0.3)" stroke-width="1"/>
+                <line x1="190" y1="100" x2="190" y2="124" stroke="rgba(180,140,80,0.3)" stroke-width="1"/>
+                <line x1="240" y1="100" x2="240" y2="124" stroke="rgba(180,140,80,0.3)" stroke-width="1"/>
+                <!-- Subject off to the side, lines don't help -->
+                <circle cx="240" cy="80" r="8" fill="rgba(255,107,107,0.7)"/>
+                <line x1="270" y1="60" x2="270" y2="100" stroke="rgba(255,107,107,0.3)" stroke-width="1"/>
+                <text x="150" y="218" text-anchor="middle" fill="rgba(245,242,238,0.2)" font-size="9" font-family="sans-serif">horizontal line leads eye out of frame — not to subject</text>
+              </svg>
+            </div>
+            <div class="example-foot">
+              <div class="example-verdict">✗ Line Leads Nowhere</div>
+              <div class="example-note">Horizontal fence cuts across frame — doesn't serve the subject</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MISSION -->
+        <div class="mission-section">
+          <div class="mission-top">
+            <div>
+              <div class="mission-title">🎯 Your Mission</div>
+              <div class="mission-sub">Submit 5 real photos scoring 7+ on leading lines to complete this chapter</div>
+            </div>
+            <div class="mission-dots" id="ch2Dots">
+              <div class="mdot active">1</div>
+              <div class="mdot">2</div>
+              <div class="mdot">3</div>
+              <div class="mdot">4</div>
+              <div class="mdot">5</div>
+            </div>
+          </div>
+
+          <div class="ch-error" id="ch2Error"></div>
+
+          <div id="ch2UploadWrap">
+            <div class="upload-zone" id="ch2UploadZone"
+              onclick="document.getElementById('ch2File').click()"
+              ondragover="event.preventDefault();this.classList.add('drag')"
+              ondragleave="this.classList.remove('drag')"
+              ondrop="ch2Drop(event)">
+              <input type="file" id="ch2File" accept="image/*" style="display:none" onchange="ch2OnFile(this.files[0])"/>
+              <span class="upload-icon">📷</span>
+              <div class="upload-hint">Tap to upload or drag a photo<br/><strong>Use leading lines intentionally</strong></div>
+            </div>
+            <img id="ch2Preview" class="upload-preview" alt=""/>
+            <button class="btn-primary" id="ch2AnalyseBtn" onclick="ch2Analyse()" disabled>Analyse This Shot →</button>
+          </div>
+
+          <div class="ch-loading" id="ch2Loading">
+            <div class="spinner"></div>
+            <div class="loading-text">Analysing your leading lines…</div>
+          </div>
+
+          <div class="sub-result" id="ch2Result">
+            <div class="result-head" id="ch2ResultHead">
+              <div class="result-score" id="ch2Score">—</div>
+              <div>
+                <div class="result-verdict-title" id="ch2Title"></div>
+                <div class="result-verdict-sub" id="ch2Sub"></div>
+              </div>
+            </div>
+            <div class="result-body">
+              <div class="result-feedback" id="ch2Feedback"></div>
+              <div class="result-cols">
+                <div class="result-col">
+                  <div class="result-col-label worked">✓ What Worked</div>
+                  <div class="result-col-text" id="ch2Worked"></div>
+                </div>
+                <div class="result-col">
+                  <div class="result-col-label improve">↑ Improve</div>
+                  <div class="result-col-text" id="ch2Improve"></div>
+                </div>
+              </div>
+            </div>
+            <div class="fail-hint" id="ch2FailHint" style="display:none">Score below 7/10 — this shot doesn't count. Find a stronger line that leads directly to your subject.</div>
+          </div>
+
+          <div id="ch2NextWrap" style="display:none;margin-top:0.8rem;">
+            <button class="btn-primary" onclick="ch2Reset()">Submit Next Photo →</button>
+          </div>
+
+          <div class="completion" id="ch2Completion">
+            <span class="completion-icon">🏆</span>
+            <div class="completion-title">Chapter Complete!</div>
+            <div class="completion-sub">You've demonstrated Leading Lines across 5 photos.<br/>You've earned the <strong style="color:var(--gold)">Leading Lines</strong> badge.</div>
+            <div class="completion-btns">
+              <button class="btn-share" onclick="ch2GenerateCard()">📤 Share My Badge</button>
+              <a href="learn.html" class="btn-ghost">View Next Chapter ↓</a>
+            </div>
+            <div class="share-wrap" id="ch2ShareWrap">
+              <canvas id="ch2ShareCard" width="800" height="480"></canvas>
+              <div class="share-hint">Long press (mobile) or right-click → Save Image to share your badge</div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /ch2Content -->
+    </div><!-- /ch2Body -->
+  </div><!-- /ch2Card -->
+
+  <!-- CH3 LOCKED -->
+  <div class="chapter-card locked" id="ch3Card">
+    <div class="chapter-header non-clickable">
+      <div class="chapter-num" style="opacity:0.12">03</div>
       <div class="chapter-info">
-        <div class="chapter-module">Composition · Free</div>
+        <div class="chapter-module">Composition · Paid</div>
         <div class="chapter-title">Framing</div>
         <div class="chapter-desc">Use doorways, windows, arches and natural openings to frame your subject — adding depth and directing the eye instantly.</div>
       </div>
-      <div class="chapter-meta"><span class="status-badge status-free">◎ Free</span></div>
+      <div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div>
     </div>
     <div class="chapter-body" id="ch3Body">
-      <div class="coming-soon"><div class="coming-soon-inner">
-        <span class="coming-soon-icon">🔜</span>
-        <div class="coming-soon-text"><strong>Framing</strong> — lesson and mission coming soon.</div>
-      </div></div>
-    </div>
-  </div>
+
+      <!-- LOCKED GATE -->
+      <div id="ch3Gate" class="coming-soon">
+        <div class="coming-soon-inner">
+          <span class="coming-soon-icon">🔒</span>
+          <div class="coming-soon-text">
+            <strong>Complete Chapter 2 — Leading Lines first.</strong><br/>
+            You need to see your scene as a system of lines before you can use frames within it. Finish Ch2 and this unlocks automatically.
+          </div>
+        </div>
+      </div>
+
+      <!-- LESSON (hidden until ch2 done) -->
+      <div id="ch3Content" style="display:none">
+        <div class="lesson-section">
+          <div class="lesson-title">📖 The Lesson</div>
+          <div class="lesson-grid">
+            <div class="lesson-text">
+              <p><strong>Framing</strong> means using elements within the scene — a doorway, a window, an archway, overhanging branches, a tunnel — to create a frame around your subject inside the photo.</p>
+              <p>It works for three reasons. First, it <strong>directs the eye</strong> — the natural frame acts like an arrow pointing at your subject. Second, it adds <strong>depth</strong> by creating foreground, midground and background layers. Third, it gives the photo a sense of <strong>place and context</strong> that a plain shot of the subject alone cannot.</p>
+              <p>The frame doesn't have to be sharp. In fact, a slightly soft foreground frame often feels more natural and immersive. What matters is that it <strong>doesn't compete with the subject</strong> — it should support it.</p>
+              <p>Look for frames everywhere: a gap between buildings, a cave opening, two trees close together, a person seen through a crowd. Train your eye to see rectangles and circles within your scene.</p>
+            </div>
+            <div class="lesson-visual">
+              <!-- SVG Diagram — arch framing a subject -->
+              <div class="thirds-diagram" style="height:160px">
+                <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+                  <rect width="280" height="160" fill="#0a1015"/>
+                  <!-- Background scene -->
+                  <rect x="40" y="40" width="200" height="120" fill="#0d1a20"/>
+                  <!-- Arch frame walls -->
+                  <rect x="0"   y="0" width="40"  height="160" fill="#1a1208"/>
+                  <rect x="240" y="0" width="40"  height="160" fill="#1a1208"/>
+                  <rect x="0"   y="0" width="280" height="30"  fill="#1a1208"/>
+                  <!-- Arch opening (curved top) -->
+                  <path d="M40,30 Q140,0 240,30" fill="#1a1208" stroke="rgba(232,184,75,0.3)" stroke-width="1"/>
+                  <!-- Subject in background -->
+                  <rect x="128" y="80" width="24" height="40" fill="#2a3a4a" rx="2"/>
+                  <circle cx="140" cy="72" r="10" fill="rgba(232,184,75,0.7)"/>
+                  <!-- Frame highlight -->
+                  <rect x="40" y="30" width="200" height="130" fill="none" stroke="rgba(232,184,75,0.25)" stroke-width="1" stroke-dasharray="4,3"/>
+                  <text x="140" y="154" text-anchor="middle" fill="rgba(245,242,238,0.25)" font-size="8" font-family="sans-serif">arch creates a frame — eye goes straight to subject</text>
+                </svg>
+              </div>
+              <div>
+                <div class="tip-row">
+                  <span class="tip-icon">🏛️</span>
+                  <div class="tip-text"><strong>Architecture works great</strong> — doorways, windows, arches, tunnels, corridors</div>
+                </div>
+                <div class="tip-row">
+                  <span class="tip-icon">🌿</span>
+                  <div class="tip-text"><strong>Nature frames too</strong> — branches, cave openings, gaps between trees or rocks</div>
+                </div>
+                <div class="tip-row">
+                  <span class="tip-icon">🔍</span>
+                  <div class="tip-text"><strong>Frame can be out of focus</strong> — soft foreground frames feel natural and add depth</div>
+                </div>
+                <div class="tip-row">
+                  <span class="tip-icon">⚖️</span>
+                  <div class="tip-text"><strong>Frame supports, not competes</strong> — if the frame is the subject, it's just a photo of a frame</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- EXAMPLES -->
+        <div class="examples-wrap">
+          <div class="example-card good">
+            <div class="example-svg-wrap">
+              <svg viewBox="0 0 300 225" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+                <rect width="300" height="225" fill="#0a1015"/>
+                <rect x="50" y="30" width="200" height="195" fill="#0d2030"/>
+                <!-- Dark walls as frame -->
+                <rect x="0"   y="0" width="50"  height="225" fill="#120e08"/>
+                <rect x="250" y="0" width="50"  height="225" fill="#120e08"/>
+                <rect x="0"   y="0" width="300" height="30"  fill="#120e08"/>
+                <!-- Arch -->
+                <path d="M50,30 Q150,5 250,30" fill="#120e08"/>
+                <!-- Background light -->
+                <rect x="50" y="30" width="200" height="195" fill="url(#bgGrad)"/>
+                <defs><radialGradient id="bgGrad" cx="50%" cy="40%"><stop offset="0%" stop-color="#1a3050"/><stop offset="100%" stop-color="#0a1520"/></radialGradient></defs>
+                <!-- Subject -->
+                <rect x="138" y="100" width="24" height="50" fill="#1e3050" rx="2"/>
+                <circle cx="150" cy="92" r="12" fill="rgba(232,184,75,0.8)"/>
+                <text x="150" y="218" text-anchor="middle" fill="rgba(245,242,238,0.2)" font-size="9" font-family="sans-serif">doorway frames and isolates the subject clearly</text>
+              </svg>
+            </div>
+            <div class="example-foot">
+              <div class="example-verdict">✓ Framing Applied</div>
+              <div class="example-note">Doorway arch creates a natural frame around the subject</div>
+            </div>
+          </div>
+          <div class="example-card bad">
+            <div class="example-svg-wrap">
+              <svg viewBox="0 0 300 225" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+                <rect width="300" height="225" fill="#0d1a20"/>
+                <!-- Subject floating with no frame context -->
+                <rect x="126" y="80" width="48" height="80" fill="#1e3050" rx="2"/>
+                <circle cx="150" cy="68" r="18" fill="rgba(232,184,75,0.55)"/>
+                <!-- Distracting background elements -->
+                <rect x="10"  y="20" width="60" height="100" fill="#162030" rx="1" opacity="0.6"/>
+                <rect x="220" y="40" width="70" height="80"  fill="#162030" rx="1" opacity="0.6"/>
+                <rect x="80"  y="160" width="140" height="40" fill="#162030" rx="1" opacity="0.5"/>
+                <line x1="0" y1="112" x2="300" y2="112" stroke="rgba(255,107,107,0.2)" stroke-width="1" stroke-dasharray="3,3"/>
+                <text x="150" y="218" text-anchor="middle" fill="rgba(245,242,238,0.2)" font-size="9" font-family="sans-serif">subject floats — no frame to isolate or direct the eye</text>
+              </svg>
+            </div>
+            <div class="example-foot">
+              <div class="example-verdict">✗ No Frame — Subject Floats</div>
+              <div class="example-note">Subject competes with background — eye doesn't know where to go</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MISSION -->
+        <div class="mission-section">
+          <div class="mission-top">
+            <div>
+              <div class="mission-title">🎯 Your Mission</div>
+              <div class="mission-sub">Submit 5 real photos scoring 7+ on framing to complete this chapter</div>
+            </div>
+            <div class="mission-dots" id="ch3Dots">
+              <div class="mdot active">1</div>
+              <div class="mdot">2</div>
+              <div class="mdot">3</div>
+              <div class="mdot">4</div>
+              <div class="mdot">5</div>
+            </div>
+          </div>
+
+          <div class="ch-error" id="ch3Error"></div>
+
+          <div id="ch3UploadWrap">
+            <div class="upload-zone" id="ch3UploadZone"
+              onclick="document.getElementById('ch3File').click()"
+              ondragover="event.preventDefault();this.classList.add('drag')"
+              ondragleave="this.classList.remove('drag')"
+              ondrop="ch3Drop(event)">
+              <input type="file" id="ch3File" accept="image/*" style="display:none" onchange="ch3OnFile(this.files[0])"/>
+              <span class="upload-icon">📷</span>
+              <div class="upload-hint">Tap to upload or drag a photo<br/><strong>Frame your subject using the scene</strong></div>
+            </div>
+            <img id="ch3Preview" class="upload-preview" alt=""/>
+            <button class="btn-primary" id="ch3AnalyseBtn" onclick="ch3Analyse()" disabled>Analyse This Shot →</button>
+          </div>
+
+          <div class="ch-loading" id="ch3Loading">
+            <div class="spinner"></div>
+            <div class="loading-text">Analysing your framing technique…</div>
+          </div>
+
+          <div class="sub-result" id="ch3Result">
+            <div class="result-head" id="ch3ResultHead">
+              <div class="result-score" id="ch3Score">—</div>
+              <div>
+                <div class="result-verdict-title" id="ch3Title"></div>
+                <div class="result-verdict-sub" id="ch3Sub"></div>
+              </div>
+            </div>
+            <div class="result-body">
+              <div class="result-feedback" id="ch3Feedback"></div>
+              <div class="result-cols">
+                <div class="result-col">
+                  <div class="result-col-label worked">✓ What Worked</div>
+                  <div class="result-col-text" id="ch3Worked"></div>
+                </div>
+                <div class="result-col">
+                  <div class="result-col-label improve">↑ Improve</div>
+                  <div class="result-col-text" id="ch3Improve"></div>
+                </div>
+              </div>
+            </div>
+            <div class="fail-hint" id="ch3FailHint" style="display:none">Score below 7/10 — this shot doesn't count. Find a stronger frame element that surrounds or isolates your subject.</div>
+          </div>
+
+          <div id="ch3NextWrap" style="display:none;margin-top:0.8rem;">
+            <button class="btn-primary" onclick="ch3Reset()">Submit Next Photo →</button>
+          </div>
+
+          <div class="completion" id="ch3Completion">
+            <span class="completion-icon">🏆</span>
+            <div class="completion-title">Chapter Complete!</div>
+            <div class="completion-sub">You've demonstrated Framing across 5 photos.<br/>You've earned the <strong style="color:var(--gold)">Framing</strong> badge.</div>
+            <div class="completion-btns">
+              <button class="btn-share" onclick="ch3GenerateCard()">📤 Share My Badge</button>
+              <a href="learn.html" class="btn-ghost">View Next Chapter ↓</a>
+            </div>
+            <div class="share-wrap" id="ch3ShareWrap">
+              <canvas id="ch3ShareCard" width="800" height="480"></canvas>
+              <div class="share-hint">Long press (mobile) or right-click → Save Image to share your badge</div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /ch3Content -->
+    </div><!-- /ch3Body -->
+  </div><!-- /ch3Card -->
 
   <!-- CH4 LOCKED -->
   <div class="chapter-card locked">
@@ -1018,17 +1406,9 @@
   function hideErr()     { document.getElementById('chError').classList.remove('show'); }
 
   // ── BADGE ──
-  async function saveBadge() {
-    try {
-      await sb.from('badges').upsert({
-        user_id: currentUser.id, badge_id: 'ch1-rule-of-thirds',
-        badge_name: 'Rule of Thirds', earned_at: new Date().toISOString()
-      }, { onConflict: 'user_id,badge_id' });
-    } catch(e) { console.warn('Badge save failed', e); }
-  }
-
-  // ── SHARE CARD ──
-  function generateCard() {
+  async function saveBadge() { await saveBadgeFor('ch1-rule-of-thirds', 'Rule of Thirds'); }
+  function generateCard() { generateShareCard('shareWrap', 'shareCard', 'Rule of Thirds — Composition Basics', previewSrc); }
+  function _old_unused_generateCard() {
     const wrap = document.getElementById('shareWrap');
     wrap.classList.add('show');
     const canvas = document.getElementById('shareCard');
@@ -1128,20 +1508,270 @@
   // ── LOAD PROGRESS ──
   async function loadProgress() {
     try {
-      const { data } = await sb
-        .from('chapter_submissions')
-        .select('id, passed')
-        .eq('user_id', currentUser.id)
-        .eq('chapter_id', 'ch1-rule-of-thirds');
-      const passed = (data || []).filter(r => r.passed).length;
-      totalPassed = passed;
-      updateDots(passed);
-      if (passed >= 5) {
+      // CH1
+      const { data: d1 } = await sb.from('chapter_submissions').select('id,passed')
+        .eq('user_id', currentUser.id).eq('chapter_id', 'ch1-rule-of-thirds');
+      const p1 = (d1 || []).filter(r => r.passed).length;
+      totalPassed = p1; updateDots(p1);
+      const ch1Done = p1 >= 5;
+      if (ch1Done) {
         done = true;
         document.getElementById('completion').classList.add('show');
         document.getElementById('uploadWrap').style.display = 'none';
+        document.getElementById('ch1Meta').innerHTML = '<span class="status-badge status-complete">✓ Complete</span>';
+        document.getElementById('ch1Num').style.opacity = '1';
+      }
+
+      // CH2 — unlock if ch1 done
+      if (ch1Done) {
+        document.getElementById('ch2Gate').style.display = 'none';
+        document.getElementById('ch2Content').style.display = 'block';
+        document.getElementById('ch2Num').style.opacity = '1';
+        const { data: d2 } = await sb.from('chapter_submissions').select('id,passed')
+          .eq('user_id', currentUser.id).eq('chapter_id', 'ch2-leading-lines');
+        const p2 = (d2 || []).filter(r => r.passed).length;
+        ch2Passed = p2; ch2UpdateDots(p2);
+        const ch2Done = p2 >= 5;
+        if (ch2Done) {
+          ch2done = true;
+          document.getElementById('ch2Completion').classList.add('show');
+          document.getElementById('ch2UploadWrap').style.display = 'none';
+          document.getElementById('ch2Meta').innerHTML = '<span class="status-badge status-complete">✓ Complete</span>';
+
+          // Ch3 is locked (paid) — no unlock logic
+        }
       }
     } catch(e) { console.warn('Progress load failed', e); }
+  }
+
+  // ══════════════════════════════════════════════
+  // CH2 — LEADING LINES
+  // ══════════════════════════════════════════════
+  let ch2B64 = null, ch2Mime = null, ch2Src = null, ch2Passed = 0, ch2done = false;
+
+  function ch2OnFile(file) {
+    if (!file || !file.type.startsWith('image/')) return;
+    ch2Mime = file.type;
+    const r = new FileReader();
+    r.onload = e => {
+      ch2Src = e.target.result; ch2B64 = e.target.result.split(',')[1];
+      const prev = document.getElementById('ch2Preview');
+      prev.src = ch2Src; prev.style.display = 'block';
+      document.getElementById('ch2UploadZone').style.display = 'none';
+      document.getElementById('ch2AnalyseBtn').disabled = false;
+    };
+    r.readAsDataURL(file);
+  }
+  function ch2Drop(e) { e.preventDefault(); document.getElementById('ch2UploadZone').classList.remove('drag'); ch2OnFile(e.dataTransfer.files[0]); }
+  function ch2Reset() {
+    ch2B64 = null; ch2Mime = null; ch2Src = null;
+    document.getElementById('ch2Preview').style.display = 'none';
+    document.getElementById('ch2UploadZone').style.display = 'flex';
+    document.getElementById('ch2Result').classList.remove('show');
+    document.getElementById('ch2NextWrap').style.display = 'none';
+    document.getElementById('ch2AnalyseBtn').disabled = true;
+    document.getElementById('ch2File').value = '';
+    document.getElementById('ch2Error').textContent = '';
+  }
+  function ch2UpdateDots(passed) {
+    const dots = document.getElementById('ch2Dots').children;
+    for (let i = 0; i < 5; i++) {
+      dots[i].className = 'mdot';
+      if (i < passed) { dots[i].classList.add('done'); dots[i].textContent = '✓'; }
+      else if (i === passed) { dots[i].classList.add('active'); dots[i].textContent = i + 1; }
+      else dots[i].textContent = i + 1;
+    }
+    if (passed >= 5) document.getElementById('ch2Meta').innerHTML = '<span class="status-badge status-complete">✓ Complete</span>';
+  }
+  async function ch2Analyse() {
+    if (!ch2B64 || ch2done) return;
+    document.getElementById('ch2Error').textContent = '';
+    document.getElementById('ch2Loading').style.display = 'flex';
+    document.getElementById('ch2AnalyseBtn').disabled = true;
+    document.getElementById('ch2Result').classList.remove('show');
+    document.getElementById('ch2NextWrap').style.display = 'none';
+    try {
+      const { data: { session } } = await sb.auth.getSession();
+      const res = await fetch('/api/chapter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...(session?.access_token ? { 'Authorization': `Bearer ${session.access_token}` } : {}) },
+        body: JSON.stringify({ imageContent: { type:'image', source:{ type:'base64', media_type: ch2Mime, data: ch2B64 } }, chapterId: 'ch2-leading-lines' })
+      });
+      const r = await res.json();
+      document.getElementById('ch2Loading').style.display = 'none';
+      if (r.error === 'chapter_complete') { document.getElementById('ch2Error').textContent = 'You already completed this chapter! 🎉'; return; }
+      if (!res.ok) throw new Error(r.error || 'Analysis failed');
+      if (r.rejected) { document.getElementById('ch2Error').textContent = 'Please upload a real photograph.'; document.getElementById('ch2AnalyseBtn').disabled = false; return; }
+      // Show result
+      const pass = r.passed; const score = r.composition_score;
+      document.getElementById('ch2ResultHead').className = 'result-head ' + (pass ? 'pass' : 'fail');
+      document.getElementById('ch2Score').className = 'result-score ' + (pass ? 'pass' : 'fail');
+      document.getElementById('ch2Score').textContent = score + '/10';
+      document.getElementById('ch2Title').textContent = pass ? '✓ Counts toward your progress!' : '✗ Below 7 — doesn\'t count';
+      document.getElementById('ch2Sub').textContent = pass ? 'Leading Lines well demonstrated' : 'Try again with a stronger line';
+      document.getElementById('ch2Feedback').textContent = r.feedback || '';
+      document.getElementById('ch2Worked').textContent = r.what_worked || '—';
+      document.getElementById('ch2Improve').textContent = r.improvement || '—';
+      document.getElementById('ch2FailHint').style.display = pass ? 'none' : 'block';
+      document.getElementById('ch2Result').classList.add('show');
+      ch2Passed = r.total_passed || 0; ch2UpdateDots(ch2Passed);
+      if (!ch2done) document.getElementById('ch2NextWrap').style.display = 'block';
+      if (r.chapter_complete && !ch2done) {
+        ch2done = true;
+        await saveBadgeFor('ch2-leading-lines', 'Leading Lines');
+        setTimeout(() => {
+          document.getElementById('ch2Completion').classList.add('show');
+          document.getElementById('ch2NextWrap').style.display = 'none';
+          document.getElementById('ch2Completion').scrollIntoView({ behavior:'smooth', block:'center' });
+        }, 700);
+      }
+    } catch(err) {
+      document.getElementById('ch2Loading').style.display = 'none';
+      document.getElementById('ch2Error').textContent = 'Analysis failed — ' + err.message;
+      document.getElementById('ch2AnalyseBtn').disabled = false;
+    }
+  }
+  function ch2GenerateCard() { generateShareCard('ch2ShareWrap', 'ch2ShareCard', 'Leading Lines — Composition Basics', ch2Src); }
+
+  // ══════════════════════════════════════════════
+  // CH3 — FRAMING
+  // ══════════════════════════════════════════════
+  let ch3B64 = null, ch3Mime = null, ch3Src = null, ch3Passed = 0, ch3done = false;
+
+  function ch3OnFile(file) {
+    if (!file || !file.type.startsWith('image/')) return;
+    ch3Mime = file.type;
+    const r = new FileReader();
+    r.onload = e => {
+      ch3Src = e.target.result; ch3B64 = e.target.result.split(',')[1];
+      const prev = document.getElementById('ch3Preview');
+      prev.src = ch3Src; prev.style.display = 'block';
+      document.getElementById('ch3UploadZone').style.display = 'none';
+      document.getElementById('ch3AnalyseBtn').disabled = false;
+    };
+    r.readAsDataURL(file);
+  }
+  function ch3Drop(e) { e.preventDefault(); document.getElementById('ch3UploadZone').classList.remove('drag'); ch3OnFile(e.dataTransfer.files[0]); }
+  function ch3Reset() {
+    ch3B64 = null; ch3Mime = null; ch3Src = null;
+    document.getElementById('ch3Preview').style.display = 'none';
+    document.getElementById('ch3UploadZone').style.display = 'flex';
+    document.getElementById('ch3Result').classList.remove('show');
+    document.getElementById('ch3NextWrap').style.display = 'none';
+    document.getElementById('ch3AnalyseBtn').disabled = true;
+    document.getElementById('ch3File').value = '';
+    document.getElementById('ch3Error').textContent = '';
+  }
+  function ch3UpdateDots(passed) {
+    const dots = document.getElementById('ch3Dots').children;
+    for (let i = 0; i < 5; i++) {
+      dots[i].className = 'mdot';
+      if (i < passed) { dots[i].classList.add('done'); dots[i].textContent = '✓'; }
+      else if (i === passed) { dots[i].classList.add('active'); dots[i].textContent = i + 1; }
+      else dots[i].textContent = i + 1;
+    }
+    if (passed >= 5) document.getElementById('ch3Meta').innerHTML = '<span class="status-badge status-complete">✓ Complete</span>';
+  }
+  async function ch3Analyse() {
+    if (!ch3B64 || ch3done) return;
+    document.getElementById('ch3Error').textContent = '';
+    document.getElementById('ch3Loading').style.display = 'flex';
+    document.getElementById('ch3AnalyseBtn').disabled = true;
+    document.getElementById('ch3Result').classList.remove('show');
+    document.getElementById('ch3NextWrap').style.display = 'none';
+    try {
+      const { data: { session } } = await sb.auth.getSession();
+      const res = await fetch('/api/chapter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...(session?.access_token ? { 'Authorization': `Bearer ${session.access_token}` } : {}) },
+        body: JSON.stringify({ imageContent: { type:'image', source:{ type:'base64', media_type: ch3Mime, data: ch3B64 } }, chapterId: 'ch3-framing' })
+      });
+      const r = await res.json();
+      document.getElementById('ch3Loading').style.display = 'none';
+      if (r.error === 'chapter_complete') { document.getElementById('ch3Error').textContent = 'You already completed this chapter! 🎉'; return; }
+      if (!res.ok) throw new Error(r.error || 'Analysis failed');
+      if (r.rejected) { document.getElementById('ch3Error').textContent = 'Please upload a real photograph.'; document.getElementById('ch3AnalyseBtn').disabled = false; return; }
+      const pass = r.passed; const score = r.composition_score;
+      document.getElementById('ch3ResultHead').className = 'result-head ' + (pass ? 'pass' : 'fail');
+      document.getElementById('ch3Score').className = 'result-score ' + (pass ? 'pass' : 'fail');
+      document.getElementById('ch3Score').textContent = score + '/10';
+      document.getElementById('ch3Title').textContent = pass ? '✓ Counts toward your progress!' : '✗ Below 7 — doesn\'t count';
+      document.getElementById('ch3Sub').textContent = pass ? 'Framing well demonstrated' : 'Try again with a clearer frame element';
+      document.getElementById('ch3Feedback').textContent = r.feedback || '';
+      document.getElementById('ch3Worked').textContent = r.what_worked || '—';
+      document.getElementById('ch3Improve').textContent = r.improvement || '—';
+      document.getElementById('ch3FailHint').style.display = pass ? 'none' : 'block';
+      document.getElementById('ch3Result').classList.add('show');
+      ch3Passed = r.total_passed || 0; ch3UpdateDots(ch3Passed);
+      if (!ch3done) document.getElementById('ch3NextWrap').style.display = 'block';
+      if (r.chapter_complete && !ch3done) {
+        ch3done = true;
+        await saveBadgeFor('ch3-framing', 'Framing');
+        setTimeout(() => {
+          document.getElementById('ch3Completion').classList.add('show');
+          document.getElementById('ch3NextWrap').style.display = 'none';
+          document.getElementById('ch3Completion').scrollIntoView({ behavior:'smooth', block:'center' });
+        }, 700);
+      }
+    } catch(err) {
+      document.getElementById('ch3Loading').style.display = 'none';
+      document.getElementById('ch3Error').textContent = 'Analysis failed — ' + err.message;
+      document.getElementById('ch3AnalyseBtn').disabled = false;
+    }
+  }
+  function ch3GenerateCard() { generateShareCard('ch3ShareWrap', 'ch3ShareCard', 'Framing — Composition Basics', ch3Src); }
+
+  // ── SHARED BADGE SAVE ──
+  async function saveBadgeFor(badgeId, badgeName) {
+    try {
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) return;
+      await sb.from('badges').upsert({ user_id: currentUser.id, badge_id: badgeId, badge_name: badgeName }, { onConflict: 'user_id,badge_id' });
+    } catch(e) { console.warn('Badge save failed', e); }
+  }
+
+  // ── SHARED SHARE CARD ──
+  function generateShareCard(wrapId, canvasId, chapterLabel, photoSrc) {
+    const wrap = document.getElementById(wrapId);
+    wrap.classList.add('show');
+    const canvas = document.getElementById(canvasId);
+    const ctx = canvas.getContext('2d');
+    const W = 800, H = 480;
+    ctx.fillStyle = '#080808'; ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = 'rgba(232,184,75,0.05)'; ctx.lineWidth = 1;
+    for (let x = 0; x < W; x += 60) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+    for (let y = 0; y < H; y += 60) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+    const g = ctx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,'#e8b84b'); g.addColorStop(1,'#c49a2a');
+    ctx.fillStyle = g; ctx.fillRect(0,0,5,H);
+    ctx.font = '80px serif'; ctx.fillText('🏆', 50, 155);
+    ctx.font = 'bold 18px sans-serif';
+    ctx.fillStyle = '#e8b84b'; ctx.fillText('LENS', 52, 210);
+    ctx.fillStyle = '#f5f2ee'; ctx.fillText('UP', 52 + ctx.measureText('LENS').width, 210);
+    ctx.fillStyle = '#f5f2ee'; ctx.font = 'bold 48px sans-serif'; ctx.fillText('CHAPTER COMPLETE', 52, 285);
+    ctx.fillStyle = '#e8b84b'; ctx.font = '24px sans-serif'; ctx.fillText(chapterLabel, 52, 325);
+    ctx.strokeStyle = 'rgba(232,184,75,0.2)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(52, 348); ctx.lineTo(W - 60, 348); ctx.stroke();
+    const name = currentUser?.user_metadata?.display_name || currentUser?.email?.split('@')[0] || 'Photographer';
+    const dateStr = new Date().toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
+    ctx.fillStyle = 'rgba(245,242,238,0.55)'; ctx.font = '17px sans-serif'; ctx.fillText('Completed by ' + name, 52, 378);
+    ctx.fillStyle = 'rgba(245,242,238,0.25)'; ctx.font = '13px sans-serif'; ctx.fillText(dateStr, 52, 402);
+    ctx.fillStyle = 'rgba(232,184,75,0.45)'; ctx.font = '12px sans-serif'; ctx.fillText('lensup.vercel.app', W - 170, H - 20);
+    if (photoSrc) {
+      const img = new Image();
+      img.onload = () => {
+        const tw = 220, th = 165, tx = W - tw - 52, ty = 60, r = 6;
+        ctx.save(); ctx.beginPath();
+        ctx.moveTo(tx+r,ty); ctx.lineTo(tx+tw-r,ty); ctx.arcTo(tx+tw,ty,tx+tw,ty+r,r);
+        ctx.lineTo(tx+tw,ty+th-r); ctx.arcTo(tx+tw,ty+th,tx+tw-r,ty+th,r);
+        ctx.lineTo(tx+r,ty+th); ctx.arcTo(tx,ty+th,tx,ty+th-r,r);
+        ctx.lineTo(tx,ty+r); ctx.arcTo(tx,ty,tx+r,ty,r);
+        ctx.closePath(); ctx.clip();
+        ctx.drawImage(img, tx, ty, tw, th); ctx.restore();
+      };
+      img.src = photoSrc;
+    }
+    wrap.scrollIntoView({ behavior:'smooth', block:'center' });
   }
 
   // ── INIT ──

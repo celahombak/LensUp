@@ -40,7 +40,6 @@ module.exports = async (req, res) => {
     return res.status(400).json({ error: 'chapter_complete', message: 'You have already completed this chapter!' });
   }
 
-  // ── Chapter-specific prompts ──
   const prompts = {
     'ch1-rule-of-thirds': `You are evaluating a photo specifically for the Rule of Thirds composition technique.
 
@@ -61,6 +60,52 @@ Rules:
 - composition_score: 1-10, score ONLY on Rule of Thirds application
 - passed: true if composition_score >= 7, false otherwise
 - rule_of_thirds_applied: true if subject/horizon clearly uses the thirds grid
+- If not a real photograph: return {"rejected": true, "reason": "brief reason"}
+- Keep all text under 15 words per field`,
+
+    'ch2-leading-lines': `You are evaluating a photo specifically for the Leading Lines composition technique.
+
+Analyse this photo and return ONLY valid JSON, no other text:
+{
+  "rejected": false,
+  "composition_score": N,
+  "leading_lines_present": true/false,
+  "passed": true/false,
+  "line_type": "one sentence describing what kind of lines are present (road, fence, river, shadow, etc)",
+  "line_direction": "one sentence on whether lines converge, curve, or are diagonal",
+  "feedback": "2-3 sentences of specific Leading Lines feedback",
+  "what_worked": "one sentence on what worked about the line usage",
+  "improvement": "one sentence on how to use lines more effectively"
+}
+
+Rules:
+- composition_score: 1-10, score ONLY on how effectively leading lines guide the eye to a subject or through the frame
+- passed: true if composition_score >= 7, false otherwise
+- leading_lines_present: true if clear directional lines exist in the frame
+- A high score requires lines that clearly lead somewhere — not just lines that exist
+- If not a real photograph: return {"rejected": true, "reason": "brief reason"}
+- Keep all text under 15 words per field`,
+
+    'ch3-framing': `You are evaluating a photo specifically for the Framing composition technique.
+
+Analyse this photo and return ONLY valid JSON, no other text:
+{
+  "rejected": false,
+  "composition_score": N,
+  "frame_element_present": true/false,
+  "passed": true/false,
+  "frame_type": "one sentence describing what element is being used as a frame (doorway, window, arch, branches, etc)",
+  "subject_isolation": "one sentence on how well the frame isolates or highlights the subject",
+  "feedback": "2-3 sentences of specific Framing technique feedback",
+  "what_worked": "one sentence on what worked about the framing",
+  "improvement": "one sentence on how to improve the framing"
+}
+
+Rules:
+- composition_score: 1-10, score ONLY on how effectively an in-scene element frames the subject
+- passed: true if composition_score >= 7, false otherwise
+- frame_element_present: true if a clear foreground or environmental frame element exists
+- A high score requires the frame to clearly isolate, direct attention to, or add depth around a subject
 - If not a real photograph: return {"rejected": true, "reason": "brief reason"}
 - Keep all text under 15 words per field`
   };
