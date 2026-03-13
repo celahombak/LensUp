@@ -1,9 +1,5 @@
 {
   "rewrites": [
     { "source": "/(.*)", "destination": "/$1" }
-  ],
-  "functions": {
-    "api/analyse.js": { "memory": 1024, "maxDuration": 30 },
-    "api/chapter.js": { "memory": 1024, "maxDuration": 30 }
-  }
+  ]
 }
