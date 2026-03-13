@@ -34,6 +34,8 @@
     .nav-links a:hover { color: var(--gold); }
     .nav-cta { background: var(--gold); color: var(--black); padding: 0.6rem 1.6rem; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; text-decoration: none; transition: all 0.2s; clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%); }
     .nav-cta:hover { background: var(--gold2); transform: translateY(-1px); }
+    .nav-login { color: rgba(240,237,232,0.5); text-decoration: none; font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; transition: color 0.2s; }
+    .nav-login:hover { color: var(--gold); }
 
     /* ── HERO ── */
     .hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 8rem 3rem 4rem; position: relative; overflow: hidden; }
@@ -215,7 +217,8 @@
       <li><a href="#challenges">Challenges</a></li>
       <li><a href="leaderboard.html">Leaderboard</a></li>
     </ul>
-    <a href="register.html" class="nav-cta">Start Learning Free</a>
+    <a href="login.html" class="nav-login">Sign In</a>
+    <a href="register.html" class="nav-cta">Start Learning Now</a>
   </nav>
 
   <!-- HERO -->
@@ -243,7 +246,7 @@
           </div>
         </div>
         <div class="hero-actions">
-          <a href="register.html" class="btn-primary">📚 Start Learning Free</a>
+          <a href="register.html" class="btn-primary">📚 Start Learning Now</a>
           <a href="login.html" class="btn-ghost">Already have an account? Sign In →</a>
         </div>
       </div>
@@ -284,7 +287,7 @@
     <div class="stat-item"><span class="stat-num" style="color:var(--gold)">36</span><div class="stat-label">Learning Chapters</div></div>
     <div class="stat-item"><span class="stat-num" style="color:var(--cyan)">6</span><div class="stat-label">Scoring Categories</div></div>
     <div class="stat-item"><span class="stat-num" style="color:var(--green)">Free</span><div class="stat-label">First 3 Chapters</div></div>
-    <div class="stat-item"><span class="stat-num" style="color:var(--purple)">AI</span><div class="stat-label">Powered by Claude</div></div>
+    <div class="stat-item"><span class="stat-num" style="color:var(--purple)">AI</span><div class="stat-label">Powered by AI</div></div>
   </div>
 
   <!-- HOW IT WORKS -->
@@ -397,13 +400,13 @@
     <span class="cta-label">Start for free today</span>
     <h2 class="cta-title">Stop Guessing.<br/><span>Start Improving.</span></h2>
     <p class="cta-sub">Instagram tells you how many likes you got. LensUp tells you <em>why</em> your photo works — and exactly how to make the next one better.</p>
-    <a href="register.html" class="btn-cta-big">📚 Start Learning Free →</a>
+    <a href="register.html" class="btn-cta-big">📚 Start Learning Now →</a>
   </section>
 
   <!-- FOOTER -->
   <footer>
     <div class="footer-logo">Lens<span>Up</span></div>
-    <p>© 2026 LensUp · Photography Challenge Platform · Powered by Claude AI</p>
+    <p>© 2026 LensUp · Photography Challenge Platform · Powered by AI</p>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
