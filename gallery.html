@@ -105,47 +105,73 @@
     .gallery-grid.list-view .card-score-label { display: none; }
 
     /* MODAL */
-    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 200; align-items: center; justify-content: center; padding: 1.5rem; }
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 200; align-items: flex-start; justify-content: center; padding: 1.5rem; overflow-y: auto; }
     .modal-overlay.open { display: flex; }
-    .modal { background: var(--dark); border: 1px solid var(--border); border-radius: 8px; width: 100%; max-width: 700px; max-height: 90vh; overflow-y: auto; animation: fadeUp 0.3s ease; }
-    .modal-header { padding: 1.2rem 1.8rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: var(--dark); z-index: 1; }
-    .modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; font-weight: 700; }
-    .modal-close { background: none; border: none; cursor: pointer; color: var(--mid); font-size: 1.3rem; transition: color 0.2s; }
+    .modal { background: var(--black); border: 1px solid var(--border); border-radius: 8px; width: 100%; max-width: 860px; margin: auto; animation: fadeUp 0.3s ease; }
+    .modal-header { padding: 1.2rem 1.8rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: var(--black); z-index: 1; }
+    .modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; letter-spacing: 0.06em; }
+    .modal-close { background: none; border: none; cursor: pointer; color: var(--mid); font-size: 1.3rem; transition: color 0.2s; padding: 0.2rem 0.5rem; }
     .modal-close:hover { color: var(--white); }
-    .modal-image { width: 100%; max-height: 340px; object-fit: contain; display: block; background: var(--dark2); }
-    .modal-image-placeholder { width: 100%; height: 160px; background: var(--dark2); display: flex; align-items: center; justify-content: center; font-size: 3rem; opacity: 0.15; }
 
-    /* MODAL SCORE SECTION */
-    .modal-score-top { display: flex; align-items: center; gap: 1.2rem; padding: 1.5rem 1.8rem; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
-    .modal-overall { font-family: 'Bebas Neue', sans-serif; font-size: 3.5rem; letter-spacing: 0.04em; line-height: 1; }
-    .modal-overall-denom { font-size: 1rem; color: var(--mid); }
-    .modal-verdict-wrap { }
-    .modal-verdict { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; font-weight: 700; }
-    .modal-verdict-sub { font-size: 0.72rem; color: var(--mid); letter-spacing: 0.06em; margin-top: 0.2rem; }
-
-    /* MODAL CATEGORY BARS */
-    .modal-bars { padding: 1.2rem 1.8rem; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 0.8rem; }
+    /* TOP: photo + scores side by side */
+    .modal-top { display: grid; grid-template-columns: 280px 1fr; border-bottom: 1px solid var(--border); }
+    .modal-photo { background: var(--dark2); display: flex; align-items: center; justify-content: center; min-height: 260px; overflow: hidden; }
+    .modal-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .modal-photo-placeholder { font-size: 3rem; opacity: 0.15; }
+    .modal-scores-panel { padding: 1.6rem 1.8rem; display: flex; flex-direction: column; justify-content: center; }
+    .modal-overall-row { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1.3rem; padding-bottom: 1.1rem; border-bottom: 1px solid var(--border); }
+    .modal-overall-big { font-family: 'Bebas Neue', sans-serif; font-size: 3.5rem; letter-spacing: 0.04em; color: var(--gold); line-height: 1; }
+    .modal-overall-denom { font-size: 1rem; color: var(--mid); align-self: flex-end; margin-bottom: 0.3rem; }
+    .modal-verdict { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; margin-bottom: 0.2rem; }
+    .modal-date { font-size: 0.72rem; color: rgba(245,242,238,0.35); letter-spacing: 0.05em; }
+    .modal-bars { display: flex; flex-direction: column; gap: 0.8rem; }
     .modal-bar-row { display: flex; align-items: center; gap: 0.8rem; }
-    .modal-bar-icon { font-size: 0.9rem; width: 20px; text-align: center; flex-shrink: 0; }
     .modal-bar-label { font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(245,242,238,0.5); width: 110px; flex-shrink: 0; }
-    .modal-bar-track { flex: 1; height: 5px; background: rgba(255,255,255,0.05); border-radius: 3px; overflow: hidden; }
-    .modal-bar-fill { height: 100%; border-radius: 3px; transition: width 1s ease; }
-    .modal-bar-val { font-size: 0.82rem; font-weight: 600; width: 24px; text-align: right; flex-shrink: 0; }
+    .modal-bar-track { flex: 1; height: 5px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; }
+    .modal-bar-fill { height: 100%; border-radius: 3px; transition: width 1.2s cubic-bezier(0.4,0,0.2,1); width: 0%; }
+    .modal-bar-val { font-size: 0.82rem; font-weight: 600; width: 28px; text-align: right; flex-shrink: 0; }
 
-    /* MODAL BODY */
-    .modal-body { padding: 1.5rem 1.8rem; }
-    .modal-section-title { font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.7rem; margin-top: 1.2rem; }
-    .modal-section-title:first-child { margin-top: 0; }
-    .modal-body p { font-size: 0.88rem; line-height: 1.8; color: rgba(245,242,238,0.65); }
-    .modal-list { list-style: none; padding: 0; }
-    .modal-list li { font-size: 0.85rem; line-height: 1.7; color: rgba(245,242,238,0.6); padding: 0.5rem 0 0.5rem 1.2rem; border-bottom: 1px solid rgba(201,169,110,0.06); position: relative; }
-    .modal-list li:last-child { border-bottom: none; }
-    .modal-list li::before { content: '→'; color: var(--gold); position: absolute; left: 0; font-size: 0.72rem; top: 0.6rem; }
-    .modal-footer { padding: 1.2rem 1.8rem; border-top: 1px solid var(--border); display: flex; gap: 0.8rem; flex-wrap: wrap; }
+    /* SUMMARY */
+    .modal-summary { padding: 1.5rem 1.8rem; border-bottom: 1px solid var(--border); font-size: 0.9rem; line-height: 1.8; color: rgba(245,242,238,0.65); }
+
+    /* CATEGORY CARDS */
+    .modal-category-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; padding: 1.5rem 1.8rem; border-bottom: 1px solid var(--border); }
+    .modal-cat-card { background: var(--dark); border: 1px solid var(--border); border-radius: 8px; padding: 1.1rem; }
+    .modal-cat-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6rem; }
+    .modal-cat-icon { font-size: 1.2rem; }
+    .modal-cat-badge { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; padding: 0.1rem 0.5rem; border-radius: 4px; background: rgba(255,255,255,0.05); }
+    .modal-cat-name { font-size: 0.78rem; font-weight: 600; letter-spacing: 0.03em; margin-bottom: 0.4rem; }
+    .modal-cat-desc { font-size: 0.72rem; line-height: 1.6; color: rgba(245,242,238,0.45); }
+    .modal-cat-tag { display: inline-block; margin-top: 0.6rem; font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.2rem 0.6rem; border-radius: 20px; font-weight: 600; }
+
+    /* IMPROVEMENTS */
+    .modal-improvements { padding: 1.5rem 1.8rem; border-bottom: 1px solid var(--border); }
+    .modal-imp-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.05rem; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 0.5rem; }
+    .modal-imp-title span { color: var(--gold); }
+    .modal-imp-item { display: flex; gap: 1.1rem; align-items: flex-start; padding: 0.9rem 0; border-bottom: 1px solid rgba(201,169,110,0.06); }
+    .modal-imp-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .modal-imp-num { width: 26px; height: 26px; border-radius: 50%; background: rgba(201,169,110,0.1); border: 1px solid rgba(201,169,110,0.25); color: var(--gold); font-size: 0.72rem; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 0.1rem; }
+    .modal-imp-name { font-size: 0.83rem; font-weight: 600; margin-bottom: 0.25rem; }
+    .modal-imp-desc { font-size: 0.78rem; line-height: 1.7; color: rgba(245,242,238,0.5); }
+
+    /* TECHNICAL */
+    .modal-technical { padding: 1.2rem 1.8rem; border-bottom: 1px solid var(--border); display: flex; gap: 0.8rem; align-items: flex-start; background: rgba(201,169,110,0.03); }
+    .modal-tech-text { font-size: 0.82rem; line-height: 1.7; color: rgba(245,242,238,0.5); }
+
+    /* FOOTER */
+    .modal-footer { padding: 1.2rem 1.8rem; display: flex; gap: 0.8rem; flex-wrap: wrap; }
     .btn-modal { background: none; border: 1px solid var(--border); color: var(--white); padding: 0.6rem 1.2rem; border-radius: 4px; cursor: pointer; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; transition: all 0.2s; font-family: 'DM Sans', sans-serif; text-decoration: none; display: inline-flex; align-items: center; }
     .btn-modal:hover { border-color: var(--gold); color: var(--gold); }
+    .btn-modal-danger { color: rgba(200,80,80,0.7); border-color: rgba(200,80,80,0.2); }
+    .btn-modal-danger:hover { border-color: rgba(200,80,80,0.5) !important; color: #f08080 !important; }
     .btn-modal-primary { background: var(--gold); color: var(--black); border-color: var(--gold); font-weight: 600; }
-    .btn-modal-primary:hover { background: var(--gold-light); color: var(--black); border-color: var(--gold-light); }
+    .btn-modal-primary:hover { background: var(--gold-light); color: var(--black); }
+
+    @media (max-width: 600px) {
+      .modal-top { grid-template-columns: 1fr; }
+      .modal-photo { min-height: 200px; }
+      .modal-category-grid { grid-template-columns: repeat(2,1fr); }
+    }
 
     @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
     @media (max-width: 600px) {
@@ -349,10 +375,26 @@
         <div class="modal-title">Analysis Detail</div>
         <button class="modal-close" onclick="closeModal()">✕</button>
       </div>
-      <div id="modalImageWrap"></div>
-      <div id="modalScoreTop"></div>
-      <div id="modalBars"></div>
-      <div class="modal-body" id="modalBody"></div>
+      <div class="modal-top" id="modalTop">
+        <div class="modal-photo" id="modalPhoto"></div>
+        <div class="modal-scores-panel">
+          <div class="modal-overall-row">
+            <div>
+              <div class="modal-overall-big" id="modalOverallBig">—</div>
+              <div style="font-size:0.85rem;color:var(--mid)">/10</div>
+            </div>
+            <div>
+              <div class="modal-verdict" id="modalVerdict"></div>
+              <div class="modal-date" id="modalDate"></div>
+            </div>
+          </div>
+          <div class="modal-bars" id="modalBars"></div>
+        </div>
+      </div>
+      <div class="modal-summary" id="modalSummary"></div>
+      <div class="modal-category-grid" id="modalCatGrid"></div>
+      <div class="modal-improvements" id="modalImprovements"></div>
+      <div class="modal-technical" id="modalTechnical"></div>
       <div class="modal-footer" id="modalFooter"></div>
     </div>
   </div>
@@ -507,6 +549,14 @@
 
 
     // ── MODAL ──
+    function getCategoryTag(score) {
+      if (score >= 9) return { text: 'Excellent',  bg: 'rgba(52,211,153,0.12)',  color: '#34d399' };
+      if (score >= 7) return { text: 'Good',       bg: 'rgba(201,169,110,0.12)', color: 'var(--gold)' };
+      if (score >= 5) return { text: 'Average',    bg: 'rgba(96,165,250,0.12)',  color: '#60a5fa' };
+      if (score >= 3) return { text: 'Needs Work', bg: 'rgba(251,146,60,0.12)',  color: '#fb923c' };
+      return               { text: 'Weak',         bg: 'rgba(240,128,128,0.12)', color: '#f08080' };
+    }
+
     function openModal(idx) {
       const item = getAllData()[idx];
       if (!item) return;
@@ -515,57 +565,78 @@
       const date = new Date(item.date).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
       const imgSrc = item.previewUrl || (isUrl(item.url) ? item.url : null);
 
-      // Image
-      document.getElementById('modalImageWrap').innerHTML = imgSrc
-        ? `<img class="modal-image" src="${imgSrc}" alt="Photo" onerror="this.outerHTML='<div class=\\'modal-image-placeholder\\'>📷</div>'">`
-        : `<div class="modal-image-placeholder">📷</div>`;
+      // Photo
+      document.getElementById('modalPhoto').innerHTML = imgSrc
+        ? `<img src="${imgSrc}" alt="Photo" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.outerHTML='<div class=\'modal-photo-placeholder\'>📷</div>'">`
+        : `<div class="modal-photo-placeholder">📷</div>`;
 
-      // Overall score
-      document.getElementById('modalScoreTop').innerHTML = `
-        <div class="modal-score-top">
-          <div class="modal-overall" style="color:${verdict.color}">${r.overall}<span class="modal-overall-denom">/10</span></div>
-          <div class="modal-verdict-wrap">
-            <div class="modal-verdict" style="color:${verdict.color}">${verdict.label}</div>
-            <div class="modal-verdict-sub">${date}</div>
-          </div>
-        </div>
-      `;
+      // Overall
+      const overallEl = document.getElementById('modalOverallBig');
+      overallEl.textContent = r.overall;
+      overallEl.style.color = verdict.color;
+      const verdictEl = document.getElementById('modalVerdict');
+      verdictEl.textContent = verdict.label;
+      verdictEl.style.color = verdict.color;
+      document.getElementById('modalDate').textContent = date;
 
-      // Category bars
-      document.getElementById('modalBars').innerHTML = `
-        <div class="modal-bars">
-          ${CATEGORIES.map(cat => {
-            const s = r.scores?.[cat.key] ?? '—';
-            const w = s !== '—' ? s * 10 : 0;
-            return `
-              <div class="modal-bar-row">
-                <span class="modal-bar-icon">${cat.icon}</span>
-                <div class="modal-bar-label">${cat.label}</div>
-                <div class="modal-bar-track">
-                  <div class="modal-bar-fill" style="width:${w}%;background:${cat.color}"></div>
-                </div>
-                <div class="modal-bar-val" style="color:${cat.color}">${s}</div>
-              </div>
-            `;
-          }).join('')}
-        </div>
-      `;
+      // Score bars
+      const cats = [...CATEGORIES];
+      if (r.scores?.theme_relevance) cats.push({ key: 'theme_relevance', label: (r.theme_name ? 'Theme: ' + r.theme_name : 'Theme'), icon: '📅', color: 'var(--gold)' });
+      document.getElementById('modalBars').innerHTML = cats.map(cat => {
+        const s = r.scores?.[cat.key] ?? '—';
+        return `
+          <div class="modal-bar-row">
+            <div class="modal-bar-label">${cat.icon} ${cat.label}</div>
+            <div class="modal-bar-track">
+              <div class="modal-bar-fill" style="background:${cat.color}" data-width="${s !== '—' ? s*10 : 0}%"></div>
+            </div>
+            <div class="modal-bar-val" style="color:${cat.color}">${s}</div>
+          </div>`;
+      }).join('');
 
-      // Body
-      const imps = Array.isArray(r.improvements)
-        ? r.improvements.map(i => typeof i === 'object' ? `<li><strong>${i.title}</strong> — ${i.desc}</li>` : `<li>${i}</li>`).join('')
-        : '';
+      // Summary
+      document.getElementById('modalSummary').innerHTML = `<p>${r.summary || '—'}</p>`;
 
-      document.getElementById('modalBody').innerHTML = `
-        <div class="modal-section-title">Summary</div>
-        <p>${r.summary || '—'}</p>
-        ${imps ? `<div class="modal-section-title">How to Improve</div><ul class="modal-list">${imps}</ul>` : ''}
-        ${r.technical ? `<div class="modal-section-title">Technical Notes</div><p>${r.technical}</p>` : ''}
-      `;
+      // Category cards
+      document.getElementById('modalCatGrid').innerHTML = cats.map(cat => {
+        const score = r.scores?.[cat.key] || 0;
+        const tag   = getCategoryTag(score);
+        const desc  = r.category_notes?.[cat.key] || '';
+        return `
+          <div class="modal-cat-card">
+            <div class="modal-cat-top">
+              <span class="modal-cat-icon">${cat.icon}</span>
+              <span class="modal-cat-badge" style="color:${cat.color}">${score}</span>
+            </div>
+            <div class="modal-cat-name" style="color:${cat.color}">${cat.label}</div>
+            <div class="modal-cat-desc">${desc}</div>
+            <span class="modal-cat-tag" style="background:${tag.bg};color:${tag.color}">${tag.text}</span>
+          </div>`;
+      }).join('');
 
+      // Improvements
+      const imps = Array.isArray(r.improvements) ? r.improvements : [];
+      document.getElementById('modalImprovements').innerHTML = imps.length ? `
+        <div class="modal-imp-title">✦ <span>How to Improve This Shot</span></div>
+        ${imps.map((imp, i) => `
+          <div class="modal-imp-item">
+            <div class="modal-imp-num">${i + 1}</div>
+            <div>
+              <div class="modal-imp-name">${imp.title || imp}</div>
+              ${imp.desc ? `<div class="modal-imp-desc">${imp.desc}</div>` : ''}
+            </div>
+          </div>`).join('')}` : '';
+
+      // Technical
+      const techEl = document.getElementById('modalTechnical');
+      techEl.style.display = r.technical ? 'flex' : 'none';
+      techEl.innerHTML = r.technical
+        ? `<span style="font-size:1.1rem;flex-shrink:0;margin-top:0.1rem;">⚙️</span><div class="modal-tech-text">${r.technical}</div>` : '';
+
+      // Footer
       document.getElementById('modalFooter').innerHTML = `
         <button class="btn-modal" onclick="copyAnalysis(${idx})">Copy Analysis</button>
-        <button class="btn-modal" style="color:rgba(200,80,80,0.7);border-color:rgba(200,80,80,0.2);" onmouseover="this.style.color='#f08080'" onmouseout="this.style.color='rgba(200,80,80,0.7)'" onclick="deleteItem(${idx})">Delete</button>
+        <button class="btn-modal btn-modal-danger" onclick="deleteItem(${idx})">Delete</button>
         <a href="app.html" class="btn-modal btn-modal-primary">Analyse Another</a>
       `;
 
@@ -574,12 +645,9 @@
 
       // Animate bars
       requestAnimationFrame(() => requestAnimationFrame(() => {
-        document.querySelectorAll('.modal-bar-fill').forEach(el => {
-          el.style.width = el.style.width;
-        });
+        document.querySelectorAll('.modal-bar-fill').forEach(el => { el.style.width = el.dataset.width; });
       }));
     }
-
     function closeModal() {
       document.getElementById('modalOverlay').classList.remove('open');
       document.body.style.overflow = '';
