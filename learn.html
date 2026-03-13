@@ -4,888 +4,988 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>LensUp — Learn Photography</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
   <style>
+    body { visibility: hidden; }
+    body.auth-ready { visibility: visible; }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --black: #080808;
-      --white: #f5f2ee;
-      --gold: #c9a96e;
-      --gold-light: #e8d5b0;
-      --dark: #1a1714;
-      --dark2: #141210;
-      --mid: #6b6560;
-      --border: rgba(201,169,110,0.15);
+      --black: #080808; --white: #f5f2ee; --gold: #e8b84b; --gold-light: #f5d07a;
+      --dark: #141210; --dark2: #1a1714; --mid: #6b6560; --border: rgba(232,184,75,0.15);
+      --green: #34d399; --red: #ff6b6b;
     }
-
     html { scroll-behavior: smooth; }
-    body {
-      background: var(--black);
-      color: var(--white);
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 300;
-      min-height: 100vh;
-    }
+    body { background: var(--black); color: var(--white); font-family: 'DM Sans', sans-serif; font-weight: 300; min-height: 100vh; }
 
-    /* ── NAV ── */
-    nav { display: flex; align-items: center; justify-content: space-between; padding: 1.2rem 3rem; border-bottom: 1px solid var(--border); background: rgba(10,10,10,0.97); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px); }
-    .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; letter-spacing: 0.04em; color: var(--gold); text-decoration: none; }
+    /* NAV */
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 1rem 3rem; border-bottom: 1px solid var(--border); background: rgba(8,8,8,0.97); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(16px); }
+    .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; letter-spacing: 0.08em; color: var(--gold); text-decoration: none; }
     .nav-logo span { color: var(--white); }
-    .nav-links { display: flex; align-items: center; gap: 2rem; flex-wrap: wrap; }
-    .nav-link { font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(245,242,238,0.5); text-decoration: none; transition: color 0.2s; }
-    .nav-link:hover { color: var(--gold); }
-    .nav-link.active { color: var(--gold); }
-
-    /* ── HERO ── */
-    .page-hero {
-      padding: 4rem 3rem 3rem;
-      border-bottom: 1px solid var(--border);
-      position: relative; overflow: hidden;
-    }
-    .page-hero::before {
-      content: '';
-      position: absolute; inset: 0;
-      background: radial-gradient(ellipse 50% 100% at 80% 50%, rgba(201,169,110,0.05) 0%, transparent 70%);
-    }
-    .page-hero-inner { position: relative; max-width: 600px; }
-    .page-tag {
-      display: inline-block; color: var(--gold);
-      font-size: 0.7rem; letter-spacing: 0.2em;
-      text-transform: uppercase; margin-bottom: 0.8rem;
-    }
-    .page-hero h1 {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(2rem, 5vw, 3.2rem);
-      letter-spacing: 0.04em; line-height: 1.1;
-      margin-bottom: 0.8rem;
-    }
-    .page-hero h1 em { font-style: normal; color: var(--gold); }
-    .page-hero p {
-      color: rgba(245,242,238,0.55);
-      font-size: 0.95rem; line-height: 1.8;
-    }
-
-    /* ── LAYOUT ── */
-    .learn-wrap {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 3rem 2rem 5rem;
-      display: grid;
-      grid-template-columns: 220px 1fr;
-      gap: 3rem;
-      align-items: start;
-    }
-
-    /* ── SIDEBAR ── */
-    .sidebar {
-      position: sticky; top: 80px;
-    }
-    .sidebar-title {
-      font-size: 0.68rem; letter-spacing: 0.18em;
-      text-transform: uppercase; color: var(--mid);
-      margin-bottom: 1rem;
-    }
-    .sidebar-nav { list-style: none; }
-    .sidebar-nav li { margin-bottom: 0.15rem; }
-    .sidebar-nav a {
-      display: block; padding: 0.45rem 0.8rem;
-      color: rgba(245,242,238,0.5); text-decoration: none;
-      font-size: 0.82rem; border-radius: 2px;
-      border-left: 2px solid transparent;
-      transition: all 0.2s; line-height: 1.4;
-    }
-    .sidebar-nav a:hover { color: var(--white); background: rgba(201,169,110,0.05); }
-    .sidebar-nav a.active { color: var(--gold); border-left-color: var(--gold); background: rgba(201,169,110,0.06); }
-    .sidebar-divider { height: 1px; background: var(--border); margin: 0.8rem 0; }
-
-    /* ── CONTENT ── */
-    .content { min-width: 0; }
-
-    .chapter {
-      margin-bottom: 4rem;
-      scroll-margin-top: 100px;
-    }
-    .chapter-header {
-      display: flex; align-items: center; gap: 1rem;
-      margin-bottom: 1.5rem;
-      padding-bottom: 1rem;
-      border-bottom: 1px solid var(--border);
-    }
-    .chapter-icon { font-size: 1.8rem; }
-    .chapter-meta {}
-    .chapter-num {
-      font-size: 0.68rem; letter-spacing: 0.18em;
-      text-transform: uppercase; color: var(--gold);
-      margin-bottom: 0.2rem;
-    }
-    .chapter h2 {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.6rem; letter-spacing: 0.04em;
-    }
-
-    .chapter p {
-      font-size: 0.92rem; line-height: 1.85;
-      color: rgba(245,242,238,0.7);
-      margin-bottom: 1.2rem;
-    }
-    .chapter p:last-child { margin-bottom: 0; }
-
-    .chapter h3 {
-      font-size: 0.95rem; font-weight: 500;
-      color: var(--white); margin: 1.8rem 0 0.6rem;
-      letter-spacing: 0.02em;
-    }
-
-    /* ── TIP CARDS ── */
-    .tip-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1rem; margin: 1.5rem 0;
-    }
-    .tip-card {
-      background: var(--dark);
-      border: 1px solid var(--border);
-      border-radius: 4px; padding: 1.4rem;
-      transition: border-color 0.2s;
-    }
-    .tip-card:hover { border-color: rgba(201,169,110,0.35); }
-    .tip-card-icon { font-size: 1.4rem; margin-bottom: 0.7rem; display: block; }
-    .tip-card h4 {
-      font-size: 0.88rem; font-weight: 500;
-      margin-bottom: 0.4rem;
-    }
-    .tip-card p {
-      font-size: 0.8rem; line-height: 1.6;
-      color: rgba(245,242,238,0.5); margin: 0;
-    }
-
-    /* ── RULE VISUAL ── */
-    .rule-visual {
-      background: var(--dark);
-      border: 1px solid var(--border);
-      border-radius: 4px; padding: 1.5rem;
-      margin: 1.5rem 0;
-      display: flex; align-items: center;
-      justify-content: center;
-    }
-    .grid-demo {
-      width: 240px; height: 160px;
-      border: 2px solid rgba(201,169,110,0.4);
-      position: relative; border-radius: 2px;
-      background: linear-gradient(135deg, #1e1a16, #2a2520);
-    }
-    .grid-line-v {
-      position: absolute; top: 0; bottom: 0;
-      width: 1px; background: rgba(201,169,110,0.5);
-    }
-    .grid-line-h {
-      position: absolute; left: 0; right: 0;
-      height: 1px; background: rgba(201,169,110,0.5);
-    }
-    .grid-dot {
-      position: absolute; width: 8px; height: 8px;
-      background: var(--gold); border-radius: 50%;
-      transform: translate(-50%, -50%);
-    }
-    .grid-label {
-      font-size: 0.68rem; color: var(--gold);
-      letter-spacing: 0.1em; text-transform: uppercase;
-      margin-left: 1.5rem;
-    }
-
-    /* ── CALLOUT ── */
-    .callout {
-      background: rgba(201,169,110,0.06);
-      border-left: 3px solid var(--gold);
-      padding: 1.2rem 1.5rem;
-      border-radius: 0 4px 4px 0;
-      margin: 1.5rem 0;
-    }
-    .callout-label {
-      font-size: 0.68rem; letter-spacing: 0.15em;
-      text-transform: uppercase; color: var(--gold);
-      margin-bottom: 0.4rem;
-    }
-    .callout p {
-      font-size: 0.85rem; line-height: 1.7;
-      color: rgba(245,242,238,0.75); margin: 0;
-    }
-
-    /* ── SCORE TABLE ── */
-    .score-table {
-      width: 100%; border-collapse: collapse;
-      margin: 1.5rem 0; font-size: 0.85rem;
-    }
-    .score-table th {
-      text-align: left; padding: 0.7rem 1rem;
-      font-size: 0.68rem; letter-spacing: 0.12em;
-      text-transform: uppercase; color: var(--gold);
-      border-bottom: 1px solid var(--border);
-    }
-    .score-table td {
-      padding: 0.8rem 1rem;
-      border-bottom: 1px solid rgba(201,169,110,0.07);
-      color: rgba(245,242,238,0.7); line-height: 1.5;
-      vertical-align: top;
-    }
-    .score-table tr:last-child td { border-bottom: none; }
-    .score-table tr:hover td { background: rgba(201,169,110,0.03); }
-    .badge {
-      display: inline-block; padding: 0.15rem 0.5rem;
-      border-radius: 2px; font-size: 0.7rem;
-      font-weight: 500; letter-spacing: 0.05em;
-    }
-    .badge-gold { background: rgba(201,169,110,0.15); color: var(--gold); }
-    .badge-green { background: rgba(100,200,100,0.12); color: #7ecf7e; }
-    .badge-blue { background: rgba(100,150,255,0.12); color: #8ab4f8; }
-
-    /* ── GLOSSARY ── */
-    .glossary-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 1rem; margin-top: 1.5rem;
-    }
-    .glossary-item {
-      background: var(--dark);
-      border: 1px solid var(--border);
-      border-radius: 4px; padding: 1.2rem 1.4rem;
-    }
-    .glossary-term {
-      font-size: 0.9rem; font-weight: 500;
-      color: var(--gold); margin-bottom: 0.4rem;
-    }
-    .glossary-def {
-      font-size: 0.82rem; line-height: 1.6;
-      color: rgba(245,242,238,0.55);
-    }
-
-    /* ── CTA BANNER ── */
-    .cta-banner {
-      background: var(--dark);
-      border: 1px solid var(--border);
-      border-radius: 4px; padding: 2rem;
-      text-align: center; margin-top: 2rem;
-    }
-    .cta-banner h3 {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.3rem; margin-bottom: 0.5rem;
-    }
-    .cta-banner p {
-      font-size: 0.85rem; color: rgba(245,242,238,0.5);
-      margin-bottom: 1.2rem;
-    }
-    .btn-gold {
-      background: var(--gold); color: var(--black);
-      padding: 0.75rem 2rem; border-radius: 2px;
-      text-decoration: none; font-size: 0.82rem;
-      font-weight: 500; letter-spacing: 0.1em;
-      text-transform: uppercase; transition: background 0.2s;
-      display: inline-block;
-    }
-    .btn-gold:hover { background: var(--gold-light); }
-
-    /* ── FOOTER ── */
-    footer {
-      padding: 2rem 3rem;
-      border-top: 1px solid var(--border);
-      display: flex; align-items: center;
-      justify-content: space-between; flex-wrap: wrap; gap: 1rem;
-    }
-    .footer-logo {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.1rem; color: var(--gold); letter-spacing: 0.04em;
-    }
-    .footer-logo span { color: var(--white); }
-    footer p { font-size: 0.78rem; opacity: 0.4; }
-
-    /* ── MOBILE ── */
-    @media (max-width: 768px) {
-      nav { padding: 1rem 1.2rem; }
-      .nav-links { display: none; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; background: var(--black); padding: 1.2rem 1.5rem; gap: 1.2rem; border-bottom: 1px solid var(--border); }
-      .nav-links.open { display: flex; }
-      .nav-cta { display: none; }
-      .hamburger { display: flex; }
-      .page-hero { padding: 2.5rem 1.5rem 2rem; }
-      .learn-wrap { grid-template-columns: 1fr; padding: 2rem 1.2rem 4rem; gap: 0; }
-      .sidebar { display: none; }
-      footer { padding: 1.5rem; flex-direction: column; text-align: center; }
-    }
-
-    /* ═══════════════════════════════════════
-       MOBILE NAV — shared across all pages
-    ═══════════════════════════════════════ */
-
-    /* Hide desktop nav links on mobile, show burger */
+    .nav-links { display: flex; align-items: center; gap: 2rem; }
+    .nav-link { font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(240,237,232,0.45); text-decoration: none; transition: color 0.2s; }
+    .nav-link:hover, .nav-link.active { color: var(--gold); }
     .nav-burger { display: none; background: none; border: none; cursor: pointer; padding: 0.4rem; color: var(--white); flex-direction: column; gap: 5px; align-items: center; justify-content: center; }
-    .nav-burger span { display: block; width: 22px; height: 2px; background: var(--white); transition: all 0.3s; border-radius: 2px; }
-    .nav-burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-    .nav-burger.open span:nth-child(2) { opacity: 0; }
-    .nav-burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    .nav-burger span { display: block; width: 22px; height: 2px; background: var(--white); border-radius: 2px; }
 
-    /* Overlay menu */
-    .mobile-menu {
-      display: none;
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(8,8,8,0.98);
-      z-index: 99;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 0;
-      backdrop-filter: blur(16px);
-    }
-    .mobile-menu.open { display: flex; animation: menuFadeIn 0.2s ease both; }
-    @keyframes menuFadeIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
-    .mobile-menu-close {
-      position: absolute; top: 1.2rem; right: 1.5rem;
-      background: none; border: none; color: var(--mid);
-      font-size: 1.5rem; cursor: pointer; padding: 0.4rem;
-      transition: color 0.2s;
-    }
-    .mobile-menu-close:hover { color: var(--white); }
-    .mobile-menu-logo {
-      font-family: 'Bebas Neue', sans-serif; font-size: 2rem;
-      letter-spacing: 0.08em; color: var(--gold);
-      margin-bottom: 2.5rem;
-    }
+    /* MOBILE MENU */
+    .mobile-menu { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(8,8,8,0.98); z-index: 99; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(16px); }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu-close { position: absolute; top: 1.2rem; right: 1.5rem; background: none; border: none; color: var(--mid); font-size: 1.5rem; cursor: pointer; }
+    .mobile-menu-logo { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; color: var(--gold); margin-bottom: 2.5rem; }
     .mobile-menu-logo span { color: var(--white); }
-    .mobile-menu a {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 2rem; letter-spacing: 0.06em;
-      color: rgba(240,237,232,0.55); text-decoration: none;
-      padding: 0.7rem 2rem; transition: color 0.2s;
-      text-align: center;
-    }
+    .mobile-menu a { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 0.06em; color: rgba(240,237,232,0.55); text-decoration: none; padding: 0.7rem 2rem; transition: color 0.2s; }
     .mobile-menu a:hover, .mobile-menu a.active { color: var(--gold); }
     .mobile-menu-divider { width: 40px; height: 1px; background: var(--border); margin: 0.8rem 0; }
-    .mobile-menu-auth { margin-top: 1.5rem; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mid); text-align: center; }
-    .mobile-menu-auth span { color: rgba(240,237,232,0.5); display: block; margin-bottom: 0.8rem; font-size: 0.72rem; }
-    .mobile-menu-signout { background: none; border: 1px solid var(--border); color: var(--mid); padding: 0.5rem 1.5rem; font-family: 'DM Sans', sans-serif; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
-    .mobile-menu-signout:hover { border-color: var(--gold); color: var(--gold); }
+    .mobile-menu-auth { margin-top: 1.5rem; text-align: center; }
+    .mobile-menu-auth span { color: rgba(240,237,232,0.4); font-size: 0.72rem; display: block; margin-bottom: 0.8rem; }
+    .mobile-menu-signout { background: none; border: 1px solid var(--border); color: var(--mid); padding: 0.5rem 1.5rem; font-family: 'DM Sans', sans-serif; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; }
 
-    /* Bottom nav bar */
-    .bottom-nav {
-      display: none;
-      position: fixed; bottom: 0; left: 0; right: 0;
-      background: rgba(10,10,10,0.97);
-      border-top: 1px solid var(--border);
-      backdrop-filter: blur(16px);
-      z-index: 98;
-      padding-bottom: env(safe-area-inset-bottom);
-    }
-    .bottom-nav-inner { display: flex; align-items: stretch; }
-    .bottom-nav-item {
-      flex: 1; display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      padding: 0.6rem 0.3rem;
-      text-decoration: none;
-      color: rgba(240,237,232,0.35);
-      font-size: 0.55rem; letter-spacing: 0.08em;
-      text-transform: uppercase; gap: 0.25rem;
-      transition: color 0.2s;
-      border-top: 2px solid transparent;
-    }
-    .bottom-nav-item:hover { color: rgba(240,237,232,0.7); }
+    /* BOTTOM NAV */
+    .bottom-nav { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10,10,10,0.97); border-top: 1px solid var(--border); backdrop-filter: blur(16px); z-index: 98; padding-bottom: env(safe-area-inset-bottom); }
+    .bottom-nav-inner { display: flex; }
+    .bottom-nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0.6rem 0.3rem; text-decoration: none; color: rgba(240,237,232,0.35); font-size: 0.55rem; letter-spacing: 0.08em; text-transform: uppercase; gap: 0.25rem; transition: color 0.2s; border-top: 2px solid transparent; }
     .bottom-nav-item.active { color: var(--gold); border-top-color: var(--gold); }
     .bottom-nav-icon { font-size: 1.25rem; line-height: 1; }
 
-    /* Add bottom padding to page body so content isn't hidden behind bottom nav */
+    /* HERO */
+    .page-hero { padding: 3.5rem 3rem 3rem; border-bottom: 1px solid var(--border); background: linear-gradient(135deg, rgba(232,184,75,0.04) 0%, transparent 60%); position: relative; overflow: hidden; }
+    .page-hero::before { content: ''; position: absolute; inset: 0; background-image: linear-gradient(rgba(232,184,75,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(232,184,75,0.6) 1px, transparent 1px); background-size: 60px 60px; opacity: 0.02; pointer-events: none; }
+    .hero-inner { max-width: 960px; margin: 0 auto; position: relative; }
+    .page-tag { color: var(--gold); font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 0.6rem; display: block; }
+    .page-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2.5rem, 5vw, 4rem); letter-spacing: 0.04em; line-height: 1; margin-bottom: 0.8rem; }
+    .page-title em { color: var(--gold); font-style: normal; }
+    .page-sub { color: rgba(245,242,238,0.45); font-size: 0.9rem; line-height: 1.7; max-width: 520px; }
+
+    /* CURRICULUM */
+    .curriculum-wrap { max-width: 960px; margin: 0 auto; padding: 3rem 2rem 6rem; }
+    .curriculum-label { font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.6rem; }
+    .curriculum-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    /* CHAPTER CARD */
+    .chapter-card { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 1.5rem; }
+    .chapter-card.active-chapter { border-color: rgba(232,184,75,0.4); }
+    .chapter-card.locked { opacity: 0.55; }
+    .chapter-header { padding: 1.8rem 2rem; display: flex; align-items: center; gap: 1.5rem; cursor: pointer; background: var(--dark); transition: background 0.2s; }
+    .chapter-header:hover { background: var(--dark2); }
+    .chapter-num { font-family: 'Bebas Neue', sans-serif; font-size: 2.5rem; color: var(--gold); opacity: 0.3; line-height: 1; flex-shrink: 0; width: 48px; }
+    .chapter-info { flex: 1; }
+    .chapter-module { font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--mid); margin-bottom: 0.3rem; }
+    .chapter-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; letter-spacing: 0.04em; margin-bottom: 0.3rem; }
+    .chapter-desc { font-size: 0.8rem; color: rgba(245,242,238,0.4); line-height: 1.5; }
+    .chapter-meta { flex-shrink: 0; text-align: right; }
+    .status-badge { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600; }
+    .status-active   { background: rgba(232,184,75,0.12); color: var(--gold);  border: 1px solid rgba(232,184,75,0.3); }
+    .status-complete { background: rgba(52,211,153,0.1);  color: var(--green); border: 1px solid rgba(52,211,153,0.25); }
+    .status-locked   { background: rgba(255,255,255,0.04); color: var(--mid);  border: 1px solid rgba(255,255,255,0.08); }
+    .status-free     { background: rgba(96,165,250,0.1);  color: #60a5fa;     border: 1px solid rgba(96,165,250,0.25); }
+
+    .free-chapter { border-color: rgba(96,165,250,0.2); }
+    .chapter-header.non-clickable { cursor: default; }
+    .chapter-header.non-clickable:hover { background: var(--dark); }
+
+    /* MODULE DIVIDER */
+    .module-divider { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; padding: 1.5rem 2rem; margin: 2rem 0 1rem; border: 1px solid var(--border); border-radius: 8px; background: rgba(232,184,75,0.02); }
+    .module-number { font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.2rem; }
+    .module-name { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; letter-spacing: 0.04em; margin-bottom: 0.2rem; }
+    .module-desc { font-size: 0.75rem; color: rgba(245,242,238,0.35); line-height: 1.5; }
+
+    /* UNLOCK CTA */
+    .unlock-cta { margin-top: 3rem; padding: 3rem 2rem; text-align: center; border: 1px solid rgba(232,184,75,0.2); border-radius: 8px; background: linear-gradient(135deg, rgba(232,184,75,0.04) 0%, transparent 60%); }
+    .unlock-icon { font-size: 2.5rem; display: block; margin-bottom: 1rem; }
+    .unlock-title { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 0.06em; margin-bottom: 0.6rem; }
+    .unlock-sub { font-size: 0.85rem; color: rgba(245,242,238,0.4); line-height: 1.8; margin-bottom: 1.8rem; }
+    .unlock-btn { background: var(--gold); color: #080808; border: none; padding: 1rem 2.5rem; font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; letter-spacing: 0.12em; cursor: pointer; transition: all 0.2s; clip-path: polygon(12px 0%,100% 0%,calc(100% - 12px) 100%,0% 100%); }
+    .unlock-btn:hover { background: var(--gold-light); transform: translateY(-1px); }
+    .progress-bar-wrap { margin-top: 0.6rem; height: 3px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; width: 120px; }
+    .progress-bar-fill { height: 100%; background: var(--gold); border-radius: 2px; transition: width 0.6s ease; }
+    .progress-label { font-size: 0.62rem; color: var(--mid); margin-top: 0.3rem; }
+
+    /* CHAPTER BODY */
+    .chapter-body { display: none; border-top: 1px solid var(--border); }
+    .chapter-body.open { display: block; }
+
+    /* LESSON */
+    .lesson-section { padding: 2rem 2rem 0; background: var(--black); }
+    .lesson-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; letter-spacing: 0.06em; color: var(--gold); margin-bottom: 1.2rem; }
+    .lesson-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+    .lesson-text p { font-size: 0.88rem; line-height: 1.85; color: rgba(245,242,238,0.6); margin-bottom: 1rem; }
+    .lesson-text strong { color: var(--white); font-weight: 500; }
+    .lesson-visual { background: var(--dark); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+
+    /* Rule of thirds diagram */
+    .thirds-diagram { position: relative; width: 100%; aspect-ratio: 4/3; background: #0e1a22; border-radius: 6px; overflow: hidden; }
+    .thirds-lines { position: absolute; inset: 0; }
+    .thirds-col { position: absolute; top: 0; bottom: 0; width: 1px; background: rgba(232,184,75,0.35); }
+    .thirds-row { position: absolute; left: 0; right: 0; height: 1px; background: rgba(232,184,75,0.35); }
+    .thirds-point { position: absolute; width: 10px; height: 10px; background: var(--gold); border-radius: 50%; transform: translate(-50%,-50%); box-shadow: 0 0 10px rgba(232,184,75,0.7); }
+    .diagram-label { position: absolute; bottom: 8px; left: 0; right: 0; text-align: center; font-size: 0.65rem; color: rgba(245,242,238,0.25); letter-spacing: 0.08em; }
+
+    .tip-row { display: flex; gap: 0.8rem; align-items: flex-start; padding: 0.6rem 0; border-bottom: 1px solid rgba(232,184,75,0.06); }
+    .tip-row:last-child { border-bottom: none; }
+    .tip-icon { font-size: 1rem; flex-shrink: 0; }
+    .tip-text { font-size: 0.78rem; color: rgba(245,242,238,0.5); line-height: 1.6; }
+    .tip-text strong { color: rgba(245,242,238,0.85); }
+
+    /* EXAMPLES */
+    .examples-wrap { padding: 0 2rem 1.5rem; background: var(--black); display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .example-card { background: var(--dark); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    .example-svg-wrap { aspect-ratio: 4/3; }
+    .example-foot { padding: 0.8rem 1rem; }
+    .example-verdict { font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600; margin-bottom: 0.25rem; }
+    .good .example-verdict { color: var(--green); }
+    .bad  .example-verdict { color: var(--red); }
+    .example-note { font-size: 0.72rem; color: rgba(245,242,238,0.35); line-height: 1.4; }
+
+    /* MISSION */
+    .mission-section { padding: 2rem; background: var(--black); border-top: 1px solid var(--border); }
+    .mission-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+    .mission-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem; letter-spacing: 0.06em; margin-bottom: 0.2rem; }
+    .mission-sub { font-size: 0.78rem; color: rgba(245,242,238,0.35); }
+    .mission-dots { display: flex; gap: 0.5rem; }
+    .mdot { width: 30px; height: 30px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; font-size: 0.72rem; color: var(--mid); transition: all 0.3s; font-weight: 600; }
+    .mdot.done   { background: var(--green); border-color: var(--green); color: #080808; }
+    .mdot.active { border-color: var(--gold); color: var(--gold); }
+
+    /* UPLOAD */
+    .upload-zone { border: 1px dashed rgba(232,184,75,0.25); border-radius: 8px; padding: 2.5rem 2rem; text-align: center; cursor: pointer; transition: all 0.2s; background: rgba(232,184,75,0.02); margin-bottom: 1rem; }
+    .upload-zone:hover, .upload-zone.drag { border-color: var(--gold); background: rgba(232,184,75,0.05); }
+    .upload-icon { font-size: 2.2rem; display: block; margin-bottom: 0.6rem; opacity: 0.4; }
+    .upload-hint { font-size: 0.82rem; color: rgba(245,242,238,0.4); }
+    .upload-hint strong { color: var(--gold); }
+    .upload-preview { width: 100%; max-height: 280px; object-fit: contain; border-radius: 6px; display: none; margin-bottom: 1rem; background: var(--dark); }
+
+    .btn-primary { width: 100%; background: var(--gold); color: #080808; border: none; padding: 0.95rem; font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; letter-spacing: 0.12em; cursor: pointer; transition: all 0.2s; clip-path: polygon(12px 0%,100% 0%,calc(100% - 12px) 100%,0% 100%); }
+    .btn-primary:hover:not(:disabled) { background: var(--gold-light); }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-secondary { width: 100%; background: none; color: var(--white); border: 1px solid var(--border); padding: 0.8rem; font-family: 'DM Sans', sans-serif; font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; border-radius: 4px; margin-top: 0.6rem; }
+    .btn-secondary:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* LOADING */
+    .ch-loading { display: none; text-align: center; padding: 2.5rem; }
+    .ch-loading.show { display: block; }
+    .spinner { width: 32px; height: 32px; border: 2px solid rgba(232,184,75,0.15); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 1rem; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { font-size: 0.82rem; color: var(--mid); }
+
+    /* ERROR */
+    .ch-error { display: none; padding: 0.75rem 1rem; background: rgba(255,107,107,0.08); border: 1px solid rgba(255,107,107,0.2); border-radius: 6px; font-size: 0.8rem; color: #ff8080; margin-bottom: 1rem; }
+    .ch-error.show { display: block; }
+
+    /* RESULT */
+    .sub-result { display: none; border-radius: 8px; overflow: hidden; margin-bottom: 1rem; }
+    .sub-result.show { display: block; animation: fadeUp 0.4s ease both; }
+    .result-head { padding: 1.2rem 1.5rem; display: flex; align-items: center; gap: 1.2rem; }
+    .result-head.pass { background: rgba(52,211,153,0.07);  border: 1px solid rgba(52,211,153,0.2); }
+    .result-head.fail { background: rgba(255,107,107,0.07); border: 1px solid rgba(255,107,107,0.15); }
+    .result-score { font-family: 'Bebas Neue', sans-serif; font-size: 3rem; letter-spacing: 0.04em; line-height: 1; flex-shrink: 0; }
+    .result-score.pass { color: var(--green); }
+    .result-score.fail { color: var(--red); }
+    .result-verdict-title { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.3rem; }
+    .result-verdict-sub { font-size: 0.75rem; color: rgba(245,242,238,0.4); }
+    .result-body { padding: 1.2rem 1.5rem; background: var(--dark); border: 1px solid var(--border); border-top: none; }
+    .result-feedback { font-size: 0.85rem; line-height: 1.75; color: rgba(245,242,238,0.65); margin-bottom: 1rem; }
+    .result-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+    .result-col { background: var(--dark2); border-radius: 6px; padding: 0.9rem; }
+    .result-col-label { font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.4rem; }
+    .result-col-label.worked  { color: var(--green); }
+    .result-col-label.improve { color: var(--gold); }
+    .result-col-text { font-size: 0.78rem; color: rgba(245,242,238,0.55); line-height: 1.5; }
+    .fail-hint { margin-top: 0.8rem; font-size: 0.78rem; color: rgba(245,242,238,0.35); padding: 0.7rem 1rem; background: rgba(232,184,75,0.03); border-left: 2px solid rgba(232,184,75,0.2); }
+
+    /* COMPLETION */
+    .completion { display: none; border: 1px solid rgba(52,211,153,0.3); border-radius: 8px; background: rgba(52,211,153,0.05); padding: 2.5rem 2rem; text-align: center; margin-top: 1.5rem; }
+    .completion.show { display: block; animation: fadeUp 0.5s ease both; }
+    .completion-icon { font-size: 3.5rem; display: block; margin-bottom: 0.8rem; }
+    .completion-title { font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; letter-spacing: 0.06em; color: var(--green); margin-bottom: 0.5rem; }
+    .completion-sub { font-size: 0.85rem; color: rgba(245,242,238,0.45); line-height: 1.7; margin-bottom: 1.8rem; }
+    .completion-btns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .btn-share { background: var(--gold); color: #080808; border: none; padding: 0.85rem 2rem; font-family: 'Bebas Neue', sans-serif; font-size: 1rem; letter-spacing: 0.12em; cursor: pointer; clip-path: polygon(10px 0%,100% 0%,calc(100% - 10px) 100%,0% 100%); transition: background 0.2s; }
+    .btn-share:hover { background: var(--gold-light); }
+    .btn-ghost { background: none; border: 1px solid var(--border); color: rgba(245,242,238,0.5); padding: 0.85rem 2rem; font-family: 'DM Sans', sans-serif; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; border-radius: 4px; transition: all 0.2s; text-decoration: none; display: inline-flex; align-items: center; }
+    .btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* SHARE CANVAS */
+    .share-wrap { display: none; margin-top: 1.5rem; }
+    .share-wrap.show { display: block; }
+    #shareCard { display: block; max-width: 100%; border-radius: 8px; border: 1px solid var(--border); margin: 0 auto; }
+    .share-hint { text-align: center; font-size: 0.7rem; color: var(--mid); margin-top: 0.5rem; }
+
+    /* COMING SOON */
+    .coming-soon { padding: 1.5rem 2rem; background: var(--black); border-top: 1px solid var(--border); }
+    .coming-soon-inner { display: flex; gap: 1rem; align-items: center; padding: 1.2rem 1.5rem; background: var(--dark); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); }
+    .coming-soon-icon { font-size: 1.4rem; opacity: 0.3; flex-shrink: 0; }
+    .coming-soon-text { font-size: 0.82rem; color: rgba(245,242,238,0.3); line-height: 1.5; }
+    .coming-soon-text strong { color: rgba(245,242,238,0.55); font-weight: 500; }
+
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
     @media (max-width: 768px) {
-      .nav-burger { display: flex; }
-      .nav-links { display: none !important; }
       nav { padding: 0.9rem 1.2rem; }
+      .nav-links { display: none !important; }
+      .nav-burger { display: flex; }
       .bottom-nav { display: block; }
       body { padding-bottom: 60px; }
+      .page-hero { padding: 2rem 1.2rem; }
+      .curriculum-wrap { padding: 1.5rem 1rem 5rem; }
+      .chapter-header { padding: 1.2rem; flex-wrap: wrap; gap: 0.8rem; }
+      .lesson-grid { grid-template-columns: 1fr; }
+      .examples-wrap { grid-template-columns: 1fr; padding: 0 1.2rem 1.5rem; }
+      .result-cols { grid-template-columns: 1fr; }
+      .lesson-section { padding: 1.5rem 1.2rem 0; }
+      .mission-section { padding: 1.5rem 1.2rem; }
     }
   </style>
 </head>
 <body>
 
-  <!-- NAV -->
-  <nav>
-    <a href="index.html" class="nav-logo">Lens<span>Up</span></a>
-    <div class="nav-links">
-      <a href="compete.html" class="nav-link">⚔️ Challenge</a>
-      <a href="leaderboard.html" class="nav-link">🏆 Leaderboard</a>
-      <a href="learn.html" class="nav-link active">Learn</a>
-      <a href="app.html" class="nav-link">Analyse</a>
-      <a href="gallery.html" class="nav-link">Gallery</a>
-      <a href="profile.html" class="nav-link">Profile</a>
-      <span id="navAuthArea"></span>
-    </div>
-    <button class="nav-burger" id="navBurger" onclick="openMobileMenu()" aria-label="Menu">
+<nav>
+  <a href="index.html" class="nav-logo">Lens<span>Up</span></a>
+  <div class="nav-links">
+    <a href="compete.html"     class="nav-link">⚔️ Challenge</a>
+    <a href="leaderboard.html" class="nav-link">🏆 Leaderboard</a>
+    <a href="learn.html"       class="nav-link active">📚 Learn</a>
+    <a href="app.html"         class="nav-link">📷 Analyse</a>
+    <a href="gallery.html"     class="nav-link">🖼️ Gallery</a>
+    <a href="profile.html"     class="nav-link">👤 Profile</a>
+    <span id="navAuthArea"></span>
+  </div>
+  <button class="nav-burger" id="navBurger" onclick="openMenu()">
     <span></span><span></span><span></span>
   </button>
-  </nav>
+</nav>
 
-  <!-- MOBILE OVERLAY MENU -->
-  <div class="mobile-menu" id="mobileMenu">
-    <button class="mobile-menu-close" onclick="closeMobileMenu()">✕</button>
-    <div class="mobile-menu-logo">Lens<span>Up</span></div>
-    <a href="compete.html" class="">⚔️ Challenge</a>
-    <a href="app.html" class="">📷 Analyse</a>
-    <a href="leaderboard.html" class="">🏆 Leaderboard</a>
-    <a href="gallery.html" class="">🖼️ Gallery</a>
-    <a href="profile.html" class="">👤 Profile</a>
-    <a href="learn.html" class="learn active">📚 Learn</a>
-    <div class="mobile-menu-divider"></div>
-    <div class="mobile-menu-auth">
-      <span id="mobileMenuUser"></span>
-      <button class="mobile-menu-signout" onclick="signOut()">Sign Out</button>
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-menu-close" onclick="closeMenu()">✕</button>
+  <div class="mobile-menu-logo">Lens<span>Up</span></div>
+  <a href="compete.html">⚔️ Challenge</a>
+  <a href="app.html">📷 Analyse</a>
+  <a href="leaderboard.html">🏆 Leaderboard</a>
+  <a href="gallery.html">🖼️ Gallery</a>
+  <a href="profile.html">👤 Profile</a>
+  <a href="learn.html" class="active">📚 Learn</a>
+  <div class="mobile-menu-divider"></div>
+  <div class="mobile-menu-auth">
+    <span id="mobileUser"></span>
+    <button class="mobile-menu-signout" onclick="signOut()">Sign Out</button>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="page-hero">
+  <div class="hero-inner">
+    <span class="page-tag">📚 Learning Path</span>
+    <div class="page-title">Master<br/><em>Photography</em></div>
+    <p class="page-sub">Step-by-step lessons with real photo missions. Learn a skill, shoot intentionally, get AI feedback. This is how you actually improve — not by scrolling Instagram.</p>
+  </div>
+</div>
+
+<!-- CURRICULUM -->
+<div class="curriculum-wrap">
+
+  <div class="curriculum-label">Composition Series</div>
+
+  <!-- ══ CHAPTER 1 ══ -->
+  <div class="chapter-card active-chapter" id="ch1Card">
+    <div class="chapter-header" onclick="toggleChapter('ch1')">
+      <div class="chapter-num">01</div>
+      <div class="chapter-info">
+        <div class="chapter-module">Composition · Free</div>
+        <div class="chapter-title">Rule of Thirds</div>
+        <div class="chapter-desc">The most fundamental composition rule. Learn to place your subject at the power points of the grid.</div>
+      </div>
+      <div class="chapter-meta" id="ch1Meta">
+        <span class="status-badge status-active">● Active</span>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar-fill" id="ch1Bar" style="width:0%"></div>
+        </div>
+        <div class="progress-label" id="ch1Label">0 / 5 passed</div>
+      </div>
+    </div>
+
+    <div class="chapter-body open" id="ch1Body">
+
+      <!-- LESSON -->
+      <div class="lesson-section">
+        <div class="lesson-title">📖 The Lesson</div>
+        <div class="lesson-grid">
+          <div class="lesson-text">
+            <p>The <strong>Rule of Thirds</strong> divides your frame into a 3×3 grid — two horizontal lines, two vertical lines. The four points where they cross are called <strong>power points</strong>.</p>
+            <p>Place your main subject at one of these four points instead of dead centre. The result feels more natural, more dynamic, and instantly more engaging to the eye.</p>
+            <p>The same principle applies to <strong>horizon lines</strong>. Instead of cutting the frame in half, push the horizon to the upper or lower third — whichever part of the scene is most interesting.</p>
+            <p>Most modern cameras and phones let you enable a thirds grid overlay in settings. Turn it on and practise framing intentionally before you shoot.</p>
+          </div>
+          <div class="lesson-visual">
+            <!-- Diagram -->
+            <div class="thirds-diagram">
+              <div class="thirds-lines">
+                <div class="thirds-col" style="left:33.3%"></div>
+                <div class="thirds-col" style="left:66.6%"></div>
+                <div class="thirds-row" style="top:33.3%"></div>
+                <div class="thirds-row" style="top:66.6%"></div>
+                <div class="thirds-point" style="left:33.3%;top:33.3%"></div>
+                <div class="thirds-point" style="left:66.6%;top:33.3%"></div>
+                <div class="thirds-point" style="left:33.3%;top:66.6%"></div>
+                <div class="thirds-point" style="left:66.6%;top:66.6%"></div>
+              </div>
+              <div class="diagram-label">4 power points — place your subject on any one</div>
+            </div>
+            <div>
+              <div class="tip-row">
+                <span class="tip-icon">🎯</span>
+                <div class="tip-text"><strong>Main subject</strong> — place at any of the 4 intersections, not the centre</div>
+              </div>
+              <div class="tip-row">
+                <span class="tip-icon">🌅</span>
+                <div class="tip-text"><strong>Horizon lines</strong> — sky interesting? Horizon on lower third. Ground interesting? Upper third.</div>
+              </div>
+              <div class="tip-row">
+                <span class="tip-icon">👁️</span>
+                <div class="tip-text"><strong>Portraits</strong> — place the nearest eye on the upper third line</div>
+              </div>
+              <div class="tip-row">
+                <span class="tip-icon">📱</span>
+                <div class="tip-text"><strong>Tip</strong> — enable the grid overlay in your phone camera settings</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- EXAMPLES -->
+      <div class="examples-wrap">
+        <div class="example-card good">
+          <div class="example-svg-wrap">
+            <svg viewBox="0 0 300 225" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+              <rect width="300" height="225" fill="#0e1a22"/>
+              <rect width="300" height="75" fill="#0d1d2e"/>
+              <rect y="75" width="300" height="150" fill="#12180e"/>
+              <!-- thirds grid -->
+              <line x1="100" y1="0" x2="100" y2="225" stroke="rgba(232,184,75,0.3)" stroke-width="1" stroke-dasharray="3,3"/>
+              <line x1="200" y1="0" x2="200" y2="225" stroke="rgba(232,184,75,0.3)" stroke-width="1" stroke-dasharray="3,3"/>
+              <line x1="0" y1="75" x2="300" y2="75" stroke="rgba(232,184,75,0.5)" stroke-width="1.5"/>
+              <line x1="0" y1="150" x2="300" y2="150" stroke="rgba(232,184,75,0.3)" stroke-width="1" stroke-dasharray="3,3"/>
+              <!-- tree at left power point -->
+              <rect x="92" y="85" width="16" height="60" fill="#1e3d1e" rx="2"/>
+              <ellipse cx="100" cy="78" rx="26" ry="24" fill="#1e4d1e"/>
+              <circle cx="100" cy="75" r="6" fill="rgba(232,184,75,0.9)"/>
+              <text x="150" y="215" text-anchor="middle" fill="rgba(245,242,238,0.2)" font-size="9" font-family="sans-serif">subject on power point · horizon on upper third</text>
+            </svg>
+          </div>
+          <div class="example-foot">
+            <div class="example-verdict">✓ Rule of Thirds Applied</div>
+            <div class="example-note">Subject at left power point, horizon on upper third line</div>
+          </div>
+        </div>
+        <div class="example-card bad">
+          <div class="example-svg-wrap">
+            <svg viewBox="0 0 300 225" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+              <rect width="300" height="225" fill="#0e1a22"/>
+              <rect width="300" height="112" fill="#0d1d2e"/>
+              <rect y="112" width="300" height="113" fill="#12180e"/>
+              <!-- faint grid -->
+              <line x1="100" y1="0" x2="100" y2="225" stroke="rgba(255,255,255,0.06)" stroke-width="1" stroke-dasharray="3,3"/>
+              <line x1="200" y1="0" x2="200" y2="225" stroke="rgba(255,255,255,0.06)" stroke-width="1" stroke-dasharray="3,3"/>
+              <line x1="0" y1="75"  x2="300" y2="75"  stroke="rgba(255,255,255,0.06)" stroke-width="1" stroke-dasharray="3,3"/>
+              <line x1="0" y1="150" x2="300" y2="150" stroke="rgba(255,255,255,0.06)" stroke-width="1" stroke-dasharray="3,3"/>
+              <!-- horizon dead centre — red -->
+              <line x1="0" y1="112" x2="300" y2="112" stroke="rgba(255,107,107,0.45)" stroke-width="1.5"/>
+              <!-- tree dead centre -->
+              <rect x="142" y="118" width="16" height="55" fill="#1e3d1e" rx="2"/>
+              <ellipse cx="150" cy="112" rx="26" ry="24" fill="#1e4d1e"/>
+              <circle cx="150" cy="112" r="6" fill="rgba(255,107,107,0.8)"/>
+              <text x="150" y="215" text-anchor="middle" fill="rgba(245,242,238,0.2)" font-size="9" font-family="sans-serif">subject dead centre · horizon splits frame in half</text>
+            </svg>
+          </div>
+          <div class="example-foot">
+            <div class="example-verdict">✗ Dead Centre — Avoid This</div>
+            <div class="example-note">Subject and horizon both centred — feels static and dull</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MISSION -->
+      <div class="mission-section">
+        <div class="mission-top">
+          <div>
+            <div class="mission-title">🎯 Your Mission</div>
+            <div class="mission-sub">Submit 5 real photos scoring 7+ on composition to complete this chapter</div>
+          </div>
+          <div class="mission-dots" id="missionDots">
+            <div class="mdot active">1</div>
+            <div class="mdot">2</div>
+            <div class="mdot">3</div>
+            <div class="mdot">4</div>
+            <div class="mdot">5</div>
+          </div>
+        </div>
+
+        <div class="ch-error" id="chError"></div>
+
+        <!-- UPLOAD -->
+        <div id="uploadWrap">
+          <div class="upload-zone" id="uploadZone"
+            onclick="document.getElementById('chFile').click()"
+            ondragover="event.preventDefault();this.classList.add('drag')"
+            ondragleave="this.classList.remove('drag')"
+            ondrop="onDrop(event)">
+            <input type="file" id="chFile" accept="image/*" style="display:none" onchange="onFile(this.files[0])"/>
+            <span class="upload-icon">📷</span>
+            <div class="upload-hint">Tap to upload or drag a photo<br/><strong>Apply Rule of Thirds intentionally</strong></div>
+          </div>
+          <img id="uploadPreview" class="upload-preview" alt=""/>
+          <button class="btn-primary" id="analyseBtn" onclick="analysePhoto()" disabled>Analyse This Shot →</button>
+        </div>
+
+        <!-- LOADING -->
+        <div class="ch-loading" id="chLoading">
+          <div class="spinner"></div>
+          <div class="loading-text">Analysing your Rule of Thirds composition…</div>
+        </div>
+
+        <!-- RESULT -->
+        <div class="sub-result" id="subResult">
+          <div class="result-head" id="resultHead">
+            <div class="result-score" id="resultScore">—</div>
+            <div>
+              <div class="result-verdict-title" id="resultTitle"></div>
+              <div class="result-verdict-sub" id="resultSub"></div>
+            </div>
+          </div>
+          <div class="result-body">
+            <div class="result-feedback" id="resultFeedback"></div>
+            <div class="result-cols">
+              <div class="result-col">
+                <div class="result-col-label worked">✓ What Worked</div>
+                <div class="result-col-text" id="resultWorked"></div>
+              </div>
+              <div class="result-col">
+                <div class="result-col-label improve">↑ Improve</div>
+                <div class="result-col-text" id="resultImprove"></div>
+              </div>
+            </div>
+            <div class="fail-hint" id="failHint" style="display:none">
+              Score below 7/10 — this shot doesn't count. Review the lesson above and try a different photo.
+            </div>
+          </div>
+        </div>
+
+        <div id="nextWrap" style="display:none;margin-top:0.8rem;">
+          <button class="btn-primary" onclick="resetUpload()">Submit Next Photo →</button>
+        </div>
+
+        <!-- COMPLETION -->
+        <div class="completion" id="completion">
+          <span class="completion-icon">🏆</span>
+          <div class="completion-title">Chapter Complete!</div>
+          <div class="completion-sub">You've demonstrated Rule of Thirds across 5 photos.<br/>You've earned the <strong style="color:var(--gold)">Rule of Thirds</strong> badge.</div>
+          <div class="completion-btns">
+            <button class="btn-share" onclick="generateCard()">📤 Share My Badge</button>
+            <a href="learn.html" class="btn-ghost">View Next Chapter ↓</a>
+          </div>
+          <div class="share-wrap" id="shareWrap">
+            <canvas id="shareCard" width="800" height="480"></canvas>
+            <div class="share-hint">Long press (mobile) or right-click → Save Image to share your badge</div>
+          </div>
+        </div>
+
+      </div><!-- /mission -->
+    </div><!-- /ch1Body -->
+  </div><!-- /ch1Card -->
+
+  <!-- CH2 FREE -->
+  <div class="chapter-card free-chapter">
+    <div class="chapter-header" onclick="toggleChapter('ch2')">
+      <div class="chapter-num" style="opacity:0.3">02</div>
+      <div class="chapter-info">
+        <div class="chapter-module">Composition · Free</div>
+        <div class="chapter-title">Leading Lines</div>
+        <div class="chapter-desc">Roads, rivers, fences, shadows — use natural lines in your scene to guide the viewer's eye through the frame with purpose.</div>
+      </div>
+      <div class="chapter-meta"><span class="status-badge status-free">◎ Free</span></div>
+    </div>
+    <div class="chapter-body" id="ch2Body">
+      <div class="coming-soon"><div class="coming-soon-inner">
+        <span class="coming-soon-icon">🔜</span>
+        <div class="coming-soon-text"><strong>Leading Lines</strong> — lesson and mission coming soon. Complete Chapter 1 first.</div>
+      </div></div>
     </div>
   </div>
 
-  <!-- HERO -->
-  <div class="page-hero">
-    <div class="page-hero-inner">
-      <div class="page-tag">Photography School</div>
-      <h1>Learn to Shoot<br/>Like a <em>Pro</em></h1>
-      <p>Everything you need to understand what makes a great photo — from the basics to what Claude AI looks for when analysing your shots.</p>
+  <!-- CH3 FREE -->
+  <div class="chapter-card free-chapter">
+    <div class="chapter-header" onclick="toggleChapter('ch3')">
+      <div class="chapter-num" style="opacity:0.3">03</div>
+      <div class="chapter-info">
+        <div class="chapter-module">Composition · Free</div>
+        <div class="chapter-title">Framing</div>
+        <div class="chapter-desc">Use doorways, windows, arches and natural openings to frame your subject — adding depth and directing the eye instantly.</div>
+      </div>
+      <div class="chapter-meta"><span class="status-badge status-free">◎ Free</span></div>
+    </div>
+    <div class="chapter-body" id="ch3Body">
+      <div class="coming-soon"><div class="coming-soon-inner">
+        <span class="coming-soon-icon">🔜</span>
+        <div class="coming-soon-text"><strong>Framing</strong> — lesson and mission coming soon.</div>
+      </div></div>
     </div>
   </div>
 
-  <div class="learn-wrap">
-
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-      <div class="sidebar-title">Chapters</div>
-      <ul class="sidebar-nav">
-        <li><a href="#composition" class="active">01 · Composition</a></li>
-        <li><a href="#lighting">02 · Lighting</a></li>
-        <li><a href="#colour">03 · Colour & Mood</a></li>
-        <li><a href="#focus">04 · Focus & Depth</a></li>
-        <li><a href="#scores">05 · Understanding Scores</a></li>
-        <li><a href="#tips">06 · Quick Win Tips</a></li>
-        <div class="sidebar-divider"></div>
-        <li><a href="#glossary">Glossary</a></li>
-      </ul>
-    </aside>
-
-    <!-- CONTENT -->
-    <main class="content">
-
-      <!-- CHAPTER 1: COMPOSITION -->
-      <div class="chapter" id="composition">
-        <div class="chapter-header">
-          <div class="chapter-icon">🎯</div>
-          <div class="chapter-meta">
-            <div class="chapter-num">Chapter 01</div>
-            <h2>Composition</h2>
-          </div>
-        </div>
-
-        <p>Composition is how you arrange the elements inside your frame. It's the single most powerful tool a photographer has — and unlike lighting or gear, it costs nothing. A well-composed photo guides the viewer's eye exactly where you want it to go.</p>
-
-        <h3>The Rule of Thirds</h3>
-        <p>Imagine dividing your frame into a 3×3 grid. The four points where the lines intersect are called "power points." Placing your subject on one of these points — rather than dead centre — creates natural tension and visual interest.</p>
-
-        <div class="rule-visual">
-          <div class="grid-demo">
-            <div class="grid-line-v" style="left:33.3%"></div>
-            <div class="grid-line-v" style="left:66.6%"></div>
-            <div class="grid-line-h" style="top:33.3%"></div>
-            <div class="grid-line-h" style="top:66.6%"></div>
-            <div class="grid-dot" style="left:33.3%;top:33.3%"></div>
-            <div class="grid-dot" style="left:66.6%;top:33.3%"></div>
-            <div class="grid-dot" style="left:33.3%;top:66.6%"></div>
-            <div class="grid-dot" style="left:66.6%;top:66.6%"></div>
-          </div>
-          <div class="grid-label">Place subjects<br/>on power points</div>
-        </div>
-
-        <div class="callout">
-          <div class="callout-label">💡 Pro Tip</div>
-          <p>Most smartphones have a grid overlay built into the camera app. Turn it on in settings — it's the fastest way to train your eye for the rule of thirds.</p>
-        </div>
-
-        <h3>Leading Lines</h3>
-        <p>Roads, fences, rivers, stairways — any line that draws the eye from the foreground into the background creates depth and guides the viewer through the image. The strongest leading lines point toward your subject.</p>
-
-        <h3>Framing</h3>
-        <p>Use natural elements like doorways, windows, archways, or tree branches to frame your subject. This creates layers in the image and adds a sense of depth that flat compositions lack.</p>
-
-        <h3>Negative Space</h3>
-        <p>Leaving empty space around your subject isn't wasted space — it gives the eye room to breathe and makes the subject feel more powerful. Minimalist compositions with strong negative space often score very well.</p>
-
-        <div class="tip-grid">
-          <div class="tip-card">
-            <span class="tip-card-icon">📐</span>
-            <h4>Rule of Thirds</h4>
-            <p>Off-centre subjects create visual tension and feel more dynamic.</p>
-          </div>
-          <div class="tip-card">
-            <span class="tip-card-icon">↗️</span>
-            <h4>Leading Lines</h4>
-            <p>Draw the eye through the frame toward your main subject.</p>
-          </div>
-          <div class="tip-card">
-            <span class="tip-card-icon">🪟</span>
-            <h4>Framing</h4>
-            <p>Use natural elements to frame and isolate your subject.</p>
-          </div>
-          <div class="tip-card">
-            <span class="tip-card-icon">⬜</span>
-            <h4>Negative Space</h4>
-            <p>Empty space isn't wasted — it makes subjects pop.</p>
-          </div>
-        </div>
+  <!-- CH4 LOCKED -->
+  <div class="chapter-card locked">
+    <div class="chapter-header non-clickable">
+      <div class="chapter-num" style="opacity:0.12">04</div>
+      <div class="chapter-info">
+        <div class="chapter-module">Composition · Paid</div>
+        <div class="chapter-title">Symmetry &amp; Patterns</div>
+        <div class="chapter-desc">Reflections, architecture, repetition — find and use visual symmetry and repeating patterns for striking compositions.</div>
       </div>
-
-      <!-- CHAPTER 2: LIGHTING -->
-      <div class="chapter" id="lighting">
-        <div class="chapter-header">
-          <div class="chapter-icon">💡</div>
-          <div class="chapter-meta">
-            <div class="chapter-num">Chapter 02</div>
-            <h2>Lighting</h2>
-          </div>
-        </div>
-
-        <p>Photography literally means "writing with light." The quality, direction, and colour of light determines the mood, texture, and drama of your image more than any other single factor.</p>
-
-        <h3>Golden Hour</h3>
-        <p>The hour after sunrise and the hour before sunset produce warm, soft, directional light that flatters almost any subject. Shadows are long, colours are rich, and the light has a natural glow that's nearly impossible to replicate artificially. If you can only shoot at one time of day, shoot golden hour.</p>
-
-        <h3>Hard vs Soft Light</h3>
-        <p>Hard light (midday sun, bare flash) creates strong shadows and high contrast — great for dramatic, graphic images. Soft light (overcast sky, window light, diffused flash) creates gentle gradients and flattering skin tones. Neither is better — they serve different stories.</p>
-
-        <h3>Light Direction</h3>
-        <p>Front lighting is flat and safe. Side lighting (also called Rembrandt lighting) creates shadows that reveal texture and depth. Backlighting creates silhouettes and rim light — dramatic but requires careful exposure. Understanding where your light source is coming from is the first step to controlling it.</p>
-
-        <div class="callout">
-          <div class="callout-label">💡 Pro Tip</div>
-          <p>Overcast days are a photographer's best friend for portraits. The entire sky becomes one giant soft box, giving you even, flattering light from everywhere with no harsh shadows.</p>
-        </div>
-
-        <h3>Exposure Triangle</h3>
-        <p>If you're shooting with a camera or advanced phone settings, three factors control exposure: <strong style="color:var(--white)">ISO</strong> (sensor sensitivity), <strong style="color:var(--white)">Aperture</strong> (how much light enters), and <strong style="color:var(--white)">Shutter Speed</strong> (how long the sensor is exposed). Balancing these three is the foundation of technical photography.</p>
-
-        <div class="tip-grid">
-          <div class="tip-card">
-            <span class="tip-card-icon">🌅</span>
-            <h4>Golden Hour</h4>
-            <p>Warm, soft light just after sunrise or before sunset.</p>
-          </div>
-          <div class="tip-card">
-            <span class="tip-card-icon">☁️</span>
-            <h4>Overcast = Soft Box</h4>
-            <p>Clouds diffuse sunlight into perfect portrait lighting.</p>
-          </div>
-          <div class="tip-card">
-            <span class="tip-card-icon">🔦</span>
-            <h4>Side Lighting</h4>
-            <p>Reveals texture and adds dramatic depth to any subject.</p>
-          </div>
-          <div class="tip-card">
-            <span class="tip-card-icon">🌑</span>
-            <h4>Backlighting</h4>
-            <p>Creates silhouettes and glowing rim light effects.</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- CHAPTER 3: COLOUR & MOOD -->
-      <div class="chapter" id="colour">
-        <div class="chapter-header">
-          <div class="chapter-icon">🎨</div>
-          <div class="chapter-meta">
-            <div class="chapter-num">Chapter 03</div>
-            <h2>Colour & Mood</h2>
-          </div>
-        </div>
-
-        <p>Colour is one of the most emotionally powerful tools in photography. Viewers feel colour before they consciously process it. A deliberate colour palette can make a technically average photo feel unforgettable.</p>
-
-        <h3>Warm vs Cool Tones</h3>
-        <p>Warm tones (oranges, reds, yellows) feel energetic, intimate, and inviting. Cool tones (blues, greens, purples) feel calm, distant, and melancholic. Most great photos lean intentionally one way or the other rather than sitting neutrally in the middle.</p>
-
-        <h3>Colour Harmony</h3>
-        <p>Complementary colours (opposite on the colour wheel, like orange and blue) create vibrant contrast. Analogous colours (neighbours on the wheel, like yellow, orange, and red) feel harmonious and natural. Both work — the key is being intentional rather than accidental.</p>
-
-        <h3>Colour as Story</h3>
-        <p>Think about what story your colours are telling. Desaturated, faded tones feel nostalgic. Rich, vibrant saturation feels bold and modern. Moody, dark tones feel cinematic. Before editing, ask yourself: what feeling do I want this photo to create?</p>
-
-        <div class="callout">
-          <div class="callout-label">💡 Pro Tip</div>
-          <p>The most iconic travel photos often have a single dominant colour that ties the whole frame together. Look for scenes where one colour dominates — yellow tuk-tuks, a red door, a blue boat — and simplify around it.</p>
-        </div>
-      </div>
-
-      <!-- CHAPTER 4: FOCUS & DEPTH -->
-      <div class="chapter" id="focus">
-        <div class="chapter-header">
-          <div class="chapter-icon">🔍</div>
-          <div class="chapter-meta">
-            <div class="chapter-num">Chapter 04</div>
-            <h2>Focus & Depth of Field</h2>
-          </div>
-        </div>
-
-        <p>Where you focus in a photo is a creative decision, not just a technical one. What's sharp draws the eye. What's blurred recedes. Controlling this separation is one of the most powerful ways to direct attention.</p>
-
-        <h3>Shallow Depth of Field</h3>
-        <p>A wide aperture (low f-number like f/1.8 or f/2.8) blurs the background into a smooth wash called "bokeh." This isolates your subject and is the signature look of portrait photography. The subject is sharp; the world melts away behind it.</p>
-
-        <h3>Deep Depth of Field</h3>
-        <p>A narrow aperture (high f-number like f/11 or f/16) keeps everything sharp from foreground to background. Essential for landscapes, architecture, and street photography where context and environment are part of the story.</p>
-
-        <h3>Focus Points</h3>
-        <p>Always focus on the most important part of your subject. For portraits, that's the eyes — specifically the eye closest to the camera. A photo where the nose is sharp but eyes are blurry feels fundamentally wrong to every viewer, even if they can't explain why.</p>
-
-        <div class="callout">
-          <div class="callout-label">💡 Pro Tip</div>
-          <p>On a smartphone, tap the screen where you want to focus before shooting. Most phones also let you lock focus and exposure separately — look for the AF/AE lock option.</p>
-        </div>
-      </div>
-
-      <!-- CHAPTER 5: UNDERSTANDING SCORES -->
-      <div class="chapter" id="scores">
-        <div class="chapter-header">
-          <div class="chapter-icon">📊</div>
-          <div class="chapter-meta">
-            <div class="chapter-num">Chapter 05</div>
-            <h2>Understanding Your LensUp Scores</h2>
-          </div>
-        </div>
-
-        <p>When you analyse a photo with LensUp, Claude AI evaluates it across five dimensions. Here's exactly what each score means and how to improve it.</p>
-
-        <table class="score-table">
-          <thead>
-            <tr>
-              <th>Score</th>
-              <th>What It Measures</th>
-              <th>How to Improve</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><span class="badge badge-gold">Composition</span></td>
-              <td>How well the frame is arranged — rule of thirds, leading lines, balance, framing</td>
-              <td>Enable grid overlay on your camera app. Slow down before shooting.</td>
-            </tr>
-            <tr>
-              <td><span class="badge badge-blue">Lighting</span></td>
-              <td>Quality, direction, and exposure of light — is it flattering, dramatic, or harsh?</td>
-              <td>Shoot during golden hour. Use shade to soften harsh midday sun.</td>
-            </tr>
-            <tr>
-              <td><span class="badge badge-gold">Colour</span></td>
-              <td>Colour palette, harmony, saturation, and whether the tones serve the mood</td>
-              <td>Look for scenes with a dominant colour. Edit with intention, not randomly.</td>
-            </tr>
-            <tr>
-              <td><span class="badge badge-green">Focus</span></td>
-              <td>Sharpness of the subject, appropriate depth of field, correct focal point</td>
-              <td>Tap to focus on your subject. For portraits, always focus on the nearest eye.</td>
-            </tr>
-            <tr>
-              <td><span class="badge badge-blue">Mood</span></td>
-              <td>Emotional impact — does the photo tell a story or evoke a feeling?</td>
-              <td>Ask "what is this photo about?" before pressing the shutter.</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <div class="callout">
-          <div class="callout-label">📈 Score Benchmarks</div>
-          <p><strong style="color:var(--white)">1–4:</strong> Learning phase — focus on one dimension at a time. &nbsp;|&nbsp; <strong style="color:var(--white)">5–7:</strong> Solid foundations — refine and be more intentional. &nbsp;|&nbsp; <strong style="color:var(--white)">8–10:</strong> Strong work — push creative boundaries.</p>
-        </div>
-      </div>
-
-      <!-- CHAPTER 6: QUICK TIPS -->
-      <div class="chapter" id="tips">
-        <div class="chapter-header">
-          <div class="chapter-icon">⚡</div>
-          <div class="chapter-meta">
-            <div class="chapter-num">Chapter 06</div>
-            <h2>Quick Win Tips</h2>
-          </div>
-        </div>
-
-        <p>These are small changes that make an immediate difference to your scores — no new gear required.</p>
-
-        <div class="tip-grid">
-          <div class="tip-card">
-            <span class="tip-card-icon">🔲</span>
-            <h4>Turn on the grid</h4>
-            <p>Camera grid overlay trains your eye for composition without thinking.</p>
-          </div>
-          <div class="tip-card">
-            <span class="tip-card-icon">🚶</span>
-            <h4>Move your feet</h4>
-            <p>Change your angle before zooming. Walking closer or lower changes everything.</p>
-          </div>
-          <div class="tip-card">
-            <span class="tip-card-icon">🧹</span>
-            <h4>Clean the background</h4>
-            <p>Look behind your subject. Remove distractions before shooting, not after.</p>
-          </div>
-          <div class="tip-card">
-            <span class="tip-card-icon">⏱️</span>
-            <h4>Wait for the moment</h4>
-            <p>Set up your composition first, then wait for the right light or action.</p>
-          </div>
-          <div class="tip-card">
-            <span class="tip-card-icon">📏</span>
-            <h4>Get lower</h4>
-            <p>Shooting from eye level is safe. Shooting from knee or ground level is memorable.</p>
-          </div>
-          <div class="tip-card">
-            <span class="tip-card-icon">🔁</span>
-            <h4>Shoot more frames</h4>
-            <p>Pro photographers take dozens of shots of the same scene. Quantity leads to quality.</p>
-          </div>
-          <div class="tip-card">
-            <span class="tip-card-icon">✂️</span>
-            <h4>Crop ruthlessly</h4>
-            <p>A tight crop can rescue a weak composition. Remove anything that doesn't add to the story.</p>
-          </div>
-          <div class="tip-card">
-            <span class="tip-card-icon">🌤️</span>
-            <h4>Embrace bad weather</h4>
-            <p>Fog, rain, and overcast skies create mood that perfect sunny days never can.</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- GLOSSARY -->
-      <div class="chapter" id="glossary">
-        <div class="chapter-header">
-          <div class="chapter-icon">📖</div>
-          <div class="chapter-meta">
-            <div class="chapter-num">Reference</div>
-            <h2>Glossary</h2>
-          </div>
-        </div>
-        <p>Key terms you'll encounter in your LensUp analyses and in photography generally.</p>
-        <div class="glossary-grid">
-          <div class="glossary-item">
-            <div class="glossary-term">Aperture</div>
-            <div class="glossary-def">The opening in a lens that controls how much light reaches the sensor. Measured in f-stops (f/1.8, f/8). Lower number = wider opening = more light + blurrier background.</div>
-          </div>
-          <div class="glossary-item">
-            <div class="glossary-term">Bokeh</div>
-            <div class="glossary-def">The aesthetic quality of the out-of-focus blur in a photograph. Creamy, smooth bokeh is highly prized in portrait photography.</div>
-          </div>
-          <div class="glossary-item">
-            <div class="glossary-term">Composition</div>
-            <div class="glossary-def">The arrangement of visual elements within the frame. How you position subjects, lines, shapes, and space relative to each other.</div>
-          </div>
-          <div class="glossary-item">
-            <div class="glossary-term">Depth of Field</div>
-            <div class="glossary-def">The range of distance in a photo that appears acceptably sharp. Shallow DoF = blurry background. Deep DoF = everything sharp.</div>
-          </div>
-          <div class="glossary-item">
-            <div class="glossary-term">Exposure</div>
-            <div class="glossary-def">How bright or dark the final image is. Controlled by ISO, aperture, and shutter speed together — the "exposure triangle."</div>
-          </div>
-          <div class="glossary-item">
-            <div class="glossary-term">Golden Hour</div>
-            <div class="glossary-def">The period shortly after sunrise and before sunset when sunlight is warm, soft, and directional. Considered the best natural light for photography.</div>
-          </div>
-          <div class="glossary-item">
-            <div class="glossary-term">ISO</div>
-            <div class="glossary-def">The sensitivity of the camera sensor to light. Higher ISO brightens images in dark conditions but introduces grain (noise).</div>
-          </div>
-          <div class="glossary-item">
-            <div class="glossary-term">Leading Lines</div>
-            <div class="glossary-def">Lines within the frame (roads, fences, rivers) that guide the viewer's eye toward the main subject or through the image.</div>
-          </div>
-          <div class="glossary-item">
-            <div class="glossary-term">Negative Space</div>
-            <div class="glossary-def">Empty or uncluttered areas around the subject. Gives the eye room to breathe and makes subjects feel more powerful and isolated.</div>
-          </div>
-          <div class="glossary-item">
-            <div class="glossary-term">Rule of Thirds</div>
-            <div class="glossary-def">A compositional guideline that divides the frame into a 3×3 grid. Placing subjects at the intersections creates natural visual balance.</div>
-          </div>
-          <div class="glossary-item">
-            <div class="glossary-term">Shutter Speed</div>
-            <div class="glossary-def">How long the camera sensor is exposed to light. Fast speeds freeze motion; slow speeds create motion blur and light trails.</div>
-          </div>
-          <div class="glossary-item">
-            <div class="glossary-term">White Balance</div>
-            <div class="glossary-def">A camera setting that adjusts colours so whites appear neutral under different light sources (daylight, tungsten, fluorescent).</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- CTA BANNER -->
-      <div class="cta-banner">
-        <h3>Ready to Put This Into Practice?</h3>
-        <p>Analyse a photo now and see your scores across all five dimensions.</p>
-        <a href="app.html" class="btn-gold">Analyse a Photo</a>
-      </div>
-
-    </main>
+      <div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div>
+    </div>
   </div>
 
-  <!-- FOOTER -->
-  <footer>
-    <div class="footer-logo">Lens<span>Up</span></div>
-    <p>© 2025 LensUp · AI-Powered Photo Analysis</p>
-  </footer>
+  <!-- CH5 LOCKED -->
+  <div class="chapter-card locked">
+    <div class="chapter-header non-clickable">
+      <div class="chapter-num" style="opacity:0.12">05</div>
+      <div class="chapter-info">
+        <div class="chapter-module">Composition · Paid</div>
+        <div class="chapter-title">Negative Space</div>
+        <div class="chapter-desc">Use emptiness intentionally. Learn how the space around your subject can make it more powerful, not less.</div>
+      </div>
+      <div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div>
+    </div>
+  </div>
 
-  <script>
-    function toggleNav() {
-      document.getElementById('navLinks').classList.toggle('open');
-    }
+  <!-- CH6 LOCKED -->
+  <div class="chapter-card locked">
+    <div class="chapter-header non-clickable">
+      <div class="chapter-num" style="opacity:0.12">06</div>
+      <div class="chapter-info">
+        <div class="chapter-module">Composition · Paid</div>
+        <div class="chapter-title">Foreground &amp; Depth</div>
+        <div class="chapter-desc">Layer near and far elements to create a 3D sense of depth in a 2D frame. Turn flat photos into immersive ones.</div>
+      </div>
+      <div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div>
+    </div>
+  </div>
 
-    // Highlight sidebar link on scroll
-    const chapters = document.querySelectorAll('.chapter');
-    const sidebarLinks = document.querySelectorAll('.sidebar-nav a');
+  <!-- CH7 LOCKED -->
+  <div class="chapter-card locked">
+    <div class="chapter-header non-clickable">
+      <div class="chapter-num" style="opacity:0.12">07</div>
+      <div class="chapter-info">
+        <div class="chapter-module">Composition · Paid</div>
+        <div class="chapter-title">The Golden Ratio</div>
+        <div class="chapter-desc">Go beyond Rule of Thirds. The spiral and ratio that artists have used for centuries to create naturally pleasing compositions.</div>
+      </div>
+      <div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div>
+    </div>
+  </div>
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          sidebarLinks.forEach(link => {
-            link.classList.toggle('active', link.getAttribute('href') === '#' + entry.target.id);
-          });
-        }
+  <!-- MODULE 2 -->
+  <div class="module-divider">
+    <div class="module-info">
+      <div class="module-number">Module 02</div>
+      <div class="module-name">Light</div>
+      <div class="module-desc">The single biggest factor separating good photos from great ones. 6 chapters.</div>
+    </div>
+    <span class="status-badge status-locked" style="flex-shrink:0">🔒 Locked</span>
+  </div>
+  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">08</div><div class="chapter-info"><div class="chapter-module">Light · Paid</div><div class="chapter-title">Golden Hour</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
+  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">09</div><div class="chapter-info"><div class="chapter-module">Light · Paid</div><div class="chapter-title">Direction of Light</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
+  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">10</div><div class="chapter-info"><div class="chapter-module">Light · Paid</div><div class="chapter-title">Natural vs Artificial Light</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
+  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">11</div><div class="chapter-info"><div class="chapter-module">Light · Paid</div><div class="chapter-title">Shadows as Subject</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
+  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">12</div><div class="chapter-info"><div class="chapter-module">Light · Paid</div><div class="chapter-title">Silhouettes</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
+  <div class="chapter-card locked" style="margin-bottom:2.5rem"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">13</div><div class="chapter-info"><div class="chapter-module">Light · Paid</div><div class="chapter-title">Harsh Midday Light</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
+
+  <!-- MODULE 3 -->
+  <div class="module-divider">
+    <div class="module-info">
+      <div class="module-number">Module 03</div>
+      <div class="module-name">Subject &amp; Storytelling</div>
+      <div class="module-desc">What the photo is actually about. Intention, emotion, the decisive moment. 6 chapters.</div>
+    </div>
+    <span class="status-badge status-locked" style="flex-shrink:0">🔒 Locked</span>
+  </div>
+  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">14</div><div class="chapter-info"><div class="chapter-module">Storytelling · Paid</div><div class="chapter-title">Finding Your Subject</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
+  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">15</div><div class="chapter-info"><div class="chapter-module">Storytelling · Paid</div><div class="chapter-title">Eyes &amp; Connection</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
+  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">16</div><div class="chapter-info"><div class="chapter-module">Storytelling · Paid</div><div class="chapter-title">Candid vs Posed</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
+  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">17</div><div class="chapter-info"><div class="chapter-module">Storytelling · Paid</div><div class="chapter-title">The Decisive Moment</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
+  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">18</div><div class="chapter-info"><div class="chapter-module">Storytelling · Paid</div><div class="chapter-title">Environmental Portraits</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
+  <div class="chapter-card locked" style="margin-bottom:2.5rem"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">19</div><div class="chapter-info"><div class="chapter-module">Storytelling · Paid</div><div class="chapter-title">Telling a Story in One Frame</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
+
+  <!-- MODULE 4 -->
+  <div class="module-divider">
+    <div class="module-info">
+      <div class="module-number">Module 04</div>
+      <div class="module-name">Technical Fundamentals</div>
+      <div class="module-desc">Exposure, depth of field, white balance. Understanding your camera, not just pointing it. 6 chapters.</div>
+    </div>
+    <span class="status-badge status-locked" style="flex-shrink:0">🔒 Locked</span>
+  </div>
+  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">20</div><div class="chapter-info"><div class="chapter-module">Technical · Paid</div><div class="chapter-title">Exposure Triangle</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
+  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">21</div><div class="chapter-info"><div class="chapter-module">Technical · Paid</div><div class="chapter-title">Depth of Field</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
+  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">22</div><div class="chapter-info"><div class="chapter-module">Technical · Paid</div><div class="chapter-title">Motion Blur vs Freeze</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
+  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">23</div><div class="chapter-info"><div class="chapter-module">Technical · Paid</div><div class="chapter-title">White Balance</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
+  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">24</div><div class="chapter-info"><div class="chapter-module">Technical · Paid</div><div class="chapter-title">Reading the Histogram</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
+  <div class="chapter-card locked" style="margin-bottom:2.5rem"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">25</div><div class="chapter-info"><div class="chapter-module">Technical · Paid</div><div class="chapter-title">RAW vs JPEG</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
+
+  <!-- MODULE 5 -->
+  <div class="module-divider">
+    <div class="module-info">
+      <div class="module-number">Module 05</div>
+      <div class="module-name">Genre Specific</div>
+      <div class="module-desc">Street, food, architecture, night and mobile. Apply everything to real-world photography types. 6 chapters.</div>
+    </div>
+    <span class="status-badge status-locked" style="flex-shrink:0">🔒 Locked</span>
+  </div>
+  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">26</div><div class="chapter-info"><div class="chapter-module">Genre · Paid</div><div class="chapter-title">Street Photography</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
+  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">27</div><div class="chapter-info"><div class="chapter-module">Genre · Paid</div><div class="chapter-title">Food Photography</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
+  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">28</div><div class="chapter-info"><div class="chapter-module">Genre · Paid</div><div class="chapter-title">Architecture</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
+  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">29</div><div class="chapter-info"><div class="chapter-module">Genre · Paid</div><div class="chapter-title">Nature &amp; Macro</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
+  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">30</div><div class="chapter-info"><div class="chapter-module">Genre · Paid</div><div class="chapter-title">Night Photography</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
+  <div class="chapter-card locked" style="margin-bottom:2.5rem"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">31</div><div class="chapter-info"><div class="chapter-module">Genre · Paid</div><div class="chapter-title">Mobile Photography</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
+
+  <!-- MODULE 6 -->
+  <div class="module-divider">
+    <div class="module-info">
+      <div class="module-number">Module 06</div>
+      <div class="module-name">Post-Processing Mindset</div>
+      <div class="module-desc">Not about filters — about intention. Crop, colour grading, developing your visual style. 5 chapters.</div>
+    </div>
+    <span class="status-badge status-locked" style="flex-shrink:0">🔒 Locked</span>
+  </div>
+  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">32</div><div class="chapter-info"><div class="chapter-module">Post-Processing · Paid</div><div class="chapter-title">Crop &amp; Straighten</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
+  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">33</div><div class="chapter-info"><div class="chapter-module">Post-Processing · Paid</div><div class="chapter-title">Exposure Correction</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
+  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">34</div><div class="chapter-info"><div class="chapter-module">Post-Processing · Paid</div><div class="chapter-title">Colour Grading Basics</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
+  <div class="chapter-card locked"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">35</div><div class="chapter-info"><div class="chapter-module">Post-Processing · Paid</div><div class="chapter-title">When to Go Black &amp; White</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
+  <div class="chapter-card locked" style="margin-bottom:2.5rem"><div class="chapter-header non-clickable"><div class="chapter-num" style="opacity:0.12">36</div><div class="chapter-info"><div class="chapter-module">Post-Processing · Paid</div><div class="chapter-title">Developing Your Edit Style</div></div><div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div></div></div>
+
+  <!-- UNLOCK CTA -->
+  <div class="unlock-cta">
+    <div class="unlock-icon">🔓</div>
+    <div class="unlock-title">Unlock the Full Curriculum</div>
+    <div class="unlock-sub">36 chapters · 6 modules · Real photos · AI feedback · Actual improvement.<br/>Complete the free chapters first, then unlock everything.</div>
+    <button class="unlock-btn" onclick="alert('Payment coming soon — finish the free chapters first!')">Unlock All Chapters →</button>
+  </div>
+
+</div><!-- /curriculum-wrap -->
+
+<div class="bottom-nav">
+  <div class="bottom-nav-inner">
+    <a href="compete.html"     class="bottom-nav-item"><span class="bottom-nav-icon">⚔️</span><span>Challenge</span></a>
+    <a href="app.html"         class="bottom-nav-item"><span class="bottom-nav-icon">📷</span><span>Analyse</span></a>
+    <a href="leaderboard.html" class="bottom-nav-item"><span class="bottom-nav-icon">🏆</span><span>Ranks</span></a>
+    <a href="gallery.html"     class="bottom-nav-item"><span class="bottom-nav-icon">🖼️</span><span>Gallery</span></a>
+    <a href="profile.html"     class="bottom-nav-item"><span class="bottom-nav-icon">👤</span><span>Profile</span></a>
+  </div>
+</div>
+
+<script>
+  let currentUser  = null;
+  let b64Data      = null;
+  let mimeType     = null;
+  let previewSrc   = null;
+  let totalPassed  = 0;
+  let done         = false;
+
+  // ── AUTH / NAV ──
+  function renderNav() {
+    const name = currentUser.user_metadata?.display_name || currentUser.email.split('@')[0];
+    document.getElementById('navAuthArea').innerHTML =
+      `<span style="font-size:0.78rem;color:rgba(240,237,232,0.3)">Hi, ${name}</span>
+       <button onclick="signOut()" style="background:none;border:none;cursor:pointer;font-size:0.72rem;letter-spacing:0.07em;text-transform:uppercase;color:rgba(240,237,232,0.3);font-family:'DM Sans',sans-serif" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='rgba(240,237,232,0.3)'">Sign Out</button>`;
+  }
+  function openMenu() {
+    document.getElementById('mobileMenu').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    const n = currentUser?.user_metadata?.display_name || currentUser?.email?.split('@')[0] || '';
+    const el = document.getElementById('mobileUser');
+    if (el) el.textContent = 'Hi, ' + n;
+  }
+  function closeMenu() { document.getElementById('mobileMenu').classList.remove('open'); document.body.style.overflow = ''; }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+
+  // ── TOGGLE ──
+  function toggleChapter(id) { document.getElementById(id + 'Body').classList.toggle('open'); }
+
+  // ── FILE ──
+  function onFile(file) {
+    if (!file || !file.type.startsWith('image/')) return;
+    mimeType = file.type;
+    const reader = new FileReader();
+    reader.onload = e => {
+      previewSrc = e.target.result;
+      b64Data    = e.target.result.split(',')[1];
+      const prev = document.getElementById('uploadPreview');
+      prev.src = previewSrc;
+      prev.style.display = 'block';
+      document.getElementById('uploadZone').style.display = 'none';
+      document.getElementById('analyseBtn').disabled = false;
+      hideErr();
+    };
+    reader.readAsDataURL(file);
+  }
+  function onDrop(e) {
+    e.preventDefault();
+    document.getElementById('uploadZone').classList.remove('drag');
+    onFile(e.dataTransfer.files[0]);
+  }
+
+  // ── ANALYSE ──
+  async function analysePhoto() {
+    if (!b64Data || done) return;
+    hideErr();
+    setLoading(true);
+    document.getElementById('analyseBtn').disabled = true;
+    document.getElementById('subResult').classList.remove('show');
+    document.getElementById('nextWrap').style.display = 'none';
+
+    try {
+      const { data: { session } } = await sb.auth.getSession();
+      const token = session?.access_token;
+
+      const res = await fetch('/api/chapter', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({
+          imageContent: { type: 'image', source: { type: 'base64', media_type: mimeType, data: b64Data } },
+          chapterId: 'ch1-rule-of-thirds'
+        })
       });
-    }, { rootMargin: '-20% 0px -70% 0px' });
 
-    chapters.forEach(c => observer.observe(c));
-  </script>
+      const r = await res.json();
+      setLoading(false);
 
-  <!-- BOTTOM NAV -->
-  <div class="bottom-nav">
-    <div class="bottom-nav-inner">
-      <a href="compete.html" class="bottom-nav-item">
-        <span class="bottom-nav-icon">⚔️</span>
-        <span>Challenge</span>
-      </a>
-      <a href="app.html" class="bottom-nav-item">
-        <span class="bottom-nav-icon">📷</span>
-        <span>Analyse</span>
-      </a>
-      <a href="leaderboard.html" class="bottom-nav-item">
-        <span class="bottom-nav-icon">🏆</span>
-        <span>Ranks</span>
-      </a>
-      <a href="gallery.html" class="bottom-nav-item">
-        <span class="bottom-nav-icon">🖼️</span>
-        <span>Gallery</span>
-      </a>
-      <a href="profile.html" class="bottom-nav-item">
-        <span class="bottom-nav-icon">👤</span>
-        <span>Profile</span>
-      </a>
-    </div>
-  </div>
+      if (r.error === 'chapter_complete') { showErr('You already completed this chapter! 🎉'); return; }
+      if (!res.ok) throw new Error(r.error || 'Analysis failed');
+      if (r.rejected) { showErr('Please upload a real photograph.'); document.getElementById('analyseBtn').disabled = false; return; }
 
-  <script>
-    function openMobileMenu() {
-      document.getElementById('mobileMenu').classList.add('open');
-      document.body.style.overflow = 'hidden';
+      showResult(r);
+      totalPassed = r.total_passed || 0;
+      updateDots(totalPassed);
+
+      if (r.chapter_complete && !done) {
+        done = true;
+        saveBadge();
+        setTimeout(() => {
+          document.getElementById('completion').classList.add('show');
+          document.getElementById('nextWrap').style.display = 'none';
+          document.getElementById('completion').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 700);
+      }
+
+    } catch (err) {
+      setLoading(false);
+      showErr('Analysis failed — ' + err.message);
+      document.getElementById('analyseBtn').disabled = false;
     }
-    function closeMobileMenu() {
-      document.getElementById('mobileMenu').classList.remove('open');
-      document.body.style.overflow = '';
+  }
+
+  function showResult(r) {
+    const pass = r.passed;
+    const score = r.composition_score;
+    const head = document.getElementById('resultHead');
+    const scoreEl = document.getElementById('resultScore');
+    head.className  = 'result-head ' + (pass ? 'pass' : 'fail');
+    scoreEl.className = 'result-score ' + (pass ? 'pass' : 'fail');
+    scoreEl.textContent = score + '/10';
+    document.getElementById('resultTitle').textContent = pass ? '✓ Counts toward your progress!' : '✗ Below 7 — doesn\'t count';
+    document.getElementById('resultSub').textContent   = pass ? 'Rule of Thirds well demonstrated' : 'Try again with a different photo';
+    document.getElementById('resultFeedback').textContent = r.feedback || '';
+    document.getElementById('resultWorked').textContent   = r.what_worked || '—';
+    document.getElementById('resultImprove').textContent  = r.improvement || '—';
+    document.getElementById('failHint').style.display     = pass ? 'none' : 'block';
+    document.getElementById('subResult').classList.add('show');
+    if (!done) document.getElementById('nextWrap').style.display = 'block';
+    document.getElementById('subResult').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function updateDots(passed) {
+    const dots = document.getElementById('missionDots').children;
+    for (let i = 0; i < 5; i++) {
+      dots[i].className = 'mdot';
+      if (i < passed)        { dots[i].classList.add('done');   dots[i].textContent = '✓'; }
+      else if (i === passed) { dots[i].classList.add('active'); dots[i].textContent = i + 1; }
+      else                   { dots[i].textContent = i + 1; }
     }
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMobileMenu(); });
-  </script>
+    const pct = (passed / 5) * 100;
+    document.getElementById('ch1Bar').style.width   = pct + '%';
+    document.getElementById('ch1Label').textContent = passed + ' / 5 passed';
+    if (passed >= 5) {
+      document.getElementById('ch1Meta').innerHTML = '<span class="status-badge status-complete">✓ Complete</span>';
+    }
+  }
+
+  function resetUpload() {
+    b64Data = null; mimeType = null; previewSrc = null;
+    const prev = document.getElementById('uploadPreview');
+    prev.src = ''; prev.style.display = 'none';
+    document.getElementById('uploadZone').style.display = 'block';
+    document.getElementById('chFile').value = '';
+    document.getElementById('analyseBtn').disabled = true;
+    document.getElementById('subResult').classList.remove('show');
+    document.getElementById('nextWrap').style.display = 'none';
+    hideErr();
+    document.getElementById('uploadZone').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function setLoading(on) {
+    document.getElementById('chLoading').classList.toggle('show', on);
+    document.getElementById('uploadWrap').style.display = on ? 'none' : 'block';
+  }
+  function showErr(msg) { const e = document.getElementById('chError'); e.textContent = msg; e.classList.add('show'); }
+  function hideErr()     { document.getElementById('chError').classList.remove('show'); }
+
+  // ── BADGE ──
+  async function saveBadge() {
+    try {
+      await sb.from('badges').upsert({
+        user_id: currentUser.id, badge_id: 'ch1-rule-of-thirds',
+        badge_name: 'Rule of Thirds', earned_at: new Date().toISOString()
+      }, { onConflict: 'user_id,badge_id' });
+    } catch(e) { console.warn('Badge save failed', e); }
+  }
+
+  // ── SHARE CARD ──
+  function generateCard() {
+    const wrap = document.getElementById('shareWrap');
+    wrap.classList.add('show');
+    const canvas = document.getElementById('shareCard');
+    const ctx    = canvas.getContext('2d');
+    const W = 800, H = 480;
+
+    // BG
+    ctx.fillStyle = '#080808';
+    ctx.fillRect(0, 0, W, H);
+
+    // Grid
+    ctx.strokeStyle = 'rgba(232,184,75,0.05)';
+    ctx.lineWidth = 1;
+    for (let x = 0; x < W; x += 60) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+    for (let y = 0; y < H; y += 60) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+
+    // Left gold bar
+    const g = ctx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0, '#e8b84b'); g.addColorStop(1, '#c49a2a');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, 5, H);
+
+    // Badge emoji
+    ctx.font = '80px serif';
+    ctx.fillText('🏆', 50, 155);
+
+    // LensUp wordmark
+    ctx.font = 'bold 18px sans-serif';
+    ctx.fillStyle = '#e8b84b'; ctx.fillText('LENS', 52, 210);
+    ctx.fillStyle = '#f5f2ee'; ctx.fillText('UP',  52 + ctx.measureText('LENS').width, 210);
+
+    // Headline
+    ctx.fillStyle = '#f5f2ee';
+    ctx.font = 'bold 48px sans-serif';
+    ctx.fillText('CHAPTER COMPLETE', 52, 285);
+
+    // Chapter name
+    ctx.fillStyle = '#e8b84b';
+    ctx.font = '24px sans-serif';
+    ctx.fillText('Rule of Thirds — Composition Basics', 52, 325);
+
+    // Divider
+    ctx.strokeStyle = 'rgba(232,184,75,0.2)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(52, 348); ctx.lineTo(W - 60, 348); ctx.stroke();
+
+    // Name + date
+    const name    = currentUser?.user_metadata?.display_name || currentUser?.email?.split('@')[0] || 'Photographer';
+    const dateStr = new Date().toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
+    ctx.fillStyle = 'rgba(245,242,238,0.55)';
+    ctx.font = '17px sans-serif';
+    ctx.fillText('Completed by ' + name, 52, 378);
+    ctx.fillStyle = 'rgba(245,242,238,0.25)';
+    ctx.font = '13px sans-serif';
+    ctx.fillText(dateStr, 52, 402);
+
+    // URL
+    ctx.fillStyle = 'rgba(232,184,75,0.45)';
+    ctx.font = '12px sans-serif';
+    ctx.fillText('lensup.vercel.app', W - 170, H - 20);
+
+    // Photo thumbnail — top right
+    if (previewSrc) {
+      const img = new Image();
+      img.onload = () => {
+        const tw = 220, th = 165;
+        const tx = W - tw - 52, ty = 60;
+        ctx.save();
+        ctx.beginPath();
+        // Rounded rect clip
+        const r = 8;
+        ctx.moveTo(tx + r, ty);
+        ctx.lineTo(tx + tw - r, ty); ctx.arcTo(tx+tw, ty, tx+tw, ty+r, r);
+        ctx.lineTo(tx+tw, ty+th-r);  ctx.arcTo(tx+tw, ty+th, tx+tw-r, ty+th, r);
+        ctx.lineTo(tx+r, ty+th);      ctx.arcTo(tx, ty+th, tx, ty+th-r, r);
+        ctx.lineTo(tx, ty+r);         ctx.arcTo(tx, ty, tx+r, ty, r);
+        ctx.clip();
+        ctx.drawImage(img, tx, ty, tw, th);
+        ctx.restore();
+        // Border
+        ctx.strokeStyle = 'rgba(232,184,75,0.35)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(tx + r, ty);
+        ctx.lineTo(tx + tw - r, ty); ctx.arcTo(tx+tw, ty, tx+tw, ty+r, r);
+        ctx.lineTo(tx+tw, ty+th-r);  ctx.arcTo(tx+tw, ty+th, tx+tw-r, ty+th, r);
+        ctx.lineTo(tx+r, ty+th);      ctx.arcTo(tx, ty+th, tx, ty+th-r, r);
+        ctx.lineTo(tx, ty+r);         ctx.arcTo(tx, ty, tx+r, ty, r);
+        ctx.stroke();
+      };
+      img.src = previewSrc;
+    }
+
+    wrap.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  // ── LOAD PROGRESS ──
+  async function loadProgress() {
+    try {
+      const { data } = await sb
+        .from('chapter_submissions')
+        .select('id, passed')
+        .eq('user_id', currentUser.id)
+        .eq('chapter_id', 'ch1-rule-of-thirds');
+      const passed = (data || []).filter(r => r.passed).length;
+      totalPassed = passed;
+      updateDots(passed);
+      if (passed >= 5) {
+        done = true;
+        document.getElementById('completion').classList.add('show');
+        document.getElementById('uploadWrap').style.display = 'none';
+      }
+    } catch(e) { console.warn('Progress load failed', e); }
+  }
+
+  // ── INIT ──
+  async function init() {
+    try {
+      initSupabase();
+      await new Promise(r => setTimeout(r, 200));
+      currentUser = await getUser();
+      if (!currentUser) { window.location.href = 'login.html'; return; }
+      document.body.classList.add('auth-ready');
+      renderNav();
+      await loadProgress();
+    } catch(e) {
+      console.error(e);
+      document.body.classList.add('auth-ready');
+    }
+  }
+
+  init();
+</script>
 </body>
 </html>
