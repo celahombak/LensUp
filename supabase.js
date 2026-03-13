@@ -111,7 +111,7 @@ function dbRowToResult(row) {
       category_notes: row.category_notes || {},
       summary: row.summary,
       strengths: row.strengths,
-      improvements: row.improvements,
+      improvements: typeof row.improvements === 'string' ? (() => { try { return JSON.parse(row.improvements); } catch { return []; } })() : (row.improvements || []),
       technical: row.technical
     }
   };
