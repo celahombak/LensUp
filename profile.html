@@ -315,13 +315,17 @@
     }
 
     async function loadProfileData(userId) {
-      const sb = window._supabase;
+
+      console.log('🔍 loadProfileData called with userId:', userId);
+      console.log('🔍 supabase instance:', sb ? 'exists' : 'NULL');
       const { data, error } = await sb
         .from('analyses')
         .select('*')
         .eq('user_id', userId)
         .order('created_at', { ascending: false });
-      if (error) { console.error(error); return []; }
+      console.log('🔍 query result — data:', data, '| error:', error);
+      if (error) { console.error('❌ Supabase error:', error); return []; }
+      console.log('✅ rows returned:', data?.length);
       return data || [];
     }
 
@@ -452,7 +456,7 @@
     async function saveName() {
       const val = document.getElementById('nameInput').value.trim();
       if (!val) return;
-      const { error } = await window._supabase.auth.updateUser({ data: { display_name: val } });
+      const { error } = await sb.auth.updateUser({ data: { display_name: val } });
       if (error) { showToast('Error saving name'); return; }
       document.getElementById('heroName').innerHTML = `<em>${val}</em>`;
       showToast('Name saved!');
@@ -468,7 +472,7 @@
     async function selectEmoji(e) {
       document.getElementById('avatarEmoji').textContent = e;
       closeEmojiPicker();
-      const { error } = await window._supabase.auth.updateUser({ data: { avatar: e } });
+      const { error } = await sb.auth.updateUser({ data: { avatar: e } });
       if (error) { showToast('Error saving avatar'); return; }
       showToast('Avatar updated!');
     }
@@ -494,6 +498,7 @@
         initSupabase();
         await new Promise(resolve => setTimeout(resolve, 300));
         currentUser = await getUser();
+        console.log('🔍 currentUser:', currentUser?.id, currentUser?.email);
         if (!currentUser) { window.location.href = 'login.html'; return; }
         document.body.classList.add('auth-ready');
         renderNavAuth();
@@ -502,11 +507,13 @@
         const viewingId   = params.get('user');
         isOwnProfile      = !viewingId || viewingId === currentUser.id;
         const targetId    = isOwnProfile ? currentUser.id : viewingId;
+        console.log('🔍 viewingId:', viewingId, '| isOwnProfile:', isOwnProfile, '| targetId:', targetId);
 
         document.getElementById('ownProfileSettings').style.display   = isOwnProfile  ? ''     : 'none';
         document.getElementById('publicProfileSidebar').style.display = !isOwnProfile ? 'flex' : 'none';
 
         const data = await loadProfileData(targetId);
+        console.log('🔍 data length:', data.length);
 
         renderHero(data);
         renderBadges(data);
@@ -516,7 +523,7 @@
         renderBestPhoto(data);
 
       } catch(err) {
-        console.error('Profile init error:', err);
+        console.error('❌ Profile init error:', err);
         document.body.classList.add('auth-ready');
       }
     }
