@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LensUp — My Gallery</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
+  <style>
+    body { visibility: hidden; }
+    body.auth-ready { visibility: visible; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --black: #080808; --white: #f5f2ee; --gold: #c9a96e;
+      --gold-light: #e8d5b0; --dark: #1a1714; --dark2: #141210;
+      --mid: #6b6560; --border: rgba(201,169,110,0.15);
+      --c1: #60a5fa; --c2: #f472b6; --c3: #34d399;
+      --c4: #fbbf24; --c5: #a78bfa; --c6: #fb923c;
+    }
+    html { scroll-behavior: smooth; }
+    body { background: var(--black); color: var(--white); font-family: 'DM Sans', sans-serif; font-weight: 300; min-height: 100vh; }
+
+    /* NAV */
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 1rem 3rem; border-bottom: 1px solid var(--border); background: rgba(8,8,8,0.97); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(16px); }
+    .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; letter-spacing: 0.08em; color: var(--gold); text-decoration: none; }
+    .nav-logo span { color: var(--white); }
+    .nav-links { display: flex; align-items: center; gap: 2rem; flex-wrap: wrap; }
+    .nav-link { font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(240,237,232,0.45); text-decoration: none; transition: color 0.2s; }
+    .nav-link:hover { color: var(--gold); }
+    .nav-link.active { color: var(--gold); }
+
+    /* HERO */
+    .page-hero { padding: 3rem 3rem 2.5rem; border-bottom: 1px solid var(--border); background: linear-gradient(135deg, rgba(201,169,110,0.04) 0%, transparent 60%); }
+    .page-hero-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 1.5rem; }
+    .page-tag { color: var(--gold); font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 0.5rem; display: block; }
+    .page-hero h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2.5rem, 5vw, 3.8rem); letter-spacing: 0.04em; line-height: 1; margin-bottom: 0.4rem; }
+    .page-hero h1 em { font-style: normal; color: var(--gold); }
+    .page-hero p { color: rgba(245,242,238,0.45); font-size: 0.88rem; line-height: 1.7; }
+    .hero-stats { display: flex; gap: 2rem; flex-shrink: 0; }
+    .hero-stat { text-align: center; }
+    .hero-stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; letter-spacing: 0.04em; display: block; }
+    .hero-stat-label { font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--mid); }
+
+    /* WRAP */
+    .gallery-wrap { max-width: 1100px; margin: 0 auto; padding: 2.5rem 2rem 5rem; }
+
+    /* TOOLBAR */
+    .toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+    .filter-group { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .filter-btn { background: none; border: 1px solid var(--border); color: rgba(245,242,238,0.5); padding: 0.45rem 1rem; border-radius: 20px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; transition: all 0.2s; }
+    .filter-btn:hover { border-color: rgba(201,169,110,0.4); color: var(--white); }
+    .filter-btn.active { background: var(--gold); color: var(--black); border-color: var(--gold); }
+    .toolbar-right { display: flex; gap: 0.6rem; align-items: center; }
+    .sort-select { background: var(--dark); border: 1px solid var(--border); color: rgba(245,242,238,0.7); padding: 0.45rem 0.8rem; border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 0.75rem; outline: none; cursor: pointer; }
+    .view-toggle { display: flex; gap: 0.3rem; }
+    .view-btn { background: none; border: 1px solid var(--border); color: rgba(245,242,238,0.4); padding: 0.45rem 0.7rem; border-radius: 6px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; }
+    .view-btn.active { background: var(--dark); color: var(--gold); border-color: rgba(201,169,110,0.3); }
+
+
+    /* EMPTY */
+    .empty-state { text-align: center; padding: 6rem 2rem; display: none; }
+    .empty-state.visible { display: block; }
+    .empty-icon { font-size: 3rem; margin-bottom: 1.2rem; opacity: 0.3; display: block; }
+    .empty-state h2 { font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; margin-bottom: 0.6rem; opacity: 0.5; }
+    .empty-state p { color: rgba(245,242,238,0.3); font-size: 0.88rem; line-height: 1.7; margin-bottom: 2rem; }
+    .btn-gold { background: var(--gold); color: var(--black); padding: 0.8rem 2rem; border-radius: 6px; text-decoration: none; font-size: 0.82rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; transition: background 0.2s; display: inline-block; }
+    .btn-gold:hover { background: var(--gold-light); }
+
+    /* GRID */
+    .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
+    .gallery-grid.list-view { grid-template-columns: 1fr; gap: 0.8rem; }
+
+    /* CARD */
+    .gallery-card { background: var(--dark); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; cursor: pointer; transition: all 0.25s; animation: fadeUp 0.4s ease both; }
+    .gallery-card:hover { border-color: rgba(201,169,110,0.35); transform: translateY(-2px); }
+    .card-image { width: 100%; height: 200px; object-fit: contain; display: block; background: var(--dark2); }
+    .card-image-placeholder { width: 100%; height: 200px; background: var(--dark2); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; opacity: 0.15; }
+    .card-body { padding: 1.2rem; }
+    .card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 0.8rem; }
+    .card-score-big { font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; letter-spacing: 0.04em; line-height: 1; }
+    .card-score-label { font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mid); margin-top: 0.2rem; }
+    .card-verdict { font-size: 0.72rem; font-weight: 600; margin-top: 0.2rem; }
+    .card-date { font-size: 0.7rem; color: var(--mid); text-align: right; }
+
+    /* MINI SCORE PILLS */
+    .card-mini-scores { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.8rem; }
+    .mini-pill { font-size: 0.62rem; padding: 0.2rem 0.55rem; border-radius: 20px; font-weight: 600; border: 1px solid; }
+
+    .card-summary { font-size: 0.78rem; line-height: 1.6; color: rgba(245,242,238,0.4); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .card-actions { display: flex; gap: 0.5rem; padding: 0.8rem 1.2rem; border-top: 1px solid var(--border); }
+    .card-btn { background: none; border: 1px solid var(--border); color: rgba(245,242,238,0.5); padding: 0.35rem 0.8rem; border-radius: 4px; cursor: pointer; font-size: 0.68rem; letter-spacing: 0.07em; text-transform: uppercase; transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
+    .card-btn:hover { border-color: var(--gold); color: var(--gold); }
+    .card-btn-del:hover { border-color: rgba(200,80,80,0.5) !important; color: #f08080 !important; }
+
+    /* LIST VIEW */
+    .gallery-grid.list-view .gallery-card { display: flex; align-items: center; }
+    .gallery-grid.list-view .card-image,
+    .gallery-grid.list-view .card-image-placeholder { width: 80px; height: 60px; flex-shrink: 0; border-radius: 0; }
+    .gallery-grid.list-view .card-body { flex: 1; padding: 0.7rem 1rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+    .gallery-grid.list-view .card-top { flex-direction: row; align-items: center; margin: 0; gap: 0.5rem; }
+    .gallery-grid.list-view .card-mini-scores { margin: 0; flex: 1; }
+    .gallery-grid.list-view .card-summary { display: none; }
+    .gallery-grid.list-view .card-actions { border: none; padding: 0.7rem; flex-shrink: 0; }
+    .gallery-grid.list-view .card-score-label { display: none; }
+
+    /* MODAL */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 200; align-items: flex-start; justify-content: center; padding: 1.5rem; overflow-y: auto; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--black); border: 1px solid var(--border); border-radius: 8px; width: 100%; max-width: 860px; margin: auto; animation: fadeUp 0.3s ease; }
+    .modal-header { padding: 1.2rem 1.8rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: var(--black); z-index: 1; }
+    .modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; letter-spacing: 0.06em; }
+    .modal-close { background: none; border: none; cursor: pointer; color: var(--mid); font-size: 1.3rem; transition: color 0.2s; padding: 0.2rem 0.5rem; }
+    .modal-close:hover { color: var(--white); }
+
+    /* TOP: photo + scores side by side */
+    .modal-top { display: grid; grid-template-columns: 280px 1fr; border-bottom: 1px solid var(--border); }
+    .modal-photo { background: var(--dark2); display: flex; align-items: center; justify-content: center; min-height: 260px; overflow: hidden; }
+    .modal-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .modal-photo-placeholder { font-size: 3rem; opacity: 0.15; }
+    .modal-scores-panel { padding: 1.6rem 1.8rem; display: flex; flex-direction: column; justify-content: center; }
+    .modal-overall-row { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1.3rem; padding-bottom: 1.1rem; border-bottom: 1px solid var(--border); }
+    .modal-overall-big { font-family: 'Bebas Neue', sans-serif; font-size: 3.5rem; letter-spacing: 0.04em; color: var(--gold); line-height: 1; }
+    .modal-overall-denom { font-size: 1rem; color: var(--mid); align-self: flex-end; margin-bottom: 0.3rem; }
+    .modal-verdict { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; margin-bottom: 0.2rem; }
+    .modal-date { font-size: 0.72rem; color: rgba(245,242,238,0.35); letter-spacing: 0.05em; }
+    .modal-bars { display: flex; flex-direction: column; gap: 0.8rem; }
+    .modal-bar-row { display: flex; align-items: center; gap: 0.8rem; }
+    .modal-bar-label { font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(245,242,238,0.5); width: 110px; flex-shrink: 0; }
+    .modal-bar-track { flex: 1; height: 5px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; }
+    .modal-bar-fill { height: 100%; border-radius: 3px; transition: width 1.2s cubic-bezier(0.4,0,0.2,1); width: 0%; }
+    .modal-bar-val { font-size: 0.82rem; font-weight: 600; width: 28px; text-align: right; flex-shrink: 0; }
+
+    /* SUMMARY */
+    .modal-summary { padding: 1.5rem 1.8rem; border-bottom: 1px solid var(--border); font-size: 0.9rem; line-height: 1.8; color: rgba(245,242,238,0.65); }
+
+    /* CATEGORY CARDS */
+    .modal-category-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; padding: 1.5rem 1.8rem; border-bottom: 1px solid var(--border); }
+    .modal-cat-card { background: var(--dark); border: 1px solid var(--border); border-radius: 8px; padding: 1.1rem; }
+    .modal-cat-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6rem; }
+    .modal-cat-icon { font-size: 1.2rem; }
+    .modal-cat-badge { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; padding: 0.1rem 0.5rem; border-radius: 4px; background: rgba(255,255,255,0.05); }
+    .modal-cat-name { font-size: 0.78rem; font-weight: 600; letter-spacing: 0.03em; margin-bottom: 0.4rem; }
+    .modal-cat-desc { font-size: 0.72rem; line-height: 1.6; color: rgba(245,242,238,0.45); }
+    .modal-cat-tag { display: inline-block; margin-top: 0.6rem; font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.2rem 0.6rem; border-radius: 20px; font-weight: 600; }
+
+    /* IMPROVEMENTS */
+    .modal-improvements { padding: 1.5rem 1.8rem; border-bottom: 1px solid var(--border); }
+    .modal-imp-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.05rem; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 0.5rem; }
+    .modal-imp-title span { color: var(--gold); }
+    .modal-imp-item { display: flex; gap: 1.1rem; align-items: flex-start; padding: 0.9rem 0; border-bottom: 1px solid rgba(201,169,110,0.06); }
+    .modal-imp-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .modal-imp-num { width: 26px; height: 26px; border-radius: 50%; background: rgba(201,169,110,0.1); border: 1px solid rgba(201,169,110,0.25); color: var(--gold); font-size: 0.72rem; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 0.1rem; }
+    .modal-imp-name { font-size: 0.83rem; font-weight: 600; margin-bottom: 0.25rem; }
+    .modal-imp-desc { font-size: 0.78rem; line-height: 1.7; color: rgba(245,242,238,0.5); }
+
+    /* TECHNICAL */
+    .modal-technical { padding: 1.2rem 1.8rem; border-bottom: 1px solid var(--border); display: flex; gap: 0.8rem; align-items: flex-start; background: rgba(201,169,110,0.03); }
+    .modal-tech-text { font-size: 0.82rem; line-height: 1.7; color: rgba(245,242,238,0.5); }
+
+    /* FOOTER */
+    .modal-footer { padding: 1.2rem 1.8rem; display: flex; gap: 0.8rem; flex-wrap: wrap; }
+    .btn-modal { background: none; border: 1px solid var(--border); color: var(--white); padding: 0.6rem 1.2rem; border-radius: 4px; cursor: pointer; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; transition: all 0.2s; font-family: 'DM Sans', sans-serif; text-decoration: none; display: inline-flex; align-items: center; }
+    .btn-modal:hover { border-color: var(--gold); color: var(--gold); }
+    .btn-modal-danger { color: rgba(200,80,80,0.7); border-color: rgba(200,80,80,0.2); }
+    .btn-modal-danger:hover { border-color: rgba(200,80,80,0.5) !important; color: #f08080 !important; }
+    .btn-modal-primary { background: var(--gold); color: var(--black); border-color: var(--gold); font-weight: 600; }
+    .btn-modal-primary:hover { background: var(--gold-light); color: var(--black); }
+
+    @media (max-width: 600px) {
+      .modal-top { grid-template-columns: 1fr; }
+      .modal-photo { min-height: 200px; }
+      .modal-category-grid { grid-template-columns: repeat(2,1fr); }
+    }
+
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    @media (max-width: 600px) {
+      nav { padding: 1rem 1.2rem; }
+      .page-hero { padding: 2rem 1.2rem 1.8rem; }
+      .gallery-wrap { padding: 1.5rem 1rem 4rem; }
+      .hero-stats { display: none; }
+      .modal { max-height: 95vh; }
+    }
+
+    /* ═══════════════════════════════════════
+       MOBILE NAV — shared across all pages
+    ═══════════════════════════════════════ */
+
+    /* Hide desktop nav links on mobile, show burger */
+    .nav-burger { display: none; background: none; border: none; cursor: pointer; padding: 0.4rem; color: var(--white); flex-direction: column; gap: 5px; align-items: center; justify-content: center; }
+    .nav-burger span { display: block; width: 22px; height: 2px; background: var(--white); transition: all 0.3s; border-radius: 2px; }
+    .nav-burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .nav-burger.open span:nth-child(2) { opacity: 0; }
+    .nav-burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* Overlay menu */
+    .mobile-menu {
+      display: none;
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(8,8,8,0.98);
+      z-index: 99;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      backdrop-filter: blur(16px);
+    }
+    .mobile-menu.open { display: flex; animation: menuFadeIn 0.2s ease both; }
+    @keyframes menuFadeIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+    .mobile-menu-close {
+      position: absolute; top: 1.2rem; right: 1.5rem;
+      background: none; border: none; color: var(--mid);
+      font-size: 1.5rem; cursor: pointer; padding: 0.4rem;
+      transition: color 0.2s;
+    }
+    .mobile-menu-close:hover { color: var(--white); }
+    .mobile-menu-logo {
+      font-family: 'Bebas Neue', sans-serif; font-size: 2rem;
+      letter-spacing: 0.08em; color: var(--gold);
+      margin-bottom: 2.5rem;
+    }
+    .mobile-menu-logo span { color: var(--white); }
+    .mobile-menu a {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem; letter-spacing: 0.06em;
+      color: rgba(240,237,232,0.55); text-decoration: none;
+      padding: 0.7rem 2rem; transition: color 0.2s;
+      text-align: center;
+    }
+    .mobile-menu a:hover, .mobile-menu a.active { color: var(--gold); }
+    .mobile-menu-divider { width: 40px; height: 1px; background: var(--border); margin: 0.8rem 0; }
+    .mobile-menu-auth { margin-top: 1.5rem; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mid); text-align: center; }
+    .mobile-menu-auth span { color: rgba(240,237,232,0.5); display: block; margin-bottom: 0.8rem; font-size: 0.72rem; }
+    .mobile-menu-signout { background: none; border: 1px solid var(--border); color: var(--mid); padding: 0.5rem 1.5rem; font-family: 'DM Sans', sans-serif; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+    .mobile-menu-signout:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* Bottom nav bar */
+    .bottom-nav {
+      display: none;
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: rgba(10,10,10,0.97);
+      border-top: 1px solid var(--border);
+      backdrop-filter: blur(16px);
+      z-index: 98;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    .bottom-nav-inner { display: flex; align-items: stretch; }
+    .bottom-nav-item {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 0.6rem 0.3rem;
+      text-decoration: none;
+      color: rgba(240,237,232,0.35);
+      font-size: 0.55rem; letter-spacing: 0.08em;
+      text-transform: uppercase; gap: 0.25rem;
+      transition: color 0.2s;
+      border-top: 2px solid transparent;
+    }
+    .bottom-nav-item:hover { color: rgba(240,237,232,0.7); }
+    .bottom-nav-item.active { color: var(--gold); border-top-color: var(--gold); }
+    .bottom-nav-icon { font-size: 1.25rem; line-height: 1; }
+
+    /* Add bottom padding to page body so content isn't hidden behind bottom nav */
+    @media (max-width: 768px) {
+      .nav-burger { display: flex; }
+      .nav-links { display: none !important; }
+      nav { padding: 0.9rem 1.2rem; }
+      .bottom-nav { display: block; }
+      body { padding-bottom: 60px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="index.html" class="nav-logo">Lens<span>Up</span></a>
+    <div class="nav-links">
+      <a href="compete.html" class="nav-link">⚔️ Challenge</a>
+      <a href="leaderboard.html" class="nav-link">🏆 Leaderboard</a>
+      <a href="learn.html" class="nav-link">Learn</a>
+      <a href="app.html" class="nav-link">Analyse</a>
+      <a href="gallery.html" class="nav-link active">Gallery</a>
+      <a href="profile.html" class="nav-link">Profile</a>
+      <span id="navAuthArea"></span>
+    </div>
+    <button class="nav-burger" id="navBurger" onclick="openMobileMenu()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+  </nav>
+
+  <!-- MOBILE OVERLAY MENU -->
+  <div class="mobile-menu" id="mobileMenu">
+    <button class="mobile-menu-close" onclick="closeMobileMenu()">✕</button>
+    <div class="mobile-menu-logo">Lens<span>Up</span></div>
+    <a href="compete.html" class="">⚔️ Challenge</a>
+    <a href="app.html" class="">📷 Analyse</a>
+    <a href="leaderboard.html" class="">🏆 Leaderboard</a>
+    <a href="gallery.html" class="gallery active">🖼️ Gallery</a>
+    <a href="profile.html" class="">👤 Profile</a>
+    <a href="learn.html" class="">📚 Learn</a>
+    <div class="mobile-menu-divider"></div>
+    <div class="mobile-menu-auth">
+      <span id="mobileMenuUser"></span>
+      <button class="mobile-menu-signout" onclick="signOut()">Sign Out</button>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <div class="page-hero">
+    <div class="page-hero-inner">
+      <div>
+        <span class="page-tag">Your Collection</span>
+        <h1>My <em>Gallery</em></h1>
+        <p>All your analysed photos in one place.</p>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <span class="hero-stat-num" id="heroTotal" style="color:var(--c1)">0</span>
+          <span class="hero-stat-label">Photos</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-num" id="heroAvg" style="color:var(--gold)">—</span>
+          <span class="hero-stat-label">Avg Score</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-num" id="heroBest" style="color:var(--c3)">—</span>
+          <span class="hero-stat-label">Best Score</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="gallery-wrap">
+
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+      <div class="filter-group">
+        <button class="filter-btn active" onclick="setFilter('all', this)">All</button>
+        <button class="filter-btn" onclick="setFilter('high', this)">7–10 🏆</button>
+        <button class="filter-btn" onclick="setFilter('mid', this)">5–6 👍</button>
+        <button class="filter-btn" onclick="setFilter('low', this)">1–4 📚</button>
+      </div>
+      <div class="toolbar-right">
+        <select class="sort-select" onchange="setSort(this.value)">
+          <option value="date-desc">Newest First</option>
+          <option value="date-asc">Oldest First</option>
+          <option value="score-desc">Highest Score</option>
+          <option value="score-asc">Lowest Score</option>
+        </select>
+        <div class="view-toggle">
+          <button class="view-btn active" onclick="setView('grid', this)" title="Grid">⊞</button>
+          <button class="view-btn" onclick="setView('list', this)" title="List">☰</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- EMPTY STATE -->
+    <div class="empty-state" id="emptyState">
+      <span class="empty-icon">🖼️</span>
+      <h2>No photos yet</h2>
+      <p>Analyse your first photo to start building your gallery.</p>
+      <a href="app.html" class="btn-gold">📷 Analyse a Photo</a>
+    </div>
+
+    <!-- GRID -->
+    <div class="gallery-grid" id="galleryGrid"></div>
+
+  </div>
+
+  <!-- MODAL -->
+  <div class="modal-overlay" id="modalOverlay" onclick="closeModalOnOverlay(event)">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Analysis Detail</div>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+      <div class="modal-top" id="modalTop">
+        <div class="modal-photo" id="modalPhoto"></div>
+        <div class="modal-scores-panel">
+          <div class="modal-overall-row">
+            <div>
+              <div class="modal-overall-big" id="modalOverallBig">—</div>
+              <div style="font-size:0.85rem;color:var(--mid)">/10</div>
+            </div>
+            <div>
+              <div class="modal-verdict" id="modalVerdict"></div>
+              <div class="modal-date" id="modalDate"></div>
+            </div>
+          </div>
+          <div class="modal-bars" id="modalBars"></div>
+        </div>
+      </div>
+      <div class="modal-summary" id="modalSummary"></div>
+      <div class="modal-category-grid" id="modalCatGrid"></div>
+      <div class="modal-improvements" id="modalImprovements"></div>
+      <div class="modal-technical" id="modalTechnical"></div>
+      <div class="modal-footer" id="modalFooter"></div>
+    </div>
+  </div>
+
+  <script>
+    const CATEGORIES = [
+      { key: 'subject_focus',   label: 'Subject Focus',    icon: '🎯', color: 'var(--c1)' },
+      { key: 'color_contrast',  label: 'Color & Contrast', icon: '🎨', color: 'var(--c2)' },
+      { key: 'composition',     label: 'Composition',      icon: '📐', color: 'var(--c3)' },
+      { key: 'lighting',        label: 'Lighting',         icon: '💡', color: 'var(--c4)' },
+      { key: 'background_blur', label: 'Background Blur',  icon: '✨', color: 'var(--c5)' },
+      { key: 'framing',         label: 'Framing',          icon: '✂️', color: 'var(--c6)' },
+    ];
+
+    function getVerdict(score) {
+      if (score >= 9) return { label: 'Mastershot! 🏆', color: '#34d399' };
+      if (score >= 7) return { label: 'Good Shot! 📷',  color: 'var(--gold)' };
+      if (score >= 5) return { label: 'Decent Shot 👍', color: '#60a5fa' };
+      if (score >= 3) return { label: 'Needs Work 📚',  color: '#fb923c' };
+      return              { label: 'Keep Practicing 💪', color: '#f08080' };
+    }
+
+    let currentUser = null;
+    let cloudData = [];
+    let currentFilter = 'all';
+    let currentSort = 'date-desc';
+    let currentView = 'grid';
+
+    function getHistory() {
+      try { return JSON.parse(localStorage.getItem('lensup_history') || '[]'); } catch { return []; }
+    }
+
+    function getAllData() {
+      return cloudData.length > 0 ? cloudData : getHistory();
+    }
+
+    function isUrl(str) { return str && str.startsWith('http'); }
+
+    // ── NAV AUTH ──
+    function renderNavAuth() {
+      const area = document.getElementById('navAuthArea');
+      const name = currentUser.user_metadata?.display_name || currentUser.email.split('@')[0];
+      area.innerHTML = `
+        <span style="font-size:0.78rem;color:rgba(245,242,238,0.35);">Hi, ${name}</span>
+        <button onclick="signOut()" style="font-size:0.78rem;letter-spacing:0.07em;text-transform:uppercase;color:rgba(245,242,238,0.35);background:none;border:none;cursor:pointer;padding:0;font-family:'DM Sans',sans-serif;" onmouseover="this.style.color='#c9a96e'" onmouseout="this.style.color='rgba(245,242,238,0.35)'">Sign Out</button>
+      `;
+    }
+
+    // ── FILTER / SORT / VIEW ──
+    function setFilter(f, btn) {
+      currentFilter = f;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderGallery();
+    }
+    function setSort(s) { currentSort = s; renderGallery(); }
+    function setView(v, btn) {
+      currentView = v;
+      document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('galleryGrid').className = 'gallery-grid' + (v === 'list' ? ' list-view' : '');
+    }
+
+    // ── RENDER ──
+    function renderGallery() {
+      let data = [...getAllData()];
+
+      // Filter
+      if (currentFilter === 'high') data = data.filter(i => i.result.overall >= 7);
+      else if (currentFilter === 'mid') data = data.filter(i => i.result.overall >= 5 && i.result.overall < 7);
+      else if (currentFilter === 'low') data = data.filter(i => i.result.overall < 5);
+
+      // Sort
+      if (currentSort === 'date-asc') data.sort((a,b) => new Date(a.date) - new Date(b.date));
+      else if (currentSort === 'score-desc') data.sort((a,b) => b.result.overall - a.result.overall);
+      else if (currentSort === 'score-asc') data.sort((a,b) => a.result.overall - b.result.overall);
+      else data.sort((a,b) => new Date(b.date) - new Date(a.date));
+
+      const all = getAllData();
+      const grid = document.getElementById('galleryGrid');
+      const empty = document.getElementById('emptyState');
+
+      // Hero stats
+      if (all.length > 0) {
+        const scores = all.map(i => i.result.overall);
+        document.getElementById('heroTotal').textContent = all.length;
+        document.getElementById('heroAvg').textContent = (scores.reduce((a,b)=>a+b,0)/scores.length).toFixed(1);
+        document.getElementById('heroBest').textContent = Math.max(...scores);
+      }
+
+      if (data.length === 0) {
+        grid.innerHTML = '';
+        empty.classList.add('visible');
+        return;
+      }
+      empty.classList.remove('visible');
+
+      grid.innerHTML = data.map((item, i) => {
+        const r = item.result;
+        const verdict = getVerdict(r.overall);
+        const date = new Date(item.date).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+        const imgSrc = item.previewUrl || (isUrl(item.url) ? item.url : null);
+        const realIdx = getAllData().indexOf(item);
+
+        return `
+          <div class="gallery-card" onclick="openModal(${realIdx})" style="animation-delay:${i*0.04}s">
+            ${imgSrc
+              ? `<img class="card-image" src="${imgSrc}" alt="Photo" loading="lazy" onerror="this.outerHTML='<div class=\\'card-image-placeholder\\'>📷</div>'">`
+              : `<div class="card-image-placeholder">📷</div>`}
+            <div class="card-body">
+              <div class="card-top">
+                <div>
+                  <div class="card-score-big" style="color:${verdict.color}">${r.overall}</div>
+                  <div class="card-score-label">/10 Overall</div>
+                  <div class="card-verdict" style="color:${verdict.color}">${verdict.label}</div>
+                </div>
+                <div class="card-date">${date}</div>
+              </div>
+              <div class="card-mini-scores">
+                ${CATEGORIES.map(cat => {
+                  const s = r.scores?.[cat.key];
+                  if (s == null) return '';
+                  return `<span class="mini-pill" style="color:${cat.color};border-color:${cat.color}33;background:${cat.color}11">${cat.icon} ${s}</span>`;
+                }).join('')}
+              </div>
+              <div class="card-summary">${r.summary || ''}</div>
+            </div>
+            <div class="card-actions">
+              <button class="card-btn" onclick="event.stopPropagation();openModal(${realIdx})">View</button>
+              <button class="card-btn card-btn-del" onclick="event.stopPropagation();deleteItem(${realIdx})">Delete</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ── DELETE / CLEAR ──
+    async function deleteItem(idx) {
+      if (!confirm('Remove this photo from your gallery?')) return;
+      const item = getAllData()[idx];
+      if (currentUser && item?.id) {
+        await deleteAnalysis(item.id);
+        cloudData.splice(cloudData.indexOf(item), 1);
+      } else {
+        const hist = getHistory();
+        hist.splice(idx, 1);
+        localStorage.setItem('lensup_history', JSON.stringify(hist));
+      }
+      closeModal();
+      renderGallery();
+    }
+
+
+    // ── MODAL ──
+    function getCategoryTag(score) {
+      if (score >= 9) return { text: 'Excellent',  bg: 'rgba(52,211,153,0.12)',  color: '#34d399' };
+      if (score >= 7) return { text: 'Good',       bg: 'rgba(201,169,110,0.12)', color: 'var(--gold)' };
+      if (score >= 5) return { text: 'Average',    bg: 'rgba(96,165,250,0.12)',  color: '#60a5fa' };
+      if (score >= 3) return { text: 'Needs Work', bg: 'rgba(251,146,60,0.12)',  color: '#fb923c' };
+      return               { text: 'Weak',         bg: 'rgba(240,128,128,0.12)', color: '#f08080' };
+    }
+
+    function openModal(idx) {
+      const item = getAllData()[idx];
+      if (!item) return;
+      const r = item.result;
+      const verdict = getVerdict(r.overall);
+      const date = new Date(item.date).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
+      const imgSrc = item.previewUrl || (isUrl(item.url) ? item.url : null);
+
+      // Photo
+      document.getElementById('modalPhoto').innerHTML = imgSrc
+        ? `<img src="${imgSrc}" alt="Photo" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.outerHTML='<div class=\'modal-photo-placeholder\'>📷</div>'">`
+        : `<div class="modal-photo-placeholder">📷</div>`;
+
+      // Overall
+      const overallEl = document.getElementById('modalOverallBig');
+      overallEl.textContent = r.overall;
+      overallEl.style.color = verdict.color;
+      const verdictEl = document.getElementById('modalVerdict');
+      verdictEl.textContent = verdict.label;
+      verdictEl.style.color = verdict.color;
+      document.getElementById('modalDate').textContent = date;
+
+      // Score bars
+      const cats = [...CATEGORIES];
+      if (r.scores?.theme_relevance) cats.push({ key: 'theme_relevance', label: (r.theme_name ? 'Theme: ' + r.theme_name : 'Theme'), icon: '📅', color: 'var(--gold)' });
+      document.getElementById('modalBars').innerHTML = cats.map(cat => {
+        const s = r.scores?.[cat.key] ?? '—';
+        return `
+          <div class="modal-bar-row">
+            <div class="modal-bar-label">${cat.icon} ${cat.label}</div>
+            <div class="modal-bar-track">
+              <div class="modal-bar-fill" style="background:${cat.color}" data-width="${s !== '—' ? s*10 : 0}%"></div>
+            </div>
+            <div class="modal-bar-val" style="color:${cat.color}">${s}</div>
+          </div>`;
+      }).join('');
+
+      // Summary
+      document.getElementById('modalSummary').innerHTML = `<p>${r.summary || '—'}</p>`;
+
+      // Category cards
+      document.getElementById('modalCatGrid').innerHTML = cats.map(cat => {
+        const score = r.scores?.[cat.key] || 0;
+        const tag   = getCategoryTag(score);
+        const desc  = r.category_notes?.[cat.key] || '';
+        return `
+          <div class="modal-cat-card">
+            <div class="modal-cat-top">
+              <span class="modal-cat-icon">${cat.icon}</span>
+              <span class="modal-cat-badge" style="color:${cat.color}">${score}</span>
+            </div>
+            <div class="modal-cat-name" style="color:${cat.color}">${cat.label}</div>
+            <div class="modal-cat-desc">${desc}</div>
+            <span class="modal-cat-tag" style="background:${tag.bg};color:${tag.color}">${tag.text}</span>
+          </div>`;
+      }).join('');
+
+      // Improvements — normalise all formats from Supabase
+      let rawImps = r.improvements;
+      if (typeof rawImps === 'string') { try { rawImps = JSON.parse(rawImps); } catch { rawImps = []; } }
+      const imps = (Array.isArray(rawImps) ? rawImps : []).map(i => {
+        if (typeof i === 'object' && i !== null) return i;
+        try { return JSON.parse(i); } catch { return { title: String(i), desc: '' }; }
+      });
+      document.getElementById('modalImprovements').innerHTML = imps.length ? `
+        <div class="modal-imp-title">✦ <span>How to Improve This Shot</span></div>
+        ${imps.map((imp, i) => `
+          <div class="modal-imp-item">
+            <div class="modal-imp-num">${i + 1}</div>
+            <div>
+              <div class="modal-imp-name">${imp.title || imp}</div>
+              ${imp.desc ? `<div class="modal-imp-desc">${imp.desc}</div>` : ''}
+            </div>
+          </div>`).join('')}` : '';
+
+      // Technical
+      const techEl = document.getElementById('modalTechnical');
+      techEl.style.display = r.technical ? 'flex' : 'none';
+      techEl.innerHTML = r.technical
+        ? `<span style="font-size:1.1rem;flex-shrink:0;margin-top:0.1rem;">⚙️</span><div class="modal-tech-text">${r.technical}</div>` : '';
+
+      // Footer
+      document.getElementById('modalFooter').innerHTML = `
+        <button class="btn-modal" onclick="copyAnalysis(${idx})">Copy Analysis</button>
+        <button class="btn-modal btn-modal-danger" onclick="deleteItem(${idx})">Delete</button>
+        <a href="app.html" class="btn-modal btn-modal-primary">Analyse Another</a>
+      `;
+
+      document.getElementById('modalOverlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
+
+      // Animate bars
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        document.querySelectorAll('.modal-bar-fill').forEach(el => { el.style.width = el.dataset.width; });
+      }));
+    }
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    function closeModalOnOverlay(e) {
+      if (e.target === document.getElementById('modalOverlay')) closeModal();
+    }
+
+    async function copyAnalysis(idx) {
+      const item = getAllData()[idx];
+      if (!item) return;
+      const r = item.result;
+      const text = `LensUp Photo Analysis\n\nOverall: ${r.overall}/10 — ${getVerdict(r.overall).label}\n\n${CATEGORIES.map(c => `${c.label}: ${r.scores?.[c.key] ?? '—'}/10`).join(' | ')}\n\nSummary:\n${r.summary}\n\nTechnical:\n${r.technical}`;
+      try {
+        await navigator.clipboard.writeText(text);
+        const btn = event.target;
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Analysis', 2000);
+      } catch { alert('Copy failed — please copy manually.'); }
+    }
+
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+    // ── INIT ──
+    async function init() {
+      try {
+        initSupabase();
+
+        // Wait for Supabase session to restore (important on first load)
+        await new Promise(resolve => setTimeout(resolve, 300));
+
+        currentUser = await getUser();
+        if (!currentUser) { window.location.href = 'login.html'; return; }
+
+        document.body.classList.add('auth-ready');
+        renderNavAuth();
+
+        const { data, error } = await getAnalyses(currentUser);
+        if (!error && data) {
+          cloudData = data.map(dbRowToResult);
+        }
+        renderGallery();
+      } catch(err) {
+        console.error('Gallery init error:', err);
+        // Don't redirect on error — show empty state instead
+        document.body.classList.add('auth-ready');
+        renderGallery();
+      }
+    }
+
+    // ── MOBILE MENU ──
+    function openMobileMenu() {
+      document.getElementById('mobileMenu').classList.add('open');
+      document.body.style.overflow = 'hidden';
+      // Fill in username
+      if (typeof currentUser !== 'undefined' && currentUser) {
+        const name = currentUser.user_metadata?.display_name || currentUser.email?.split('@')[0] || '';
+        const el = document.getElementById('mobileMenuUser');
+        if (el) el.textContent = 'Hi, ' + name;
+      }
+    }
+    function closeMobileMenu() {
+      document.getElementById('mobileMenu').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    // Close on escape
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeMobileMenu();
+    });
+
+    init();
+  </script>
+
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav">
+    <div class="bottom-nav-inner">
+      <a href="compete.html" class="bottom-nav-item">
+        <span class="bottom-nav-icon">⚔️</span>
+        <span>Challenge</span>
+      </a>
+      <a href="app.html" class="bottom-nav-item">
+        <span class="bottom-nav-icon">📷</span>
+        <span>Analyse</span>
+      </a>
+      <a href="leaderboard.html" class="bottom-nav-item">
+        <span class="bottom-nav-icon">🏆</span>
+        <span>Ranks</span>
+      </a>
+      <a href="gallery.html" class="bottom-nav-item active">
+        <span class="bottom-nav-icon">🖼️</span>
+        <span>Gallery</span>
+      </a>
+      <a href="profile.html" class="bottom-nav-item">
+        <span class="bottom-nav-icon">👤</span>
+        <span>Profile</span>
+      </a>
+    </div>
+  </div>
+</body>
+</html>
