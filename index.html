@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>LensUp — The Photography Challenge Platform</title>
+  <title>LensUp — Learn Photography. Shoot Better. Prove It.</title>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,900;1,700&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -34,6 +34,8 @@
     .nav-links a:hover { color: var(--gold); }
     .nav-cta { background: var(--gold); color: var(--black); padding: 0.6rem 1.6rem; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; text-decoration: none; transition: all 0.2s; clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%); }
     .nav-cta:hover { background: var(--gold2); transform: translateY(-1px); }
+    .nav-login { color: rgba(240,237,232,0.5); text-decoration: none; font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; transition: color 0.2s; }
+    .nav-login:hover { color: var(--gold); }
 
     /* ── HERO ── */
     .hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 8rem 3rem 4rem; position: relative; overflow: hidden; }
@@ -211,11 +213,12 @@
     <a href="index.html" class="nav-logo">Lens<span>Up</span></a>
     <ul class="nav-links">
       <li><a href="#how">How It Works</a></li>
+      <li><a href="learn.html" style="color:var(--gold)">📚 Learn</a></li>
       <li><a href="#challenges">Challenges</a></li>
       <li><a href="leaderboard.html">Leaderboard</a></li>
-      <li><a href="learn.html">Learn</a></li>
     </ul>
-    <a href="register.html" class="nav-cta">Join the Challenge</a>
+    <a href="login.html" class="nav-login">Sign In</a>
+    <a href="register.html" class="nav-cta">Start Learning Now</a>
   </nav>
 
   <!-- HERO -->
@@ -227,11 +230,11 @@
       <div class="hero-left">
         <div class="hero-live-badge" id="heroLiveBadge"><span class="live-dot"></span> Loading…</div>
         <h1>
-          Shoot.<br/>
-          <span class="line2">Score.</span>
-          <span class="line3">Dominate.</span>
+          Learn.
+          <span class="line2">Shoot.</span>
+          <span class="line3">Improve.</span>
         </h1>
-        <p class="hero-desc">A year-long photography quest. Weekly themes. Daily submissions. AI scoring. One leaderboard to rule them all.</p>
+        <p class="hero-desc">The only photography app that teaches you <em>why</em> your photos work — or don't. Step-by-step lessons, real photo missions, AI feedback, and a weekly challenge to prove your progress.</p>
         <div class="hero-theme-card">
           <div class="hero-theme-label">📅 This Week's Theme</div>
           <div class="hero-theme-name" id="heroThemeName">—</div>
@@ -243,8 +246,8 @@
           </div>
         </div>
         <div class="hero-actions">
-          <a href="register.html" class="btn-primary">🎯 Enter This Week</a>
-          <a href="leaderboard.html" class="btn-ghost">View Leaderboard →</a>
+          <a href="register.html" class="btn-primary">📚 Start Learning Now</a>
+          <a href="login.html" class="btn-ghost">Already have an account? Sign In →</a>
         </div>
       </div>
       <div class="hero-right">
@@ -265,60 +268,60 @@
   <div class="ticker">
     <div class="ticker-inner">
       <span class="ticker-item" id="tickerTheme">📷 LensUp Weekly Challenge</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">📚 36 Chapters Across 6 Modules</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">🤖 AI Feedback on Every Shot</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">🆓 First 3 Chapters Free</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">⚔️ Weekly Challenge Active</span><span class="ticker-sep">·</span>
       <span class="ticker-item">🏆 Leaderboard Updated Daily</span><span class="ticker-sep">·</span>
-      <span class="ticker-item">🤖 AI-Powered Scoring</span><span class="ticker-sep">·</span>
-      <span class="ticker-item">📈 Track Your Progress</span><span class="ticker-sep">·</span>
-      <span class="ticker-item">🎯 52 Weekly Challenges</span><span class="ticker-sep">·</span>
-      <span class="ticker-item">🔥 1 Submission Per Day</span><span class="ticker-sep">·</span>
       <span class="ticker-item" id="tickerTheme2">📷 LensUp Weekly Challenge</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">📚 36 Chapters Across 6 Modules</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">🤖 AI Feedback on Every Shot</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">🆓 First 3 Chapters Free</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">⚔️ Weekly Challenge Active</span><span class="ticker-sep">·</span>
       <span class="ticker-item">🏆 Leaderboard Updated Daily</span><span class="ticker-sep">·</span>
-      <span class="ticker-item">🤖 AI-Powered Scoring</span><span class="ticker-sep">·</span>
-      <span class="ticker-item">📈 Track Your Progress</span><span class="ticker-sep">·</span>
-      <span class="ticker-item">🎯 52 Weekly Challenges</span><span class="ticker-sep">·</span>
-      <span class="ticker-item">🔥 1 Submission Per Day</span><span class="ticker-sep">·</span>
     </div>
   </div>
 
   <!-- STATS -->
   <div class="stats-bar">
-    <div class="stat-item"><span class="stat-num" style="color:var(--gold)">52</span><div class="stat-label">Weekly Challenges</div></div>
+    <div class="stat-item"><span class="stat-num" style="color:var(--gold)">36</span><div class="stat-label">Learning Chapters</div></div>
     <div class="stat-item"><span class="stat-num" style="color:var(--cyan)">6</span><div class="stat-label">Scoring Categories</div></div>
-    <div class="stat-item"><span class="stat-num" style="color:var(--green)">Daily</span><div class="stat-label">Leaderboard Updates</div></div>
-    <div class="stat-item"><span class="stat-num" style="color:var(--purple)">AI</span><div class="stat-label">Powered by Claude</div></div>
+    <div class="stat-item"><span class="stat-num" style="color:var(--green)">Free</span><div class="stat-label">First 3 Chapters</div></div>
+    <div class="stat-item"><span class="stat-num" style="color:var(--purple)">AI</span><div class="stat-label">Powered by AI</div></div>
   </div>
 
   <!-- HOW IT WORKS -->
   <section class="section" id="how">
     <span class="section-tag">How It Works</span>
-    <h2 class="section-title">Four Steps to the Top</h2>
-    <p class="section-sub">Every week is a new chance to climb the leaderboard. Every photo is a step forward.</p>
+    <h2 class="section-title">Learn by Doing</h2>
+    <p class="section-sub">Not by reading. Not by watching. You improve by shooting intentionally, getting honest feedback, and coming back better next time.</p>
     <div class="steps">
       <div class="step">
         <div class="step-num">01</div>
-        <span class="step-icon">📅</span>
-        <h3>Get the Theme</h3>
-        <p>Every week a new challenge theme drops. Study it. Plan your shot. Think about what story you want to tell.</p>
+        <span class="step-icon">📚</span>
+        <h3>Take a Lesson</h3>
+        <p>Each chapter focuses on one skill — Rule of Thirds, Leading Lines, Lighting. Short, clear, practical. No fluff.</p>
         <div class="step-arrow">→</div>
       </div>
       <div class="step">
         <div class="step-num">02</div>
         <span class="step-icon">📷</span>
-        <h3>Submit Your Best Shot</h3>
-        <p>Upload one photo per day. Make it count. The AI scores it across 6 dimensions plus theme relevance.</p>
+        <h3>Complete the Mission</h3>
+        <p>Go shoot 5 real photos applying what you learned. Not for likes — for intentional practice with a clear goal.</p>
         <div class="step-arrow">→</div>
       </div>
       <div class="step">
         <div class="step-num">03</div>
         <span class="step-icon">🤖</span>
-        <h3>Get AI Feedback</h3>
-        <p>Instant detailed scoring on composition, lighting, framing and more. Plus specific tips to improve your next shot.</p>
+        <h3>Get Honest AI Feedback</h3>
+        <p>Every photo is scored specifically on the skill you're practising. Not vibes — precise feedback on what worked and what didn't.</p>
         <div class="step-arrow">→</div>
       </div>
       <div class="step">
         <div class="step-num">04</div>
-        <span class="step-icon">🏆</span>
-        <h3>Climb the Leaderboard</h3>
-        <p>Your best weekly score counts. See where you rank daily. At year end — your full photography journey, documented.</p>
+        <span class="step-icon">⚔️</span>
+        <h3>Enter the Weekly Challenge</h3>
+        <p>Apply your growing skills to the weekly theme. Compete on the leaderboard. See your improvement in your scores over time.</p>
         <div class="step-arrow">→</div>
       </div>
     </div>
@@ -394,16 +397,16 @@
 
   <!-- CTA -->
   <section class="cta-section">
-    <span class="cta-label">Ready to compete?</span>
-    <h2 class="cta-title">Your Journey<br/><span>Starts This Week</span></h2>
-    <p class="cta-sub">52 themes. 365 days. One leaderboard. Join now and start building your photography legacy.</p>
-    <a href="register.html" class="btn-cta-big">🎯 Join the Challenge — Free</a>
+    <span class="cta-label">Start for free today</span>
+    <h2 class="cta-title">Stop Guessing.<br/><span>Start Improving.</span></h2>
+    <p class="cta-sub">Instagram tells you how many likes you got. LensUp tells you <em>why</em> your photo works — and exactly how to make the next one better.</p>
+    <a href="register.html" class="btn-cta-big">📚 Start Learning Now →</a>
   </section>
 
   <!-- FOOTER -->
   <footer>
     <div class="footer-logo">Lens<span>Up</span></div>
-    <p>© 2026 LensUp · Photography Challenge Platform · Powered by Claude AI</p>
+    <p>© 2026 LensUp · Photography Challenge Platform · Powered by AI</p>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

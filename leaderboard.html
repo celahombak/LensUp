@@ -215,12 +215,10 @@
   <nav>
     <a href="index.html" class="nav-logo">Lens<span>Up</span></a>
     <div class="nav-links">
+      <a href="learn.html" class="nav-link">📚 Learn</a>
       <a href="compete.html" class="nav-link">⚔️ Challenge</a>
       <a href="leaderboard.html" class="nav-link active">🏆 Leaderboard</a>
-      <a href="learn.html" class="nav-link">Learn</a>
-      <a href="app.html" class="nav-link">Analyse</a>
-      <a href="gallery.html" class="nav-link">Gallery</a>
-      <a href="profile.html" class="nav-link">Profile</a>
+      <a href="profile.html" class="nav-link">👤 Profile</a>
       <span id="navAuthArea"></span>
     </div>
     <button class="nav-burger" id="navBurger" onclick="openMobileMenu()" aria-label="Menu">
@@ -305,7 +303,18 @@
   </div>
 
   <script>
-    let currentUser = null;
+  
+  function esc(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#x27;')
+      .replace(/\//g, '&#x2F;');
+  }
+  let currentUser = null;
 
     function renderNavAuth() {
       const area = document.getElementById('navAuthArea');
@@ -400,7 +409,7 @@
           <div class="podium-card ${cls[ri]}">
             <span class="podium-medal">${medals[ri]}</span>
             <div class="podium-avatar">${p.avatar}</div>
-            <div class="podium-name" ${!isYou ? `onclick="window.location.href='profile.html?user=${p.id}'" style="cursor:pointer;"` : ''}>${p.name}${isYou ? '<span class="podium-you">you</span>' : ''}</div>
+            <div class="podium-name" ${!isYou ? `onclick="window.location.href='profile.html?user=${p.id}'" style="cursor:pointer;"` : ''}>${esc(p.name)}${isYou ? '<span class="podium-you">you</span>' : ''}</div>
             <div class="podium-score">${p.best}<span class="podium-denom">/10</span></div>
             <div class="podium-meta">${p.total} shot${p.total !== 1 ? 's' : ''} · avg ${p.avg}</div>
           </div>
@@ -417,7 +426,7 @@
             <div class="lb-rank ${rankCls[i] || ''}">${i + 1}</div>
             <div class="lb-user">
               <span class="lb-avatar">${p.avatar}</span>
-              <span class="lb-name">${p.name}${isYou ? '<span class="lb-you-tag">you</span>' : ' →'}</span>
+              <span class="lb-name">${esc(p.name)}${isYou ? '<span class="lb-you-tag">you</span>' : ' →'}</span>
             </div>
             <div class="lb-best">${p.best}</div>
             <div class="lb-avg">${p.avg}</div>
@@ -463,26 +472,10 @@
   <!-- BOTTOM NAV -->
   <div class="bottom-nav">
     <div class="bottom-nav-inner">
-      <a href="compete.html" class="bottom-nav-item">
-        <span class="bottom-nav-icon">⚔️</span>
-        <span>Challenge</span>
-      </a>
-      <a href="app.html" class="bottom-nav-item">
-        <span class="bottom-nav-icon">📷</span>
-        <span>Analyse</span>
-      </a>
-      <a href="leaderboard.html" class="bottom-nav-item active">
-        <span class="bottom-nav-icon">🏆</span>
-        <span>Ranks</span>
-      </a>
-      <a href="gallery.html" class="bottom-nav-item">
-        <span class="bottom-nav-icon">🖼️</span>
-        <span>Gallery</span>
-      </a>
-      <a href="profile.html" class="bottom-nav-item">
-        <span class="bottom-nav-icon">👤</span>
-        <span>Profile</span>
-      </a>
+      <a href="learn.html"       class="bottom-nav-item"><span class="bottom-nav-icon">📚</span><span>Learn</span></a>
+      <a href="compete.html"     class="bottom-nav-item"><span class="bottom-nav-icon">⚔️</span><span>Challenge</span></a>
+      <a href="leaderboard.html" class="bottom-nav-item active"><span class="bottom-nav-icon">🏆</span><span>Ranks</span></a>
+      <a href="profile.html"     class="bottom-nav-item"><span class="bottom-nav-icon">👤</span><span>Profile</span></a>
     </div>
   </div>
 </body>
