@@ -125,7 +125,7 @@ Rules:
         },
         body: JSON.stringify({
           model: 'claude-haiku-4-5-20251001',
-          max_tokens: 500,
+          max_tokens: 400,
           messages: [{ role: 'user', content: [imageContent, { type: 'text', text: prompt }] }]
         })
       });
@@ -136,7 +136,7 @@ Rules:
 
     if (!claudeRes.ok) return res.status(claudeRes.status).json({ error: data.error?.message || 'Claude API error' });
 
-    const raw = data.content[0].text.trim().replace(/```json|```/g, '').trim();
+    const raw    = data.content[0].text.trim().replace(/```json|```/g, '').trim();
     const result = JSON.parse(raw);
 
     if (result.rejected) return res.status(200).json(result);
