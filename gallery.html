@@ -163,32 +163,34 @@
 
 <nav>
   <a href="dashboard.html" class="nav-logo">Lens<span>Up</span></a>
-  <div class="nav-links">
-    <a href="learn.html" class="nav-link">Learn</a>
-    <a href="compete.html" class="nav-link">Challenge</a>
-    <a href="gallery.html" class="nav-link active">Feed</a>
-    <a href="leaderboard.html" class="nav-link">Leaderboard</a>
-    <a href="profile.html" class="nav-link">Profile</a>
-    <span id="navAuthArea"></span>
-  </div>
+    <div class="nav-links">
+      <a href="dashboard.html" class="nav-link">🏠 Dashboard</a>
+      <a href="learn.html" class="nav-link">📚 Learn</a>
+      <a href="gallery.html" class="nav-link active">🖼️ Feed</a>
+      <a href="compete.html" class="nav-link">⚔️ Challenge</a>
+      <a href="leaderboard.html" class="nav-link">🏆 Leaderboard</a>
+      <a href="profile.html" class="nav-link">👤 Profile</a>
+      <span id="navAuthArea"></span>
+    </div>
   <button class="nav-burger" onclick="openMenu()"><span></span><span></span><span></span></button>
 </nav>
 
-<div class="mobile-menu" id="mobileMenu">
-  <button class="mobile-menu-close" onclick="closeMenu()">x</button>
+  <div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-menu-close" onclick="closeMenu()">✕</button>
   <div class="mobile-menu-logo">Lens<span>Up</span></div>
-  <a href="dashboard.html">Home</a>
-  <a href="learn.html">Learn</a>
-  <a href="compete.html">Challenge</a>
-  <a href="gallery.html" class="active">Feed</a>
-  <a href="leaderboard.html">Leaderboard</a>
-  <a href="profile.html">Profile</a>
+  <a href="dashboard.html">🏠 Dashboard</a>
+  <a href="learn.html">📚 Learn</a>
+  <a href="gallery.html" class="active">🖼️ Feed</a>
+  <a href="compete.html">⚔️ Challenge</a>
+  <a href="leaderboard.html">🏆 Leaderboard</a>
+  <a href="profile.html">👤 Profile</a>
   <div class="mobile-menu-divider"></div>
   <div class="mobile-menu-auth">
     <span id="mobileUser"></span>
     <button class="mobile-menu-signout" onclick="signOut()">Sign Out</button>
   </div>
 </div>
+
 
 <div class="submit-bar">
   <div class="submit-bar-left">Community Feed &middot; <strong id="dailyLeft">3</strong> posts left today</div>
@@ -200,58 +202,16 @@
   <button class="load-more" id="loadMoreBtn" style="display:none" onclick="loadMore()">Load more</button>
 </div>
 
-<div class="bottom-nav">
-  <div class="bottom-nav-inner">
-    <a href="learn.html" class="bottom-nav-item"><span class="bottom-nav-icon">Learn</span></a>
-    <a href="compete.html" class="bottom-nav-item"><span class="bottom-nav-icon">Challenge</span></a>
-    <a href="gallery.html" class="bottom-nav-item active"><span class="bottom-nav-icon">Feed</span></a>
-    <a href="leaderboard.html" class="bottom-nav-item"><span class="bottom-nav-icon">Ranks</span></a>
-    <a href="profile.html" class="bottom-nav-item"><span class="bottom-nav-icon">Profile</span></a>
-  </div>
-</div>
-
-<!-- DETAIL MODAL -->
-<div class="modal-overlay" id="detailModal" onclick="if(event.target===this)closeDetail()">
-  <div class="modal-box">
-    <div class="modal-close-btn"><button onclick="closeDetail()">close x</button></div>
-    <div class="modal-photo-wrap" id="dPhoto"></div>
-    <div class="modal-content">
-      <div class="modal-user-row">
-        <div class="modal-av" id="dAv"></div>
-        <div><div class="modal-uname" id="dName"></div><div class="modal-utime" id="dTime"></div></div>
-      </div>
-      <div class="modal-score" id="dScore"></div>
-      <div class="modal-summary-text" id="dSummary"></div>
-      <div class="modal-bars" id="dBars"></div>
-      <div id="dImps"></div>
+  <div class="bottom-nav">
+    <div class="bottom-nav-inner">
+      <a href="dashboard.html" class="bottom-nav-item"><span class="bottom-nav-icon">🏠</span><span>Home</span></a>
+      <a href="learn.html" class="bottom-nav-item"><span class="bottom-nav-icon">📚</span><span>Learn</span></a>
+      <a href="gallery.html" class="bottom-nav-item active"><span class="bottom-nav-icon">🖼️</span><span>Feed</span></a>
+      <a href="compete.html" class="bottom-nav-item"><span class="bottom-nav-icon">⚔️</span><span>Challenge</span></a>
+      <a href="leaderboard.html" class="bottom-nav-item"><span class="bottom-nav-icon">🏆</span><span>Ranks</span></a>
+      <a href="profile.html" class="bottom-nav-item"><span class="bottom-nav-icon">👤</span><span>Profile</span></a>
     </div>
   </div>
-</div>
-
-<!-- SUBMIT MODAL -->
-<div class="smodal-overlay" id="sModal" onclick="if(event.target===this)closeSModal()">
-  <div class="smodal">
-    <div class="smodal-head">
-      <div class="smodal-title">Post to Feed</div>
-      <button class="smodal-x" onclick="closeSModal()">x</button>
-    </div>
-    <div class="smodal-body">
-      <div class="drop-zone" id="dz" onclick="document.getElementById('fi').click()" ondragover="dzOver(event)" ondragleave="dzLeave(event)" ondrop="dzDrop(event)">
-        <div class="dz-icon">camera</div>
-        <div class="dz-text">Tap to choose a photo<br/><strong>JPG, PNG, WEBP - max 5MB</strong></div>
-      </div>
-      <input type="file" id="fi" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="onFile(event)"/>
-      <div class="preview-wrap" id="pw">
-        <img class="preview-img" id="pi" alt=""/>
-        <button class="preview-rm" onclick="rmFile()">remove</button>
-      </div>
-      <div class="limit-note">You can post <strong id="limitNum">3</strong> photos to the feed per day. Learn photos do not count.</div>
-      <div class="serror" id="serr"></div>
-      <div class="sloading" id="sload"><div class="sp"></div><p>Analysing your photo...</p></div>
-      <button class="btn-analyse" id="abtn" onclick="doSubmit()" disabled>Analyse and Post</button>
-    </div>
-  </div>
-</div>
 
 <div class="toast" id="toast"></div>
 
