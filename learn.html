@@ -2,1795 +2,1388 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>LensUp — Learn Photography</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LensUp — Learn</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="supabase.js"></script>
   <style>
-    body { visibility: hidden; }
-    body.auth-ready { visibility: visible; }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --black: #080808; --white: #f5f2ee; --gold: #e8b84b; --gold-light: #f5d07a;
-      --dark: #141210; --dark2: #1a1714; --mid: #6b6560; --border: rgba(232,184,75,0.15);
-      --green: #34d399; --red: #ff6b6b;
+      --cream: #FAF7F2;
+      --warm-white: #FDF9F4;
+      --terracotta: #C4622D;
+      --terracotta-light: #E8845A;
+      --terracotta-pale: #F5E6DE;
+      --brown: #6B3A2A;
+      --text-dark: #2C1810;
+      --text-mid: #7A5C4F;
+      --text-light: #B09080;
+      --border: #E8DDD5;
+      --success: #4CAF50;
+      --gold: #D4A853;
+      --card-bg: #FFFFFF;
+      --nav-h: 64px;
+      --bottom-nav-h: 68px;
     }
-    html { scroll-behavior: smooth; }
-    body { background: var(--black); color: var(--white); font-family: 'DM Sans', sans-serif; font-weight: 300; min-height: 100vh; }
-
-    /* NAV */
-    nav { display: flex; align-items: center; justify-content: space-between; padding: 1rem 3rem; border-bottom: 1px solid var(--border); background: rgba(8,8,8,0.97); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(16px); }
-    .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; letter-spacing: 0.08em; color: var(--gold); text-decoration: none; }
-    .nav-logo span { color: var(--white); }
-    .nav-links { display: flex; align-items: center; gap: 2rem; }
-    .nav-link { font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(240,237,232,0.45); text-decoration: none; transition: color 0.2s; }
-    .nav-link:hover, .nav-link.active { color: var(--gold); }
-    .nav-burger { display: none; background: none; border: none; cursor: pointer; padding: 0.4rem; color: var(--white); flex-direction: column; gap: 5px; align-items: center; justify-content: center; }
-    .nav-burger span { display: block; width: 22px; height: 2px; background: var(--white); border-radius: 2px; }
-
-    /* MOBILE MENU */
-    .mobile-menu { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(8,8,8,0.98); z-index: 99; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(16px); }
-    .mobile-menu.open { display: flex; }
-    .mobile-menu-close { position: absolute; top: 1.2rem; right: 1.5rem; background: none; border: none; color: var(--mid); font-size: 1.5rem; cursor: pointer; }
-    .mobile-menu-logo { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; color: var(--gold); margin-bottom: 2.5rem; }
-    .mobile-menu-logo span { color: var(--white); }
-    .mobile-menu a { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 0.06em; color: rgba(240,237,232,0.55); text-decoration: none; padding: 0.7rem 2rem; transition: color 0.2s; }
-    .mobile-menu a:hover, .mobile-menu a.active { color: var(--gold); }
-    .mobile-menu-divider { width: 40px; height: 1px; background: var(--border); margin: 0.8rem 0; }
-    .mobile-menu-auth { margin-top: 1.5rem; text-align: center; }
-    .mobile-menu-auth span { color: rgba(240,237,232,0.4); font-size: 0.72rem; display: block; margin-bottom: 0.8rem; }
-    .mobile-menu-signout { background: none; border: 1px solid var(--border); color: var(--mid); padding: 0.5rem 1.5rem; font-family: 'DM Sans', sans-serif; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; }
-
-    /* BOTTOM NAV */
-    .bottom-nav { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10,10,10,0.97); border-top: 1px solid var(--border); backdrop-filter: blur(16px); z-index: 98; padding-bottom: env(safe-area-inset-bottom); }
-    .bottom-nav-inner { display: flex; }
-    .bottom-nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0.6rem 0.3rem; text-decoration: none; color: rgba(240,237,232,0.35); font-size: 0.55rem; letter-spacing: 0.08em; text-transform: uppercase; gap: 0.25rem; transition: color 0.2s; border-top: 2px solid transparent; }
-    .bottom-nav-item.active { color: var(--gold); border-top-color: var(--gold); }
-    .bottom-nav-icon { font-size: 1.25rem; line-height: 1; }
-
-    /* HERO */
-    .page-hero { padding: 3.5rem 3rem 3rem; border-bottom: 1px solid var(--border); background: linear-gradient(135deg, rgba(232,184,75,0.04) 0%, transparent 60%); position: relative; overflow: hidden; }
-    .page-hero::before { content: ''; position: absolute; inset: 0; background-image: linear-gradient(rgba(232,184,75,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(232,184,75,0.6) 1px, transparent 1px); background-size: 60px 60px; opacity: 0.02; pointer-events: none; }
-    .hero-inner { max-width: 960px; margin: 0 auto; position: relative; }
-    .page-tag { color: var(--gold); font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 0.6rem; display: block; }
-    .page-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2.5rem, 5vw, 4rem); letter-spacing: 0.04em; line-height: 1; margin-bottom: 0.8rem; }
-    .page-title em { color: var(--gold); font-style: normal; }
-    .page-sub { color: rgba(245,242,238,0.45); font-size: 0.9rem; line-height: 1.7; max-width: 520px; }
-
-
-    /* ── STEPPER PROGRESS ── */
-    .stepper-wrap { max-width: 960px; margin: 0 auto; padding: 2.5rem 2rem 0; }
-    .stepper { display: flex; align-items: flex-start; position: relative; }
-    .stepper::before { content: ''; position: absolute; top: 20px; left: 20px; right: 20px; height: 2px; background: var(--border); z-index: 0; }
-    .stepper-filled { position: absolute; top: 20px; left: 20px; height: 2px; background: var(--gold); z-index: 1; transition: width 1s ease; }
-    .step-node { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.6rem; position: relative; z-index: 2; cursor: default; }
-    .step-node-circle { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; transition: all 0.3s; border: 2px solid var(--border); background: var(--black); color: var(--mid); flex-shrink: 0; }
-    .step-node.done   .step-node-circle { background: var(--green);  border-color: var(--green);  color: #080808; }
-    .step-node.active .step-node-circle { background: var(--gold);   border-color: var(--gold);   color: #080808; box-shadow: 0 0 16px rgba(232,184,75,0.4); }
-    .step-node.locked .step-node-circle { opacity: 0.35; }
-    .step-node-label { font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; text-align: center; line-height: 1.4; color: var(--mid); max-width: 70px; }
-    .step-node.active .step-node-label { color: var(--gold); }
-    .step-node.done   .step-node-label { color: var(--green); }
-    .stepper-sub { text-align: center; font-size: 0.72rem; color: rgba(245,242,238,0.25); margin-top: 1rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border); }
-    .stepper-sub span { color: var(--gold); }
-
-    /* ── MODULE ACCORDION ── */
-    .module-block { margin-bottom: 1rem; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
-    .module-block.mod-active { border-color: rgba(232,184,75,0.3); }
-    .module-toggle { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; padding: 1.5rem 2rem; background: var(--dark); cursor: pointer; transition: background 0.2s; user-select: none; }
-    .module-toggle:hover { background: var(--dark2); }
-    .module-toggle-left { display: flex; align-items: center; gap: 1.2rem; }
-    .module-toggle-num { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; color: var(--gold); opacity: 0.25; line-height: 1; width: 40px; flex-shrink: 0; }
-    .module-toggle-info .module-number { font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.15rem; }
-    .module-toggle-info .module-name { font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem; letter-spacing: 0.04em; }
-    .module-toggle-info .module-desc { font-size: 0.72rem; color: rgba(245,242,238,0.3); margin-top: 0.15rem; }
-    .module-toggle-right { display: flex; align-items: center; gap: 1rem; flex-shrink: 0; }
-    .module-chevron { font-size: 0.8rem; color: var(--mid); transition: transform 0.3s; }
-    .module-body { display: none; border-top: 1px solid var(--border); padding: 1rem; background: rgba(0,0,0,0.2); }
-    .module-body.open { display: block; }
-    .module-block.mod-active .module-body { display: block; }
-    .module-chapter-row { display: flex; align-items: center; gap: 1rem; padding: 0.8rem 1rem; border-radius: 6px; margin-bottom: 0.4rem; background: var(--dark); opacity: 0.6; }
-    .module-chapter-row:last-child { margin-bottom: 0; }
-    .module-ch-num { font-family: 'Bebas Neue', sans-serif; font-size: 1rem; color: var(--mid); width: 28px; flex-shrink: 0; }
-    .module-ch-title { flex: 1; font-size: 0.82rem; color: rgba(245,242,238,0.5); }
-    .module-ch-badge { font-size: 0.62rem; color: var(--mid); }
-
-    @media (max-width: 768px) {
-      .stepper-wrap { padding: 1.5rem 1rem 0; }
-      .step-node-label { font-size: 0.52rem; max-width: 55px; }
-      .step-node-circle { width: 34px; height: 34px; font-size: 0.7rem; }
-      .stepper::before { top: 17px; }
-      .stepper-filled { top: 17px; }
-      .module-toggle { padding: 1.2rem; }
-      .module-body { padding: 0.8rem; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--text-dark);
+      min-height: 100vh;
+      padding-bottom: calc(var(--bottom-nav-h) + 20px);
     }
 
-    /* CURRICULUM */
-    .curriculum-wrap { max-width: 960px; margin: 0 auto; padding: 3rem 2rem 6rem; }
-    .curriculum-label { font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.6rem; }
-    .curriculum-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    /* ── TOP NAV ── */
+    .top-nav {
+      position: sticky; top: 0; z-index: 100;
+      height: var(--nav-h);
+      background: var(--warm-white);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 20px;
+    }
+    .nav-logo { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--terracotta); }
+    .nav-title { font-size: 15px; font-weight: 600; color: var(--text-dark); }
+    .streak-badge {
+      display: flex; align-items: center; gap: 5px;
+      background: var(--terracotta-pale);
+      border: 1px solid var(--terracotta-light);
+      border-radius: 20px; padding: 5px 12px;
+      font-size: 13px; font-weight: 600; color: var(--terracotta);
+    }
 
-    /* CHAPTER CARD */
-    .chapter-card { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 1.5rem; }
-    .chapter-card.active-chapter { border-color: rgba(232,184,75,0.4); }
-    .chapter-card.locked { opacity: 0.55; }
-    .chapter-header { padding: 1.8rem 2rem; display: flex; align-items: center; gap: 1.5rem; cursor: pointer; background: var(--dark); transition: background 0.2s; }
-    .chapter-header:hover { background: var(--dark2); }
-    .chapter-num { font-family: 'Bebas Neue', sans-serif; font-size: 2.5rem; color: var(--gold); opacity: 0.3; line-height: 1; flex-shrink: 0; width: 48px; }
+    /* ── BOTTOM NAV ── */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+      height: var(--bottom-nav-h);
+      background: var(--warm-white);
+      border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-around;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    .nav-item {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      text-decoration: none; color: var(--text-light);
+      font-size: 10px; font-weight: 500;
+      transition: color 0.2s;
+      padding: 8px 16px;
+    }
+    .nav-item.active { color: var(--terracotta); }
+    .nav-item svg { width: 22px; height: 22px; }
+
+    /* ── MAIN LAYOUT ── */
+    .main { padding: 20px 16px; max-width: 480px; margin: 0 auto; }
+
+    /* ── PROGRESS BANNER ── */
+    .progress-banner {
+      background: linear-gradient(135deg, var(--terracotta) 0%, var(--brown) 100%);
+      border-radius: 16px; padding: 20px;
+      color: white; margin-bottom: 24px;
+      position: relative; overflow: hidden;
+    }
+    .progress-banner::after {
+      content: '📸';
+      position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
+      font-size: 40px; opacity: 0.3;
+    }
+    .progress-banner h2 { font-family: 'DM Serif Display', serif; font-size: 20px; margin-bottom: 4px; }
+    .progress-banner p { font-size: 13px; opacity: 0.85; margin-bottom: 14px; }
+    .prog-bar-bg { background: rgba(255,255,255,0.25); border-radius: 6px; height: 8px; }
+    .prog-bar-fill {
+      background: white; border-radius: 6px; height: 8px;
+      transition: width 0.5s ease;
+    }
+    .prog-label { font-size: 12px; opacity: 0.8; margin-top: 6px; }
+
+    /* ── SECTION HEADER ── */
+    .section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .section-title { font-size: 17px; font-weight: 700; color: var(--text-dark); }
+
+    /* ── CHAPTER CARD ── */
+    .chapter-card {
+      background: var(--card-bg);
+      border: 1.5px solid var(--border);
+      border-radius: 14px; padding: 16px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .chapter-card:hover { border-color: var(--terracotta-light); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(196,98,45,0.1); }
+    .chapter-card.completed { border-color: var(--success); background: #F6FFF6; }
+    .chapter-card.in-progress { border-color: var(--terracotta); background: var(--terracotta-pale); }
+
+    .card-top { display: flex; align-items: flex-start; gap: 12px; }
+    .chapter-num {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: var(--terracotta-pale); border: 1.5px solid var(--terracotta-light);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 13px; color: var(--terracotta);
+      flex-shrink: 0;
+    }
+    .chapter-card.completed .chapter-num { background: #E8F5E9; border-color: var(--success); color: var(--success); }
     .chapter-info { flex: 1; }
-    .chapter-module { font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--mid); margin-bottom: 0.3rem; }
-    .chapter-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; letter-spacing: 0.04em; margin-bottom: 0.3rem; }
-    .chapter-desc { font-size: 0.8rem; color: rgba(245,242,238,0.4); line-height: 1.5; }
-    .chapter-meta { flex-shrink: 0; text-align: right; }
-    .status-badge { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600; }
-    .status-active   { background: rgba(232,184,75,0.12); color: var(--gold);  border: 1px solid rgba(232,184,75,0.3); }
-    .status-complete { background: rgba(52,211,153,0.1);  color: var(--green); border: 1px solid rgba(52,211,153,0.25); }
-    .status-locked   { background: rgba(255,255,255,0.04); color: var(--mid);  border: 1px solid rgba(255,255,255,0.08); }
-    .status-free     { background: rgba(96,165,250,0.1);  color: #60a5fa;     border: 1px solid rgba(96,165,250,0.25); }
+    .chapter-name { font-size: 15px; font-weight: 600; color: var(--text-dark); margin-bottom: 3px; }
+    .chapter-desc { font-size: 12px; color: var(--text-mid); line-height: 1.4; }
 
-    .free-chapter { border-color: rgba(96,165,250,0.2); }
-    .chapter-header.non-clickable { cursor: default; }
-    .chapter-header.non-clickable:hover { background: var(--dark); }
+    .card-meta {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 12px; padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+    .photo-dots { display: flex; gap: 5px; }
+    .dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--border);
+    }
+    .dot.done { background: var(--success); }
+    .dot.active { background: var(--terracotta); }
 
-    /* MODULE DIVIDER */
-    .module-divider { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; padding: 1.5rem 2rem; margin: 2rem 0 1rem; border: 1px solid var(--border); border-radius: 8px; background: rgba(232,184,75,0.02); }
-    .module-number { font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.2rem; }
-    .module-name { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; letter-spacing: 0.04em; margin-bottom: 0.2rem; }
-    .module-desc { font-size: 0.75rem; color: rgba(245,242,238,0.35); line-height: 1.5; }
+    .chapter-score {
+      font-size: 12px; font-weight: 600; color: var(--gold);
+      background: #FFF8E7; border: 1px solid #F0D080;
+      border-radius: 20px; padding: 3px 10px;
+    }
+    .chapter-badge {
+      font-size: 11px; font-weight: 600; padding: 3px 10px;
+      border-radius: 20px;
+    }
+    .badge-done { background: #E8F5E9; color: var(--success); border: 1px solid #A5D6A7; }
+    .badge-open { background: var(--terracotta-pale); color: var(--terracotta); border: 1px solid var(--terracotta-light); }
 
-    /* UNLOCK CTA */
-    .unlock-cta { margin-top: 3rem; padding: 3rem 2rem; text-align: center; border: 1px solid rgba(232,184,75,0.2); border-radius: 8px; background: linear-gradient(135deg, rgba(232,184,75,0.04) 0%, transparent 60%); }
-    .unlock-icon { font-size: 2.5rem; display: block; margin-bottom: 1rem; }
-    .unlock-title { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 0.06em; margin-bottom: 0.6rem; }
-    .unlock-sub { font-size: 0.85rem; color: rgba(245,242,238,0.4); line-height: 1.8; margin-bottom: 1.8rem; }
-    .unlock-btn { background: var(--gold); color: #080808; border: none; padding: 1rem 2.5rem; font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; letter-spacing: 0.12em; cursor: pointer; transition: all 0.2s; clip-path: polygon(12px 0%,100% 0%,calc(100% - 12px) 100%,0% 100%); }
-    .unlock-btn:hover { background: var(--gold-light); transform: translateY(-1px); }
-    .progress-bar-wrap { margin-top: 0.6rem; height: 3px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; width: 120px; }
-    .progress-bar-fill { height: 100%; background: var(--gold); border-radius: 2px; transition: width 0.6s ease; }
-    .progress-label { font-size: 0.62rem; color: var(--mid); margin-top: 0.3rem; }
+    /* ── MODAL OVERLAY ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 200;
+      background: rgba(44,24,16,0.55); backdrop-filter: blur(4px);
+      align-items: flex-end; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-sheet {
+      background: var(--warm-white);
+      border-radius: 24px 24px 0 0;
+      padding: 24px 20px 32px;
+      width: 100%; max-width: 480px;
+      max-height: 92vh; overflow-y: auto;
+      animation: slideUp 0.3s ease;
+    }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .modal-handle {
+      width: 40px; height: 4px; border-radius: 2px;
+      background: var(--border); margin: 0 auto 20px;
+    }
+    .modal-chapter-num {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 44px; height: 44px; border-radius: 12px;
+      background: var(--terracotta-pale); border: 2px solid var(--terracotta);
+      font-weight: 700; font-size: 14px; color: var(--terracotta);
+      margin-bottom: 12px;
+    }
+    .modal-title { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--text-dark); margin-bottom: 6px; }
+    .modal-subtitle { font-size: 13px; color: var(--text-mid); margin-bottom: 20px; }
 
-    /* CHAPTER BODY */
-    .chapter-body { display: none; border-top: 1px solid var(--border); }
-    .chapter-body.open { display: block; }
+    .mission-box {
+      background: linear-gradient(135deg, #FFF3EC, #FDE8DB);
+      border: 1.5px solid var(--terracotta-light);
+      border-radius: 14px; padding: 16px; margin-bottom: 20px;
+    }
+    .mission-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+      color: var(--terracotta); text-transform: uppercase; margin-bottom: 8px;
+    }
+    .mission-text { font-size: 14px; color: var(--text-dark); line-height: 1.6; }
 
-    /* LESSON */
-    .lesson-section { padding: 2rem 2rem 0; background: var(--black); }
-    .lesson-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; letter-spacing: 0.06em; color: var(--gold); margin-bottom: 1.2rem; }
-    .lesson-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
-    .lesson-text p { font-size: 0.88rem; line-height: 1.85; color: rgba(245,242,238,0.6); margin-bottom: 1rem; }
-    .lesson-text strong { color: var(--white); font-weight: 500; }
-    .lesson-visual { background: var(--dark); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+    .tips-section { margin-bottom: 20px; }
+    .tips-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+      color: var(--text-mid); text-transform: uppercase; margin-bottom: 10px;
+    }
+    .tip-item {
+      display: flex; align-items: flex-start; gap: 10px;
+      margin-bottom: 8px; font-size: 13px; color: var(--text-mid); line-height: 1.5;
+    }
+    .tip-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--terracotta-light); flex-shrink: 0; margin-top: 6px; }
 
-    /* Rule of thirds diagram */
-    .thirds-diagram { position: relative; width: 100%; aspect-ratio: 4/3; background: #0e1a22; border-radius: 6px; overflow: hidden; }
-    .thirds-lines { position: absolute; inset: 0; }
-    .thirds-col { position: absolute; top: 0; bottom: 0; width: 1px; background: rgba(232,184,75,0.35); }
-    .thirds-row { position: absolute; left: 0; right: 0; height: 1px; background: rgba(232,184,75,0.35); }
-    .thirds-point { position: absolute; width: 10px; height: 10px; background: var(--gold); border-radius: 50%; transform: translate(-50%,-50%); box-shadow: 0 0 10px rgba(232,184,75,0.7); }
-    .diagram-label { position: absolute; bottom: 8px; left: 0; right: 0; text-align: center; font-size: 0.65rem; color: rgba(245,242,238,0.25); letter-spacing: 0.08em; }
+    .photo-progress-section { margin-bottom: 20px; }
+    .photo-slots { display: flex; gap: 10px; margin-top: 12px; }
+    .photo-slot {
+      flex: 1; aspect-ratio: 1; border-radius: 12px;
+      border: 2px dashed var(--border);
+      background: var(--cream);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      font-size: 11px; color: var(--text-light); gap: 6px;
+      position: relative; overflow: hidden;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .photo-slot:hover { border-color: var(--terracotta-light); background: var(--terracotta-pale); }
+    .photo-slot.filled { border: 2px solid var(--success); cursor: default; }
+    .photo-slot.filled img { width: 100%; height: 100%; object-fit: cover; }
+    .photo-slot.active-slot { border-color: var(--terracotta); border-style: solid; }
+    .slot-check {
+      position: absolute; bottom: 5px; right: 5px;
+      width: 20px; height: 20px; border-radius: 50%;
+      background: var(--success); color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px;
+    }
+    .slot-num {
+      font-size: 18px; font-weight: 700; color: var(--border);
+    }
 
-    .tip-row { display: flex; gap: 0.8rem; align-items: flex-start; padding: 0.6rem 0; border-bottom: 1px solid rgba(232,184,75,0.06); }
-    .tip-row:last-child { border-bottom: none; }
-    .tip-icon { font-size: 1rem; flex-shrink: 0; }
-    .tip-text { font-size: 0.78rem; color: rgba(245,242,238,0.5); line-height: 1.6; }
-    .tip-text strong { color: rgba(245,242,238,0.85); }
+    .upload-btn {
+      width: 100%; padding: 15px;
+      background: var(--terracotta); color: white;
+      border: none; border-radius: 14px;
+      font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .upload-btn:hover { background: var(--brown); transform: translateY(-1px); }
+    .upload-btn:disabled { background: var(--text-light); cursor: not-allowed; transform: none; }
+    .upload-btn.loading { opacity: 0.8; cursor: wait; }
 
-    /* EXAMPLES */
-    .examples-wrap { padding: 0 2rem 1.5rem; background: var(--black); display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-    .example-card { background: var(--dark); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
-    .example-svg-wrap { aspect-ratio: 4/3; }
-    .example-foot { padding: 0.8rem 1rem; }
-    .example-verdict { font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600; margin-bottom: 0.25rem; }
-    .good .example-verdict { color: var(--green); }
-    .bad  .example-verdict { color: var(--red); }
-    .example-note { font-size: 0.72rem; color: rgba(245,242,238,0.35); line-height: 1.4; }
+    #photoInput { display: none; }
 
-    /* MISSION */
-    .mission-section { padding: 2rem; background: var(--black); border-top: 1px solid var(--border); }
-    .mission-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
-    .mission-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem; letter-spacing: 0.06em; margin-bottom: 0.2rem; }
-    .mission-sub { font-size: 0.78rem; color: rgba(245,242,238,0.35); }
-    .mission-dots { display: flex; gap: 0.5rem; }
-    .mdot { width: 30px; height: 30px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; font-size: 0.72rem; color: var(--mid); transition: all 0.3s; font-weight: 600; }
-    .mdot.done   { background: var(--green); border-color: var(--green); color: #080808; }
-    .mdot.active { border-color: var(--gold); color: var(--gold); }
+    /* ── SCORECARD MODAL ── */
+    .scorecard-overlay {
+      display: none; position: fixed; inset: 0; z-index: 300;
+      background: rgba(44,24,16,0.7); backdrop-filter: blur(6px);
+      align-items: flex-end; justify-content: center;
+    }
+    .scorecard-overlay.open { display: flex; }
+    .scorecard-sheet {
+      background: var(--warm-white);
+      border-radius: 24px 24px 0 0;
+      padding: 24px 20px 40px;
+      width: 100%; max-width: 480px;
+      max-height: 92vh; overflow-y: auto;
+      animation: slideUp 0.35s ease;
+    }
+    .scorecard-title { font-family: 'DM Serif Display', serif; font-size: 24px; color: var(--text-dark); margin-bottom: 4px; }
+    .scorecard-sub { font-size: 13px; color: var(--text-mid); margin-bottom: 24px; }
 
-    /* UPLOAD */
-    .upload-zone { border: 1px dashed rgba(232,184,75,0.25); border-radius: 8px; padding: 2.5rem 2rem; text-align: center; cursor: pointer; transition: all 0.2s; background: rgba(232,184,75,0.02); margin-bottom: 1rem; }
-    .upload-zone:hover, .upload-zone.drag { border-color: var(--gold); background: rgba(232,184,75,0.05); }
-    .upload-icon { font-size: 2.2rem; display: block; margin-bottom: 0.6rem; opacity: 0.4; }
-    .upload-hint { font-size: 0.82rem; color: rgba(245,242,238,0.4); }
-    .upload-hint strong { color: var(--gold); }
-    .upload-preview { width: 100%; max-height: 280px; object-fit: contain; border-radius: 6px; display: none; margin-bottom: 1rem; background: var(--dark); }
+    .score-big {
+      text-align: center; margin-bottom: 24px;
+      background: linear-gradient(135deg, var(--terracotta-pale), #FFF3EC);
+      border-radius: 16px; padding: 24px;
+    }
+    .score-big-num { font-family: 'DM Serif Display', serif; font-size: 56px; color: var(--terracotta); }
+    .score-big-label { font-size: 13px; color: var(--text-mid); }
 
-    .btn-primary { width: 100%; background: var(--gold); color: #080808; border: none; padding: 0.95rem; font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; letter-spacing: 0.12em; cursor: pointer; transition: all 0.2s; clip-path: polygon(12px 0%,100% 0%,calc(100% - 12px) 100%,0% 100%); }
-    .btn-primary:hover:not(:disabled) { background: var(--gold-light); }
-    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
-    .btn-secondary { width: 100%; background: none; color: var(--white); border: 1px solid var(--border); padding: 0.8rem; font-family: 'DM Sans', sans-serif; font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; border-radius: 4px; margin-top: 0.6rem; }
-    .btn-secondary:hover { border-color: var(--gold); color: var(--gold); }
+    .score-breakdown { margin-bottom: 24px; }
+    .score-row {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 12px;
+    }
+    .score-label { font-size: 13px; color: var(--text-mid); width: 90px; flex-shrink: 0; }
+    .score-bar-bg { flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+    .score-bar-fill { height: 100%; border-radius: 4px; background: var(--terracotta); transition: width 0.8s ease; }
+    .score-val { font-size: 13px; font-weight: 600; color: var(--text-dark); width: 32px; text-align: right; }
 
-    /* LOADING */
-    .ch-loading { display: none; text-align: center; padding: 2.5rem; }
-    .ch-loading.show { display: block; }
-    .spinner { width: 32px; height: 32px; border: 2px solid rgba(232,184,75,0.15); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 1rem; }
+    .ai-feedback {
+      background: var(--cream);
+      border: 1.5px solid var(--border);
+      border-radius: 14px; padding: 16px; margin-bottom: 20px;
+    }
+    .ai-feedback-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+      color: var(--text-mid); text-transform: uppercase; margin-bottom: 8px;
+    }
+    .ai-feedback-text { font-size: 14px; color: var(--text-dark); line-height: 1.6; }
+
+    .photo-previews { display: flex; gap: 8px; margin-bottom: 20px; }
+    .preview-thumb {
+      flex: 1; aspect-ratio: 1; border-radius: 10px; overflow: hidden;
+      background: var(--border);
+    }
+    .preview-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+    .scorecard-actions { display: flex; flex-direction: column; gap: 10px; }
+    .btn-primary {
+      width: 100%; padding: 15px;
+      background: var(--terracotta); color: white;
+      border: none; border-radius: 14px;
+      font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn-primary:hover { background: var(--brown); }
+    .btn-secondary {
+      width: 100%; padding: 14px;
+      background: transparent; color: var(--text-mid);
+      border: 1.5px solid var(--border); border-radius: 14px;
+      font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn-secondary:hover { border-color: var(--terracotta-light); color: var(--terracotta); }
+
+    /* ── LOADING SPINNER ── */
+    .spinner {
+      width: 20px; height: 20px; border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: white;
+      animation: spin 0.7s linear infinite; display: inline-block;
+    }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .loading-text { font-size: 0.82rem; color: var(--mid); }
 
-    /* ERROR */
-    .ch-error { display: none; padding: 0.75rem 1rem; background: rgba(255,107,107,0.08); border: 1px solid rgba(255,107,107,0.2); border-radius: 6px; font-size: 0.8rem; color: #ff8080; margin-bottom: 1rem; }
-    .ch-error.show { display: block; }
+    /* ── TOAST ── */
+    .toast {
+      position: fixed; bottom: calc(var(--bottom-nav-h) + 16px); left: 50%; transform: translateX(-50%) translateY(20px);
+      background: var(--text-dark); color: white;
+      border-radius: 30px; padding: 10px 20px;
+      font-size: 13px; font-weight: 500;
+      opacity: 0; transition: all 0.3s; z-index: 500;
+      white-space: nowrap;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    /* RESULT */
-    .sub-result { display: none; border-radius: 8px; overflow: hidden; margin-bottom: 1rem; }
-    .sub-result.show { display: block; animation: fadeUp 0.4s ease both; }
-    .result-head { padding: 1.2rem 1.5rem; display: flex; align-items: center; gap: 1.2rem; }
-    .result-head.pass { background: rgba(52,211,153,0.07);  border: 1px solid rgba(52,211,153,0.2); }
-    .result-head.fail { background: rgba(255,107,107,0.07); border: 1px solid rgba(255,107,107,0.15); }
-    .result-score { font-family: 'Bebas Neue', sans-serif; font-size: 3rem; letter-spacing: 0.04em; line-height: 1; flex-shrink: 0; }
-    .result-score.pass { color: var(--green); }
-    .result-score.fail { color: var(--red); }
-    .result-verdict-title { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.3rem; }
-    .result-verdict-sub { font-size: 0.75rem; color: rgba(245,242,238,0.4); }
-    .result-body { padding: 1.2rem 1.5rem; background: var(--dark); border: 1px solid var(--border); border-top: none; }
-    .result-feedback { font-size: 0.85rem; line-height: 1.75; color: rgba(245,242,238,0.65); margin-bottom: 1rem; }
-    .result-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
-    .result-col { background: var(--dark2); border-radius: 6px; padding: 0.9rem; }
-    .result-col-label { font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.4rem; }
-    .result-col-label.worked  { color: var(--green); }
-    .result-col-label.improve { color: var(--gold); }
-    .result-col-text { font-size: 0.78rem; color: rgba(245,242,238,0.55); line-height: 1.5; }
-    .fail-hint { margin-top: 0.8rem; font-size: 0.78rem; color: rgba(245,242,238,0.35); padding: 0.7rem 1rem; background: rgba(232,184,75,0.03); border-left: 2px solid rgba(232,184,75,0.2); }
+    .analyzing-overlay {
+      display: none; position: fixed; inset: 0; z-index: 400;
+      background: rgba(44,24,16,0.8); backdrop-filter: blur(8px);
+      flex-direction: column; align-items: center; justify-content: center;
+      gap: 20px;
+    }
+    .analyzing-overlay.open { display: flex; }
+    .analyzing-spinner {
+      width: 56px; height: 56px; border-radius: 50%;
+      border: 3px solid rgba(255,255,255,0.2);
+      border-top-color: var(--terracotta-light);
+      animation: spin 0.9s linear infinite;
+    }
+    .analyzing-text { color: white; font-size: 16px; font-weight: 500; }
+    .analyzing-sub { color: rgba(255,255,255,0.6); font-size: 13px; }
 
-    /* COMPLETION */
-    .completion { display: none; border: 1px solid rgba(52,211,153,0.3); border-radius: 8px; background: rgba(52,211,153,0.05); padding: 2.5rem 2rem; text-align: center; margin-top: 1.5rem; }
-    .completion.show { display: block; animation: fadeUp 0.5s ease both; }
-    .completion-icon { font-size: 3.5rem; display: block; margin-bottom: 0.8rem; }
-    .completion-title { font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; letter-spacing: 0.06em; color: var(--green); margin-bottom: 0.5rem; }
-    .completion-sub { font-size: 0.85rem; color: rgba(245,242,238,0.45); line-height: 1.7; margin-bottom: 1.8rem; }
-    .completion-btns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
-    .btn-share { background: var(--gold); color: #080808; border: none; padding: 0.85rem 2rem; font-family: 'Bebas Neue', sans-serif; font-size: 1rem; letter-spacing: 0.12em; cursor: pointer; clip-path: polygon(10px 0%,100% 0%,calc(100% - 10px) 100%,0% 100%); transition: background 0.2s; }
-    .btn-share:hover { background: var(--gold-light); }
-    .btn-ghost { background: none; border: 1px solid var(--border); color: rgba(245,242,238,0.5); padding: 0.85rem 2rem; font-family: 'DM Sans', sans-serif; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; border-radius: 4px; transition: all 0.2s; text-decoration: none; display: inline-flex; align-items: center; }
-    .btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
-
-    /* SHARE CANVAS */
-    .share-wrap { display: none; margin-top: 1.5rem; }
-    .share-wrap.show { display: block; }
-    #shareCard { display: block; max-width: 100%; border-radius: 8px; border: 1px solid var(--border); margin: 0 auto; }
-    .share-hint { text-align: center; font-size: 0.7rem; color: var(--mid); margin-top: 0.5rem; }
-
-    /* COMING SOON */
-    .coming-soon { padding: 1.5rem 2rem; background: var(--black); border-top: 1px solid var(--border); }
-    .coming-soon-inner { display: flex; gap: 1rem; align-items: center; padding: 1.2rem 1.5rem; background: var(--dark); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); }
-    .coming-soon-icon { font-size: 1.4rem; opacity: 0.3; flex-shrink: 0; }
-    .coming-soon-text { font-size: 0.82rem; color: rgba(245,242,238,0.3); line-height: 1.5; }
-    .coming-soon-text strong { color: rgba(245,242,238,0.55); font-weight: 500; }
-
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-    @media (max-width: 768px) {
-      nav { padding: 0.9rem 1.2rem; }
-      .nav-links { display: none !important; }
-      .nav-burger { display: flex; }
-      .bottom-nav { display: block; }
-      body { padding-bottom: 60px; }
-      .page-hero { padding: 2rem 1.2rem; }
-      .curriculum-wrap { padding: 1.5rem 1rem 5rem; }
-      .chapter-header { padding: 1.2rem; flex-wrap: wrap; gap: 0.8rem; }
-      .lesson-grid { grid-template-columns: 1fr; }
-      .examples-wrap { grid-template-columns: 1fr; padding: 0 1.2rem 1.5rem; }
-      .result-cols { grid-template-columns: 1fr; }
-      .lesson-section { padding: 1.5rem 1.2rem 0; }
-      .mission-section { padding: 1.5rem 1.2rem; }
+    /* ── AUTH GATE ── */
+    .auth-gate {
+      display: none; position: fixed; inset: 0; z-index: 600;
+      background: var(--cream);
+      flex-direction: column; align-items: center; justify-content: center;
+      padding: 40px 24px; text-align: center;
+    }
+    .auth-gate.open { display: flex; }
+    .auth-gate h2 { font-family: 'DM Serif Display', serif; font-size: 28px; margin-bottom: 10px; }
+    .auth-gate p { color: var(--text-mid); margin-bottom: 30px; }
+    .auth-gate a {
+      background: var(--terracotta); color: white;
+      padding: 15px 40px; border-radius: 14px;
+      text-decoration: none; font-weight: 600; font-size: 16px;
     }
   </style>
 </head>
 <body>
 
-<nav>
-  <a href="index.html" class="nav-logo">Lens<span>Up</span></a>
-  <div class="nav-links">
-      <a href="learn.html" class="nav-link active">📚 Learn</a>
-      <a href="compete.html" class="nav-link">⚔️ Challenge</a>
-      <a href="leaderboard.html" class="nav-link">🏆 Leaderboard</a>
-      <a href="profile.html" class="nav-link">👤 Profile</a>
-      <span id="navAuthArea"></span>
-    </div>
-  <button class="nav-burger" id="navBurger" onclick="openMenu()">
-    <span></span><span></span><span></span>
-  </button>
+<!-- TOP NAV -->
+<nav class="top-nav">
+  <span class="nav-logo">LensUp</span>
+  <span class="nav-title">Learn</span>
+  <div class="streak-badge">
+    🔥 <span id="streakCount">0</span>
+  </div>
 </nav>
 
-<div class="mobile-menu" id="mobileMenu">
-  <button class="mobile-menu-close" onclick="closeMenu()">✕</button>
-  <div class="mobile-menu-logo">Lens<span>Up</span></div>
-  <a href="compete.html">⚔️ Challenge</a>
-  <a href="app.html">📷 Analyse</a>
-  <a href="leaderboard.html">🏆 Leaderboard</a>
-  <a href="gallery.html">🖼️ Gallery</a>
-  <a href="profile.html">👤 Profile</a>
-  <a href="learn.html" class="active">📚 Learn</a>
-  <div class="mobile-menu-divider"></div>
-  <div class="mobile-menu-auth">
-    <span id="mobileUser"></span>
-    <button class="mobile-menu-signout" onclick="signOut()">Sign Out</button>
+<!-- MAIN -->
+<main class="main">
+
+  <!-- Progress Banner -->
+  <div class="progress-banner">
+    <h2>Photography Mastery</h2>
+    <p id="progressText">Complete 3 photos per chapter to advance</p>
+    <div class="prog-bar-bg">
+      <div class="prog-bar-fill" id="progFill" style="width:0%"></div>
+    </div>
+    <div class="prog-label" id="progLabel">0 / 36 chapters complete</div>
+  </div>
+
+  <!-- Chapter List -->
+  <div class="section-header">
+    <span class="section-title">All Chapters</span>
+    <span style="font-size:12px;color:var(--text-light)" id="completedCount">0 done</span>
+  </div>
+
+  <div id="chapterList"></div>
+
+</main>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <a href="dashboard.html" class="nav-item">
+    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    Home
+  </a>
+  <a href="learn.html" class="nav-item active">
+    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    Learn
+  </a>
+  <a href="feed.html" class="nav-item">
+    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    Feed
+  </a>
+  <a href="challenge.html" class="nav-item">
+    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+    Challenge
+  </a>
+  <a href="leaderboard.html" class="nav-item">
+    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    Ranks
+  </a>
+  <a href="profile.html" class="nav-item">
+    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    Profile
+  </a>
+</nav>
+
+<!-- CHAPTER DETAIL MODAL -->
+<div class="modal-overlay" id="chapterModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-chapter-num" id="modalNum">1</div>
+    <h2 class="modal-title" id="modalTitle">Chapter Title</h2>
+    <p class="modal-subtitle" id="modalSubtitle">Subtitle</p>
+
+    <div class="mission-box">
+      <div class="mission-label">🎯 Your Mission</div>
+      <div class="mission-text" id="modalMission">Mission text</div>
+    </div>
+
+    <div class="tips-section">
+      <div class="tips-label">📚 Tips</div>
+      <div id="modalTips"></div>
+    </div>
+
+    <div class="photo-progress-section">
+      <div class="tips-label">📷 Progress — 3 Photos to Pass</div>
+      <div class="photo-slots" id="modalSlots">
+        <div class="photo-slot" id="slot0" onclick="triggerUpload(0)"><span class="slot-num">1</span><span>Tap to add</span></div>
+        <div class="photo-slot" id="slot1" onclick="triggerUpload(1)"><span class="slot-num">2</span><span>Tap to add</span></div>
+        <div class="photo-slot" id="slot2" onclick="triggerUpload(2)"><span class="slot-num">3</span><span>Tap to add</span></div>
+      </div>
+    </div>
+
+    <input type="file" id="photoInput" accept="image/*" />
+
+    <button class="upload-btn" id="analyzeBtn" onclick="analyzeChapter()" disabled>
+      Analyse Chapter Photos
+    </button>
   </div>
 </div>
 
-<!-- HERO -->
-<div class="page-hero">
-  <div class="hero-inner">
-    <span class="page-tag">📚 Learning Path</span>
-    <div class="page-title">Master<br/><em>Photography</em></div>
-    <p class="page-sub">Step-by-step lessons with real photo missions. Learn a skill, shoot intentionally, get AI feedback. This is how you actually improve — not by scrolling Instagram.</p>
+<!-- ANALYZING OVERLAY -->
+<div class="analyzing-overlay" id="analyzingOverlay">
+  <div class="analyzing-spinner"></div>
+  <div class="analyzing-text">Analysing your photos…</div>
+  <div class="analyzing-sub" id="analyzingSubText">Getting AI feedback</div>
+</div>
+
+<!-- SCORECARD MODAL -->
+<div class="scorecard-overlay" id="scorecardOverlay">
+  <div class="scorecard-sheet">
+    <div class="modal-handle"></div>
+    <h2 class="scorecard-title" id="scTitle">Chapter Complete!</h2>
+    <p class="scorecard-sub" id="scSubtitle">Your performance</p>
+
+    <div class="score-big">
+      <div class="score-big-num" id="scBigScore">—</div>
+      <div class="score-big-label">Average Score</div>
+    </div>
+
+    <div class="photo-previews" id="scPreviews"></div>
+
+    <div class="score-breakdown" id="scBreakdown"></div>
+
+    <div class="ai-feedback">
+      <div class="ai-feedback-label">🤖 AI Feedback</div>
+      <div class="ai-feedback-text" id="scFeedback">Loading feedback…</div>
+    </div>
+
+    <div class="scorecard-actions">
+      <button class="btn-primary" onclick="closeScorecard()">Continue Learning →</button>
+      <button class="btn-secondary" onclick="retryChapter()">Retake Chapter</button>
+    </div>
   </div>
 </div>
 
-
-<!-- STEPPER -->
-<div class="stepper-wrap">
-  <div class="stepper">
-    <div class="stepper-filled" id="stepperFill" style="width:0%"></div>
-    <div class="step-node active" id="snode1">
-      <div class="step-node-circle">01</div>
-      <div class="step-node-label">Composition</div>
-    </div>
-    <div class="step-node locked" id="snode2">
-      <div class="step-node-circle">02</div>
-      <div class="step-node-label">Light</div>
-    </div>
-    <div class="step-node locked" id="snode3">
-      <div class="step-node-circle">03</div>
-      <div class="step-node-label">Storytelling</div>
-    </div>
-    <div class="step-node locked" id="snode4">
-      <div class="step-node-circle">04</div>
-      <div class="step-node-label">Technical</div>
-    </div>
-    <div class="step-node locked" id="snode5">
-      <div class="step-node-circle">05</div>
-      <div class="step-node-label">Genre</div>
-    </div>
-    <div class="step-node locked" id="snode6">
-      <div class="step-node-circle">06</div>
-      <div class="step-node-label">Post Process</div>
-    </div>
-  </div>
-  <div class="stepper-sub">You are on <span>Module 01 — Composition</span> · 36 chapters total · First 3 free</div>
+<!-- AUTH GATE -->
+<div class="auth-gate" id="authGate">
+  <div style="font-size:48px;margin-bottom:16px">📷</div>
+  <h2>Sign in to Learn</h2>
+  <p>Track your progress across 36 chapters</p>
+  <a href="index.html">Get Started</a>
 </div>
 
-<!-- CURRICULUM -->
-<div class="curriculum-wrap">
-
-  <div class="curriculum-label">Composition Series</div>
-
-  <!-- MODULE 01 HEADER -->
-  <div class="module-block mod-active" style="margin-bottom:1.5rem;">
-    <div class="module-toggle" onclick="toggleModule('mod1chapters')">
-      <div class="module-toggle-left">
-        <div class="module-toggle-num">01</div>
-        <div class="module-toggle-info">
-          <div class="module-number">Module 01 · Free to Start</div>
-          <div class="module-name">Composition</div>
-          <div class="module-desc">The foundation of every great photo. 7 chapters — first 3 free.</div>
-        </div>
-      </div>
-      <div class="module-toggle-right">
-        <span class="status-badge status-active">● Active</span>
-        <span class="module-chevron" id="mod1chevron">▲</span>
-      </div>
-    </div>
-    <div class="module-body open" id="mod1chapters">
-  <!-- ══ CHAPTER 1 ══ -->
-  <div class="chapter-card active-chapter" id="ch1Card">
-    <div class="chapter-header" onclick="toggleChapter('ch1')">
-      <div class="chapter-num">01</div>
-      <div class="chapter-info">
-        <div class="chapter-module">Composition · Free</div>
-        <div class="chapter-title">Rule of Thirds</div>
-        <div class="chapter-desc">The most fundamental composition rule. Learn to place your subject at the power points of the grid.</div>
-      </div>
-      <div class="chapter-meta" id="ch1Meta">
-        <span class="status-badge status-active">● Active</span>
-        <div class="progress-bar-wrap">
-          <div class="progress-bar-fill" id="ch1Bar" style="width:0%"></div>
-        </div>
-        <div class="progress-label" id="ch1Label">0 / 5 passed</div>
-      </div>
-    </div>
-
-    <div class="chapter-body open" id="ch1Body">
-
-      <!-- LESSON -->
-      <div class="lesson-section">
-        <div class="lesson-title">📖 The Lesson</div>
-        <div class="lesson-grid">
-          <div class="lesson-text">
-            <p>The <strong>Rule of Thirds</strong> divides your frame into a 3×3 grid — two horizontal lines, two vertical lines. The four points where they cross are called <strong>power points</strong>.</p>
-            <p>Place your main subject at one of these four points instead of dead centre. The result feels more natural, more dynamic, and instantly more engaging to the eye.</p>
-            <p>The same principle applies to <strong>horizon lines</strong>. Instead of cutting the frame in half, push the horizon to the upper or lower third — whichever part of the scene is most interesting.</p>
-            <p>Most modern cameras and phones let you enable a thirds grid overlay in settings. Turn it on and practise framing intentionally before you shoot.</p>
-          </div>
-          <div class="lesson-visual">
-            <!-- Diagram -->
-            <div class="thirds-diagram">
-              <div class="thirds-lines">
-                <div class="thirds-col" style="left:33.3%"></div>
-                <div class="thirds-col" style="left:66.6%"></div>
-                <div class="thirds-row" style="top:33.3%"></div>
-                <div class="thirds-row" style="top:66.6%"></div>
-                <div class="thirds-point" style="left:33.3%;top:33.3%"></div>
-                <div class="thirds-point" style="left:66.6%;top:33.3%"></div>
-                <div class="thirds-point" style="left:33.3%;top:66.6%"></div>
-                <div class="thirds-point" style="left:66.6%;top:66.6%"></div>
-              </div>
-              <div class="diagram-label">4 power points — place your subject on any one</div>
-            </div>
-            <div>
-              <div class="tip-row">
-                <span class="tip-icon">🎯</span>
-                <div class="tip-text"><strong>Main subject</strong> — place at any of the 4 intersections, not the centre</div>
-              </div>
-              <div class="tip-row">
-                <span class="tip-icon">🌅</span>
-                <div class="tip-text"><strong>Horizon lines</strong> — sky interesting? Horizon on lower third. Ground interesting? Upper third.</div>
-              </div>
-              <div class="tip-row">
-                <span class="tip-icon">👁️</span>
-                <div class="tip-text"><strong>Portraits</strong> — place the nearest eye on the upper third line</div>
-              </div>
-              <div class="tip-row">
-                <span class="tip-icon">📱</span>
-                <div class="tip-text"><strong>Tip</strong> — enable the grid overlay in your phone camera settings</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- EXAMPLES -->
-      <div class="examples-wrap">
-        <div class="example-card good">
-          <div class="example-svg-wrap">
-            <svg viewBox="0 0 300 225" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
-              <rect width="300" height="225" fill="#0e1a22"/>
-              <rect width="300" height="75" fill="#0d1d2e"/>
-              <rect y="75" width="300" height="150" fill="#12180e"/>
-              <!-- thirds grid -->
-              <line x1="100" y1="0" x2="100" y2="225" stroke="rgba(232,184,75,0.3)" stroke-width="1" stroke-dasharray="3,3"/>
-              <line x1="200" y1="0" x2="200" y2="225" stroke="rgba(232,184,75,0.3)" stroke-width="1" stroke-dasharray="3,3"/>
-              <line x1="0" y1="75" x2="300" y2="75" stroke="rgba(232,184,75,0.5)" stroke-width="1.5"/>
-              <line x1="0" y1="150" x2="300" y2="150" stroke="rgba(232,184,75,0.3)" stroke-width="1" stroke-dasharray="3,3"/>
-              <!-- tree at left power point -->
-              <rect x="92" y="85" width="16" height="60" fill="#1e3d1e" rx="2"/>
-              <ellipse cx="100" cy="78" rx="26" ry="24" fill="#1e4d1e"/>
-              <circle cx="100" cy="75" r="6" fill="rgba(232,184,75,0.9)"/>
-              <text x="150" y="215" text-anchor="middle" fill="rgba(245,242,238,0.2)" font-size="9" font-family="sans-serif">subject on power point · horizon on upper third</text>
-            </svg>
-          </div>
-          <div class="example-foot">
-            <div class="example-verdict">✓ Rule of Thirds Applied</div>
-            <div class="example-note">Subject at left power point, horizon on upper third line</div>
-          </div>
-        </div>
-        <div class="example-card bad">
-          <div class="example-svg-wrap">
-            <svg viewBox="0 0 300 225" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
-              <rect width="300" height="225" fill="#0e1a22"/>
-              <rect width="300" height="112" fill="#0d1d2e"/>
-              <rect y="112" width="300" height="113" fill="#12180e"/>
-              <!-- faint grid -->
-              <line x1="100" y1="0" x2="100" y2="225" stroke="rgba(255,255,255,0.06)" stroke-width="1" stroke-dasharray="3,3"/>
-              <line x1="200" y1="0" x2="200" y2="225" stroke="rgba(255,255,255,0.06)" stroke-width="1" stroke-dasharray="3,3"/>
-              <line x1="0" y1="75"  x2="300" y2="75"  stroke="rgba(255,255,255,0.06)" stroke-width="1" stroke-dasharray="3,3"/>
-              <line x1="0" y1="150" x2="300" y2="150" stroke="rgba(255,255,255,0.06)" stroke-width="1" stroke-dasharray="3,3"/>
-              <!-- horizon dead centre — red -->
-              <line x1="0" y1="112" x2="300" y2="112" stroke="rgba(255,107,107,0.45)" stroke-width="1.5"/>
-              <!-- tree dead centre -->
-              <rect x="142" y="118" width="16" height="55" fill="#1e3d1e" rx="2"/>
-              <ellipse cx="150" cy="112" rx="26" ry="24" fill="#1e4d1e"/>
-              <circle cx="150" cy="112" r="6" fill="rgba(255,107,107,0.8)"/>
-              <text x="150" y="215" text-anchor="middle" fill="rgba(245,242,238,0.2)" font-size="9" font-family="sans-serif">subject dead centre · horizon splits frame in half</text>
-            </svg>
-          </div>
-          <div class="example-foot">
-            <div class="example-verdict">✗ Dead Centre — Avoid This</div>
-            <div class="example-note">Subject and horizon both centred — feels static and dull</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- MISSION -->
-      <div class="mission-section">
-        <div class="mission-top">
-          <div>
-            <div class="mission-title">🎯 Your Mission</div>
-            <div class="mission-sub">Submit 5 real photos scoring 7+ on composition to complete this chapter</div>
-          </div>
-          <div class="mission-dots" id="missionDots">
-            <div class="mdot active">1</div>
-            <div class="mdot">2</div>
-            <div class="mdot">3</div>
-            <div class="mdot">4</div>
-            <div class="mdot">5</div>
-          </div>
-        </div>
-
-        <div class="ch-error" id="chError"></div>
-
-        <!-- UPLOAD -->
-        <div id="uploadWrap">
-          <div class="upload-zone" id="uploadZone"
-            onclick="document.getElementById('chFile').click()"
-            ondragover="event.preventDefault();this.classList.add('drag')"
-            ondragleave="this.classList.remove('drag')"
-            ondrop="onDrop(event)">
-            <input type="file" id="chFile" accept="image/*" style="display:none" onchange="onFile(this.files[0])"/>
-            <span class="upload-icon">📷</span>
-            <div class="upload-hint">Tap to upload or drag a photo<br/><strong>Apply Rule of Thirds intentionally</strong></div>
-          </div>
-          <img id="uploadPreview" class="upload-preview" alt=""/>
-          <button class="btn-primary" id="analyseBtn" onclick="analysePhoto()" disabled>Analyse This Shot →</button>
-        </div>
-
-        <!-- LOADING -->
-        <div class="ch-loading" id="chLoading">
-          <div class="spinner"></div>
-          <div class="loading-text">Analysing your Rule of Thirds composition…</div>
-        </div>
-
-        <!-- RESULT -->
-        <div class="sub-result" id="subResult">
-          <div class="result-head" id="resultHead">
-            <div class="result-score" id="resultScore">—</div>
-            <div>
-              <div class="result-verdict-title" id="resultTitle"></div>
-              <div class="result-verdict-sub" id="resultSub"></div>
-            </div>
-          </div>
-          <div class="result-body">
-            <div class="result-feedback" id="resultFeedback"></div>
-            <div class="result-cols">
-              <div class="result-col">
-                <div class="result-col-label worked">✓ What Worked</div>
-                <div class="result-col-text" id="resultWorked"></div>
-              </div>
-              <div class="result-col">
-                <div class="result-col-label improve">↑ Improve</div>
-                <div class="result-col-text" id="resultImprove"></div>
-              </div>
-            </div>
-            <div class="fail-hint" id="failHint" style="display:none">
-              Score below 7/10 — this shot doesn't count. Review the lesson above and try a different photo.
-            </div>
-          </div>
-        </div>
-
-        <div id="nextWrap" style="display:none;margin-top:0.8rem;">
-          <button class="btn-primary" onclick="resetUpload()">Submit Next Photo →</button>
-        </div>
-
-        <!-- COMPLETION -->
-        <div class="completion" id="completion">
-          <span class="completion-icon">🏆</span>
-          <div class="completion-title">Chapter Complete!</div>
-          <div class="completion-sub">You've demonstrated Rule of Thirds across 5 photos.<br/>You've earned the <strong style="color:var(--gold)">Rule of Thirds</strong> badge.</div>
-          <div class="completion-btns">
-            <button class="btn-share" onclick="generateCard()">📤 Share My Badge</button>
-            <a href="learn.html" class="btn-ghost">View Next Chapter ↓</a>
-          </div>
-          <div class="share-wrap" id="shareWrap">
-            <canvas id="shareCard" width="800" height="480"></canvas>
-            <div class="share-hint">Long press (mobile) or right-click → Save Image to share your badge</div>
-          </div>
-        </div>
-
-      </div><!-- /mission -->
-    </div><!-- /ch1Body -->
-  </div><!-- /ch1Card -->
-
-  <!-- CH2 FREE -->
-  <div class="chapter-card free-chapter" id="ch2Card">
-    <div class="chapter-header" onclick="toggleChapter('ch2')">
-      <div class="chapter-num" id="ch2Num" style="opacity:0.3">02</div>
-      <div class="chapter-info">
-        <div class="chapter-module">Composition · Free</div>
-        <div class="chapter-title">Leading Lines</div>
-        <div class="chapter-desc">Roads, rivers, fences, shadows — use natural lines in your scene to guide the viewer's eye through the frame with purpose.</div>
-      </div>
-      <div class="chapter-meta" id="ch2Meta"><span class="status-badge status-free">◎ Free</span></div>
-    </div>
-    <div class="chapter-body" id="ch2Body">
-
-      <!-- LOCKED GATE (shown until Ch1 complete) -->
-      <div id="ch2Gate" class="coming-soon">
-        <div class="coming-soon-inner">
-          <span class="coming-soon-icon">🔒</span>
-          <div class="coming-soon-text">
-            <strong>Complete Chapter 1 — Rule of Thirds first.</strong><br/>
-            Submit 5 photos scoring 7+ on composition. Each shot teaches you to feel the grid before you learn to break it.
-          </div>
-        </div>
-      </div>
-
-      <!-- LESSON (hidden until ch1 done) -->
-      <div id="ch2Content" style="display:none">
-        <div class="lesson-section">
-          <div class="lesson-title">📖 The Lesson</div>
-          <div class="lesson-grid">
-            <div class="lesson-text">
-              <p><strong>Leading lines</strong> are any lines in your scene — roads, fences, rivers, shadows, walls, corridors — that draw the viewer's eye from one part of the frame toward your subject.</p>
-              <p>The power is in <strong>direction and destination</strong>. A line that leads nowhere is just a line. A line that carries the eye to your subject is a composition tool.</p>
-              <p>Lines don't have to be straight. Curves create a slower, more elegant journey through the frame. Diagonal lines add energy and tension. Converging lines — like a road disappearing to a vanishing point — create a powerful sense of depth and distance.</p>
-              <p>Look for lines <strong>before</strong> you look for your subject. Then position yourself so the lines serve the story you want to tell.</p>
-            </div>
-            <div class="lesson-visual">
-              <!-- SVG Diagram — converging road lines -->
-              <div class="thirds-diagram" style="height:160px">
-                <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
-                  <rect width="280" height="160" fill="#0e1a14"/>
-                  <!-- Sky -->
-                  <rect width="280" height="70" fill="#0a1520"/>
-                  <!-- Ground -->
-                  <rect y="70" width="280" height="90" fill="#0e1a0a"/>
-                  <!-- Horizon -->
-                  <line x1="0" y1="70" x2="280" y2="70" stroke="rgba(232,184,75,0.15)" stroke-width="1"/>
-                  <!-- Converging road lines -->
-                  <line x1="140" y1="70" x2="20"  y2="160" stroke="rgba(232,184,75,0.7)" stroke-width="2"/>
-                  <line x1="140" y1="70" x2="260" y2="160" stroke="rgba(232,184,75,0.7)" stroke-width="2"/>
-                  <!-- Road centre dashes -->
-                  <line x1="140" y1="80"  x2="140" y2="95"  stroke="rgba(232,184,75,0.3)" stroke-width="1" stroke-dasharray="4,4"/>
-                  <line x1="140" y1="105" x2="140" y2="120" stroke="rgba(232,184,75,0.3)" stroke-width="1" stroke-dasharray="4,4"/>
-                  <line x1="140" y1="130" x2="140" y2="150" stroke="rgba(232,184,75,0.3)" stroke-width="1" stroke-dasharray="4,4"/>
-                  <!-- Vanishing point dot -->
-                  <circle cx="140" cy="70" r="4" fill="rgba(232,184,75,0.9)"/>
-                  <!-- Subject at vanishing point -->
-                  <rect x="134" y="52" width="12" height="18" fill="#2a4a2a" rx="1"/>
-                  <text x="140" y="154" text-anchor="middle" fill="rgba(245,242,238,0.25)" font-size="8" font-family="sans-serif">lines converge — eye travels to subject</text>
-                </svg>
-              </div>
-              <div>
-                <div class="tip-row">
-                  <span class="tip-icon">🛣️</span>
-                  <div class="tip-text"><strong>Natural lines</strong> — roads, paths, fences, rivers, corridors all work</div>
-                </div>
-                <div class="tip-row">
-                  <span class="tip-icon">📐</span>
-                  <div class="tip-text"><strong>Diagonal &gt; Horizontal</strong> — diagonal lines feel dynamic; flat lines feel static</div>
-                </div>
-                <div class="tip-row">
-                  <span class="tip-icon">🎯</span>
-                  <div class="tip-text"><strong>Line needs a destination</strong> — lead the eye toward your subject, not out of frame</div>
-                </div>
-                <div class="tip-row">
-                  <span class="tip-icon">📷</span>
-                  <div class="tip-text"><strong>Get low</strong> — shooting from ground level exaggerates converging lines dramatically</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- EXAMPLES -->
-        <div class="examples-wrap">
-          <div class="example-card good">
-            <div class="example-svg-wrap">
-              <svg viewBox="0 0 300 225" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
-                <rect width="300" height="225" fill="#0a1520"/>
-                <rect y="100" width="300" height="125" fill="#0d1a0a"/>
-                <!-- Converging fence lines -->
-                <line x1="150" y1="100" x2="0"   y2="225" stroke="rgba(180,140,80,0.6)" stroke-width="1.5"/>
-                <line x1="150" y1="100" x2="300" y2="225" stroke="rgba(180,140,80,0.6)" stroke-width="1.5"/>
-                <!-- Fence posts diminishing -->
-                <line x1="120" y1="108" x2="100" y2="140" stroke="rgba(180,140,80,0.4)" stroke-width="1"/>
-                <line x1="90"  y1="118" x2="60"  y2="165" stroke="rgba(180,140,80,0.4)" stroke-width="1"/>
-                <line x1="180" y1="108" x2="200" y2="140" stroke="rgba(180,140,80,0.4)" stroke-width="1"/>
-                <line x1="210" y1="118" x2="240" y2="165" stroke="rgba(180,140,80,0.4)" stroke-width="1"/>
-                <!-- Subject at vanishing point -->
-                <circle cx="150" cy="96" r="8" fill="rgba(232,184,75,0.85)"/>
-                <rect x="146" y="78" width="8" height="18" fill="#2a3a2a" rx="1"/>
-                <text x="150" y="218" text-anchor="middle" fill="rgba(245,242,238,0.2)" font-size="9" font-family="sans-serif">fence lines lead directly to the subject</text>
-              </svg>
-            </div>
-            <div class="example-foot">
-              <div class="example-verdict">✓ Leading Lines Applied</div>
-              <div class="example-note">Converging fence guides the eye straight to the subject</div>
-            </div>
-          </div>
-          <div class="example-card bad">
-            <div class="example-svg-wrap">
-              <svg viewBox="0 0 300 225" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
-                <rect width="300" height="225" fill="#0a1520"/>
-                <rect y="112" width="300" height="113" fill="#0d1a0a"/>
-                <!-- Horizontal fence — goes nowhere -->
-                <line x1="0" y1="112" x2="300" y2="112" stroke="rgba(180,140,80,0.5)" stroke-width="1.5"/>
-                <line x1="40"  y1="100" x2="40"  y2="124" stroke="rgba(180,140,80,0.3)" stroke-width="1"/>
-                <line x1="90"  y1="100" x2="90"  y2="124" stroke="rgba(180,140,80,0.3)" stroke-width="1"/>
-                <line x1="140" y1="100" x2="140" y2="124" stroke="rgba(180,140,80,0.3)" stroke-width="1"/>
-                <line x1="190" y1="100" x2="190" y2="124" stroke="rgba(180,140,80,0.3)" stroke-width="1"/>
-                <line x1="240" y1="100" x2="240" y2="124" stroke="rgba(180,140,80,0.3)" stroke-width="1"/>
-                <!-- Subject off to the side, lines don't help -->
-                <circle cx="240" cy="80" r="8" fill="rgba(255,107,107,0.7)"/>
-                <line x1="270" y1="60" x2="270" y2="100" stroke="rgba(255,107,107,0.3)" stroke-width="1"/>
-                <text x="150" y="218" text-anchor="middle" fill="rgba(245,242,238,0.2)" font-size="9" font-family="sans-serif">horizontal line leads eye out of frame — not to subject</text>
-              </svg>
-            </div>
-            <div class="example-foot">
-              <div class="example-verdict">✗ Line Leads Nowhere</div>
-              <div class="example-note">Horizontal fence cuts across frame — doesn't serve the subject</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- MISSION -->
-        <div class="mission-section">
-          <div class="mission-top">
-            <div>
-              <div class="mission-title">🎯 Your Mission</div>
-              <div class="mission-sub">Submit 5 real photos scoring 7+ on leading lines to complete this chapter</div>
-            </div>
-            <div class="mission-dots" id="ch2Dots">
-              <div class="mdot active">1</div>
-              <div class="mdot">2</div>
-              <div class="mdot">3</div>
-              <div class="mdot">4</div>
-              <div class="mdot">5</div>
-            </div>
-          </div>
-
-          <div class="ch-error" id="ch2Error"></div>
-
-          <div id="ch2UploadWrap">
-            <div class="upload-zone" id="ch2UploadZone"
-              onclick="document.getElementById('ch2File').click()"
-              ondragover="event.preventDefault();this.classList.add('drag')"
-              ondragleave="this.classList.remove('drag')"
-              ondrop="ch2Drop(event)">
-              <input type="file" id="ch2File" accept="image/*" style="display:none" onchange="ch2OnFile(this.files[0])"/>
-              <span class="upload-icon">📷</span>
-              <div class="upload-hint">Tap to upload or drag a photo<br/><strong>Use leading lines intentionally</strong></div>
-            </div>
-            <img id="ch2Preview" class="upload-preview" alt=""/>
-            <button class="btn-primary" id="ch2AnalyseBtn" onclick="ch2Analyse()" disabled>Analyse This Shot →</button>
-          </div>
-
-          <div class="ch-loading" id="ch2Loading">
-            <div class="spinner"></div>
-            <div class="loading-text">Analysing your leading lines…</div>
-          </div>
-
-          <div class="sub-result" id="ch2Result">
-            <div class="result-head" id="ch2ResultHead">
-              <div class="result-score" id="ch2Score">—</div>
-              <div>
-                <div class="result-verdict-title" id="ch2Title"></div>
-                <div class="result-verdict-sub" id="ch2Sub"></div>
-              </div>
-            </div>
-            <div class="result-body">
-              <div class="result-feedback" id="ch2Feedback"></div>
-              <div class="result-cols">
-                <div class="result-col">
-                  <div class="result-col-label worked">✓ What Worked</div>
-                  <div class="result-col-text" id="ch2Worked"></div>
-                </div>
-                <div class="result-col">
-                  <div class="result-col-label improve">↑ Improve</div>
-                  <div class="result-col-text" id="ch2Improve"></div>
-                </div>
-              </div>
-            </div>
-            <div class="fail-hint" id="ch2FailHint" style="display:none">Score below 7/10 — this shot doesn't count. Find a stronger line that leads directly to your subject.</div>
-          </div>
-
-          <div id="ch2NextWrap" style="display:none;margin-top:0.8rem;">
-            <button class="btn-primary" onclick="ch2Reset()">Submit Next Photo →</button>
-          </div>
-
-          <div class="completion" id="ch2Completion">
-            <span class="completion-icon">🏆</span>
-            <div class="completion-title">Chapter Complete!</div>
-            <div class="completion-sub">You've demonstrated Leading Lines across 5 photos.<br/>You've earned the <strong style="color:var(--gold)">Leading Lines</strong> badge.</div>
-            <div class="completion-btns">
-              <button class="btn-share" onclick="ch2GenerateCard()">📤 Share My Badge</button>
-              <a href="learn.html" class="btn-ghost">View Next Chapter ↓</a>
-            </div>
-            <div class="share-wrap" id="ch2ShareWrap">
-              <canvas id="ch2ShareCard" width="800" height="480"></canvas>
-              <div class="share-hint">Long press (mobile) or right-click → Save Image to share your badge</div>
-            </div>
-          </div>
-        </div>
-      </div><!-- /ch2Content -->
-    </div><!-- /ch2Body -->
-  </div><!-- /ch2Card -->
-
-  <!-- CH3 LOCKED -->
-  <div class="chapter-card locked" id="ch3Card">
-    <div class="chapter-header non-clickable">
-      <div class="chapter-num" style="opacity:0.12">03</div>
-      <div class="chapter-info">
-        <div class="chapter-module">Composition · Paid</div>
-        <div class="chapter-title">Framing</div>
-        <div class="chapter-desc">Use doorways, windows, arches and natural openings to frame your subject — adding depth and directing the eye instantly.</div>
-      </div>
-      <div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div>
-    </div>
-    <div class="chapter-body" id="ch3Body">
-
-      <!-- LOCKED GATE -->
-      <div id="ch3Gate" class="coming-soon">
-        <div class="coming-soon-inner">
-          <span class="coming-soon-icon">🔒</span>
-          <div class="coming-soon-text">
-            <strong>Complete Chapter 2 — Leading Lines first.</strong><br/>
-            You need to see your scene as a system of lines before you can use frames within it. Finish Ch2 and this unlocks automatically.
-          </div>
-        </div>
-      </div>
-
-      <!-- LESSON (hidden until ch2 done) -->
-      <div id="ch3Content" style="display:none">
-        <div class="lesson-section">
-          <div class="lesson-title">📖 The Lesson</div>
-          <div class="lesson-grid">
-            <div class="lesson-text">
-              <p><strong>Framing</strong> means using elements within the scene — a doorway, a window, an archway, overhanging branches, a tunnel — to create a frame around your subject inside the photo.</p>
-              <p>It works for three reasons. First, it <strong>directs the eye</strong> — the natural frame acts like an arrow pointing at your subject. Second, it adds <strong>depth</strong> by creating foreground, midground and background layers. Third, it gives the photo a sense of <strong>place and context</strong> that a plain shot of the subject alone cannot.</p>
-              <p>The frame doesn't have to be sharp. In fact, a slightly soft foreground frame often feels more natural and immersive. What matters is that it <strong>doesn't compete with the subject</strong> — it should support it.</p>
-              <p>Look for frames everywhere: a gap between buildings, a cave opening, two trees close together, a person seen through a crowd. Train your eye to see rectangles and circles within your scene.</p>
-            </div>
-            <div class="lesson-visual">
-              <!-- SVG Diagram — arch framing a subject -->
-              <div class="thirds-diagram" style="height:160px">
-                <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
-                  <rect width="280" height="160" fill="#0a1015"/>
-                  <!-- Background scene -->
-                  <rect x="40" y="40" width="200" height="120" fill="#0d1a20"/>
-                  <!-- Arch frame walls -->
-                  <rect x="0"   y="0" width="40"  height="160" fill="#1a1208"/>
-                  <rect x="240" y="0" width="40"  height="160" fill="#1a1208"/>
-                  <rect x="0"   y="0" width="280" height="30"  fill="#1a1208"/>
-                  <!-- Arch opening (curved top) -->
-                  <path d="M40,30 Q140,0 240,30" fill="#1a1208" stroke="rgba(232,184,75,0.3)" stroke-width="1"/>
-                  <!-- Subject in background -->
-                  <rect x="128" y="80" width="24" height="40" fill="#2a3a4a" rx="2"/>
-                  <circle cx="140" cy="72" r="10" fill="rgba(232,184,75,0.7)"/>
-                  <!-- Frame highlight -->
-                  <rect x="40" y="30" width="200" height="130" fill="none" stroke="rgba(232,184,75,0.25)" stroke-width="1" stroke-dasharray="4,3"/>
-                  <text x="140" y="154" text-anchor="middle" fill="rgba(245,242,238,0.25)" font-size="8" font-family="sans-serif">arch creates a frame — eye goes straight to subject</text>
-                </svg>
-              </div>
-              <div>
-                <div class="tip-row">
-                  <span class="tip-icon">🏛️</span>
-                  <div class="tip-text"><strong>Architecture works great</strong> — doorways, windows, arches, tunnels, corridors</div>
-                </div>
-                <div class="tip-row">
-                  <span class="tip-icon">🌿</span>
-                  <div class="tip-text"><strong>Nature frames too</strong> — branches, cave openings, gaps between trees or rocks</div>
-                </div>
-                <div class="tip-row">
-                  <span class="tip-icon">🔍</span>
-                  <div class="tip-text"><strong>Frame can be out of focus</strong> — soft foreground frames feel natural and add depth</div>
-                </div>
-                <div class="tip-row">
-                  <span class="tip-icon">⚖️</span>
-                  <div class="tip-text"><strong>Frame supports, not competes</strong> — if the frame is the subject, it's just a photo of a frame</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- EXAMPLES -->
-        <div class="examples-wrap">
-          <div class="example-card good">
-            <div class="example-svg-wrap">
-              <svg viewBox="0 0 300 225" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
-                <rect width="300" height="225" fill="#0a1015"/>
-                <rect x="50" y="30" width="200" height="195" fill="#0d2030"/>
-                <!-- Dark walls as frame -->
-                <rect x="0"   y="0" width="50"  height="225" fill="#120e08"/>
-                <rect x="250" y="0" width="50"  height="225" fill="#120e08"/>
-                <rect x="0"   y="0" width="300" height="30"  fill="#120e08"/>
-                <!-- Arch -->
-                <path d="M50,30 Q150,5 250,30" fill="#120e08"/>
-                <!-- Background light -->
-                <rect x="50" y="30" width="200" height="195" fill="url(#bgGrad)"/>
-                <defs><radialGradient id="bgGrad" cx="50%" cy="40%"><stop offset="0%" stop-color="#1a3050"/><stop offset="100%" stop-color="#0a1520"/></radialGradient></defs>
-                <!-- Subject -->
-                <rect x="138" y="100" width="24" height="50" fill="#1e3050" rx="2"/>
-                <circle cx="150" cy="92" r="12" fill="rgba(232,184,75,0.8)"/>
-                <text x="150" y="218" text-anchor="middle" fill="rgba(245,242,238,0.2)" font-size="9" font-family="sans-serif">doorway frames and isolates the subject clearly</text>
-              </svg>
-            </div>
-            <div class="example-foot">
-              <div class="example-verdict">✓ Framing Applied</div>
-              <div class="example-note">Doorway arch creates a natural frame around the subject</div>
-            </div>
-          </div>
-          <div class="example-card bad">
-            <div class="example-svg-wrap">
-              <svg viewBox="0 0 300 225" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
-                <rect width="300" height="225" fill="#0d1a20"/>
-                <!-- Subject floating with no frame context -->
-                <rect x="126" y="80" width="48" height="80" fill="#1e3050" rx="2"/>
-                <circle cx="150" cy="68" r="18" fill="rgba(232,184,75,0.55)"/>
-                <!-- Distracting background elements -->
-                <rect x="10"  y="20" width="60" height="100" fill="#162030" rx="1" opacity="0.6"/>
-                <rect x="220" y="40" width="70" height="80"  fill="#162030" rx="1" opacity="0.6"/>
-                <rect x="80"  y="160" width="140" height="40" fill="#162030" rx="1" opacity="0.5"/>
-                <line x1="0" y1="112" x2="300" y2="112" stroke="rgba(255,107,107,0.2)" stroke-width="1" stroke-dasharray="3,3"/>
-                <text x="150" y="218" text-anchor="middle" fill="rgba(245,242,238,0.2)" font-size="9" font-family="sans-serif">subject floats — no frame to isolate or direct the eye</text>
-              </svg>
-            </div>
-            <div class="example-foot">
-              <div class="example-verdict">✗ No Frame — Subject Floats</div>
-              <div class="example-note">Subject competes with background — eye doesn't know where to go</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- MISSION -->
-        <div class="mission-section">
-          <div class="mission-top">
-            <div>
-              <div class="mission-title">🎯 Your Mission</div>
-              <div class="mission-sub">Submit 5 real photos scoring 7+ on framing to complete this chapter</div>
-            </div>
-            <div class="mission-dots" id="ch3Dots">
-              <div class="mdot active">1</div>
-              <div class="mdot">2</div>
-              <div class="mdot">3</div>
-              <div class="mdot">4</div>
-              <div class="mdot">5</div>
-            </div>
-          </div>
-
-          <div class="ch-error" id="ch3Error"></div>
-
-          <div id="ch3UploadWrap">
-            <div class="upload-zone" id="ch3UploadZone"
-              onclick="document.getElementById('ch3File').click()"
-              ondragover="event.preventDefault();this.classList.add('drag')"
-              ondragleave="this.classList.remove('drag')"
-              ondrop="ch3Drop(event)">
-              <input type="file" id="ch3File" accept="image/*" style="display:none" onchange="ch3OnFile(this.files[0])"/>
-              <span class="upload-icon">📷</span>
-              <div class="upload-hint">Tap to upload or drag a photo<br/><strong>Frame your subject using the scene</strong></div>
-            </div>
-            <img id="ch3Preview" class="upload-preview" alt=""/>
-            <button class="btn-primary" id="ch3AnalyseBtn" onclick="ch3Analyse()" disabled>Analyse This Shot →</button>
-          </div>
-
-          <div class="ch-loading" id="ch3Loading">
-            <div class="spinner"></div>
-            <div class="loading-text">Analysing your framing technique…</div>
-          </div>
-
-          <div class="sub-result" id="ch3Result">
-            <div class="result-head" id="ch3ResultHead">
-              <div class="result-score" id="ch3Score">—</div>
-              <div>
-                <div class="result-verdict-title" id="ch3Title"></div>
-                <div class="result-verdict-sub" id="ch3Sub"></div>
-              </div>
-            </div>
-            <div class="result-body">
-              <div class="result-feedback" id="ch3Feedback"></div>
-              <div class="result-cols">
-                <div class="result-col">
-                  <div class="result-col-label worked">✓ What Worked</div>
-                  <div class="result-col-text" id="ch3Worked"></div>
-                </div>
-                <div class="result-col">
-                  <div class="result-col-label improve">↑ Improve</div>
-                  <div class="result-col-text" id="ch3Improve"></div>
-                </div>
-              </div>
-            </div>
-            <div class="fail-hint" id="ch3FailHint" style="display:none">Score below 7/10 — this shot doesn't count. Find a stronger frame element that surrounds or isolates your subject.</div>
-          </div>
-
-          <div id="ch3NextWrap" style="display:none;margin-top:0.8rem;">
-            <button class="btn-primary" onclick="ch3Reset()">Submit Next Photo →</button>
-          </div>
-
-          <div class="completion" id="ch3Completion">
-            <span class="completion-icon">🏆</span>
-            <div class="completion-title">Chapter Complete!</div>
-            <div class="completion-sub">You've demonstrated Framing across 5 photos.<br/>You've earned the <strong style="color:var(--gold)">Framing</strong> badge.</div>
-            <div class="completion-btns">
-              <button class="btn-share" onclick="ch3GenerateCard()">📤 Share My Badge</button>
-              <a href="learn.html" class="btn-ghost">View Next Chapter ↓</a>
-            </div>
-            <div class="share-wrap" id="ch3ShareWrap">
-              <canvas id="ch3ShareCard" width="800" height="480"></canvas>
-              <div class="share-hint">Long press (mobile) or right-click → Save Image to share your badge</div>
-            </div>
-          </div>
-        </div>
-      </div><!-- /ch3Content -->
-    </div><!-- /ch3Body -->
-  </div><!-- /ch3Card -->
-
-  <!-- CH4 LOCKED -->
-  <div class="chapter-card locked">
-    <div class="chapter-header non-clickable">
-      <div class="chapter-num" style="opacity:0.12">04</div>
-      <div class="chapter-info">
-        <div class="chapter-module">Composition · Paid</div>
-        <div class="chapter-title">Symmetry &amp; Patterns</div>
-        <div class="chapter-desc">Reflections, architecture, repetition — find and use visual symmetry and repeating patterns for striking compositions.</div>
-      </div>
-      <div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div>
-    </div>
-  </div>
-
-  <!-- CH5 LOCKED -->
-  <div class="chapter-card locked">
-    <div class="chapter-header non-clickable">
-      <div class="chapter-num" style="opacity:0.12">05</div>
-      <div class="chapter-info">
-        <div class="chapter-module">Composition · Paid</div>
-        <div class="chapter-title">Negative Space</div>
-        <div class="chapter-desc">Use emptiness intentionally. Learn how the space around your subject can make it more powerful, not less.</div>
-      </div>
-      <div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div>
-    </div>
-  </div>
-
-  <!-- CH6 LOCKED -->
-  <div class="chapter-card locked">
-    <div class="chapter-header non-clickable">
-      <div class="chapter-num" style="opacity:0.12">06</div>
-      <div class="chapter-info">
-        <div class="chapter-module">Composition · Paid</div>
-        <div class="chapter-title">Foreground &amp; Depth</div>
-        <div class="chapter-desc">Layer near and far elements to create a 3D sense of depth in a 2D frame. Turn flat photos into immersive ones.</div>
-      </div>
-      <div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div>
-    </div>
-  </div>
-
-  <!-- CH7 LOCKED -->
-  <div class="chapter-card locked">
-    <div class="chapter-header non-clickable">
-      <div class="chapter-num" style="opacity:0.12">07</div>
-      <div class="chapter-info">
-        <div class="chapter-module">Composition · Paid</div>
-        <div class="chapter-title">The Golden Ratio</div>
-        <div class="chapter-desc">Go beyond Rule of Thirds. The spiral and ratio that artists have used for centuries to create naturally pleasing compositions.</div>
-      </div>
-      <div class="chapter-meta"><span class="status-badge status-locked">🔒 Locked</span></div>
-    </div>
-  </div>
-
-    </div><!-- /mod1chapters -->
-  </div><!-- /mod1 module-block -->
-
-  <!-- MODULE 02 ACCORDION -->
-  <div class="module-block" style="margin-bottom:1rem;">
-    <div class="module-toggle" onclick="toggleModule('mod2chapters')">
-      <div class="module-toggle-left">
-        <div class="module-toggle-num">02</div>
-        <div class="module-toggle-info">
-          <div class="module-number">Module 02 · Paid</div>
-          <div class="module-name">Light</div>
-          <div class="module-desc">The single biggest factor separating good photos from great ones. 6 chapters.</div>
-        </div>
-      </div>
-      <div class="module-toggle-right">
-        <span class="status-badge status-locked">🔒 Locked</span>
-        <span class="module-chevron" id="mod2chevron">▼</span>
-      </div>
-    </div>
-    <div class="module-body" id="mod2chapters">
-      <div class="module-chapter-row"><div class="module-ch-num">08</div><div class="module-ch-title">Golden Hour</div><div class="module-ch-badge">🔒</div></div>
-      <div class="module-chapter-row"><div class="module-ch-num">09</div><div class="module-ch-title">Direction of Light</div><div class="module-ch-badge">🔒</div></div>
-      <div class="module-chapter-row"><div class="module-ch-num">10</div><div class="module-ch-title">Natural vs Artificial Light</div><div class="module-ch-badge">🔒</div></div>
-      <div class="module-chapter-row"><div class="module-ch-num">11</div><div class="module-ch-title">Shadows as Subject</div><div class="module-ch-badge">🔒</div></div>
-      <div class="module-chapter-row"><div class="module-ch-num">12</div><div class="module-ch-title">Silhouettes</div><div class="module-ch-badge">🔒</div></div>
-      <div class="module-chapter-row"><div class="module-ch-num">13</div><div class="module-ch-title">Harsh Midday Light</div><div class="module-ch-badge">🔒</div></div>
-    </div>
-  </div>
-
-  <!-- MODULE 03 ACCORDION -->
-  <div class="module-block" style="margin-bottom:1rem;">
-    <div class="module-toggle" onclick="toggleModule('mod3chapters')">
-      <div class="module-toggle-left">
-        <div class="module-toggle-num">03</div>
-        <div class="module-toggle-info">
-          <div class="module-number">Module 03 · Paid</div>
-          <div class="module-name">Subject &amp; Storytelling</div>
-          <div class="module-desc">What the photo is actually about. Intention, emotion, the decisive moment. 6 chapters.</div>
-        </div>
-      </div>
-      <div class="module-toggle-right">
-        <span class="status-badge status-locked">🔒 Locked</span>
-        <span class="module-chevron" id="mod3chevron">▼</span>
-      </div>
-    </div>
-    <div class="module-body" id="mod3chapters">
-      <div class="module-chapter-row"><div class="module-ch-num">14</div><div class="module-ch-title">Finding Your Subject</div><div class="module-ch-badge">🔒</div></div>
-      <div class="module-chapter-row"><div class="module-ch-num">15</div><div class="module-ch-title">Eyes &amp; Connection</div><div class="module-ch-badge">🔒</div></div>
-      <div class="module-chapter-row"><div class="module-ch-num">16</div><div class="module-ch-title">Candid vs Posed</div><div class="module-ch-badge">🔒</div></div>
-      <div class="module-chapter-row"><div class="module-ch-num">17</div><div class="module-ch-title">The Decisive Moment</div><div class="module-ch-badge">🔒</div></div>
-      <div class="module-chapter-row"><div class="module-ch-num">18</div><div class="module-ch-title">Environmental Portraits</div><div class="module-ch-badge">🔒</div></div>
-      <div class="module-chapter-row"><div class="module-ch-num">19</div><div class="module-ch-title">Telling a Story in One Frame</div><div class="module-ch-badge">🔒</div></div>
-    </div>
-  </div>
-
-  <!-- MODULE 04 ACCORDION -->
-  <div class="module-block" style="margin-bottom:1rem;">
-    <div class="module-toggle" onclick="toggleModule('mod4chapters')">
-      <div class="module-toggle-left">
-        <div class="module-toggle-num">04</div>
-        <div class="module-toggle-info">
-          <div class="module-number">Module 04 · Paid</div>
-          <div class="module-name">Technical Fundamentals</div>
-          <div class="module-desc">Exposure, depth of field, white balance. Understanding your camera, not just pointing it. 6 chapters.</div>
-        </div>
-      </div>
-      <div class="module-toggle-right">
-        <span class="status-badge status-locked">🔒 Locked</span>
-        <span class="module-chevron" id="mod4chevron">▼</span>
-      </div>
-    </div>
-    <div class="module-body" id="mod4chapters">
-      <div class="module-chapter-row"><div class="module-ch-num">20</div><div class="module-ch-title">Exposure Triangle</div><div class="module-ch-badge">🔒</div></div>
-      <div class="module-chapter-row"><div class="module-ch-num">21</div><div class="module-ch-title">Depth of Field</div><div class="module-ch-badge">🔒</div></div>
-      <div class="module-chapter-row"><div class="module-ch-num">22</div><div class="module-ch-title">Motion Blur vs Freeze</div><div class="module-ch-badge">🔒</div></div>
-      <div class="module-chapter-row"><div class="module-ch-num">23</div><div class="module-ch-title">White Balance</div><div class="module-ch-badge">🔒</div></div>
-      <div class="module-chapter-row"><div class="module-ch-num">24</div><div class="module-ch-title">Reading the Histogram</div><div class="module-ch-badge">🔒</div></div>
-      <div class="module-chapter-row"><div class="module-ch-num">25</div><div class="module-ch-title">RAW vs JPEG</div><div class="module-ch-badge">🔒</div></div>
-    </div>
-  </div>
-
-  <!-- MODULE 05 ACCORDION -->
-  <div class="module-block" style="margin-bottom:1rem;">
-    <div class="module-toggle" onclick="toggleModule('mod5chapters')">
-      <div class="module-toggle-left">
-        <div class="module-toggle-num">05</div>
-        <div class="module-toggle-info">
-          <div class="module-number">Module 05 · Paid</div>
-          <div class="module-name">Genre Specific</div>
-          <div class="module-desc">Street, food, architecture, night and mobile. Apply everything to real-world photography types. 6 chapters.</div>
-        </div>
-      </div>
-      <div class="module-toggle-right">
-        <span class="status-badge status-locked">🔒 Locked</span>
-        <span class="module-chevron" id="mod5chevron">▼</span>
-      </div>
-    </div>
-    <div class="module-body" id="mod5chapters">
-      <div class="module-chapter-row"><div class="module-ch-num">26</div><div class="module-ch-title">Street Photography</div><div class="module-ch-badge">🔒</div></div>
-      <div class="module-chapter-row"><div class="module-ch-num">27</div><div class="module-ch-title">Food Photography</div><div class="module-ch-badge">🔒</div></div>
-      <div class="module-chapter-row"><div class="module-ch-num">28</div><div class="module-ch-title">Architecture</div><div class="module-ch-badge">🔒</div></div>
-      <div class="module-chapter-row"><div class="module-ch-num">29</div><div class="module-ch-title">Nature &amp; Macro</div><div class="module-ch-badge">🔒</div></div>
-      <div class="module-chapter-row"><div class="module-ch-num">30</div><div class="module-ch-title">Night Photography</div><div class="module-ch-badge">🔒</div></div>
-      <div class="module-chapter-row"><div class="module-ch-num">31</div><div class="module-ch-title">Mobile Photography</div><div class="module-ch-badge">🔒</div></div>
-    </div>
-  </div>
-
-  <!-- MODULE 06 ACCORDION -->
-  <div class="module-block" style="margin-bottom:1rem;">
-    <div class="module-toggle" onclick="toggleModule('mod6chapters')">
-      <div class="module-toggle-left">
-        <div class="module-toggle-num">06</div>
-        <div class="module-toggle-info">
-          <div class="module-number">Module 06 · Paid</div>
-          <div class="module-name">Post-Processing Mindset</div>
-          <div class="module-desc">Not about filters — about intention. Crop, colour grading, developing your visual style. 5 chapters.</div>
-        </div>
-      </div>
-      <div class="module-toggle-right">
-        <span class="status-badge status-locked">🔒 Locked</span>
-        <span class="module-chevron" id="mod6chevron">▼</span>
-      </div>
-    </div>
-    <div class="module-body" id="mod6chapters">
-      <div class="module-chapter-row"><div class="module-ch-num">32</div><div class="module-ch-title">Crop &amp; Straighten</div><div class="module-ch-badge">🔒</div></div>
-      <div class="module-chapter-row"><div class="module-ch-num">33</div><div class="module-ch-title">Exposure Correction</div><div class="module-ch-badge">🔒</div></div>
-      <div class="module-chapter-row"><div class="module-ch-num">34</div><div class="module-ch-title">Colour Grading Basics</div><div class="module-ch-badge">🔒</div></div>
-      <div class="module-chapter-row"><div class="module-ch-num">35</div><div class="module-ch-title">When to Go Black &amp; White</div><div class="module-ch-badge">🔒</div></div>
-      <div class="module-chapter-row"><div class="module-ch-num">36</div><div class="module-ch-title">Developing Your Edit Style</div><div class="module-ch-badge">🔒</div></div>
-    </div>
-  </div>
-
-  <!-- UNLOCK CTA -->
-  <div class="unlock-cta">
-    <div class="unlock-icon">🔓</div>
-    <div class="unlock-title">Unlock the Full Curriculum</div>
-    <div class="unlock-sub">36 chapters · 6 modules · Real photos · AI feedback · Actual improvement.<br/>Complete the free chapters first, then unlock everything.</div>
-    <button class="unlock-btn" onclick="alert('Payment coming soon — finish the free chapters first!')">Unlock All Chapters →</button>
-  </div>
-
-</div><!-- /curriculum-wrap -->
-
-<div class="bottom-nav">
-  <div class="bottom-nav-inner">
-      <a href="learn.html" class="bottom-nav-item active"><span class="bottom-nav-icon">📚</span><span>Learn</span></a>
-      <a href="compete.html" class="bottom-nav-item"><span class="bottom-nav-icon">⚔️</span><span>Challenge</span></a>
-      <a href="leaderboard.html" class="bottom-nav-item"><span class="bottom-nav-icon">🏆</span><span>Ranks</span></a>
-      <a href="profile.html" class="bottom-nav-item"><span class="bottom-nav-icon">👤</span><span>Profile</span></a>
-    </div>
-</div>
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
 
 <script>
+// ── SUPABASE CONFIG ──
+const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  function esc(str) {
-    if (str === null || str === undefined) return '';
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#x27;')
-      .replace(/\//g, '&#x2F;');
+// ── 36 CHAPTERS DATA ──
+const CHAPTERS = [
+  {
+    id: 1, name: "Rule of Thirds", category: "Composition",
+    desc: "Place subjects at intersecting grid points for balanced, dynamic shots.",
+    mission: "Shoot 3 photos where your main subject sits at one of the four rule-of-thirds intersection points. Avoid centring the subject.",
+    tips: [
+      "Turn on the grid overlay in your camera settings",
+      "Place horizons on the top or bottom third, not the middle",
+      "Eyes of portraits should fall on the upper third line"
+    ]
+  },
+  {
+    id: 2, name: "Leading Lines", category: "Composition",
+    desc: "Use lines in the scene to draw the viewer's eye toward your subject.",
+    mission: "Shoot 3 photos that use a strong leading line (road, fence, path, river, shadow) to guide the eye toward a clear focal point.",
+    tips: [
+      "Get low to exaggerate perspective lines",
+      "Diagonal lines feel more dynamic than horizontal ones",
+      "The line doesn't need to end at the subject — implied direction counts"
+    ]
+  },
+  {
+    id: 3, name: "Framing", category: "Composition",
+    desc: "Use elements in the foreground to create a natural frame around your subject.",
+    mission: "Shoot 3 photos where a natural or architectural frame (doorway, window, branches, arch) surrounds or partially borders your subject.",
+    tips: [
+      "The frame doesn't need to be sharp — soft foreground framing works beautifully",
+      "Look for circular frames for a dramatic, tunnel effect",
+      "Use the frame to add depth and context to the scene"
+    ]
+  },
+  {
+    id: 4, name: "Symmetry & Patterns", category: "Composition",
+    desc: "Find perfect symmetry or repeat patterns to create visually satisfying images.",
+    mission: "Shoot 3 photos showcasing either perfect bilateral symmetry or a strong repeating pattern. One can intentionally break the pattern.",
+    tips: [
+      "Shoot straight on for symmetry — even slight angles break the effect",
+      "Reflections in water or glass create instant symmetry",
+      "Breaking a pattern at one point draws the eye powerfully"
+    ]
+  },
+  {
+    id: 5, name: "Negative Space", category: "Composition",
+    desc: "Use empty space intentionally to make your subject stand out.",
+    mission: "Shoot 3 photos where at least 60% of the frame is intentional empty space (sky, wall, water, floor) that isolates or emphasises the subject.",
+    tips: [
+      "Use clean, uncluttered backgrounds — sky is your best friend",
+      "The subject should be small but the clear focal point",
+      "Negative space can convey loneliness, freedom, or minimalism powerfully"
+    ]
+  },
+  {
+    id: 6, name: "Depth of Field", category: "Exposure & Focus",
+    desc: "Control what's sharp and what's blurred to separate subjects from backgrounds.",
+    mission: "Shoot 3 photos that demonstrate deliberate depth of field control — at least one with a very shallow DOF (blurred background) and one with a deep DOF (everything sharp).",
+    tips: [
+      "Wide aperture (f/1.8–f/2.8) = shallow DOF; narrow (f/8–f/16) = deep DOF",
+      "Get close to your subject to increase background blur",
+      "Manual or Portrait mode on your phone exaggerates DOF"
+    ]
+  },
+  {
+    id: 7, name: "Golden Hour Light", category: "Light & Colour",
+    desc: "Shoot during the hour after sunrise or before sunset for warm, magical light.",
+    mission: "Shoot 3 photos during golden hour. Capture at least one backlit subject with rim light, and one long shadow scene.",
+    tips: [
+      "Golden hour is roughly 1 hour after sunrise and 1 hour before sunset",
+      "Shoot toward the light for silhouettes; back to it for warm fill light",
+      "Long shadows add drama and define texture in any surface"
+    ]
+  },
+  {
+    id: 8, name: "Blue Hour & Night", category: "Light & Colour",
+    desc: "Master low-light photography during the magical twilight window.",
+    mission: "Shoot 3 photos during blue hour or at night. At least one should include artificial light sources as part of the composition.",
+    tips: [
+      "Blue hour is 20–40 minutes after sunset — the sky turns deep cobalt blue",
+      "Stabilise your phone against a wall or use a mini tripod for sharp shots",
+      "Neon signs, street lights, and lit windows make natural light painting"
+    ]
+  },
+  {
+    id: 9, name: "Natural Light Indoors", category: "Light & Colour",
+    desc: "Use window light as a soft, directional natural studio.",
+    mission: "Shoot 3 photos using only window light indoors. Try side-lighting, back-lighting, and front-lighting in separate shots.",
+    tips: [
+      "North-facing windows give the most even, consistent light all day",
+      "Sheer curtains diffuse harsh sunlight into soft, flattering light",
+      "Position subject 45° to the window for classic portrait lighting"
+    ]
+  },
+  {
+    id: 10, name: "Colour Theory", category: "Light & Colour",
+    desc: "Use complementary or analogous colours to create mood and harmony.",
+    mission: "Shoot 3 photos with a deliberate colour story: one with complementary colours, one monochromatic, one with a single accent colour on a neutral background.",
+    tips: [
+      "Complementary pairs: blue/orange, red/green, yellow/purple",
+      "Monochromatic doesn't mean greyscale — try all shades of blue, for example",
+      "One bold colour on a grey or beige background pops immediately"
+    ]
+  },
+  {
+    id: 11, name: "Black & White", category: "Light & Colour",
+    desc: "See the world in tones, contrast, and texture without the distraction of colour.",
+    mission: "Shoot or convert 3 photos to B&W. Focus on high contrast, strong texture, and dramatic shadows as your visual language.",
+    tips: [
+      "Shoot in colour and convert in editing — gives more control",
+      "Look for scenes with strong tonal contrast, not just colour contrast",
+      "Texture (brick, bark, fabric, skin) looks incredible in B&W"
+    ]
+  },
+  {
+    id: 12, name: "Shadows & Silhouettes", category: "Light & Colour",
+    desc: "Let darkness be the subject — shapes and shadows tell powerful stories.",
+    mission: "Shoot 3 photos where the shadow or silhouette IS the subject. The recognisable shape should be clear even without colour or detail.",
+    tips: [
+      "Shoot toward a bright sky or light source to create silhouettes",
+      "Strong geometric shadows on plain walls are visually striking",
+      "Position the light source behind and slightly to the side of your subject"
+    ]
+  },
+  {
+    id: 13, name: "Portrait Basics", category: "People",
+    desc: "Capture the essence of a person through posing, light, and connection.",
+    mission: "Shoot 3 portraits: one environmental (shows their world), one close-up (eyes as focus), one candid (unaware/natural moment).",
+    tips: [
+      "Focus on the nearest eye — it's the anchor of any portrait",
+      "Ask your subject to look slightly away from camera for a natural feel",
+      "The best portraits happen when subjects forget the camera exists"
+    ]
+  },
+  {
+    id: 14, name: "Street Photography", category: "People",
+    desc: "Document real life candidly — the decisive moment in public spaces.",
+    mission: "Shoot 3 street photos that each tell a mini-story. Include at least one with human interaction and one with environmental storytelling (no people visible).",
+    tips: [
+      "Shoot from the hip or use your phone casually to stay inconspicuous",
+      "Wait for the right moment — patience is 90% of street photography",
+      "Look for repeating backgrounds and wait for subjects to enter the frame"
+    ]
+  },
+  {
+    id: 15, name: "Environmental Portraits", category: "People",
+    desc: "Photograph people in their context — their workspace, home, or habitat.",
+    mission: "Shoot 3 environmental portraits where the setting reveals as much about the person as their expression. The environment should take up at least 40% of the frame.",
+    tips: [
+      "Give the subject something to interact with in their environment",
+      "Wide-angle lenses emphasise the environment; telephoto compresses it",
+      "Look for visual cues that speak to their personality, job, or passion"
+    ]
+  },
+  {
+    id: 16, name: "Architecture", category: "Urban & Environment",
+    desc: "Find geometry, scale, and beauty in built structures.",
+    mission: "Shoot 3 architectural photos: one showing the full scale of a structure, one abstract detail, and one that uses the building as a frame or supporting element.",
+    tips: [
+      "Shoot upward for dramatic perspective — converging lines add power",
+      "Early morning light on buildings shows texture and avoids crowds",
+      "Look for repetition in windows, columns, and structural elements"
+    ]
+  },
+  {
+    id: 17, name: "Urban Geometry", category: "Urban & Environment",
+    desc: "Find abstract shapes, lines, and patterns in the city around you.",
+    mission: "Shoot 3 photos that isolate geometric patterns or shapes in urban environments. No recognisable structures — just pure form and line.",
+    tips: [
+      "Look up, down, and close — geometry hides in unexpected places",
+      "Shadows create temporary geometric compositions all day long",
+      "Convert to B&W to emphasise form over colour and material"
+    ]
+  },
+  {
+    id: 18, name: "Landscapes", category: "Urban & Environment",
+    desc: "Capture the scale and mood of natural environments.",
+    mission: "Shoot 3 landscape photos at different times of day. Include a strong foreground element in at least one to create depth.",
+    tips: [
+      "The sky is only as interesting as the clouds in it — be selective about how much you show",
+      "Foreground interest (rocks, flowers, patterns) prevents flat, empty compositions",
+      "Horizons should be level unless intentionally tilted for creative effect"
+    ]
+  },
+  {
+    id: 19, name: "Macro & Close-Up", category: "Urban & Environment",
+    desc: "Enter the miniature world — reveal details invisible to the naked eye.",
+    mission: "Shoot 3 macro/extreme close-up photos. At least one should be of a natural subject (plant, insect, water drop) and one manmade object.",
+    tips: [
+      "Use your phone's portrait or macro mode, or a clip-on macro lens",
+      "Even breathing can blur extreme close-ups — hold your breath, brace your arms",
+      "Shallow DOF at macro distances creates beautiful, smooth backgrounds"
+    ]
+  },
+  {
+    id: 20, name: "Reflections", category: "Creative Techniques",
+    desc: "Use reflected surfaces to create surreal, layered, or symmetrical images.",
+    mission: "Shoot 3 reflection photos using different reflective surfaces (water, glass, mirror, puddle, metal). At least one should be abstract.",
+    tips: [
+      "Shoot low to the ground to maximise puddle and water reflections",
+      "Wet roads after rain turn cities into abstract paintings",
+      "Look for partial reflections that create a dreamlike, layered effect"
+    ]
+  },
+  {
+    id: 21, name: "Motion & Long Exposure", category: "Creative Techniques",
+    desc: "Freeze action or blur motion to show the flow of time in a single frame.",
+    mission: "Shoot 3 photos demonstrating motion: one frozen (fast shutter), one with intentional motion blur, and one panning shot where the subject is sharp against a blurred background.",
+    tips: [
+      "Sports mode or shutter priority (high speed) freezes motion",
+      "Slow shutter in low light blurs movement naturally",
+      "Panning: follow the subject smoothly and shoot at 1/60–1/125s"
+    ]
+  },
+  {
+    id: 22, name: "Storytelling", category: "Creative Techniques",
+    desc: "Create a sequence of 3 related photos that tell a beginning, middle, and end.",
+    mission: "Shoot a 3-photo story: they should be thematically connected and tell a complete narrative when viewed in sequence. Each photo is a chapter of the story.",
+    tips: [
+      "Establish the setting in photo 1, build tension in photo 2, resolve in photo 3",
+      "The story can be abstract (light changing across a day) or literal (person making coffee)",
+      "Consistency in colour grade or composition style unifies a series"
+    ]
+  },
+  {
+    id: 23, name: "Flat Lay & Product", category: "Creative Techniques",
+    desc: "Arrange objects on a flat surface and shoot from directly above.",
+    mission: "Shoot 3 flat lay compositions from directly overhead. Each should have a clear theme: one food/kitchen, one lifestyle/personal items, one abstract/found objects.",
+    tips: [
+      "Use a clean, textured surface as your base — wood, marble, linen work well",
+      "Odd numbers of objects tend to look more natural than even numbers",
+      "Shoot in natural window light for soft, even shadows"
+    ]
+  },
+  {
+    id: 24, name: "Perspective & POV", category: "Creative Techniques",
+    desc: "Change your shooting position radically to see familiar subjects differently.",
+    mission: "Shoot 3 photos of the same subject or scene from radically different perspectives: ground level/worm's eye, eye level, and bird's eye/overhead.",
+    tips: [
+      "Get your lens right to the ground — literally lie down if needed",
+      "Overhead shots (stairs, streets, food) flatten and abstract the world beautifully",
+      "Mid-level is the most boring — push to the extremes"
+    ]
+  },
+  {
+    id: 25, name: "Texture", category: "Details & Still Life",
+    desc: "Make the viewer want to reach out and touch the image.",
+    mission: "Shoot 3 photos where texture is the primary visual subject. Use raking side light to emphasise surface detail.",
+    tips: [
+      "Side or raking light (light from the side, low angle) creates texture shadows",
+      "Extreme close-up at an angle maximises the 3D feel of surfaces",
+      "Look for contrast of textures in one frame: rough/smooth, hard/soft"
+    ]
+  },
+  {
+    id: 26, name: "Still Life", category: "Details & Still Life",
+    desc: "Arrange and photograph everyday objects with artistic intention.",
+    mission: "Shoot 3 still life setups using objects you find at home. Each should have a clear mood or visual theme, deliberate light direction, and intentional composition.",
+    tips: [
+      "Use books, boxes, or fabric rolls to vary object heights",
+      "One light source (window or lamp) is usually more dramatic than multiple",
+      "Limit your colour palette to 2–3 hues for a cohesive look"
+    ]
+  },
+  {
+    id: 27, name: "Food Photography", category: "Details & Still Life",
+    desc: "Make food look irresistible through styling, light, and composition.",
+    mission: "Shoot 3 food photos: one overhead (flat lay), one 45-degree angle, and one hero close-up of a single element.",
+    tips: [
+      "Always shoot food in natural light — artificial warm light makes food look unnatural",
+      "Add height and layers — stack, lean, or pour for dynamic compositions",
+      "Use props (cutlery, fabric, herbs) to frame and contextualise the dish"
+    ]
+  },
+  {
+    id: 28, name: "Nature & Plants", category: "Details & Still Life",
+    desc: "Find beauty in the natural world through close observation.",
+    mission: "Shoot 3 nature photos: one showing a full plant in its environment, one isolated single stem or flower, and one extreme close-up of a natural detail (petal, leaf vein, seed).",
+    tips: [
+      "Shoot flowers with light behind them to get that luminous, backlit glow",
+      "Get below eye level — shoot flowers from the side or below for drama",
+      "Water droplets on petals after rain add instant magic"
+    ]
+  },
+  {
+    id: 29, name: "Editing Fundamentals", category: "Post-Processing",
+    desc: "Learn the core editing controls that transform a good photo into a great one.",
+    mission: "Shoot 3 photos and edit each one — provide both the original and edited version. Focus on exposure, contrast, highlights/shadows, and colour temperature.",
+    tips: [
+      "Start with exposure: fix brightness first, everything else follows",
+      "Reduce highlights and lift shadows to recover dynamic range",
+      "Colour temperature (warmth/coolness) sets the emotional mood of the entire image"
+    ]
+  },
+  {
+    id: 30, name: "Colour Grading", category: "Post-Processing",
+    desc: "Develop a consistent colour signature style across your photos.",
+    mission: "Apply the same colour grade to all 3 photos to create a cohesive series. The grade should establish a clear mood: moody dark, warm film, cool clean, or vintage fade.",
+    tips: [
+      "Consistency across a series is more impressive than one perfectly graded photo",
+      "Try desaturating specific colours (greens → muted) to achieve film-like results",
+      "The tone curve is the single most powerful grading tool — learn the S-curve"
+    ]
+  },
+  {
+    id: 31, name: "Aspect Ratios & Crop", category: "Post-Processing",
+    desc: "Use cropping intentionally to change composition and emotional impact.",
+    mission: "Submit 3 versions of the same original photo cropped to different aspect ratios (1:1, 4:5, 16:9). Each crop should present a genuinely different compositional emphasis.",
+    tips: [
+      "Square (1:1) works best for isolation and symmetry",
+      "Portrait (4:5) is the dominant social media format — content that fills it feels powerful",
+      "Cinematic (16:9 or wider) adds a dramatic, epic quality to landscapes"
+    ]
+  },
+  {
+    id: 32, name: "Mood & Emotion", category: "Advanced",
+    desc: "Use all your photographic tools to evoke a specific emotion intentionally.",
+    mission: "Choose one emotion (joy, melancholy, tension, serenity) and shoot 3 photos designed to evoke that feeling. The title of your set should be the emotion.",
+    tips: [
+      "Colour, contrast, and composition all contribute to emotional tone",
+      "Low angles and wide frames create epic or oppressive feelings",
+      "Warmth and soft focus feel nostalgic; cold tones and hard edges feel tense"
+    ]
+  },
+  {
+    id: 33, name: "Documentary", category: "Advanced",
+    desc: "Tell a true story of a place, person, or event with honesty and empathy.",
+    mission: "Document a single real event, place, or person across 3 photos. The series should feel journalistic — honest, specific, and revealing.",
+    tips: [
+      "Observe before shooting — understand the scene before raising your camera",
+      "Look for the decisive moments: the glance, the gesture, the pause",
+      "Mix wide establishing shots with intimate close-ups for a complete story"
+    ]
+  },
+  {
+    id: 34, name: "Abstract Photography", category: "Advanced",
+    desc: "Break free from representation — let form, colour, and texture speak alone.",
+    mission: "Shoot 3 photos where the subject is completely unrecognisable. The viewer should see pure form, colour, or texture with no literal reading possible.",
+    tips: [
+      "Extreme close-ups, intentional camera movement, and out-of-focus shots all create abstraction",
+      "Look for interesting light on everyday surfaces — a lens flare, a shadow pattern, a reflection",
+      "Strong composition matters MORE in abstract photography, not less"
+    ]
+  },
+  {
+    id: 35, name: "Photo Essay", category: "Advanced",
+    desc: "Create a cohesive visual essay exploring a single theme or subject in depth.",
+    mission: "Shoot a 3-photo visual essay on a theme of your choice. The photos should work together, each adding a new layer of understanding to the theme.",
+    tips: [
+      "Vary your focal length and distance — wide context, medium relationship, close detail",
+      "Choose a theme specific enough to explore in depth: not 'the city' but 'waiting'",
+      "Let the photos breathe — don't force every image to say everything"
+    ]
+  },
+  {
+    id: 36, name: "Your Signature Style", category: "Advanced",
+    desc: "Define and demonstrate what makes YOUR photography unique.",
+    mission: "Shoot 3 photos that best represent your personal photographic style. Write a 1-sentence artist statement when submitting: 'My photography is about…'",
+    tips: [
+      "Look back at your best photos from this journey — what do they have in common?",
+      "Your style isn't invented; it's discovered through looking at your own work",
+      "Consistency, not perfection, is what defines a photographic voice"
+    ]
   }
-  let currentUser  = null;
-  let b64Data      = null;
-  let mimeType     = null;
-  let previewSrc   = null;
-  let totalPassed  = 0;
-  let done         = false;
+];
 
-  // ── AUTH / NAV ──
-  function renderNav() {
-    const name = currentUser.user_metadata?.display_name || currentUser.email.split('@')[0];
-    document.getElementById('navAuthArea').innerHTML =
-      `<span style="font-size:0.78rem;color:rgba(240,237,232,0.3)">Hi, ${name}</span>
-       <button onclick="signOut()" style="background:none;border:none;cursor:pointer;font-size:0.72rem;letter-spacing:0.07em;text-transform:uppercase;color:rgba(240,237,232,0.3);font-family:'DM Sans',sans-serif" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='rgba(240,237,232,0.3)'">Sign Out</button>`;
+// ── STATE ──
+let currentUser = null;
+let chapterProgress = {}; // { chapterId: { photos: [base64...], score: N, completed: bool } }
+let activeChapterId = null;
+let uploadSlotIndex = 0;
+let pendingFiles = [null, null, null]; // File objects for current session
+
+// ── INIT ──
+async function init() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) {
+    document.getElementById('authGate').classList.add('open');
+    return;
   }
-  function openMenu() {
-    document.getElementById('mobileMenu').classList.add('open');
-    document.body.style.overflow = 'hidden';
-    const n = currentUser?.user_metadata?.display_name || currentUser?.email?.split('@')[0] || '';
-    const el = document.getElementById('mobileUser');
-    if (el) el.textContent = 'Hi, ' + n;
+  currentUser = session.user;
+  await loadProgress();
+  renderChapters();
+  updateProgressBanner();
+}
+
+// ── LOAD PROGRESS FROM SUPABASE ──
+async function loadProgress() {
+  try {
+    const { data, error } = await sb
+      .from('analyses')
+      .select('chapter_id, score, composition_score, lighting_score, color_score, focus_score, created_at')
+      .eq('user_id', currentUser.id)
+      .eq('source', 'learn')
+      .order('created_at', { ascending: true });
+
+    if (error) throw error;
+
+    // Group by chapter
+    const grouped = {};
+    (data || []).forEach(row => {
+      if (!grouped[row.chapter_id]) grouped[row.chapter_id] = [];
+      grouped[row.chapter_id].push(row);
+    });
+
+    // Mark chapters as completed if 3+ photos analysed
+    Object.entries(grouped).forEach(([cid, rows]) => {
+      const id = parseInt(cid);
+      const scores = rows.map(r => r.score || 0);
+      const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
+      chapterProgress[id] = {
+        count: rows.length,
+        avgScore: Math.round(avg),
+        completed: rows.length >= 3,
+        scores
+      };
+    });
+
+    // Also check local streak
+    updateStreak();
+  } catch (e) {
+    console.error('Load progress error:', e);
   }
-  function closeMenu() { document.getElementById('mobileMenu').classList.remove('open'); document.body.style.overflow = ''; }
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+}
 
-  // ── TOGGLE ──
-  function toggleChapter(id) { document.getElementById(id + 'Body').classList.toggle('open'); }
+function updateStreak() {
+  // Simple streak from localStorage
+  const streak = parseInt(localStorage.getItem('lensup_streak') || '0');
+  document.getElementById('streakCount').textContent = streak;
+}
 
-  function toggleModule(id) {
-    const body = document.getElementById(id);
-    const num = id.replace('mod','').replace('chapters','');
-    const chevron = document.getElementById('mod' + num + 'chevron');
-    const isOpen = body.classList.contains('open');
-    body.classList.toggle('open', !isOpen);
-    if (chevron) chevron.textContent = isOpen ? '▼' : '▲';
+// ── RENDER ──
+function renderChapters() {
+  const list = document.getElementById('chapterList');
+  let completedCount = 0;
+
+  // Group by category
+  const categories = {};
+  CHAPTERS.forEach(ch => {
+    if (!categories[ch.category]) categories[ch.category] = [];
+    categories[ch.category].push(ch);
+  });
+
+  let html = '';
+  Object.entries(categories).forEach(([cat, chapters]) => {
+    html += `<div style="margin-bottom:6px;margin-top:18px">
+      <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;color:var(--text-light);text-transform:uppercase;margin-bottom:10px">${cat}</div>`;
+
+    chapters.forEach(ch => {
+      const prog = chapterProgress[ch.id] || { count: 0, completed: false };
+      const isComplete = prog.completed;
+      const count = Math.min(prog.count || 0, 3);
+      if (isComplete) completedCount++;
+
+      const dots = [0,1,2].map(i =>
+        `<div class="dot ${i < count ? 'done' : (i === count ? 'active' : '')}"></div>`
+      ).join('');
+
+      const badge = isComplete
+        ? `<span class="chapter-badge badge-done">✓ Done</span>`
+        : `<span class="chapter-badge badge-open">${count}/3</span>`;
+
+      const scoreTag = isComplete && prog.avgScore
+        ? `<span class="chapter-score">⭐ ${prog.avgScore}</span>`
+        : '';
+
+      html += `
+        <div class="chapter-card ${isComplete ? 'completed' : count > 0 ? 'in-progress' : ''}"
+             onclick="openChapter(${ch.id})">
+          <div class="card-top">
+            <div class="chapter-num">${isComplete ? '✓' : ch.id}</div>
+            <div class="chapter-info">
+              <div class="chapter-name">${ch.name}</div>
+              <div class="chapter-desc">${ch.desc}</div>
+            </div>
+          </div>
+          <div class="card-meta">
+            <div class="photo-dots">${dots}</div>
+            <div style="display:flex;gap:8px;align-items:center">${scoreTag}${badge}</div>
+          </div>
+        </div>`;
+    });
+
+    html += `</div>`;
+  });
+
+  list.innerHTML = html;
+  document.getElementById('completedCount').textContent = `${completedCount} done`;
+}
+
+function updateProgressBanner() {
+  const completed = Object.values(chapterProgress).filter(p => p.completed).length;
+  const pct = Math.round((completed / 36) * 100);
+  document.getElementById('progFill').style.width = pct + '%';
+  document.getElementById('progLabel').textContent = `${completed} / 36 chapters complete`;
+  document.getElementById('progressText').textContent =
+    completed === 0 ? 'Complete 3 photos per chapter to advance' :
+    completed === 36 ? '🎉 All chapters complete! You\'re a master.' :
+    `${36 - completed} chapters remaining — keep going!`;
+}
+
+// ── OPEN CHAPTER MODAL ──
+function openChapter(id) {
+  const ch = CHAPTERS.find(c => c.id === id);
+  if (!ch) return;
+  activeChapterId = id;
+  pendingFiles = [null, null, null];
+
+  document.getElementById('modalNum').textContent = id;
+  document.getElementById('modalTitle').textContent = ch.name;
+  document.getElementById('modalSubtitle').textContent = ch.category + ' · 3 photos to complete';
+  document.getElementById('modalMission').textContent = ch.mission;
+
+  // Tips
+  const tipsHtml = ch.tips.map(t =>
+    `<div class="tip-item"><div class="tip-dot"></div><span>${t}</span></div>`
+  ).join('');
+  document.getElementById('modalTips').innerHTML = tipsHtml;
+
+  // Reset slots
+  const prog = chapterProgress[id] || { count: 0 };
+  const done = Math.min(prog.count, 3);
+  for (let i = 0; i < 3; i++) {
+    const slot = document.getElementById('slot' + i);
+    if (i < done) {
+      slot.innerHTML = `<div style="width:100%;height:100%;background:var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px">✓</div>`;
+      slot.classList.add('filled');
+      slot.classList.remove('active-slot');
+      slot.onclick = null;
+    } else {
+      slot.innerHTML = `<span class="slot-num">${i + 1}</span><span>Tap to add</span>`;
+      slot.classList.remove('filled');
+      slot.classList.add(i === done ? 'active-slot' : '');
+      slot.onclick = () => triggerUpload(i);
+    }
   }
 
-  function initStepper() {
-    // For now Module 1 is always active — update when modules unlock
-    const fill = document.getElementById('stepperFill');
-    if (fill) fill.style.width = '0%';
-  }
+  updateAnalyzeBtn();
+  document.getElementById('chapterModal').classList.add('open');
+}
 
+function closeChapter() {
+  document.getElementById('chapterModal').classList.remove('open');
+  activeChapterId = null;
+  pendingFiles = [null, null, null];
+}
 
-  // ── FILE ──
-  function onFile(file) {
-    if (!file || !file.type.startsWith('image/')) return;
-    mimeType = file.type;
-    const reader = new FileReader();
-    reader.onload = e => {
-      previewSrc = e.target.result;
-      b64Data    = e.target.result.split(',')[1];
-      const prev = document.getElementById('uploadPreview');
-      prev.src = previewSrc;
-      prev.style.display = 'block';
-      document.getElementById('uploadZone').style.display = 'none';
-      document.getElementById('analyseBtn').disabled = false;
-      hideErr();
-    };
-    reader.readAsDataURL(file);
-  }
-  function onDrop(e) {
-    e.preventDefault();
-    document.getElementById('uploadZone').classList.remove('drag');
-    onFile(e.dataTransfer.files[0]);
-  }
+// ── UPLOAD HANDLING ──
+function triggerUpload(slotIndex) {
+  uploadSlotIndex = slotIndex;
+  const input = document.getElementById('photoInput');
+  input.value = '';
+  input.onchange = (e) => handleFileSelected(e, slotIndex);
+  input.click();
+}
 
-  // ── ANALYSE ──
-  async function analysePhoto() {
-    if (!b64Data || done) return;
-    hideErr();
-    setLoading(true);
-    document.getElementById('analyseBtn').disabled = true;
-    document.getElementById('subResult').classList.remove('show');
-    document.getElementById('nextWrap').style.display = 'none';
+function handleFileSelected(e, slotIndex) {
+  const file = e.target.files[0];
+  if (!file) return;
+  pendingFiles[slotIndex] = file;
 
-    try {
-      const { data: { session } } = await sb.auth.getSession();
-      const token = session?.access_token;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    const slot = document.getElementById('slot' + slotIndex);
+    slot.innerHTML = `<img src="${ev.target.result}" style="width:100%;height:100%;object-fit:cover;border-radius:8px" />
+      <div class="slot-check">✓</div>`;
+    slot.classList.add('filled');
+    slot.classList.remove('active-slot');
+    slot.onclick = null;
 
-      const res = await fetch('/api/chapter', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-        },
-        body: JSON.stringify({
-          imageContent: { type: 'image', source: { type: 'base64', media_type: mimeType, data: b64Data } },
-          chapterId: 'ch1-rule-of-thirds'
-        })
-      });
-
-      const r = await res.json();
-      setLoading(false);
-
-      if (r.error === 'chapter_complete') { showErr('You already completed this chapter! 🎉'); return; }
-      if (!res.ok) throw new Error(r.error || 'Analysis failed');
-      if (r.rejected) { showErr('Please upload a real photograph.'); document.getElementById('analyseBtn').disabled = false; return; }
-
-      showResult(r);
-      totalPassed = r.total_passed || 0;
-      updateDots(totalPassed);
-
-      if (r.chapter_complete && !done) {
-        done = true;
-        saveBadge();
-        setTimeout(() => {
-          document.getElementById('completion').classList.add('show');
-          document.getElementById('nextWrap').style.display = 'none';
-          document.getElementById('completion').scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 700);
+    // Activate next slot
+    const next = slotIndex + 1;
+    if (next < 3 && !pendingFiles[next]) {
+      const nextSlot = document.getElementById('slot' + next);
+      if (!nextSlot.classList.contains('filled')) {
+        nextSlot.classList.add('active-slot');
       }
+    }
+    updateAnalyzeBtn();
+  };
+  reader.readAsDataURL(file);
+}
 
+function updateAnalyzeBtn() {
+  const prog = chapterProgress[activeChapterId] || { count: 0 };
+  const existingDone = Math.min(prog.count || 0, 3);
+  const newCount = pendingFiles.filter(f => f !== null).length;
+  const totalReady = existingDone + newCount;
+
+  const btn = document.getElementById('analyzeBtn');
+  const needed = 3 - existingDone;
+
+  if (existingDone >= 3) {
+    btn.textContent = '✓ Chapter Complete — Retake?';
+    btn.disabled = false;
+    btn.style.background = 'var(--success)';
+  } else if (newCount >= needed) {
+    btn.textContent = `Analyse ${needed} Photo${needed > 1 ? 's' : ''}`;
+    btn.disabled = false;
+    btn.style.background = '';
+  } else if (newCount > 0) {
+    btn.textContent = `Add ${needed - newCount} more photo${needed - newCount > 1 ? 's' : ''}`;
+    btn.disabled = true;
+    btn.style.background = '';
+  } else {
+    btn.textContent = 'Add your photos above';
+    btn.disabled = true;
+    btn.style.background = '';
+  }
+}
+
+// ── ANALYSE CHAPTER ──
+async function analyzeChapter() {
+  const prog = chapterProgress[activeChapterId] || { count: 0 };
+  const existingDone = Math.min(prog.count || 0, 3);
+
+  if (existingDone >= 3) {
+    // Retake: reset progress for this chapter
+    retryChapter();
+    return;
+  }
+
+  const filesToProcess = pendingFiles.filter(f => f !== null);
+  if (filesToProcess.length === 0) { showToast('Add photos first'); return; }
+
+  const ch = CHAPTERS.find(c => c.id === activeChapterId);
+  const analyzeOverlay = document.getElementById('analyzingOverlay');
+  const subText = document.getElementById('analyzingSubText');
+
+  analyzeOverlay.classList.add('open');
+
+  const results = [];
+  const imagePreviews = [];
+
+  for (let i = 0; i < filesToProcess.length; i++) {
+    subText.textContent = `Analysing photo ${i + 1} of ${filesToProcess.length}…`;
+    try {
+      const base64 = await fileToBase64(filesToProcess[i]);
+      imagePreviews.push(base64);
+      const result = await analyzePhoto(base64, ch);
+      results.push(result);
+
+      // Save to Supabase
+      await saveAnalysis(result, base64, ch);
     } catch (err) {
-      setLoading(false);
-      showErr('Analysis failed — ' + err.message);
-      document.getElementById('analyseBtn').disabled = false;
+      console.error('Analyse error:', err);
+      results.push({ score: 50, composition: 50, lighting: 50, color: 50, focus: 50, feedback: 'Analysis failed for this photo.' });
     }
   }
 
-  function showResult(r) {
-    const pass = r.passed;
-    const score = r.composition_score;
-    const head = document.getElementById('resultHead');
-    const scoreEl = document.getElementById('resultScore');
-    head.className  = 'result-head ' + (pass ? 'pass' : 'fail');
-    scoreEl.className = 'result-score ' + (pass ? 'pass' : 'fail');
-    scoreEl.textContent = score + '/10';
-    document.getElementById('resultTitle').textContent = pass ? '✓ Counts toward your progress!' : '✗ Below 7 — doesn\'t count';
-    document.getElementById('resultSub').textContent   = pass ? 'Rule of Thirds well demonstrated' : 'Try again with a different photo';
-    document.getElementById('resultFeedback').textContent = r.feedback || '';
-    document.getElementById('resultWorked').textContent   = r.what_worked || '—';
-    document.getElementById('resultImprove').textContent  = r.improvement || '—';
-    document.getElementById('failHint').style.display     = pass ? 'none' : 'block';
-    document.getElementById('subResult').classList.add('show');
-    if (!done) document.getElementById('nextWrap').style.display = 'block';
-    document.getElementById('subResult').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  analyzeOverlay.classList.remove('open');
+  closeChapter();
+
+  // Update local progress
+  const newTotal = existingDone + results.length;
+  const allScores = results.map(r => r.score);
+  const prevScores = chapterProgress[activeChapterId]?.scores || [];
+  const combinedScores = [...prevScores, ...allScores];
+  const avgScore = Math.round(combinedScores.reduce((a, b) => a + b, 0) / combinedScores.length);
+
+  chapterProgress[activeChapterId] = {
+    count: newTotal,
+    avgScore,
+    completed: newTotal >= 3,
+    scores: combinedScores
+  };
+
+  renderChapters();
+  updateProgressBanner();
+
+  // Show scorecard only if chapter is now complete
+  if (newTotal >= 3) {
+    showScorecard(ch, results, imagePreviews, avgScore);
+    updateLearningStreak();
+  } else {
+    showToast(`${newTotal}/3 photos done — ${3 - newTotal} more to complete chapter`);
   }
+}
 
-  function updateDots(passed) {
-    const dots = document.getElementById('missionDots').children;
-    for (let i = 0; i < 5; i++) {
-      dots[i].className = 'mdot';
-      if (i < passed)        { dots[i].classList.add('done');   dots[i].textContent = '✓'; }
-      else if (i === passed) { dots[i].classList.add('active'); dots[i].textContent = i + 1; }
-      else                   { dots[i].textContent = i + 1; }
-    }
-    const pct = (passed / 5) * 100;
-    document.getElementById('ch1Bar').style.width   = pct + '%';
-    document.getElementById('ch1Label').textContent = passed + ' / 5 passed';
-    if (passed >= 5) {
-      document.getElementById('ch1Meta').innerHTML = '<span class="status-badge status-complete">✓ Complete</span>';
-    }
-  }
+async function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => resolve(e.target.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
 
-  function resetUpload() {
-    b64Data = null; mimeType = null; previewSrc = null;
-    const prev = document.getElementById('uploadPreview');
-    prev.src = ''; prev.style.display = 'none';
-    document.getElementById('uploadZone').style.display = 'block';
-    document.getElementById('chFile').value = '';
-    document.getElementById('analyseBtn').disabled = true;
-    document.getElementById('subResult').classList.remove('show');
-    document.getElementById('nextWrap').style.display = 'none';
-    hideErr();
-    document.getElementById('uploadZone').scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }
+async function analyzePhoto(base64, chapter) {
+  const prompt = `You are an expert photography coach evaluating a student's photo for Chapter ${chapter.id}: "${chapter.name}".
 
-  function setLoading(on) {
-    document.getElementById('chLoading').classList.toggle('show', on);
-    document.getElementById('uploadWrap').style.display = on ? 'none' : 'block';
-  }
-  function showErr(msg) { const e = document.getElementById('chError'); e.textContent = msg; e.classList.add('show'); }
-  function hideErr()     { document.getElementById('chError').classList.remove('show'); }
+Chapter mission: "${chapter.mission}"
 
-  // ── BADGE ──
-  async function saveBadge() { await saveBadgeFor('ch1-rule-of-thirds', 'Rule of Thirds'); }
-  function generateCard() { generateShareCard('shareWrap', 'shareCard', 'Rule of Thirds — Composition Basics', previewSrc); }
-  function _old_unused_generateCard() {
-    const wrap = document.getElementById('shareWrap');
-    wrap.classList.add('show');
-    const canvas = document.getElementById('shareCard');
-    const ctx    = canvas.getContext('2d');
-    const W = 800, H = 480;
+Score this photo on these 5 dimensions (0-100 each):
+1. composition - how well the photo applies the chapter's specific technique
+2. lighting - quality and intentionality of the lighting
+3. color - colour harmony, palette, and use of colour
+4. focus - sharpness, depth of field control
+5. overall - overall score weighted toward the chapter technique
 
-    // BG
-    ctx.fillStyle = '#080808';
-    ctx.fillRect(0, 0, W, H);
+Also provide a 2-3 sentence feedback focusing specifically on how well they executed the chapter mission.
 
-    // Grid
-    ctx.strokeStyle = 'rgba(232,184,75,0.05)';
-    ctx.lineWidth = 1;
-    for (let x = 0; x < W; x += 60) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
-    for (let y = 0; y < H; y += 60) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+Respond ONLY in this exact JSON format (no markdown, no backticks):
+{"composition":75,"lighting":70,"color":65,"focus":80,"overall":73,"feedback":"Your feedback here."}`;
 
-    // Left gold bar
-    const g = ctx.createLinearGradient(0,0,0,H);
-    g.addColorStop(0, '#e8b84b'); g.addColorStop(1, '#c49a2a');
-    ctx.fillStyle = g;
-    ctx.fillRect(0, 0, 5, H);
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'anthropic-version': '2023-06-01' },
+    body: JSON.stringify({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 300,
+      messages: [{
+        role: 'user',
+        content: [
+          { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: base64 } },
+          { type: 'text', text: prompt }
+        ]
+      }]
+    })
+  });
 
-    // Badge emoji
-    ctx.font = '80px serif';
-    ctx.fillText('🏆', 50, 155);
-
-    // LensUp wordmark
-    ctx.font = 'bold 18px sans-serif';
-    ctx.fillStyle = '#e8b84b'; ctx.fillText('LENS', 52, 210);
-    ctx.fillStyle = '#f5f2ee'; ctx.fillText('UP',  52 + ctx.measureText('LENS').width, 210);
-
-    // Headline
-    ctx.fillStyle = '#f5f2ee';
-    ctx.font = 'bold 48px sans-serif';
-    ctx.fillText('CHAPTER COMPLETE', 52, 285);
-
-    // Chapter name
-    ctx.fillStyle = '#e8b84b';
-    ctx.font = '24px sans-serif';
-    ctx.fillText('Rule of Thirds — Composition Basics', 52, 325);
-
-    // Divider
-    ctx.strokeStyle = 'rgba(232,184,75,0.2)';
-    ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(52, 348); ctx.lineTo(W - 60, 348); ctx.stroke();
-
-    // Name + date
-    const name    = currentUser?.user_metadata?.display_name || currentUser?.email?.split('@')[0] || 'Photographer';
-    const dateStr = new Date().toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
-    ctx.fillStyle = 'rgba(245,242,238,0.55)';
-    ctx.font = '17px sans-serif';
-    ctx.fillText('Completed by ' + name, 52, 378);
-    ctx.fillStyle = 'rgba(245,242,238,0.25)';
-    ctx.font = '13px sans-serif';
-    ctx.fillText(dateStr, 52, 402);
-
-    // URL
-    ctx.fillStyle = 'rgba(232,184,75,0.45)';
-    ctx.font = '12px sans-serif';
-    ctx.fillText('lensup.vercel.app', W - 170, H - 20);
-
-    // Photo thumbnail — top right
-    if (previewSrc) {
-      const img = new Image();
-      img.onload = () => {
-        const tw = 220, th = 165;
-        const tx = W - tw - 52, ty = 60;
-        ctx.save();
-        ctx.beginPath();
-        // Rounded rect clip
-        const r = 8;
-        ctx.moveTo(tx + r, ty);
-        ctx.lineTo(tx + tw - r, ty); ctx.arcTo(tx+tw, ty, tx+tw, ty+r, r);
-        ctx.lineTo(tx+tw, ty+th-r);  ctx.arcTo(tx+tw, ty+th, tx+tw-r, ty+th, r);
-        ctx.lineTo(tx+r, ty+th);      ctx.arcTo(tx, ty+th, tx, ty+th-r, r);
-        ctx.lineTo(tx, ty+r);         ctx.arcTo(tx, ty, tx+r, ty, r);
-        ctx.clip();
-        ctx.drawImage(img, tx, ty, tw, th);
-        ctx.restore();
-        // Border
-        ctx.strokeStyle = 'rgba(232,184,75,0.35)';
-        ctx.lineWidth = 1.5;
-        ctx.beginPath();
-        ctx.moveTo(tx + r, ty);
-        ctx.lineTo(tx + tw - r, ty); ctx.arcTo(tx+tw, ty, tx+tw, ty+r, r);
-        ctx.lineTo(tx+tw, ty+th-r);  ctx.arcTo(tx+tw, ty+th, tx+tw-r, ty+th, r);
-        ctx.lineTo(tx+r, ty+th);      ctx.arcTo(tx, ty+th, tx, ty+th-r, r);
-        ctx.lineTo(tx, ty+r);         ctx.arcTo(tx, ty, tx+r, ty, r);
-        ctx.stroke();
-      };
-      img.src = previewSrc;
-    }
-
-    wrap.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }
-
-  // ── LOAD PROGRESS ──
-  async function loadProgress() {
-    try {
-      // CH1
-      const { data: d1 } = await sb.from('chapter_submissions').select('id,passed')
-        .eq('user_id', currentUser.id).eq('chapter_id', 'ch1-rule-of-thirds');
-      const p1 = (d1 || []).filter(r => r.passed).length;
-      totalPassed = p1; updateDots(p1);
-      const ch1Done = p1 >= 5;
-      if (ch1Done) {
-        done = true;
-        document.getElementById('completion').classList.add('show');
-        document.getElementById('uploadWrap').style.display = 'none';
-        document.getElementById('ch1Meta').innerHTML = '<span class="status-badge status-complete">✓ Complete</span>';
-        document.getElementById('ch1Num').style.opacity = '1';
-      }
-
-      // CH2 — unlock if ch1 done
-      if (ch1Done) {
-        document.getElementById('ch2Gate').style.display = 'none';
-        document.getElementById('ch2Content').style.display = 'block';
-        document.getElementById('ch2Num').style.opacity = '1';
-        const { data: d2 } = await sb.from('chapter_submissions').select('id,passed')
-          .eq('user_id', currentUser.id).eq('chapter_id', 'ch2-leading-lines');
-        const p2 = (d2 || []).filter(r => r.passed).length;
-        ch2Passed = p2; ch2UpdateDots(p2);
-        const ch2Done = p2 >= 5;
-        if (ch2Done) {
-          ch2done = true;
-          document.getElementById('ch2Completion').classList.add('show');
-          document.getElementById('ch2UploadWrap').style.display = 'none';
-          document.getElementById('ch2Meta').innerHTML = '<span class="status-badge status-complete">✓ Complete</span>';
-
-          // Ch3 is locked (paid) — no unlock logic
-        }
-      }
-    } catch(e) { console.warn('Progress load failed', e); }
-  }
-
-  // ══════════════════════════════════════════════
-  // CH2 — LEADING LINES
-  // ══════════════════════════════════════════════
-  let ch2B64 = null, ch2Mime = null, ch2Src = null, ch2Passed = 0, ch2done = false;
-
-  function ch2OnFile(file) {
-    if (!file || !file.type.startsWith('image/')) return;
-    ch2Mime = file.type;
-    const r = new FileReader();
-    r.onload = e => {
-      ch2Src = e.target.result; ch2B64 = e.target.result.split(',')[1];
-      const prev = document.getElementById('ch2Preview');
-      prev.src = ch2Src; prev.style.display = 'block';
-      document.getElementById('ch2UploadZone').style.display = 'none';
-      document.getElementById('ch2AnalyseBtn').disabled = false;
+  const data = await response.json();
+  const text = data.content?.[0]?.text || '{}';
+  try {
+    const clean = text.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(clean);
+    return {
+      score: parsed.overall || 70,
+      composition: parsed.composition || 70,
+      lighting: parsed.lighting || 70,
+      color: parsed.color || 70,
+      focus: parsed.focus || 70,
+      feedback: parsed.feedback || 'Good effort on this chapter.'
     };
-    r.readAsDataURL(file);
+  } catch {
+    return { score: 70, composition: 70, lighting: 70, color: 70, focus: 70, feedback: 'Keep practising this technique!' };
   }
-  function ch2Drop(e) { e.preventDefault(); document.getElementById('ch2UploadZone').classList.remove('drag'); ch2OnFile(e.dataTransfer.files[0]); }
-  function ch2Reset() {
-    ch2B64 = null; ch2Mime = null; ch2Src = null;
-    document.getElementById('ch2Preview').style.display = 'none';
-    document.getElementById('ch2UploadZone').style.display = 'flex';
-    document.getElementById('ch2Result').classList.remove('show');
-    document.getElementById('ch2NextWrap').style.display = 'none';
-    document.getElementById('ch2AnalyseBtn').disabled = true;
-    document.getElementById('ch2File').value = '';
-    document.getElementById('ch2Error').textContent = '';
-  }
-  function ch2UpdateDots(passed) {
-    const dots = document.getElementById('ch2Dots').children;
-    for (let i = 0; i < 5; i++) {
-      dots[i].className = 'mdot';
-      if (i < passed) { dots[i].classList.add('done'); dots[i].textContent = '✓'; }
-      else if (i === passed) { dots[i].classList.add('active'); dots[i].textContent = i + 1; }
-      else dots[i].textContent = i + 1;
-    }
-    if (passed >= 5) document.getElementById('ch2Meta').innerHTML = '<span class="status-badge status-complete">✓ Complete</span>';
-  }
-  async function ch2Analyse() {
-    if (!ch2B64 || ch2done) return;
-    document.getElementById('ch2Error').textContent = '';
-    document.getElementById('ch2Loading').style.display = 'flex';
-    document.getElementById('ch2AnalyseBtn').disabled = true;
-    document.getElementById('ch2Result').classList.remove('show');
-    document.getElementById('ch2NextWrap').style.display = 'none';
-    try {
-      const { data: { session } } = await sb.auth.getSession();
-      const res = await fetch('/api/chapter', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...(session?.access_token ? { 'Authorization': `Bearer ${session.access_token}` } : {}) },
-        body: JSON.stringify({ imageContent: { type:'image', source:{ type:'base64', media_type: ch2Mime, data: ch2B64 } }, chapterId: 'ch2-leading-lines' })
-      });
-      const r = await res.json();
-      document.getElementById('ch2Loading').style.display = 'none';
-      if (r.error === 'chapter_complete') { document.getElementById('ch2Error').textContent = 'You already completed this chapter! 🎉'; return; }
-      if (!res.ok) throw new Error(r.error || 'Analysis failed');
-      if (r.rejected) { document.getElementById('ch2Error').textContent = 'Please upload a real photograph.'; document.getElementById('ch2AnalyseBtn').disabled = false; return; }
-      // Show result
-      const pass = r.passed; const score = r.composition_score;
-      document.getElementById('ch2ResultHead').className = 'result-head ' + (pass ? 'pass' : 'fail');
-      document.getElementById('ch2Score').className = 'result-score ' + (pass ? 'pass' : 'fail');
-      document.getElementById('ch2Score').textContent = score + '/10';
-      document.getElementById('ch2Title').textContent = pass ? '✓ Counts toward your progress!' : '✗ Below 7 — doesn\'t count';
-      document.getElementById('ch2Sub').textContent = pass ? 'Leading Lines well demonstrated' : 'Try again with a stronger line';
-      document.getElementById('ch2Feedback').textContent = r.feedback || '';
-      document.getElementById('ch2Worked').textContent = r.what_worked || '—';
-      document.getElementById('ch2Improve').textContent = r.improvement || '—';
-      document.getElementById('ch2FailHint').style.display = pass ? 'none' : 'block';
-      document.getElementById('ch2Result').classList.add('show');
-      ch2Passed = r.total_passed || 0; ch2UpdateDots(ch2Passed);
-      if (!ch2done) document.getElementById('ch2NextWrap').style.display = 'block';
-      if (r.chapter_complete && !ch2done) {
-        ch2done = true;
-        await saveBadgeFor('ch2-leading-lines', 'Leading Lines');
-        setTimeout(() => {
-          document.getElementById('ch2Completion').classList.add('show');
-          document.getElementById('ch2NextWrap').style.display = 'none';
-          document.getElementById('ch2Completion').scrollIntoView({ behavior:'smooth', block:'center' });
-        }, 700);
-      }
-    } catch(err) {
-      document.getElementById('ch2Loading').style.display = 'none';
-      document.getElementById('ch2Error').textContent = 'Analysis failed — ' + err.message;
-      document.getElementById('ch2AnalyseBtn').disabled = false;
-    }
-  }
-  function ch2GenerateCard() { generateShareCard('ch2ShareWrap', 'ch2ShareCard', 'Leading Lines — Composition Basics', ch2Src); }
+}
 
-  // ══════════════════════════════════════════════
-  // CH3 — FRAMING
-  // ══════════════════════════════════════════════
-  let ch3B64 = null, ch3Mime = null, ch3Src = null, ch3Passed = 0, ch3done = false;
+async function saveAnalysis(result, base64, chapter) {
+  try {
+    // Upload image to storage
+    const fileName = `learn/${currentUser.id}/${chapter.id}/${Date.now()}.jpg`;
+    const byteArr = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
+    const blob = new Blob([byteArr], { type: 'image/jpeg' });
 
-  function ch3OnFile(file) {
-    if (!file || !file.type.startsWith('image/')) return;
-    ch3Mime = file.type;
-    const r = new FileReader();
-    r.onload = e => {
-      ch3Src = e.target.result; ch3B64 = e.target.result.split(',')[1];
-      const prev = document.getElementById('ch3Preview');
-      prev.src = ch3Src; prev.style.display = 'block';
-      document.getElementById('ch3UploadZone').style.display = 'none';
-      document.getElementById('ch3AnalyseBtn').disabled = false;
-    };
-    r.readAsDataURL(file);
-  }
-  function ch3Drop(e) { e.preventDefault(); document.getElementById('ch3UploadZone').classList.remove('drag'); ch3OnFile(e.dataTransfer.files[0]); }
-  function ch3Reset() {
-    ch3B64 = null; ch3Mime = null; ch3Src = null;
-    document.getElementById('ch3Preview').style.display = 'none';
-    document.getElementById('ch3UploadZone').style.display = 'flex';
-    document.getElementById('ch3Result').classList.remove('show');
-    document.getElementById('ch3NextWrap').style.display = 'none';
-    document.getElementById('ch3AnalyseBtn').disabled = true;
-    document.getElementById('ch3File').value = '';
-    document.getElementById('ch3Error').textContent = '';
-  }
-  function ch3UpdateDots(passed) {
-    const dots = document.getElementById('ch3Dots').children;
-    for (let i = 0; i < 5; i++) {
-      dots[i].className = 'mdot';
-      if (i < passed) { dots[i].classList.add('done'); dots[i].textContent = '✓'; }
-      else if (i === passed) { dots[i].classList.add('active'); dots[i].textContent = i + 1; }
-      else dots[i].textContent = i + 1;
+    const { data: uploadData } = await sb.storage
+      .from('photos')
+      .upload(fileName, blob, { upsert: false });
+
+    let imageUrl = null;
+    if (uploadData?.path) {
+      const { data: urlData } = sb.storage.from('photos').getPublicUrl(uploadData.path);
+      imageUrl = urlData?.publicUrl;
     }
-    if (passed >= 5) document.getElementById('ch3Meta').innerHTML = '<span class="status-badge status-complete">✓ Complete</span>';
+
+    // Save analysis record
+    await sb.from('analyses').insert({
+      user_id: currentUser.id,
+      source: 'learn',
+      chapter_id: chapter.id,
+      score: result.score,
+      composition_score: result.composition,
+      lighting_score: result.lighting,
+      color_score: result.color,
+      focus_score: result.focus,
+      feedback: result.feedback,
+      image_url: imageUrl,
+      created_at: new Date().toISOString()
+    });
+  } catch (e) {
+    console.error('Save error:', e);
   }
-  async function ch3Analyse() {
-    if (!ch3B64 || ch3done) return;
-    document.getElementById('ch3Error').textContent = '';
-    document.getElementById('ch3Loading').style.display = 'flex';
-    document.getElementById('ch3AnalyseBtn').disabled = true;
-    document.getElementById('ch3Result').classList.remove('show');
-    document.getElementById('ch3NextWrap').style.display = 'none';
-    try {
-      const { data: { session } } = await sb.auth.getSession();
-      const res = await fetch('/api/chapter', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...(session?.access_token ? { 'Authorization': `Bearer ${session.access_token}` } : {}) },
-        body: JSON.stringify({ imageContent: { type:'image', source:{ type:'base64', media_type: ch3Mime, data: ch3B64 } }, chapterId: 'ch3-framing' })
-      });
-      const r = await res.json();
-      document.getElementById('ch3Loading').style.display = 'none';
-      if (r.error === 'chapter_complete') { document.getElementById('ch3Error').textContent = 'You already completed this chapter! 🎉'; return; }
-      if (!res.ok) throw new Error(r.error || 'Analysis failed');
-      if (r.rejected) { document.getElementById('ch3Error').textContent = 'Please upload a real photograph.'; document.getElementById('ch3AnalyseBtn').disabled = false; return; }
-      const pass = r.passed; const score = r.composition_score;
-      document.getElementById('ch3ResultHead').className = 'result-head ' + (pass ? 'pass' : 'fail');
-      document.getElementById('ch3Score').className = 'result-score ' + (pass ? 'pass' : 'fail');
-      document.getElementById('ch3Score').textContent = score + '/10';
-      document.getElementById('ch3Title').textContent = pass ? '✓ Counts toward your progress!' : '✗ Below 7 — doesn\'t count';
-      document.getElementById('ch3Sub').textContent = pass ? 'Framing well demonstrated' : 'Try again with a clearer frame element';
-      document.getElementById('ch3Feedback').textContent = r.feedback || '';
-      document.getElementById('ch3Worked').textContent = r.what_worked || '—';
-      document.getElementById('ch3Improve').textContent = r.improvement || '—';
-      document.getElementById('ch3FailHint').style.display = pass ? 'none' : 'block';
-      document.getElementById('ch3Result').classList.add('show');
-      ch3Passed = r.total_passed || 0; ch3UpdateDots(ch3Passed);
-      if (!ch3done) document.getElementById('ch3NextWrap').style.display = 'block';
-      if (r.chapter_complete && !ch3done) {
-        ch3done = true;
-        await saveBadgeFor('ch3-framing', 'Framing');
-        setTimeout(() => {
-          document.getElementById('ch3Completion').classList.add('show');
-          document.getElementById('ch3NextWrap').style.display = 'none';
-          document.getElementById('ch3Completion').scrollIntoView({ behavior:'smooth', block:'center' });
-        }, 700);
-      }
-    } catch(err) {
-      document.getElementById('ch3Loading').style.display = 'none';
-      document.getElementById('ch3Error').textContent = 'Analysis failed — ' + err.message;
-      document.getElementById('ch3AnalyseBtn').disabled = false;
+}
+
+// ── SCORECARD ──
+function showScorecard(chapter, results, previews, avgScore) {
+  document.getElementById('scTitle').textContent = `Chapter ${chapter.id} Complete!`;
+  document.getElementById('scSubtitle').textContent = chapter.name + ' — ' + (avgScore >= 80 ? 'Excellent!' : avgScore >= 65 ? 'Well done!' : 'Good effort!');
+  document.getElementById('scBigScore').textContent = avgScore;
+
+  // Photo previews
+  const previewsHtml = previews.map(b64 =>
+    `<div class="preview-thumb"><img src="data:image/jpeg;base64,${b64}" /></div>`
+  ).join('');
+  document.getElementById('scPreviews').innerHTML = previewsHtml;
+
+  // Score breakdown (average across all results)
+  const avgComp = Math.round(results.reduce((a, r) => a + r.composition, 0) / results.length);
+  const avgLight = Math.round(results.reduce((a, r) => a + r.lighting, 0) / results.length);
+  const avgColor = Math.round(results.reduce((a, r) => a + r.color, 0) / results.length);
+  const avgFocus = Math.round(results.reduce((a, r) => a + r.focus, 0) / results.length);
+
+  const dims = [
+    { label: 'Composition', val: avgComp },
+    { label: 'Lighting', val: avgLight },
+    { label: 'Colour', val: avgColor },
+    { label: 'Focus', val: avgFocus }
+  ];
+
+  document.getElementById('scBreakdown').innerHTML = dims.map(d => `
+    <div class="score-row">
+      <div class="score-label">${d.label}</div>
+      <div class="score-bar-bg"><div class="score-bar-fill" style="width:${d.val}%"></div></div>
+      <div class="score-val">${d.val}</div>
+    </div>
+  `).join('');
+
+  // Combined feedback
+  const combinedFeedback = results.map((r, i) =>
+    results.length > 1 ? `Photo ${i + 1}: ${r.feedback}` : r.feedback
+  ).join(' ');
+  document.getElementById('scFeedback').textContent = combinedFeedback;
+
+  document.getElementById('scorecardOverlay').classList.add('open');
+}
+
+function closeScorecard() {
+  document.getElementById('scorecardOverlay').classList.remove('open');
+}
+
+function retryChapter() {
+  closeScorecard();
+  // Reset progress for this chapter
+  if (activeChapterId) {
+    delete chapterProgress[activeChapterId];
+    renderChapters();
+    updateProgressBanner();
+    openChapter(activeChapterId);
+  }
+}
+
+function updateLearningStreak() {
+  const today = new Date().toDateString();
+  const lastLearn = localStorage.getItem('lensup_last_learn');
+  let streak = parseInt(localStorage.getItem('lensup_streak') || '0');
+
+  if (lastLearn !== today) {
+    const yesterday = new Date(Date.now() - 86400000).toDateString();
+    if (lastLearn === yesterday) {
+      streak++;
+    } else if (lastLearn !== today) {
+      streak = 1;
     }
+    localStorage.setItem('lensup_streak', streak.toString());
+    localStorage.setItem('lensup_last_learn', today);
+    document.getElementById('streakCount').textContent = streak;
   }
-  function ch3GenerateCard() { generateShareCard('ch3ShareWrap', 'ch3ShareCard', 'Framing — Composition Basics', ch3Src); }
+}
 
-  // ── SHARED BADGE SAVE ──
-  async function saveBadgeFor(badgeId, badgeName) {
-    try {
-      const { data: { session } } = await sb.auth.getSession();
-      if (!session) return;
-      await sb.from('badges').upsert({ user_id: currentUser.id, badge_id: badgeId, badge_name: badgeName }, { onConflict: 'user_id,badge_id' });
-    } catch(e) { console.warn('Badge save failed', e); }
-  }
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
 
-  // ── SHARED SHARE CARD ──
-  function generateShareCard(wrapId, canvasId, chapterLabel, photoSrc) {
-    const wrap = document.getElementById(wrapId);
-    wrap.classList.add('show');
-    const canvas = document.getElementById(canvasId);
-    const ctx = canvas.getContext('2d');
-    const W = 800, H = 480;
-    ctx.fillStyle = '#080808'; ctx.fillRect(0, 0, W, H);
-    ctx.strokeStyle = 'rgba(232,184,75,0.05)'; ctx.lineWidth = 1;
-    for (let x = 0; x < W; x += 60) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
-    for (let y = 0; y < H; y += 60) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
-    const g = ctx.createLinearGradient(0,0,0,H);
-    g.addColorStop(0,'#e8b84b'); g.addColorStop(1,'#c49a2a');
-    ctx.fillStyle = g; ctx.fillRect(0,0,5,H);
-    ctx.font = '80px serif'; ctx.fillText('🏆', 50, 155);
-    ctx.font = 'bold 18px sans-serif';
-    ctx.fillStyle = '#e8b84b'; ctx.fillText('LENS', 52, 210);
-    ctx.fillStyle = '#f5f2ee'; ctx.fillText('UP', 52 + ctx.measureText('LENS').width, 210);
-    ctx.fillStyle = '#f5f2ee'; ctx.font = 'bold 48px sans-serif'; ctx.fillText('CHAPTER COMPLETE', 52, 285);
-    ctx.fillStyle = '#e8b84b'; ctx.font = '24px sans-serif'; ctx.fillText(chapterLabel, 52, 325);
-    ctx.strokeStyle = 'rgba(232,184,75,0.2)'; ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(52, 348); ctx.lineTo(W - 60, 348); ctx.stroke();
-    const name = currentUser?.user_metadata?.display_name || currentUser?.email?.split('@')[0] || 'Photographer';
-    const dateStr = new Date().toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
-    ctx.fillStyle = 'rgba(245,242,238,0.55)'; ctx.font = '17px sans-serif'; ctx.fillText('Completed by ' + name, 52, 378);
-    ctx.fillStyle = 'rgba(245,242,238,0.25)'; ctx.font = '13px sans-serif'; ctx.fillText(dateStr, 52, 402);
-    ctx.fillStyle = 'rgba(232,184,75,0.45)'; ctx.font = '12px sans-serif'; ctx.fillText('lensup.vercel.app', W - 170, H - 20);
-    if (photoSrc) {
-      const img = new Image();
-      img.onload = () => {
-        const tw = 220, th = 165, tx = W - tw - 52, ty = 60, r = 6;
-        ctx.save(); ctx.beginPath();
-        ctx.moveTo(tx+r,ty); ctx.lineTo(tx+tw-r,ty); ctx.arcTo(tx+tw,ty,tx+tw,ty+r,r);
-        ctx.lineTo(tx+tw,ty+th-r); ctx.arcTo(tx+tw,ty+th,tx+tw-r,ty+th,r);
-        ctx.lineTo(tx+r,ty+th); ctx.arcTo(tx,ty+th,tx,ty+th-r,r);
-        ctx.lineTo(tx,ty+r); ctx.arcTo(tx,ty,tx+r,ty,r);
-        ctx.closePath(); ctx.clip();
-        ctx.drawImage(img, tx, ty, tw, th); ctx.restore();
-      };
-      img.src = photoSrc;
-    }
-    wrap.scrollIntoView({ behavior:'smooth', block:'center' });
-  }
+// Close modal on overlay click
+document.getElementById('chapterModal').addEventListener('click', function(e) {
+  if (e.target === this) closeChapter();
+});
+document.getElementById('scorecardOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeScorecard();
+});
 
-  // ── INIT ──
-  async function init() {
-    try {
-      initSupabase();
-      await new Promise(r => setTimeout(r, 200));
-      currentUser = await getUser();
-      if (!currentUser) { window.location.href = 'login.html'; return; }
-      document.body.classList.add('auth-ready');
-      renderNav();
-      await loadProgress();
-    } catch(e) {
-      console.error(e);
-      document.body.classList.add('auth-ready');
-    }
-  }
-
-  init();
+init();
 </script>
 </body>
 </html>
