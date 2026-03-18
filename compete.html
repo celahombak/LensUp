@@ -242,9 +242,10 @@
 
   <nav>
     <a href="index.html" class="nav-logo">Lens<span>Up</span></a>
-    <div class="nav-links">
+        <div class="nav-links">
       <a href="learn.html" class="nav-link">📚 Learn</a>
       <a href="compete.html" class="nav-link active">⚔️ Challenge</a>
+      <a href="gallery.html" class="nav-link">🖼️ Feed</a>
       <a href="leaderboard.html" class="nav-link">🏆 Leaderboard</a>
       <a href="profile.html" class="nav-link">👤 Profile</a>
       <span id="navAuthArea"></span>
@@ -255,15 +256,15 @@
   </nav>
 
   <!-- MOBILE OVERLAY MENU -->
-  <div class="mobile-menu" id="mobileMenu">
+    <div class="mobile-menu" id="mobileMenu">
     <button class="mobile-menu-close" onclick="closeMobileMenu()">✕</button>
     <div class="mobile-menu-logo">Lens<span>Up</span></div>
-    <a href="compete.html" class="challenge active">⚔️ Challenge</a>
-    <a href="app.html" class="">📷 Analyse</a>
-    <a href="leaderboard.html" class="">🏆 Leaderboard</a>
-    <a href="gallery.html" class="">🖼️ Gallery</a>
-    <a href="profile.html" class="">👤 Profile</a>
-    <a href="learn.html" class="">📚 Learn</a>
+    <a href="dashboard.html">🏠 Home</a>
+    <a href="learn.html">📚 Learn</a>
+    <a href="compete.html" class="active">⚔️ Challenge</a>
+    <a href="gallery.html">🖼️ Feed</a>
+    <a href="leaderboard.html">🏆 Leaderboard</a>
+    <a href="profile.html">👤 Profile</a>
     <div class="mobile-menu-divider"></div>
     <div class="mobile-menu-auth">
       <span id="mobileMenuUser"></span>
@@ -349,18 +350,7 @@
   </div>
 
   <script>
-  
-  function esc(str) {
-    if (str === null || str === undefined) return '';
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#x27;')
-      .replace(/\//g, '&#x2F;');
-  }
-  let currentUser = null;
+    let currentUser = null;
     let activeTheme = null;
     let allEntries  = [];
     let sortMode    = 'score';
@@ -481,7 +471,7 @@
         const rank  = rankMap[e.id];
         const rankBadge = rank <= 3 ? `<div class="card-rank-badge rank-${rank}">${rank === 1 ? '🥇 #1' : rank === 2 ? '🥈 #2' : '🥉 #3'}</div>` : '';
         const thumb = e.thumbnail
-          ? `<img class="card-thumb" src="data:image/jpeg;base64,${e.thumbnail}" alt="${esc(name)}" loading="lazy"/>`
+          ? `<img class="card-thumb" src="data:image/jpeg;base64,${e.thumbnail}" alt="${name}" loading="lazy"/>`
           : `<div class="card-thumb-placeholder">📷</div>`;
 
         const catKeys = ['subject_focus','color_contrast','composition','lighting','background_blur','framing'];
@@ -503,7 +493,7 @@
             </div>
             <div class="card-body">
               <div class="card-top-row">
-                <span class="card-name">${isYou ? name : `<a href="profile.html?user=${e.user_id}" onclick="event.stopPropagation()" style="color:inherit;text-decoration:none;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color=''">${name}</a>`}${isYou ? `<span class="card-you">you</span>` : ''}</span>
+                <span class="card-name">${name}${isYou ? `<span class="card-you">you</span>` : ''}</span>
                 <span class="card-score">${e.overall}<span class="card-score-denom">/10</span></span>
               </div>
               <div class="card-meta">${date}${themeStr}</div>
@@ -521,10 +511,10 @@
       const name  = e.display_name || 'Anonymous';
 
       document.getElementById('modalName').innerHTML =
-        `${esc(name)}${isYou ? ' <span style="font-size:0.65rem;color:var(--gold);background:rgba(232,184,75,0.1);padding:0.1rem 0.5rem;">YOU</span>' : ''} — ${new Date(e.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' })}`;
+        `${name}${isYou ? ' <span style="font-size:0.65rem;color:var(--gold);background:rgba(232,184,75,0.1);padding:0.1rem 0.5rem;">YOU</span>' : ''} — ${new Date(e.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' })}`;
 
       document.getElementById('modalPhoto').innerHTML = e.thumbnail
-        ? `<img src="data:image/jpeg;base64,${e.thumbnail}" alt="${esc(name)}" style="width:100%;height:100%;object-fit:contain;display:block;"/>`
+        ? `<img src="data:image/jpeg;base64,${e.thumbnail}" alt="${name}" style="width:100%;height:100%;object-fit:contain;display:block;"/>`
         : `<div class="modal-photo-placeholder">📷</div>`;
 
       const scoreEl = document.getElementById('modalScore');
@@ -641,13 +631,16 @@
   </script>
 
   <!-- BOTTOM NAV -->
-  <div class="bottom-nav">
+    <div class="bottom-nav">
     <div class="bottom-nav-inner">
-      <a href="learn.html"       class="bottom-nav-item"><span class="bottom-nav-icon">📚</span><span>Learn</span></a>
-      <a href="compete.html"     class="bottom-nav-item active"><span class="bottom-nav-icon">⚔️</span><span>Challenge</span></a>
+      <a href="learn.html" class="bottom-nav-item"><span class="bottom-nav-icon">📚</span><span>Learn</span></a>
+      <a href="compete.html" class="bottom-nav-item active"><span class="bottom-nav-icon">⚔️</span><span>Challenge</span></a>
+      <a href="gallery.html" class="bottom-nav-item"><span class="bottom-nav-icon">🖼️</span><span>Feed</span></a>
       <a href="leaderboard.html" class="bottom-nav-item"><span class="bottom-nav-icon">🏆</span><span>Ranks</span></a>
-      <a href="profile.html"     class="bottom-nav-item"><span class="bottom-nav-icon">👤</span><span>Profile</span></a>
+      <a href="profile.html" class="bottom-nav-item"><span class="bottom-nav-icon">👤</span><span>Profile</span></a>
     </div>
+  </div>
+
   </div>
 </body>
 </html>

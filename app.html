@@ -425,9 +425,10 @@
 
   <nav>
     <a href="index.html" class="nav-logo">Lens<span>Up</span></a>
-    <div class="nav-links">
+        <div class="nav-links">
       <a href="learn.html" class="nav-link">📚 Learn</a>
       <a href="compete.html" class="nav-link active">⚔️ Challenge</a>
+      <a href="gallery.html" class="nav-link">🖼️ Feed</a>
       <a href="leaderboard.html" class="nav-link">🏆 Leaderboard</a>
       <a href="profile.html" class="nav-link">👤 Profile</a>
       <span id="navAuthArea"></span>
@@ -438,15 +439,15 @@
   </nav>
 
   <!-- MOBILE OVERLAY MENU -->
-  <div class="mobile-menu" id="mobileMenu">
+    <div class="mobile-menu" id="mobileMenu">
     <button class="mobile-menu-close" onclick="closeMobileMenu()">✕</button>
     <div class="mobile-menu-logo">Lens<span>Up</span></div>
-    <a href="compete.html" class="">⚔️ Challenge</a>
-    <a href="app.html" class="analyse active">📷 Analyse</a>
-    <a href="leaderboard.html" class="">🏆 Leaderboard</a>
-    <a href="gallery.html" class="">🖼️ Gallery</a>
-    <a href="profile.html" class="">👤 Profile</a>
-    <a href="learn.html" class="">📚 Learn</a>
+    <a href="dashboard.html">🏠 Home</a>
+    <a href="learn.html">📚 Learn</a>
+    <a href="compete.html" class="active">⚔️ Challenge</a>
+    <a href="gallery.html">🖼️ Feed</a>
+    <a href="leaderboard.html">🏆 Leaderboard</a>
+    <a href="profile.html">👤 Profile</a>
     <div class="mobile-menu-divider"></div>
     <div class="mobile-menu-auth">
       <span id="mobileMenuUser"></span>
@@ -454,15 +455,7 @@
     </div>
   </div>
 
-  <div class="app-wrap">
-
-    <div class="app-header">
-      <div class="app-tag">📷 Submit Your Shot</div>
-      <h1>Submit Your <em>Photo</em></h1>
-      <p>Upload your best shot for this week's challenge. AI scores it across 6 categories plus theme relevance.</p>
-    </div>
-
-    <!-- THEME BANNER -->
+  <!-- THEME BANNER -->
     <div class="theme-banner hidden" id="themeBanner">
       <div class="theme-banner-left">
         <div class="theme-banner-icon">📅</div>
@@ -576,18 +569,7 @@
     let activeTheme = null;
     let uploadedMediaType = null;
     let currentPreviewUrl = null;
-  
-  function esc(str) {
-    if (str === null || str === undefined) return '';
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#x27;')
-      .replace(/\//g, '&#x2F;');
-  }
-  let currentUser = null;
+    let currentUser = null;
 
     // ── CATEGORY CONFIG ──
     const CATEGORIES = [
@@ -824,7 +806,7 @@
       });
 
       // Summary
-      document.getElementById('resultSummary').innerHTML = `<p>${esc(r.summary)}</p>`;
+      document.getElementById('resultSummary').innerHTML = `<p>${r.summary}</p>`;
 
       // Category cards — include theme_relevance if present
       const gridEl = document.getElementById('categoryGrid');
@@ -1038,13 +1020,16 @@
   </script>
 
   <!-- BOTTOM NAV -->
-  <div class="bottom-nav">
+    <div class="bottom-nav">
     <div class="bottom-nav-inner">
-      <a href="learn.html"       class="bottom-nav-item"><span class="bottom-nav-icon">📚</span><span>Learn</span></a>
-      <a href="compete.html"     class="bottom-nav-item active"><span class="bottom-nav-icon">⚔️</span><span>Challenge</span></a>
+      <a href="learn.html" class="bottom-nav-item"><span class="bottom-nav-icon">📚</span><span>Learn</span></a>
+      <a href="compete.html" class="bottom-nav-item active"><span class="bottom-nav-icon">⚔️</span><span>Challenge</span></a>
+      <a href="gallery.html" class="bottom-nav-item"><span class="bottom-nav-icon">🖼️</span><span>Feed</span></a>
       <a href="leaderboard.html" class="bottom-nav-item"><span class="bottom-nav-icon">🏆</span><span>Ranks</span></a>
-      <a href="profile.html"     class="bottom-nav-item"><span class="bottom-nav-icon">👤</span><span>Profile</span></a>
+      <a href="profile.html" class="bottom-nav-item"><span class="bottom-nav-icon">👤</span><span>Profile</span></a>
     </div>
+  </div>
+
   </div>
 </body>
 </html>
