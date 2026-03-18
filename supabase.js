@@ -59,6 +59,7 @@ async function saveAnalysis(user, url, result, thumbnail) {
     display_name: user.user_metadata?.display_name || user.email?.split('@')[0] || 'Anonymous',
     image_url: url,
     thumbnail: thumbnail || null,
+    source: result.source || 'feed',
     overall: result.overall,
     subject_focus: result.scores.subject_focus,
     color_contrast: result.scores.color_contrast,
