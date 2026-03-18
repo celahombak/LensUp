@@ -6,6 +6,7 @@
   <title>LensUp — Leaderboard</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
   <style>
     :root {
       --cream: #FAF7F2;
@@ -315,10 +316,7 @@
 </div>
 
 <script>
-const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
-const { createClient } = supabase;
-const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+initSupabase();
 
 const CHAPTER_NAMES = ["Rule of Thirds","Leading Lines","Framing","Symmetry & Patterns","Negative Space","Depth of Field","Golden Hour Light","Blue Hour & Night","Natural Light Indoors","Colour Theory","Black & White","Shadows & Silhouettes","Portrait Basics","Street Photography","Environmental Portraits","Architecture","Urban Geometry","Landscapes","Macro & Close-Up","Reflections","Motion & Long Exposure","Storytelling","Flat Lay & Product","Perspective & POV","Texture","Still Life","Food Photography","Nature & Plants","Editing Fundamentals","Colour Grading","Aspect Ratios & Crop","Mood & Emotion","Documentary","Abstract Photography","Photo Essay","Your Signature Style"];
 
