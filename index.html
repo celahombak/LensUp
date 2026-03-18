@@ -1,560 +1,571 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LensUp — Become a Better Photographer</title>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LensUp — Learn Photography. Shoot Better. Prove It.</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,900;1,700&display=swap" rel="stylesheet"/>
   <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --cream: #FAF7F2;
-      --warm-white: #FDF9F4;
-      --terracotta: #C4622D;
-      --terracotta-light: #E8845A;
-      --terracotta-pale: #F5E6DE;
-      --brown: #6B3A2A;
-      --text-dark: #2C1810;
-      --text-mid: #7A5C4F;
-      --text-light: #B09080;
-      --border: #E8DDD5;
-      --gold: #D4A853;
+      --black: #080808;
+      --white: #f0ede8;
+      --dark: #111010;
+      --dark2: #181615;
+      --mid: #5a5550;
+      --border: rgba(255,255,255,0.07);
+      --gold: #e8b84b;
+      --gold2: #f5d07a;
+      --red: #ff4444;
+      --orange: #ff7a1a;
+      --cyan: #00d4ff;
+      --green: #00e676;
+      --purple: #b44bff;
     }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body { height: 100%; }
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--cream);
-      color: var(--text-dark);
-      min-height: 100vh;
-    }
+    html { scroll-behavior: smooth; }
+    body { background: var(--black); color: var(--white); font-family: 'DM Sans', sans-serif; font-weight: 300; overflow-x: hidden; }
+
+    /* ── NAV ── */
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 200; display: flex; align-items: center; justify-content: space-between; padding: 1.2rem 3rem; background: rgba(8,8,8,0.92); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); }
+    .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; letter-spacing: 0.08em; color: var(--gold); text-decoration: none; }
+    .nav-logo span { color: var(--white); }
+    .nav-links { display: flex; align-items: center; gap: 2.5rem; list-style: none; }
+    .nav-links a { color: rgba(240,237,232,0.5); text-decoration: none; font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--gold); }
+    .nav-cta { background: var(--gold); color: var(--black); padding: 0.6rem 1.6rem; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; text-decoration: none; transition: all 0.2s; clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%); }
+    .nav-cta:hover { background: var(--gold2); transform: translateY(-1px); }
+    .nav-login { color: rgba(240,237,232,0.5); text-decoration: none; font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; transition: color 0.2s; }
+    .nav-login:hover { color: var(--gold); }
 
     /* ── HERO ── */
-    .hero {
-      min-height: 100vh;
-      display: flex; flex-direction: column;
-      position: relative; overflow: hidden;
-    }
+    .hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 8rem 3rem 4rem; position: relative; overflow: hidden; }
 
-    /* Decorative background blobs */
-    .bg-blob {
-      position: absolute; border-radius: 50%;
-      pointer-events: none; z-index: 0;
-    }
-    .blob-1 {
-      width: 300px; height: 300px;
-      background: radial-gradient(circle, rgba(196,98,45,0.12), transparent 70%);
-      top: -80px; right: -80px;
-    }
-    .blob-2 {
-      width: 200px; height: 200px;
-      background: radial-gradient(circle, rgba(212,168,83,0.15), transparent 70%);
-      bottom: 120px; left: -60px;
-    }
-    .blob-3 {
-      width: 150px; height: 150px;
-      background: radial-gradient(circle, rgba(196,98,45,0.08), transparent 70%);
-      top: 40%; left: 60%;
-    }
+    /* Animated background */
+    .hero-bg { position: absolute; inset: 0; }
+    .hero-bg::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 70% 60% at 20% 60%, rgba(232,184,75,0.06) 0%, transparent 60%), radial-gradient(ellipse 50% 50% at 80% 30%, rgba(0,212,255,0.04) 0%, transparent 60%), radial-gradient(ellipse 40% 40% at 60% 80%, rgba(180,75,255,0.04) 0%, transparent 60%); }
+    .hero-grid { position: absolute; inset: 0; opacity: 0.04; background-image: linear-gradient(rgba(232,184,75,0.8) 1px, transparent 1px), linear-gradient(90deg, rgba(232,184,75,0.8) 1px, transparent 1px); background-size: 80px 80px; }
+    .hero-scanline { position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--gold), transparent); animation: scan 4s ease-in-out infinite; opacity: 0.4; }
+    @keyframes scan { 0%,100% { top: 0%; opacity: 0; } 10% { opacity: 0.4; } 90% { opacity: 0.4; } 50% { top: 100%; } }
 
-    /* Top bar */
-    .top-bar {
-      position: relative; z-index: 10;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 20px 24px;
-    }
-    .logo { font-family: 'DM Serif Display', serif; font-size: 26px; color: var(--terracotta); }
-    .top-bar-cta {
-      font-size: 13px; font-weight: 600; color: var(--terracotta);
-      background: var(--terracotta-pale); border: 1px solid var(--terracotta-light);
-      border-radius: 20px; padding: 7px 16px; cursor: pointer;
-      text-decoration: none;
-    }
+    .hero-inner { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; max-width: 1200px; margin: 0 auto; width: 100%; }
 
-    /* Hero content */
-    .hero-content {
-      flex: 1; display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      padding: 20px 24px 40px; position: relative; z-index: 10;
-      text-align: center;
-    }
+    /* Left side */
+    .hero-left {}
+    .hero-live-badge { display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255,68,68,0.12); border: 1px solid rgba(255,68,68,0.3); color: var(--red); padding: 0.35rem 0.9rem; font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1.8rem; animation: fadeUp 0.6s ease both; }
+    .live-dot { width: 6px; height: 6px; background: var(--red); border-radius: 50%; animation: pulse 1.5s ease-in-out infinite; }
+    @keyframes pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.7); } }
 
-    .hero-eyebrow {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: var(--terracotta-pale); border: 1px solid var(--terracotta-light);
-      border-radius: 20px; padding: 5px 14px;
-      font-size: 12px; font-weight: 600; color: var(--terracotta);
-      margin-bottom: 20px;
-      animation: fadeUp 0.5s ease both;
-    }
+    .hero h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(4rem, 8vw, 7rem); line-height: 0.92; letter-spacing: 0.03em; margin-bottom: 1.5rem; animation: fadeUp 0.6s 0.1s ease both; }
+    .hero h1 .line2 { color: var(--gold); display: block; }
+    .hero h1 .line3 { color: rgba(240,237,232,0.25); display: block; font-size: 0.6em; letter-spacing: 0.08em; }
 
-    .hero-title {
-      font-family: 'DM Serif Display', serif;
-      font-size: clamp(36px, 10vw, 52px);
-      color: var(--text-dark); line-height: 1.1;
-      margin-bottom: 16px;
-      animation: fadeUp 0.5s 0.1s ease both;
-    }
-    .hero-title em { color: var(--terracotta); font-style: italic; }
+    .hero-desc { font-size: 1rem; line-height: 1.8; color: rgba(240,237,232,0.55); max-width: 440px; margin-bottom: 2rem; animation: fadeUp 0.6s 0.2s ease both; }
 
-    .hero-sub {
-      font-size: 15px; color: var(--text-mid);
-      line-height: 1.6; max-width: 340px;
-      margin-bottom: 32px;
-      animation: fadeUp 0.5s 0.2s ease both;
-    }
+    .hero-theme-card { background: var(--dark2); border: 1px solid var(--border); border-left: 3px solid var(--gold); padding: 1.2rem 1.5rem; margin-bottom: 2rem; animation: fadeUp 0.6s 0.3s ease both; }
+    .hero-theme-label { font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.4rem; }
+    .hero-theme-name { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; letter-spacing: 0.05em; margin-bottom: 0.3rem; }
+    .hero-theme-sub { font-size: 0.78rem; color: rgba(240,237,232,0.4); }
+    .hero-theme-timer { display: flex; gap: 1rem; margin-top: 0.8rem; }
+    .timer-unit { text-align: center; }
+    .timer-num { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; color: var(--gold); line-height: 1; display: block; }
+    .timer-label { font-size: 0.55rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mid); }
 
-    /* Feature pills */
-    .feature-pills {
-      display: flex; flex-wrap: wrap; justify-content: center; gap: 8px;
-      margin-bottom: 36px;
-      animation: fadeUp 0.5s 0.25s ease both;
-    }
-    .pill {
-      background: white; border: 1.5px solid var(--border);
-      border-radius: 20px; padding: 6px 14px;
-      font-size: 12px; font-weight: 500; color: var(--text-mid);
-      display: flex; align-items: center; gap: 5px;
-    }
+    .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; animation: fadeUp 0.6s 0.4s ease both; }
+    .btn-primary { background: var(--gold); color: var(--black); padding: 0.9rem 2.2rem; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; text-decoration: none; transition: all 0.2s; display: inline-block; clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%); }
+    .btn-primary:hover { background: var(--gold2); transform: translateY(-2px); }
+    .btn-ghost { color: var(--white); text-decoration: none; font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.5; display: flex; align-items: center; gap: 0.4rem; transition: opacity 0.2s; padding: 0.9rem 0; }
+    .btn-ghost:hover { opacity: 1; }
 
-    /* Auth box */
-    .auth-box {
-      width: 100%; max-width: 360px;
-      background: white; border: 1.5px solid var(--border);
-      border-radius: 20px; padding: 24px;
-      box-shadow: 0 8px 40px rgba(44,24,16,0.08);
-      animation: fadeUp 0.5s 0.3s ease both;
-    }
+    /* Right side — leaderboard preview */
+    .hero-right { animation: fadeUp 0.6s 0.5s ease both; }
+    .leaderboard-preview { background: var(--dark); border: 1px solid var(--border); overflow: hidden; }
+    .lb-header { padding: 1rem 1.4rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .lb-title { font-family: 'Bebas Neue', sans-serif; font-size: 1rem; letter-spacing: 0.1em; color: var(--gold); }
+    .lb-live { font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--red); display: flex; align-items: center; gap: 0.4rem; }
+    .lb-row { display: flex; align-items: center; gap: 1rem; padding: 0.9rem 1.4rem; border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.2s; }
+    .lb-row:hover { background: rgba(232,184,75,0.04); }
+    .lb-row.gold-row { background: rgba(232,184,75,0.06); border-left: 2px solid var(--gold); }
+    .lb-rank { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; width: 24px; text-align: center; }
+    .lb-rank.r1 { color: var(--gold); }
+    .lb-rank.r2 { color: #c0c0c0; }
+    .lb-rank.r3 { color: #cd7f32; }
+    .lb-photo { width: 42px; height: 42px; background: var(--dark2); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; overflow: hidden; }
+    .lb-info { flex: 1; }
+    .lb-name { font-size: 0.82rem; font-weight: 500; margin-bottom: 0.1rem; }
+    .lb-theme { font-size: 0.68rem; color: var(--mid); }
+    .lb-score { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; }
+    .lb-score.s-high { color: var(--green); }
+    .lb-score.s-mid { color: var(--gold); }
 
-    .auth-tabs {
-      display: flex; background: var(--cream); border-radius: 12px;
-      padding: 3px; margin-bottom: 20px;
-    }
-    .auth-tab {
-      flex: 1; padding: 9px; border-radius: 10px;
-      font-size: 14px; font-weight: 600; text-align: center;
-      cursor: pointer; color: var(--text-light); transition: all 0.2s;
-      border: none; background: transparent; font-family: 'DM Sans', sans-serif;
-    }
-    .auth-tab.active { background: white; color: var(--text-dark); box-shadow: 0 2px 8px rgba(44,24,16,0.08); }
-
-    .auth-form { display: flex; flex-direction: column; gap: 12px; }
-    .auth-form.hidden { display: none; }
-
-    .input-group { display: flex; flex-direction: column; gap: 5px; }
-    .input-label { font-size: 12px; font-weight: 600; color: var(--text-mid); }
-    .auth-input {
-      padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 12px;
-      font-family: 'DM Sans', sans-serif; font-size: 14px;
-      background: var(--cream); color: var(--text-dark);
-      outline: none; transition: border-color 0.2s; width: 100%;
-    }
-    .auth-input:focus { border-color: var(--terracotta); background: white; }
-
-    .auth-btn {
-      width: 100%; padding: 14px;
-      background: var(--terracotta); color: white;
-      border: none; border-radius: 14px;
-      font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700;
-      cursor: pointer; transition: all 0.2s; margin-top: 4px;
-    }
-    .auth-btn:hover { background: var(--brown); transform: translateY(-1px); }
-    .auth-btn:disabled { background: var(--text-light); cursor: not-allowed; transform: none; }
-
-    .auth-divider {
-      display: flex; align-items: center; gap: 10px; margin: 4px 0;
-    }
-    .auth-divider::before, .auth-divider::after {
-      content: ''; flex: 1; height: 1px; background: var(--border);
-    }
-    .auth-divider span { font-size: 11px; color: var(--text-light); }
-
-    .google-btn {
-      width: 100%; padding: 12px 14px;
-      background: white; border: 1.5px solid var(--border); border-radius: 14px;
-      font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
-      color: var(--text-dark); cursor: pointer; transition: all 0.2s;
-      display: flex; align-items: center; justify-content: center; gap: 10px;
-    }
-    .google-btn:hover { border-color: var(--terracotta-light); background: var(--cream); }
-
-    .auth-error {
-      font-size: 12px; color: #E53935; background: #FFF5F5;
-      border: 1px solid #FFCDD2; border-radius: 8px; padding: 8px 12px;
-      display: none;
-    }
-    .auth-error.show { display: block; }
-    .auth-success {
-      font-size: 13px; color: #2E7D32; background: #E8F5E9;
-      border: 1px solid #A5D6A7; border-radius: 8px; padding: 10px 12px;
-      display: none; text-align: center;
-    }
-    .auth-success.show { display: block; }
-
-    .auth-terms {
-      font-size: 11px; color: var(--text-light); text-align: center; margin-top: 8px; line-height: 1.5;
-    }
-
-    /* ── HOW IT WORKS ── */
-    .how-section {
-      padding: 60px 24px; background: var(--warm-white);
-      border-top: 1px solid var(--border);
-    }
-    .section-label {
-      font-size: 11px; font-weight: 700; letter-spacing: 2px;
-      text-transform: uppercase; color: var(--terracotta);
-      text-align: center; margin-bottom: 12px;
-    }
-    .section-title {
-      font-family: 'DM Serif Display', serif;
-      font-size: 28px; color: var(--text-dark);
-      text-align: center; margin-bottom: 36px; line-height: 1.2;
-    }
-
-    .steps { display: flex; flex-direction: column; gap: 20px; max-width: 400px; margin: 0 auto; }
-    .step {
-      display: flex; gap: 16px; align-items: flex-start;
-    }
-    .step-num {
-      width: 40px; height: 40px; border-radius: 12px; flex-shrink: 0;
-      background: var(--terracotta-pale); border: 2px solid var(--terracotta-light);
-      display: flex; align-items: center; justify-content: center;
-      font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--terracotta);
-    }
-    .step-content h3 { font-size: 15px; font-weight: 700; color: var(--text-dark); margin-bottom: 4px; }
-    .step-content p { font-size: 13px; color: var(--text-mid); line-height: 1.5; }
+    /* ── TICKER ── */
+    .ticker { background: var(--gold); color: var(--black); padding: 0.6rem 0; overflow: hidden; white-space: nowrap; }
+    .ticker-inner { display: inline-flex; gap: 0; animation: ticker 25s linear infinite; }
+    .ticker-item { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; padding: 0 2rem; }
+    .ticker-sep { opacity: 0.4; }
+    @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
     /* ── STATS BAR ── */
-    .stats-bar {
-      background: linear-gradient(135deg, var(--terracotta), var(--brown));
-      padding: 32px 24px;
-      display: flex; justify-content: space-around; flex-wrap: wrap; gap: 20px;
-    }
-    .stat-item { text-align: center; color: white; }
-    .stat-num-big { font-family: 'DM Serif Display', serif; font-size: 32px; }
-    .stat-label-sm { font-size: 12px; opacity: 0.8; margin-top: 2px; }
+    .stats-bar { padding: 3rem; display: flex; justify-content: center; gap: 0; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+    .stat-item { text-align: center; padding: 1rem 3rem; border-right: 1px solid var(--border); }
+    .stat-item:last-child { border-right: none; }
+    .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 2.8rem; letter-spacing: 0.04em; display: block; line-height: 1; }
+    .stat-label { font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--mid); margin-top: 0.3rem; }
+
+    /* ── HOW IT WORKS ── */
+    .section { padding: 6rem 3rem; max-width: 1200px; margin: 0 auto; }
+    .section-tag { font-size: 0.68rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.8rem; display: block; }
+    .section-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2.5rem, 5vw, 4rem); letter-spacing: 0.04em; line-height: 1; margin-bottom: 1rem; }
+    .section-sub { color: rgba(240,237,232,0.45); font-size: 0.95rem; line-height: 1.8; max-width: 480px; margin-bottom: 3rem; }
+
+    .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border: 1px solid var(--border); }
+    .step { padding: 2.5rem 2rem; border-right: 1px solid var(--border); position: relative; transition: background 0.3s; }
+    .step:last-child { border-right: none; }
+    .step:hover { background: var(--dark2); }
+    .step-num { font-family: 'Bebas Neue', sans-serif; font-size: 4rem; color: rgba(232,184,75,0.1); line-height: 1; margin-bottom: 1rem; }
+    .step-icon { font-size: 1.6rem; margin-bottom: 1rem; display: block; }
+    .step h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.6rem; letter-spacing: 0.02em; }
+    .step p { font-size: 0.82rem; line-height: 1.7; color: rgba(240,237,232,0.45); }
+    .step-arrow { position: absolute; right: -12px; top: 50%; transform: translateY(-50%); width: 24px; height: 24px; background: var(--black); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.65rem; color: var(--gold); z-index: 1; }
+    .step:last-child .step-arrow { display: none; }
+
+    /* ── CHALLENGE PREVIEW ── */
+    .challenges-section { padding: 6rem 3rem; background: var(--dark); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .challenges-inner { max-width: 1200px; margin: 0 auto; }
+    .challenge-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); margin-top: 3rem; }
+    .challenge-card { background: var(--black); padding: 2rem; transition: background 0.3s; position: relative; overflow: hidden; }
+    .challenge-card::before { content: ''; position: absolute; inset: 0; opacity: 0; transition: opacity 0.3s; }
+    .challenge-card.c1::before { background: radial-gradient(ellipse at top left, rgba(232,184,75,0.08), transparent 60%); }
+    .challenge-card.c2::before { background: radial-gradient(ellipse at top left, rgba(0,212,255,0.06), transparent 60%); }
+    .challenge-card.c3::before { background: radial-gradient(ellipse at top left, rgba(180,75,255,0.06), transparent 60%); }
+    .challenge-card:hover { background: var(--dark2); }
+    .challenge-card:hover::before { opacity: 1; }
+    .challenge-week { font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 0.6rem; }
+    .challenge-name { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 0.04em; margin-bottom: 0.5rem; }
+    .challenge-desc { font-size: 0.82rem; line-height: 1.7; color: rgba(240,237,232,0.45); margin-bottom: 1.2rem; }
+    .challenge-meta { display: flex; gap: 1rem; }
+    .challenge-tag { font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.25rem 0.7rem; border: 1px solid var(--border); color: rgba(240,237,232,0.4); }
+
+    /* ── SCORING ── */
+    .scoring-section { padding: 6rem 3rem; max-width: 1200px; margin: 0 auto; }
+    .scoring-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; margin-top: 3rem; }
+    .score-categories { display: flex; flex-direction: column; gap: 0.8rem; }
+    .score-cat { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.2rem; background: var(--dark); border: 1px solid var(--border); transition: border-color 0.2s; }
+    .score-cat:hover { border-color: rgba(232,184,75,0.3); }
+    .score-cat-icon { font-size: 1.1rem; width: 28px; text-align: center; }
+    .score-cat-info { flex: 1; }
+    .score-cat-name { font-size: 0.82rem; font-weight: 500; margin-bottom: 0.2rem; }
+    .score-cat-desc { font-size: 0.72rem; color: var(--mid); }
+    .score-cat-bar { width: 80px; height: 4px; background: rgba(255,255,255,0.06); overflow: hidden; }
+    .score-cat-fill { height: 100%; transition: width 1s ease; }
+    .score-right { }
+    .score-sample { background: var(--dark); border: 1px solid var(--border); padding: 2rem; }
+    .score-sample-title { font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--mid); margin-bottom: 1.2rem; }
+    .score-overall { font-family: 'Bebas Neue', sans-serif; font-size: 5rem; color: var(--gold); line-height: 1; margin-bottom: 0.3rem; }
+    .score-overall span { font-size: 1.5rem; color: var(--mid); }
+    .score-verdict { font-size: 0.85rem; color: var(--gold); margin-bottom: 1.5rem; }
+    .score-bars { display: flex; flex-direction: column; gap: 0.6rem; }
+    .score-bar-row { display: flex; align-items: center; gap: 0.8rem; }
+    .score-bar-label { font-size: 0.68rem; width: 90px; color: rgba(240,237,232,0.5); text-transform: uppercase; letter-spacing: 0.05em; flex-shrink: 0; }
+    .score-bar-track { flex: 1; height: 4px; background: rgba(255,255,255,0.06); overflow: hidden; }
+    .score-bar-fill { height: 100%; }
+    .score-bar-val { font-size: 0.75rem; font-weight: 600; width: 20px; text-align: right; flex-shrink: 0; }
+
+    /* ── CTA ── */
+    .cta-section { padding: 8rem 3rem; text-align: center; position: relative; overflow: hidden; background: var(--dark); border-top: 1px solid var(--border); }
+    .cta-section::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(232,184,75,0.07) 0%, transparent 70%); }
+    .cta-section > * { position: relative; }
+    .cta-label { font-size: 0.68rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); margin-bottom: 1rem; display: block; }
+    .cta-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(3rem, 7vw, 6rem); letter-spacing: 0.04em; line-height: 1; margin-bottom: 1.2rem; }
+    .cta-title span { color: var(--gold); }
+    .cta-sub { color: rgba(240,237,232,0.45); font-size: 0.95rem; line-height: 1.8; max-width: 460px; margin: 0 auto 2.5rem; }
+    .btn-cta-big { background: var(--gold); color: var(--black); padding: 1.1rem 3.5rem; font-size: 0.88rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; text-decoration: none; transition: all 0.25s; display: inline-block; clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%); }
+    .btn-cta-big:hover { background: var(--gold2); transform: translateY(-3px); box-shadow: 0 12px 40px rgba(232,184,75,0.25); }
 
     /* ── FOOTER ── */
-    .footer {
-      padding: 24px; text-align: center;
-      border-top: 1px solid var(--border);
-      font-size: 12px; color: var(--text-light);
-    }
-    .footer a { color: var(--terracotta); text-decoration: none; }
+    footer { padding: 2rem 3rem; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+    .footer-logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; letter-spacing: 0.08em; color: var(--gold); }
+    .footer-logo span { color: var(--white); }
+    footer p { font-size: 0.75rem; color: var(--mid); letter-spacing: 0.05em; }
 
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* Loading state */
-    .btn-spinner {
-      width: 16px; height: 16px; border-radius: 50%;
-      border: 2px solid rgba(255,255,255,0.4); border-top-color: white;
-      animation: spin 0.7s linear infinite; display: inline-block; vertical-align: middle;
+    @media (max-width: 900px) {
+      nav { padding: 1rem 1.5rem; }
+      .nav-links { display: none; }
+      .hero { padding: 7rem 1.5rem 3rem; }
+      .hero-inner { grid-template-columns: 1fr; gap: 2rem; }
+      .hero-right { display: none; }
+      .stats-bar { gap: 0; }
+      .stat-item { padding: 1rem 1.5rem; }
+      .section, .scoring-section { padding: 4rem 1.5rem; }
+      .steps { grid-template-columns: 1fr 1fr; }
+      .challenge-grid { grid-template-columns: 1fr; }
+      .scoring-grid { grid-template-columns: 1fr; }
+      .challenges-section { padding: 4rem 1.5rem; }
+      .cta-section { padding: 5rem 1.5rem; }
+      footer { padding: 2rem 1.5rem; flex-direction: column; text-align: center; }
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
 
-<!-- HERO -->
-<section class="hero">
-  <div class="bg-blob blob-1"></div>
-  <div class="bg-blob blob-2"></div>
-  <div class="bg-blob blob-3"></div>
+  <nav>
+    <a href="index.html" class="nav-logo">Lens<span>Up</span></a>
+    <ul class="nav-links">
+      <li><a href="#how">How It Works</a></li>
+      <li><a href="learn.html" style="color:var(--gold)">📚 Learn</a></li>
+      <li><a href="#challenges">Challenges</a></li>
+      <li><a href="leaderboard.html">Leaderboard</a></li>
+    </ul>
+    <a href="login.html" class="nav-login">Sign In</a>
+    <a href="register.html" class="nav-cta">Start Learning Now</a>
+  </nav>
 
-  <div class="top-bar">
-    <span class="logo">LensUp</span>
-    <a class="top-bar-cta" href="#auth-box" onclick="scrollToAuth()">Start Free →</a>
-  </div>
-
-  <div class="hero-content">
-    <div class="hero-eyebrow">📸 36-Chapter Photography Quest</div>
-
-    <h1 class="hero-title">
-      Shoot better.<br>
-      Learn <em>faster.</em>
-    </h1>
-
-    <p class="hero-sub">
-      AI-powered photo coaching, weekly challenges, and a structured curriculum — all in one place.
-    </p>
-
-    <div class="feature-pills">
-      <div class="pill">📚 36 Chapters</div>
-      <div class="pill">🤖 AI Scoring</div>
-      <div class="pill">🏆 Weekly Challenges</div>
-      <div class="pill">👥 Community Feed</div>
-    </div>
-
-    <!-- AUTH BOX -->
-    <div class="auth-box" id="auth-box">
-
-      <div class="auth-tabs">
-        <button class="auth-tab active" id="tabSignup" onclick="switchTab('signup')">Create Account</button>
-        <button class="auth-tab" id="tabLogin" onclick="switchTab('login')">Sign In</button>
-      </div>
-
-      <!-- SIGN UP FORM -->
-      <div class="auth-form" id="signupForm">
-        <div class="input-group">
-          <label class="input-label">Display Name</label>
-          <input class="auth-input" type="text" id="signupName" placeholder="How you'll appear on the feed" autocomplete="name" />
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-scanline"></div>
+    <div class="hero-inner">
+      <div class="hero-left">
+        <div class="hero-live-badge" id="heroLiveBadge"><span class="live-dot"></span> Loading…</div>
+        <h1>
+          Learn.
+          <span class="line2">Shoot.</span>
+          <span class="line3">Improve.</span>
+        </h1>
+        <p class="hero-desc">The only photography app that teaches you <em>why</em> your photos work — or don't. Step-by-step lessons, real photo missions, AI feedback, and a weekly challenge to prove your progress.</p>
+        <div class="hero-theme-card">
+          <div class="hero-theme-label">📅 This Week's Theme</div>
+          <div class="hero-theme-name" id="heroThemeName">—</div>
+          <div class="hero-theme-sub" id="heroThemeSub"></div>
+          <div class="hero-theme-timer">
+            <div class="timer-unit"><span class="timer-num" id="timerD">—</span><span class="timer-label">Days</span></div>
+            <div class="timer-unit"><span class="timer-num" id="timerH">—</span><span class="timer-label">Hrs</span></div>
+            <div class="timer-unit"><span class="timer-num" id="timerM">—</span><span class="timer-label">Min</span></div>
+          </div>
         </div>
-        <div class="input-group">
-          <label class="input-label">Email</label>
-          <input class="auth-input" type="email" id="signupEmail" placeholder="your@email.com" autocomplete="email" />
-        </div>
-        <div class="input-group">
-          <label class="input-label">Password</label>
-          <input class="auth-input" type="password" id="signupPassword" placeholder="Min 8 characters" autocomplete="new-password" />
-        </div>
-        <div class="auth-error" id="signupError"></div>
-        <div class="auth-success" id="signupSuccess"></div>
-        <button class="auth-btn" id="signupBtn" onclick="handleSignup()">Start Your Journey →</button>
-        <!-- <div class="auth-divider"><span>or</span></div>
-        <button class="google-btn" onclick="handleGoogle()">
-          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-          Continue with Google
-        </button> -->
-        <div class="auth-terms">By signing up you agree to our Terms & Privacy Policy</div>
-      </div>
-
-      <!-- SIGN IN FORM -->
-      <div class="auth-form hidden" id="loginForm">
-        <div class="input-group">
-          <label class="input-label">Email</label>
-          <input class="auth-input" type="email" id="loginEmail" placeholder="your@email.com" autocomplete="email" />
-        </div>
-        <div class="input-group">
-          <label class="input-label">Password</label>
-          <input class="auth-input" type="password" id="loginPassword" placeholder="Your password" autocomplete="current-password" />
-        </div>
-        <div class="auth-error" id="loginError"></div>
-        <button class="auth-btn" id="loginBtn" onclick="handleLogin()">Sign In →</button>
-        <div class="auth-divider"><span>or</span></div>
-        <!-- <button class="google-btn" onclick="handleGoogle()">
-          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-          Continue with Google
-        </button> -->
-        <div style="text-align:center;margin-top:8px">
-          <a href="#" onclick="handleForgotPassword()" style="font-size:12px;color:var(--terracotta);text-decoration:none">Forgot password?</a>
+        <div class="hero-actions">
+          <a href="register.html" class="btn-primary">📚 Start Learning Now</a>
+          <a href="login.html" class="btn-ghost">Already have an account? Sign In →</a>
         </div>
       </div>
-
-    </div><!-- /auth-box -->
-  </div>
-</section>
-
-<!-- HOW IT WORKS -->
-<section class="how-section">
-  <div class="section-label">How it works</div>
-  <h2 class="section-title">Your year-long photography quest</h2>
-  <div class="steps">
-    <div class="step">
-      <div class="step-num">1</div>
-      <div class="step-content">
-        <h3>Learn a technique</h3>
-        <p>Work through 36 structured chapters — from Rule of Thirds to your Signature Style. Submit 3 photos per chapter to unlock the next.</p>
+      <div class="hero-right">
+        <div class="leaderboard-preview">
+          <div class="lb-header">
+            <span class="lb-title">🏆 Today's Top Shots</span>
+            <span class="lb-live"><span class="live-dot"></span> Live</span>
+          </div>
+          <div id="lbPreviewRows">
+            <div style="text-align:center;padding:2rem;color:rgba(240,237,232,0.3);font-size:0.8rem;">Loading…</div>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="step">
-      <div class="step-num">2</div>
-      <div class="step-content">
-        <h3>Get AI feedback</h3>
-        <p>Every photo is scored by AI across composition, lighting, colour, and focus. Instant, objective feedback on every shot.</p>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-num">3</div>
-      <div class="step-content">
-        <h3>Post & compete</h3>
-        <p>Share your best 3 photos a day to the community feed. Enter weekly themed challenges and climb the leaderboard.</p>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-num">4</div>
-      <div class="step-content">
-        <h3>Track your growth</h3>
-        <p>Your profile tracks your avg score, completed chapters, challenge wins, and shows your strengths and weaknesses over time.</p>
-      </div>
+  </section>
+
+  <!-- TICKER -->
+  <div class="ticker">
+    <div class="ticker-inner">
+      <span class="ticker-item" id="tickerTheme">📷 LensUp Weekly Challenge</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">📚 36 Chapters Across 6 Modules</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">🤖 AI Feedback on Every Shot</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">🆓 First 3 Chapters Free</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">⚔️ Weekly Challenge Active</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">🏆 Leaderboard Updated Daily</span><span class="ticker-sep">·</span>
+      <span class="ticker-item" id="tickerTheme2">📷 LensUp Weekly Challenge</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">📚 36 Chapters Across 6 Modules</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">🤖 AI Feedback on Every Shot</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">🆓 First 3 Chapters Free</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">⚔️ Weekly Challenge Active</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">🏆 Leaderboard Updated Daily</span><span class="ticker-sep">·</span>
     </div>
   </div>
-</section>
 
-<!-- STATS BAR -->
-<div class="stats-bar">
-  <div class="stat-item">
-    <div class="stat-num-big">36</div>
-    <div class="stat-label-sm">Photo Chapters</div>
+  <!-- STATS -->
+  <div class="stats-bar">
+    <div class="stat-item"><span class="stat-num" style="color:var(--gold)">36</span><div class="stat-label">Learning Chapters</div></div>
+    <div class="stat-item"><span class="stat-num" style="color:var(--cyan)">6</span><div class="stat-label">Scoring Categories</div></div>
+    <div class="stat-item"><span class="stat-num" style="color:var(--green)">Free</span><div class="stat-label">First 3 Chapters</div></div>
+    <div class="stat-item"><span class="stat-num" style="color:var(--purple)">AI</span><div class="stat-label">Powered by AI</div></div>
   </div>
-  <div class="stat-item">
-    <div class="stat-num-big">3/day</div>
-    <div class="stat-label-sm">Feed Posts</div>
-  </div>
-  <div class="stat-item">
-    <div class="stat-num-big">Weekly</div>
-    <div class="stat-label-sm">Challenges</div>
-  </div>
-  <div class="stat-item">
-    <div class="stat-num-big">AI</div>
-    <div class="stat-label-sm">Photo Scoring</div>
-  </div>
-</div>
 
-<!-- FOOTER -->
-<footer class="footer">
-  <p>© 2025 LensUp · Made for photographers who want to grow</p>
-</footer>
+  <!-- HOW IT WORKS -->
+  <section class="section" id="how">
+    <span class="section-tag">How It Works</span>
+    <h2 class="section-title">Learn by Doing</h2>
+    <p class="section-sub">Not by reading. Not by watching. You improve by shooting intentionally, getting honest feedback, and coming back better next time.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <span class="step-icon">📚</span>
+        <h3>Take a Lesson</h3>
+        <p>Each chapter focuses on one skill — Rule of Thirds, Leading Lines, Lighting. Short, clear, practical. No fluff.</p>
+        <div class="step-arrow">→</div>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <span class="step-icon">📷</span>
+        <h3>Complete the Mission</h3>
+        <p>Go shoot 5 real photos applying what you learned. Not for likes — for intentional practice with a clear goal.</p>
+        <div class="step-arrow">→</div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <span class="step-icon">🤖</span>
+        <h3>Get Honest AI Feedback</h3>
+        <p>Every photo is scored specifically on the skill you're practising. Not vibes — precise feedback on what worked and what didn't.</p>
+        <div class="step-arrow">→</div>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <span class="step-icon">⚔️</span>
+        <h3>Enter the Weekly Challenge</h3>
+        <p>Apply your growing skills to the weekly theme. Compete on the leaderboard. See your improvement in your scores over time.</p>
+        <div class="step-arrow">→</div>
+      </div>
+    </div>
+  </section>
 
-<script>
-const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
-const { createClient } = supabase;
-const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+  <!-- CHALLENGES PREVIEW -->
+  <section class="challenges-section" id="challenges">
+    <div class="challenges-inner">
+      <span class="section-tag">Upcoming Challenges</span>
+      <h2 class="section-title">What's Coming</h2>
+      <p class="section-sub">Themes are designed to push your creative limits. No two weeks are the same.</p>
+      <div class="challenge-grid" id="challengeGrid">
+        <div style="grid-column:1/-1;text-align:center;padding:3rem;color:rgba(240,237,232,0.3);font-size:0.85rem;">Loading challenges…</div>
+      </div>
+    </div>
+  </section>
 
-// Redirect if already logged in
-(async () => {
-  const { data: { session } } = await sb.auth.getSession();
-  if (session) window.location.href = 'dashboard.html';
-})();
+  <!-- SCORING -->
+  <section class="scoring-section">
+    <span class="section-tag">AI Scoring System</span>
+    <h2 class="section-title">Scored on What Actually Matters</h2>
+    <p class="section-sub">Not vibes. Not likes. Six objective dimensions scored by AI — the same standard for everyone.</p>
+    <div class="scoring-grid">
+      <div class="score-categories">
+        <div class="score-cat">
+          <span class="score-cat-icon">🎯</span>
+          <div class="score-cat-info"><div class="score-cat-name">Subject Focus</div><div class="score-cat-desc">Is your subject sharp and intentional?</div></div>
+          <div class="score-cat-bar"><div class="score-cat-fill" style="width:88%;background:#60a5fa"></div></div>
+        </div>
+        <div class="score-cat">
+          <span class="score-cat-icon">🎨</span>
+          <div class="score-cat-info"><div class="score-cat-name">Color & Contrast</div><div class="score-cat-desc">Palette harmony and tonal range</div></div>
+          <div class="score-cat-bar"><div class="score-cat-fill" style="width:92%;background:#f472b6"></div></div>
+        </div>
+        <div class="score-cat">
+          <span class="score-cat-icon">📐</span>
+          <div class="score-cat-info"><div class="score-cat-name">Composition</div><div class="score-cat-desc">Rule of thirds, balance, visual flow</div></div>
+          <div class="score-cat-bar"><div class="score-cat-fill" style="width:75%;background:#34d399"></div></div>
+        </div>
+        <div class="score-cat">
+          <span class="score-cat-icon">💡</span>
+          <div class="score-cat-info"><div class="score-cat-name">Lighting</div><div class="score-cat-desc">Quality, direction and mood of light</div></div>
+          <div class="score-cat-bar"><div class="score-cat-fill" style="width:95%;background:#fbbf24"></div></div>
+        </div>
+        <div class="score-cat">
+          <span class="score-cat-icon">✨</span>
+          <div class="score-cat-info"><div class="score-cat-name">Background Blur</div><div class="score-cat-desc">Separation between subject and scene</div></div>
+          <div class="score-cat-bar"><div class="score-cat-fill" style="width:65%;background:#a78bfa"></div></div>
+        </div>
+        <div class="score-cat">
+          <span class="score-cat-icon">✂️</span>
+          <div class="score-cat-info"><div class="score-cat-name">Framing</div><div class="score-cat-desc">How well the subject fills the frame</div></div>
+          <div class="score-cat-bar"><div class="score-cat-fill" style="width:82%;background:#fb923c"></div></div>
+        </div>
+      </div>
+      <div class="score-right">
+        <div class="score-sample">
+          <div class="score-sample-title">Sample Analysis Result</div>
+          <div class="score-overall">9.4<span>/10</span></div>
+          <div class="score-verdict">Mastershot! 🏆</div>
+          <div class="score-bars">
+            <div class="score-bar-row"><span class="score-bar-label">Subject Focus</span><div class="score-bar-track"><div class="score-bar-fill" style="width:90%;background:#60a5fa"></div></div><span class="score-bar-val" style="color:#60a5fa">9</span></div>
+            <div class="score-bar-row"><span class="score-bar-label">Color</span><div class="score-bar-track"><div class="score-bar-fill" style="width:100%;background:#f472b6"></div></div><span class="score-bar-val" style="color:#f472b6">10</span></div>
+            <div class="score-bar-row"><span class="score-bar-label">Composition</span><div class="score-bar-track"><div class="score-bar-fill" style="width:80%;background:#34d399"></div></div><span class="score-bar-val" style="color:#34d399">8</span></div>
+            <div class="score-bar-row"><span class="score-bar-label">Lighting</span><div class="score-bar-track"><div class="score-bar-fill" style="width:100%;background:#fbbf24"></div></div><span class="score-bar-val" style="color:#fbbf24">10</span></div>
+            <div class="score-bar-row"><span class="score-bar-label">BG Blur</span><div class="score-bar-track"><div class="score-bar-fill" style="width:90%;background:#a78bfa"></div></div><span class="score-bar-val" style="color:#a78bfa">9</span></div>
+            <div class="score-bar-row"><span class="score-bar-label">Framing</span><div class="score-bar-track"><div class="score-bar-fill" style="width:90%;background:#fb923c"></div></div><span class="score-bar-val" style="color:#fb923c">9</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-// Handle OAuth redirect
-sb.auth.onAuthStateChange(async (event, session) => {
-  if (event === 'SIGNED_IN' && session) {
-    await ensureProfile(session.user);
-    window.location.href = 'dashboard.html';
-  }
-});
+  <!-- CTA -->
+  <section class="cta-section">
+    <span class="cta-label">Start for free today</span>
+    <h2 class="cta-title">Stop Guessing.<br/><span>Start Improving.</span></h2>
+    <p class="cta-sub">Instagram tells you how many likes you got. LensUp tells you <em>why</em> your photo works — and exactly how to make the next one better.</p>
+    <a href="register.html" class="btn-cta-big">📚 Start Learning Now →</a>
+  </section>
 
-function switchTab(tab) {
-  const isSignup = tab === 'signup';
-  document.getElementById('tabSignup').classList.toggle('active', isSignup);
-  document.getElementById('tabLogin').classList.toggle('active', !isSignup);
-  document.getElementById('signupForm').classList.toggle('hidden', !isSignup);
-  document.getElementById('loginForm').classList.toggle('hidden', isSignup);
-  clearErrors();
-}
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">Lens<span>Up</span></div>
+    <p>© 2026 LensUp · Photography Challenge Platform · Powered by AI</p>
+  </footer>
 
-function clearErrors() {
-  ['signupError','loginError'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) { el.classList.remove('show'); el.textContent = ''; }
-  });
-}
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL     = 'https://sjjgzuaeqcbtvrnmquex.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqamd6dWFlcWNidHZybm1xdWV4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyMDYzNjIsImV4cCI6MjA4ODc4MjM2Mn0.RRRjWxamVkzTZbEn6FwL3-6bvhFw6njXjnk9Bsu5TiI';
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-function showError(id, msg) {
-  const el = document.getElementById(id);
-  if (el) { el.textContent = msg; el.classList.add('show'); }
-}
+    let activeTheme = null;
+    let timerInterval = null;
 
-function scrollToAuth() {
-  document.getElementById('auth-box').scrollIntoView({ behavior: 'smooth', block: 'center' });
-}
-
-async function handleSignup() {
-  const name = document.getElementById('signupName').value.trim();
-  const email = document.getElementById('signupEmail').value.trim();
-  const password = document.getElementById('signupPassword').value;
-
-  if (!name) { showError('signupError', 'Please enter a display name'); return; }
-  if (!email) { showError('signupError', 'Please enter your email'); return; }
-  if (password.length < 8) { showError('signupError', 'Password must be at least 8 characters'); return; }
-
-  const btn = document.getElementById('signupBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="btn-spinner"></span> Creating account…';
-  clearErrors();
-
-  const { data, error } = await sb.auth.signUp({
-    email, password,
-    options: { data: { full_name: name } }
-  });
-
-  if (error) {
-    showError('signupError', error.message);
-    btn.disabled = false;
-    btn.textContent = 'Start Your Journey →';
-    return;
-  }
-
-  if (data.user) {
-    // Create profile
-    await ensureProfile(data.user, name);
-
-    if (data.session) {
-      window.location.href = 'dashboard.html';
-    } else {
-      document.getElementById('signupSuccess').textContent = '✓ Check your email to confirm your account, then sign in.';
-      document.getElementById('signupSuccess').classList.add('show');
-      btn.disabled = false;
-      btn.textContent = 'Start Your Journey →';
+    // ── TIMER ──
+    function updateTimer(endsAt) {
+      const diff = new Date(endsAt) - new Date();
+      if (diff <= 0) {
+        document.getElementById('timerD').textContent = '0';
+        document.getElementById('timerH').textContent = '00';
+        document.getElementById('timerM').textContent = '00';
+        return;
+      }
+      const d = Math.floor(diff / 86400000);
+      const h = Math.floor((diff % 86400000) / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      document.getElementById('timerD').textContent = d;
+      document.getElementById('timerH').textContent = String(h).padStart(2,'0');
+      document.getElementById('timerM').textContent = String(m).padStart(2,'0');
     }
-  }
-}
 
-async function handleLogin() {
-  const email = document.getElementById('loginEmail').value.trim();
-  const password = document.getElementById('loginPassword').value;
+    // ── LOAD ACTIVE THEME ──
+    async function loadTheme() {
+      const now = new Date().toISOString();
+      const { data, error } = await sb
+        .from('themes')
+        .select('*')
+        .eq('is_active', true)
+        .lte('starts_at', now)
+        .gte('ends_at', now)
+        .limit(1)
+        .single();
 
-  if (!email || !password) { showError('loginError', 'Please fill in all fields'); return; }
+      if (error || !data) {
+        document.getElementById('heroLiveBadge').innerHTML = '<span class="live-dot"></span> No Active Challenge';
+        document.getElementById('heroThemeName').textContent = 'Coming Soon';
+        document.getElementById('heroThemeSub').textContent = 'Check back soon for the next weekly theme.';
+        return;
+      }
 
-  const btn = document.getElementById('loginBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="btn-spinner"></span> Signing in…';
-  clearErrors();
+      activeTheme = data;
+      document.getElementById('heroLiveBadge').innerHTML = `<span class="live-dot"></span> Week ${data.week_number} Challenge Active`;
+      document.getElementById('heroThemeName').textContent = data.name;
+      document.getElementById('heroThemeSub').textContent = data.description || '';
 
-  const { data, error } = await sb.auth.signInWithPassword({ email, password });
+      // Ticker
+      const tickerText = `📷 Week ${data.week_number}: ${data.name}`;
+      document.getElementById('tickerTheme').textContent = tickerText;
+      document.getElementById('tickerTheme2').textContent = tickerText;
 
-  if (error) {
-    showError('loginError', error.message === 'Invalid login credentials' ? 'Incorrect email or password' : error.message);
-    btn.disabled = false;
-    btn.textContent = 'Sign In →';
-    return;
-  }
+      // Timer
+      updateTimer(data.ends_at);
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => updateTimer(data.ends_at), 60000);
+    }
 
-  await ensureProfile(data.user);
-  window.location.href = 'dashboard.html';
-}
+    // ── LOAD LEADERBOARD PREVIEW ──
+    async function loadLeaderboardPreview() {
+      const rankColors = ['r1','r2','r3'];
+      const rankEmojis = ['🥇','🥈','🥉'];
+      try {
+        const { data, error } = await sb
+          .from('analyses')
+          .select('user_id, display_name, overall, theme_name, created_at')
+          .order('overall', { ascending: false })
+          .limit(20);
 
-async function handleGoogle() {
-  const { error } = await sb.auth.signInWithOAuth({
-    provider: 'google',
-    options: { redirectTo: window.location.origin + '/dashboard.html' }
-  });
-  if (error) alert('Google sign-in failed: ' + error.message);
-}
+        if (error || !data || !data.length) {
+          document.getElementById('lbPreviewRows').innerHTML =
+            '<div style="text-align:center;padding:2rem;color:rgba(240,237,232,0.25);font-size:0.78rem;">Be the first to submit a shot!</div>';
+          return;
+        }
 
-async function handleForgotPassword() {
-  const email = document.getElementById('loginEmail').value.trim();
-  if (!email) { showError('loginError', 'Enter your email above first'); return; }
-  const { error } = await sb.auth.resetPasswordForEmail(email, {
-    redirectTo: window.location.origin + '/index.html'
-  });
-  if (error) { showError('loginError', error.message); }
-  else {
-    showError('loginError', '');
-    document.getElementById('loginError').style.display = 'none';
-    alert('Password reset email sent! Check your inbox.');
-  }
-}
+        // Dedupe — best score per user
+        const seen = {};
+        const top = [];
+        for (const row of data) {
+          if (!seen[row.user_id]) { seen[row.user_id] = true; top.push(row); }
+          if (top.length >= 5) break;
+        }
 
-async function ensureProfile(user, displayName) {
-  const name = displayName || user.user_metadata?.full_name || user.email?.split('@')[0] || 'Photographer';
-  try {
-    await sb.from('profiles').upsert({
-      id: user.id,
-      display_name: name,
-      updated_at: new Date().toISOString()
-    }, { onConflict: 'id', ignoreDuplicates: true });
-  } catch (e) { console.error('Profile upsert error:', e); }
-}
+        const scoreClass = s => s >= 8 ? 's-high' : s >= 6 ? 's-mid' : '';
 
-// Enter key support
-document.addEventListener('keydown', e => {
-  if (e.key !== 'Enter') return;
-  const signupVisible = !document.getElementById('signupForm').classList.contains('hidden');
-  if (signupVisible) handleSignup();
-  else handleLogin();
-});
-</script>
+        document.getElementById('lbPreviewRows').innerHTML = top.map((row, i) => `
+          <div class="lb-row ${i === 0 ? 'gold-row' : ''}">
+            <span class="lb-rank ${rankColors[i] || ''}" style="${i >= 3 ? 'color:var(--mid)' : ''}">${i + 1}</span>
+            <div class="lb-photo">${rankEmojis[i] || '📷'}</div>
+            <div class="lb-info">
+              <div class="lb-name">${row.display_name || 'Anonymous'}</div>
+              <div class="lb-theme">${row.theme_name || '—'}</div>
+            </div>
+            <span class="lb-score ${scoreClass(row.overall)}">${row.overall}</span>
+          </div>
+        `).join('');
+      } catch(e) {
+        document.getElementById('lbPreviewRows').innerHTML =
+          '<div style="text-align:center;padding:1.5rem;color:rgba(240,237,232,0.2);font-size:0.78rem;">Could not load scores</div>';
+      }
+    }
+
+    // ── LOAD UPCOMING CHALLENGES ──
+    async function loadChallenges() {
+      const cardColors = ['c1','c2','c3'];
+      const accentColors = ['var(--gold)','var(--cyan)','var(--purple)'];
+      try {
+        const { data, error } = await sb
+          .from('themes')
+          .select('*')
+          .order('week_number', { ascending: true })
+          .limit(6);
+
+        if (error || !data || !data.length) {
+          document.getElementById('challengeGrid').innerHTML =
+            '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:rgba(240,237,232,0.3);font-size:0.85rem;">No challenges found.</div>';
+          return;
+        }
+
+        const now = new Date();
+        document.getElementById('challengeGrid').innerHTML = data.slice(0, 3).map((t, i) => {
+          const isActive = t.is_active && new Date(t.starts_at) <= now && new Date(t.ends_at) >= now;
+          const isPast   = new Date(t.ends_at) < now;
+          const color    = accentColors[i] || accentColors[0];
+          const statusLabel = isActive ? '🔥 Active Now' : isPast ? '✅ Completed' : '⏳ Coming Soon';
+          const statusStyle = isActive
+            ? `border-color:rgba(232,184,75,0.3);color:var(--gold)`
+            : isPast
+              ? `border-color:rgba(0,230,118,0.2);color:var(--green)`
+              : `border-color:rgba(255,255,255,0.1);color:rgba(240,237,232,0.4)`;
+
+          return `
+            <div class="challenge-card ${cardColors[i] || 'c1'}">
+              <div class="challenge-week" style="color:${color}">Week ${t.week_number} · ${isActive ? 'Active Now' : isPast ? 'Completed' : 'Coming Soon'}</div>
+              <div class="challenge-name">${t.name}</div>
+              <div class="challenge-desc">${t.description || ''}</div>
+              <div class="challenge-meta">
+                <span class="challenge-tag" style="${statusStyle}">${statusLabel}</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } catch(e) {
+        document.getElementById('challengeGrid').innerHTML =
+          '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:rgba(240,237,232,0.3);font-size:0.85rem;">Could not load challenges.</div>';
+      }
+    }
+
+    // ── INIT ──
+    async function init() {
+      await Promise.all([loadTheme(), loadLeaderboardPreview(), loadChallenges()]);
+    }
+
+    init();
+  </script>
 </body>
 </html>
