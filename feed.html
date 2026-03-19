@@ -1,706 +1,670 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LensUp — Feed</title>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LensUp — Community Feed</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
   <style>
+    body { visibility: hidden; }
+    body.auth-ready { visibility: visible; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --cream: #FAF7F2;
-      --warm-white: #FDF9F4;
-      --terracotta: #C4622D;
-      --terracotta-light: #E8845A;
-      --terracotta-pale: #F5E6DE;
-      --brown: #6B3A2A;
-      --text-dark: #2C1810;
-      --text-mid: #7A5C4F;
-      --text-light: #B09080;
-      --border: #E8DDD5;
-      --success: #4CAF50;
-      --gold: #D4A853;
-      --nav-h: 64px;
-      --bottom-nav-h: 68px;
+      --black: #080808; --white: #f0ede8; --dark: #111010; --dark2: #181615;
+      --mid: #5a5550; --border: rgba(255,255,255,0.07);
+      --gold: #e8b84b; --gold2: #f5d07a; --green: #00e676; --red: #ff4444;
+      --c1:#60a5fa; --c2:#f472b6; --c3:#34d399; --c4:#fbbf24; --c5:#a78bfa; --c6:#fb923c;
     }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--cream);
-      color: var(--text-dark);
-      min-height: 100vh;
-      padding-bottom: calc(var(--bottom-nav-h) + 20px);
-    }
+    body { background: var(--black); color: var(--white); font-family: 'DM Sans', sans-serif; font-weight: 300; min-height: 100vh; }
 
-    .top-nav {
-      position: sticky; top: 0; z-index: 100;
-      height: var(--nav-h);
-      background: var(--warm-white);
-      border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 20px;
-    }
-    .nav-logo { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--terracotta); }
-    .daily-badge {
-      display: flex; align-items: center; gap: 5px;
-      background: var(--terracotta-pale); border: 1px solid var(--terracotta-light);
-      border-radius: 20px; padding: 6px 12px;
-      font-size: 12px; font-weight: 600; color: var(--terracotta);
-    }
-    .daily-badge.full { background: #E8F5E9; border-color: #A5D6A7; color: var(--success); }
+    /* ── NAV ── */
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 1rem 3rem; border-bottom: 1px solid var(--border); background: rgba(8,8,8,0.97); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(16px); }
+    .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; letter-spacing: 0.08em; color: var(--gold); text-decoration: none; }
+    .nav-logo span { color: var(--white); }
+    .nav-links { display: flex; align-items: center; gap: 2rem; }
+    .nav-link { font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(240,237,232,0.45); text-decoration: none; transition: color 0.2s; }
+    .nav-link:hover, .nav-link.active { color: var(--gold); }
+    .nav-burger { display: none; background: none; border: none; cursor: pointer; padding: 0.4rem; color: var(--white); flex-direction: column; gap: 5px; align-items: center; justify-content: center; }
+    .nav-burger span { display: block; width: 22px; height: 2px; background: var(--white); border-radius: 2px; }
 
-    .bottom-nav {
-      position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
-      height: var(--bottom-nav-h);
-      background: var(--warm-white);
-      border-top: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: space-around;
-      padding-bottom: env(safe-area-inset-bottom);
-    }
-    .nav-item {
-      display: flex; flex-direction: column; align-items: center; gap: 4px;
-      text-decoration: none; color: var(--text-light);
-      font-size: 10px; font-weight: 500; padding: 8px 14px; transition: color 0.2s;
-    }
-    .nav-item.active { color: var(--terracotta); }
-    .nav-item svg { width: 22px; height: 22px; }
+    /* ── MOBILE MENU ── */
+    .mobile-menu { display: none; position: fixed; inset: 0; background: rgba(8,8,8,0.98); z-index: 200; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(16px); }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu-close { position: absolute; top: 1.2rem; right: 1.5rem; background: none; border: none; color: var(--mid); font-size: 1.5rem; cursor: pointer; }
+    .mobile-menu-logo { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; color: var(--gold); margin-bottom: 2rem; }
+    .mobile-menu-logo span { color: var(--white); }
+    .mobile-menu a { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; letter-spacing: 0.06em; color: rgba(240,237,232,0.55); text-decoration: none; padding: 0.5rem 2rem; transition: color 0.2s; }
+    .mobile-menu a:hover, .mobile-menu a.active { color: var(--gold); }
+    .mobile-menu-divider { width: 40px; height: 1px; background: var(--border); margin: 0.8rem 0; }
+    .mobile-menu-auth { margin-top: 1rem; text-align: center; color: var(--mid); font-size: 0.72rem; }
+    .mobile-menu-auth span { color: rgba(240,237,232,0.5); display: block; margin-bottom: 0.6rem; }
+    .mobile-menu-signout { background: none; border: 1px solid var(--border); color: var(--mid); padding: 0.5rem 1.5rem; font-family: 'DM Sans', sans-serif; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+    .mobile-menu-signout:hover { border-color: var(--gold); color: var(--gold); }
 
-    .main { padding: 16px 16px; max-width: 480px; margin: 0 auto; }
+    /* ── ACTION BAR ── */
+    .action-bar {
+      position: sticky; top: 57px; z-index: 90;
+      background: rgba(8,8,8,0.96); border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      padding: 0.75rem 3rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .action-bar-left { font-size: 0.78rem; color: rgba(240,237,232,0.35); }
+    .action-bar-left strong { color: var(--gold); }
+    .btn-post {
+      background: var(--gold); color: var(--black);
+      border: none; padding: 0.6rem 1.5rem;
+      font-family: 'Bebas Neue', sans-serif; font-size: 1rem; letter-spacing: 0.1em;
+      cursor: pointer; transition: all 0.2s; white-space: nowrap;
+      clip-path: polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%);
+    }
+    .btn-post:hover { background: var(--gold2); }
+    .btn-post:disabled { opacity: 0.4; cursor: not-allowed; }
 
-    /* SUBMIT CARD */
-    .submit-card {
-      background: white; border: 1.5px solid var(--border);
-      border-radius: 18px; padding: 18px; margin-bottom: 20px;
-    }
-    .submit-card-title {
-      font-size: 14px; font-weight: 700; color: var(--text-dark); margin-bottom: 14px;
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .limit-label {
-      font-size: 12px; font-weight: 500;
-      color: var(--text-light); background: var(--cream);
-      border: 1px solid var(--border); border-radius: 20px; padding: 3px 10px;
-    }
-    .limit-label.full { color: var(--success); background: #E8F5E9; border-color: #A5D6A7; }
+    /* ── FEED LAYOUT ── */
+    .feed-wrap { max-width: 600px; margin: 0 auto; padding: 2rem 1.5rem 6rem; }
 
-    .photo-picker {
-      border: 2px dashed var(--border);
-      border-radius: 14px; padding: 28px 20px;
-      text-align: center; cursor: pointer;
-      transition: all 0.2s; margin-bottom: 12px;
-      background: var(--cream);
-    }
-    .photo-picker:hover { border-color: var(--terracotta-light); background: var(--terracotta-pale); }
-    .photo-picker.has-image { border-style: solid; border-color: var(--terracotta-light); padding: 0; overflow: hidden; }
-    .photo-picker img { width: 100%; max-height: 260px; object-fit: cover; border-radius: 12px; display: block; }
-    .picker-icon { font-size: 28px; margin-bottom: 8px; }
-    .picker-label { font-size: 14px; font-weight: 500; color: var(--text-mid); }
-    .picker-sub { font-size: 12px; color: var(--text-light); margin-top: 4px; }
+    /* ── FEED CARD ── */
+    .feed-card { background: var(--dark); border: 1px solid var(--border); margin-bottom: 1.5rem; animation: fadeUp 0.3s ease both; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
 
-    .caption-input {
-      width: 100%; padding: 12px 14px;
-      border: 1.5px solid var(--border); border-radius: 12px;
-      font-family: 'DM Sans', sans-serif; font-size: 14px;
-      background: var(--cream); color: var(--text-dark);
-      outline: none; transition: border-color 0.2s;
-      resize: none; margin-bottom: 12px;
-    }
-    .caption-input:focus { border-color: var(--terracotta); }
+    .card-header { display: flex; align-items: center; gap: 0.8rem; padding: 0.9rem 1.1rem; }
+    .card-avatar { width: 36px; height: 36px; border-radius: 50%; background: rgba(232,184,75,0.1); border: 1px solid rgba(232,184,75,0.2); display: flex; align-items: center; justify-content: center; font-size: 0.9rem; font-weight: 700; color: var(--gold); flex-shrink: 0; cursor: pointer; }
+    .card-user { flex: 1; min-width: 0; }
+    .card-name { font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: color 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .card-name:hover { color: var(--gold); }
+    .card-time { font-size: 0.68rem; color: var(--mid); margin-top: 0.1rem; }
+    .card-score { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; flex-shrink: 0; line-height: 1; }
+    .card-score span { font-size: 0.8rem; color: var(--mid); }
 
-    .submit-btn {
-      width: 100%; padding: 15px;
-      background: var(--terracotta); color: white;
-      border: none; border-radius: 14px;
-      font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600;
-      cursor: pointer; transition: all 0.2s;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-    }
-    .submit-btn:hover { background: var(--brown); transform: translateY(-1px); }
-    .submit-btn:disabled { background: var(--text-light); cursor: not-allowed; transform: none; }
+    .card-photo { width: 100%; background: var(--dark2); cursor: pointer; overflow: hidden; }
+    .card-photo img { width: 100%; max-height: 480px; object-fit: cover; display: block; transition: transform 0.3s; }
+    .card-photo:hover img { transform: scale(1.01); }
+    .card-photo-empty { width: 100%; height: 200px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; opacity: 0.1; }
 
-    /* ANALYZING */
-    .analyzing-overlay {
-      display: none; position: fixed; inset: 0; z-index: 400;
-      background: rgba(44,24,16,0.8); backdrop-filter: blur(8px);
-      flex-direction: column; align-items: center; justify-content: center; gap: 20px;
-    }
-    .analyzing-overlay.open { display: flex; }
-    .analyzing-spinner {
-      width: 56px; height: 56px; border-radius: 50%;
-      border: 3px solid rgba(255,255,255,0.2);
-      border-top-color: var(--terracotta-light);
-      animation: spin 0.9s linear infinite;
-    }
+    .card-summary { padding: 0.7rem 1.1rem 0.3rem; font-size: 0.8rem; line-height: 1.7; color: rgba(240,237,232,0.4); }
+    .card-cats { display: flex; gap: 0.35rem; flex-wrap: wrap; padding: 0.3rem 1.1rem 0.6rem; }
+    .cat-pill { font-size: 0.6rem; padding: 0.15rem 0.45rem; border-radius: 10px; border: 1px solid; }
+    .card-actions { display: flex; align-items: center; gap: 0.5rem; padding: 0.65rem 1.1rem; border-top: 1px solid var(--border); }
+    .like-btn { display: flex; align-items: center; gap: 0.4rem; background: none; border: 1px solid var(--border); color: rgba(240,237,232,0.45); padding: 0.3rem 0.8rem; font-family: 'DM Sans', sans-serif; font-size: 0.78rem; cursor: pointer; transition: all 0.2s; border-radius: 20px; }
+    .like-btn:hover { border-color: rgba(232,184,75,0.4); color: var(--gold); }
+    .like-btn.liked { border-color: rgba(232,184,75,0.5); color: var(--gold); background: rgba(232,184,75,0.06); }
+    .see-more-btn { margin-left: auto; background: none; border: none; color: rgba(240,237,232,0.3); font-size: 0.75rem; cursor: pointer; font-family: 'DM Sans', sans-serif; padding: 0.3rem; transition: color 0.2s; }
+    .see-more-btn:hover { color: var(--gold); }
+
+    /* ── STATES ── */
+    .feed-loading { text-align: center; padding: 4rem 2rem; }
+    .feed-spinner { width: 30px; height: 30px; border: 2px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 1rem; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .analyzing-text { color: white; font-size: 16px; font-weight: 500; }
-    .analyzing-sub { color: rgba(255,255,255,0.6); font-size: 13px; }
+    .feed-empty { text-align: center; padding: 5rem 2rem; }
+    .feed-empty-icon { font-size: 3rem; display: block; margin-bottom: 1rem; opacity: 0.3; }
+    .feed-empty p { color: rgba(240,237,232,0.25); font-size: 0.88rem; line-height: 1.7; }
+    .load-more-btn { display: block; width: 100%; background: none; border: 1px solid var(--border); color: rgba(240,237,232,0.4); padding: 0.8rem; font-family: 'DM Sans', sans-serif; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; margin-top: 0.5rem; }
+    .load-more-btn:hover { border-color: var(--gold); color: var(--gold); }
 
-    /* SCORE TOAST */
-    .score-toast {
-      display: none; position: fixed; bottom: calc(var(--bottom-nav-h) + 16px);
-      left: 16px; right: 16px; max-width: 448px; margin: 0 auto;
-      background: white; border: 1.5px solid var(--border);
-      border-radius: 16px; padding: 16px; z-index: 500;
-      box-shadow: 0 8px 32px rgba(44,24,16,0.15);
-      animation: slideUp 0.3s ease;
-    }
-    .score-toast.show { display: block; }
-    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-    .score-toast-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-    .score-toast-title { font-size: 14px; font-weight: 700; color: var(--text-dark); }
-    .score-toast-num { font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--terracotta); }
-    .score-toast-feedback { font-size: 13px; color: var(--text-mid); line-height: 1.5; margin-bottom: 10px; }
-    .score-toast-close {
-      width: 100%; padding: 10px;
-      background: var(--cream); border: 1.5px solid var(--border);
-      border-radius: 10px; cursor: pointer;
-      font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
-      color: var(--text-mid);
-    }
+    /* ── DETAIL MODAL ── */
+    .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 300; align-items: flex-start; justify-content: center; padding: 2rem 1rem; overflow-y: auto; }
+    .overlay.open { display: flex; }
+    .modal-box { background: var(--dark); border: 1px solid var(--border); width: 100%; max-width: 500px; margin: auto; }
+    .modal-top-bar { display: flex; justify-content: flex-end; padding: 0.7rem 0.8rem; border-bottom: 1px solid var(--border); }
+    .modal-close { background: none; border: none; color: var(--mid); font-size: 1rem; cursor: pointer; padding: 0.2rem 0.5rem; transition: color 0.2s; }
+    .modal-close:hover { color: var(--white); }
+    .modal-photo { width: 100%; max-height: 300px; overflow: hidden; background: var(--dark2); }
+    .modal-photo img { width: 100%; object-fit: cover; display: block; }
+    .modal-body { padding: 1.4rem 1.5rem; }
+    .modal-user-row { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1.1rem; }
+    .modal-av { width: 38px; height: 38px; border-radius: 50%; background: rgba(232,184,75,0.1); border: 1px solid rgba(232,184,75,0.2); display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--gold); font-size: 0.9rem; flex-shrink: 0; }
+    .modal-uname { font-weight: 600; font-size: 0.88rem; }
+    .modal-utime { font-size: 0.68rem; color: var(--mid); margin-top: 0.1rem; }
+    .modal-score-row { display: flex; align-items: baseline; gap: 0.4rem; margin-bottom: 0.8rem; }
+    .modal-score-big { font-family: 'Bebas Neue', sans-serif; font-size: 3rem; line-height: 1; }
+    .modal-score-denom { font-size: 0.85rem; color: var(--mid); }
+    .modal-summary { font-size: 0.82rem; line-height: 1.8; color: rgba(240,237,232,0.45); margin-bottom: 1.2rem; }
+    .modal-section-label { font-size: 0.62rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--mid); margin-bottom: 0.7rem; }
+    .modal-bars { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 1.2rem; }
+    .bar-row { display: flex; align-items: center; gap: 0.7rem; }
+    .bar-lbl { font-size: 0.7rem; color: var(--mid); width: 105px; flex-shrink: 0; }
+    .bar-track { flex: 1; height: 4px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 2px; width: 0; transition: width 0.8s ease; }
+    .bar-val { font-family: 'Bebas Neue', sans-serif; font-size: 1rem; width: 22px; text-align: right; }
+    .modal-imps { margin-top: 0.5rem; }
+    .imp-item { display: flex; gap: 0.7rem; margin-bottom: 0.65rem; }
+    .imp-num { width: 20px; height: 20px; border-radius: 50%; background: rgba(232,184,75,0.1); border: 1px solid rgba(232,184,75,0.2); color: var(--gold); font-size: 0.62rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 0.15rem; }
+    .imp-title { font-size: 0.82rem; font-weight: 500; }
+    .imp-desc { font-size: 0.73rem; color: rgba(240,237,232,0.38); line-height: 1.6; margin-top: 0.15rem; }
 
-    /* FEED SECTION */
-    .feed-section-hdr {
-      font-size: 16px; font-weight: 700; color: var(--text-dark);
-      margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
-    }
+    /* ── SUBMIT MODAL ── */
+    .s-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 400; align-items: center; justify-content: center; padding: 1rem; }
+    .s-overlay.open { display: flex; }
+    .s-modal { background: var(--dark); border: 1px solid var(--border); max-width: 440px; width: 100%; }
+    .s-modal-head { display: flex; align-items: center; justify-content: space-between; padding: 1.1rem 1.4rem; border-bottom: 1px solid var(--border); }
+    .s-modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; letter-spacing: 0.05em; }
+    .s-modal-x { background: none; border: none; color: var(--mid); font-size: 1.3rem; cursor: pointer; padding: 0.2rem; transition: color 0.2s; }
+    .s-modal-x:hover { color: var(--white); }
+    .s-modal-body { padding: 1.4rem; }
+    .drop-zone { border: 2px dashed rgba(255,255,255,0.1); padding: 2.5rem 1rem; text-align: center; cursor: pointer; transition: border-color 0.2s; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+    .drop-zone:hover, .drop-zone.drag { border-color: rgba(232,184,75,0.5); }
+    .dz-icon { font-size: 2.2rem; }
+    .dz-text { font-size: 0.82rem; color: rgba(240,237,232,0.4); line-height: 1.7; }
+    .dz-text strong { color: var(--gold); }
+    .preview-wrap { display: none; position: relative; margin-top: 1rem; }
+    .preview-img { width: 100%; max-height: 220px; object-fit: contain; display: block; background: var(--dark2); }
+    .preview-rm { position: absolute; top: 0.4rem; right: 0.4rem; background: rgba(0,0,0,0.75); border: none; color: var(--white); font-size: 0.72rem; padding: 0.2rem 0.5rem; cursor: pointer; border-radius: 3px; }
+    .limit-note { font-size: 0.7rem; color: var(--mid); text-align: center; margin-top: 0.9rem; line-height: 1.6; }
+    .limit-note strong { color: var(--gold); }
+    .s-error { background: rgba(255,68,68,0.08); border: 1px solid rgba(255,68,68,0.2); color: #ff8080; padding: 0.65rem 0.9rem; font-size: 0.78rem; margin-top: 0.8rem; display: none; }
+    .s-error.show { display: block; }
+    .s-loading { display: none; text-align: center; padding: 1.5rem; }
+    .s-spinner { width: 26px; height: 26px; border: 2px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 0.6rem; }
+    .s-loading p { font-size: 0.8rem; color: var(--mid); }
+    .btn-analyse { width: 100%; background: var(--gold); color: var(--black); border: none; padding: 0.88rem; font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; letter-spacing: 0.1em; cursor: pointer; transition: all 0.2s; margin-top: 1rem; clip-path: polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%); }
+    .btn-analyse:hover:not(:disabled) { background: var(--gold2); }
+    .btn-analyse:disabled { opacity: 0.4; cursor: not-allowed; }
 
-    /* FEED CARD */
-    .feed-card {
-      background: white; border: 1.5px solid var(--border);
-      border-radius: 18px; margin-bottom: 14px; overflow: hidden;
-    }
-    .feed-card-header {
-      display: flex; align-items: center; gap: 10px; padding: 13px 14px 10px;
-    }
-    .feed-avatar {
-      width: 36px; height: 36px; border-radius: 50%;
-      background: var(--terracotta-pale);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 14px; font-weight: 700; color: var(--terracotta);
-      flex-shrink: 0; overflow: hidden;
-    }
-    .feed-avatar img { width: 100%; height: 100%; object-fit: cover; }
-    .feed-user-info { flex: 1; }
-    .feed-username { font-size: 13px; font-weight: 600; color: var(--text-dark); }
-    .feed-time { font-size: 11px; color: var(--text-light); }
-    .feed-score-badge {
-      background: var(--terracotta-pale); border: 1px solid var(--terracotta-light);
-      border-radius: 20px; padding: 4px 10px;
-      font-size: 12px; font-weight: 600; color: var(--terracotta);
-    }
-
-    .feed-image { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; }
-
-    .feed-card-footer { padding: 12px 14px; }
-    .feed-actions { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
-    .like-btn {
-      display: flex; align-items: center; gap: 5px;
-      background: none; border: none; cursor: pointer;
-      font-size: 13px; font-weight: 500; color: var(--text-mid);
-      padding: 6px 10px; border-radius: 20px;
-      transition: all 0.2s;
-    }
-    .like-btn:hover { background: #FFF0F0; color: #E53935; }
-    .like-btn.liked { color: #E53935; background: #FFF0F0; }
-    .like-btn svg { width: 18px; height: 18px; transition: transform 0.15s; }
-    .like-btn.liked svg { transform: scale(1.2); }
-
-    .feed-caption { font-size: 13px; color: var(--text-dark); line-height: 1.5; margin-bottom: 6px; }
-    .feed-caption .bold { font-weight: 600; }
-    .feed-feedback {
-      font-size: 12px; color: var(--text-mid); line-height: 1.5;
-      background: var(--cream); border-radius: 8px; padding: 8px 10px;
-      border-left: 3px solid var(--terracotta-light);
-    }
-
-    /* EMPTY STATE */
-    .empty-feed {
-      text-align: center; padding: 40px 20px; color: var(--text-light);
-    }
-    .empty-feed-icon { font-size: 40px; margin-bottom: 12px; }
-    .empty-feed-text { font-size: 15px; font-weight: 500; color: var(--text-mid); margin-bottom: 6px; }
-    .empty-feed-sub { font-size: 13px; }
-
-    /* LOAD MORE */
-    .load-more-btn {
-      width: 100%; padding: 13px;
-      background: transparent; border: 1.5px solid var(--border);
-      border-radius: 14px; cursor: pointer;
-      font-family: 'DM Sans', sans-serif; font-size: 14px;
-      color: var(--text-mid); margin-top: 4px;
-    }
-    .load-more-btn:hover { border-color: var(--terracotta-light); color: var(--terracotta); }
-
-    .toast {
-      position: fixed; bottom: calc(var(--bottom-nav-h) + 16px); left: 50%;
-      transform: translateX(-50%) translateY(20px);
-      background: var(--text-dark); color: white;
-      border-radius: 30px; padding: 10px 20px;
-      font-size: 13px; opacity: 0; transition: all 0.3s; z-index: 600; white-space: nowrap;
-    }
+    /* ── TOAST ── */
+    .toast { position: fixed; bottom: 5.5rem; left: 50%; transform: translateX(-50%) translateY(12px); background: var(--dark); border: 1px solid var(--border); padding: 0.65rem 1.3rem; font-size: 0.8rem; opacity: 0; transition: all 0.3s; z-index: 999; pointer-events: none; white-space: nowrap; }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    .auth-gate {
-      display: none; position: fixed; inset: 0; z-index: 700;
-      background: var(--cream); flex-direction: column;
-      align-items: center; justify-content: center; padding: 40px 24px; text-align: center;
-    }
-    .auth-gate.open { display: flex; }
-    .auth-gate h2 { font-family: 'DM Serif Display', serif; font-size: 28px; margin-bottom: 10px; }
-    .auth-gate p { color: var(--text-mid); margin-bottom: 30px; }
-    .auth-gate a {
-      background: var(--terracotta); color: white; padding: 15px 40px;
-      border-radius: 14px; text-decoration: none; font-weight: 600; font-size: 16px;
-    }
+    /* ── BOTTOM NAV ── */
+    .bottom-nav { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: rgba(8,8,8,0.97); border-top: 1px solid var(--border); backdrop-filter: blur(16px); z-index: 98; padding-bottom: env(safe-area-inset-bottom); }
+    .bottom-nav-inner { display: flex; }
+    .bottom-nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0.6rem 0.3rem; text-decoration: none; color: rgba(240,237,232,0.35); font-size: 0.55rem; letter-spacing: 0.08em; text-transform: uppercase; gap: 0.25rem; border-top: 2px solid transparent; transition: color 0.2s; }
+    .bottom-nav-item.active { color: var(--gold); border-top-color: var(--gold); }
+    .bottom-nav-icon { font-size: 1.2rem; line-height: 1; }
 
-    #photoFileInput { display: none; }
+    @media (max-width: 768px) {
+      nav { padding: 0.9rem 1.2rem; }
+      .nav-links { display: none !important; }
+      .nav-burger { display: flex; }
+      .action-bar { padding: 0.7rem 1rem; top: 54px; }
+      .bottom-nav { display: block; }
+      body { padding-bottom: 70px; }
+      .feed-wrap { padding: 1.5rem 0.8rem 5rem; }
+    }
   </style>
 </head>
 <body>
 
-<nav class="top-nav">
-  <span class="nav-logo">LensUp</span>
-  <div class="daily-badge" id="dailyBadge">📷 0/3 today</div>
+<nav>
+  <a href="dashboard.html" class="nav-logo">Lens<span>Up</span></a>
+  <div class="nav-links">
+    <a href="dashboard.html" class="nav-link">🏠 Dashboard</a>
+    <a href="learn.html" class="nav-link">📚 Learn</a>
+    <a href="feed.html" class="nav-link active">🖼️ Feed</a>
+    <a href="compete.html" class="nav-link">⚔️ Challenge</a>
+    <a href="leaderboard.html" class="nav-link">🏆 Leaderboard</a>
+    <a href="profile.html" class="nav-link">👤 Profile</a>
+    <span id="navAuthArea"></span>
+  </div>
+  <button class="nav-burger" id="navBurger" onclick="openMobileMenu()"><span></span><span></span><span></span></button>
 </nav>
 
-<main class="main">
-
-  <!-- Submit Card -->
-  <div class="submit-card" id="submitCard">
-    <div class="submit-card-title">
-      Post a Photo
-      <span class="limit-label" id="limitLabel">0 / 3 today</span>
-    </div>
-
-    <div class="photo-picker" id="photoPicker" onclick="triggerPicker()">
-      <div class="picker-icon">📷</div>
-      <div class="picker-label">Tap to choose a photo</div>
-      <div class="picker-sub">JPG, PNG · Max 10MB</div>
-    </div>
-    <input type="file" id="photoFileInput" accept="image/*" />
-
-    <textarea class="caption-input" id="captionInput" rows="2" placeholder="Add a caption… (optional)"></textarea>
-
-    <button class="submit-btn" id="submitBtn" onclick="submitFeedPhoto()" disabled>
-      Post to Feed
-    </button>
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-menu-close" onclick="closeMobileMenu()">✕</button>
+  <div class="mobile-menu-logo">Lens<span>Up</span></div>
+  <a href="dashboard.html">🏠 Dashboard</a>
+  <a href="learn.html">📚 Learn</a>
+  <a href="feed.html" class="active">🖼️ Feed</a>
+  <a href="compete.html">⚔️ Challenge</a>
+  <a href="leaderboard.html">🏆 Leaderboard</a>
+  <a href="profile.html">👤 Profile</a>
+  <div class="mobile-menu-divider"></div>
+  <div class="mobile-menu-auth">
+    <span id="mobileMenuUser"></span>
+    <button class="mobile-menu-signout" onclick="signOut()">Sign Out</button>
   </div>
-
-  <!-- Feed -->
-  <div class="feed-section-hdr">
-    Community Feed
-    <span style="font-size:12px;color:var(--text-light);font-weight:400" id="feedCount"></span>
-  </div>
-  <div id="feedContainer"></div>
-  <button class="load-more-btn" id="loadMoreBtn" onclick="loadMore()" style="display:none">Load more</button>
-
-</main>
-
-<nav class="bottom-nav">
-  <a href="dashboard.html" class="nav-item">
-    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-    Home
-  </a>
-  <a href="learn.html" class="nav-item">
-    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-    Learn
-  </a>
-  <a href="feed.html" class="nav-item active">
-    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-    Feed
-  </a>
-  <a href="challenge.html" class="nav-item">
-    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-    Challenge
-  </a>
-  <a href="leaderboard.html" class="nav-item">
-    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-    Ranks
-  </a>
-  <a href="profile.html" class="nav-item">
-    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-    Profile
-  </a>
-</nav>
-
-<!-- Analyzing Overlay -->
-<div class="analyzing-overlay" id="analyzingOverlay">
-  <div class="analyzing-spinner"></div>
-  <div class="analyzing-text">Analysing your photo…</div>
-  <div class="analyzing-sub">AI scoring in progress</div>
 </div>
 
-<!-- Score Toast -->
-<div class="score-toast" id="scoreToast">
-  <div class="score-toast-top">
-    <div class="score-toast-title">✓ Photo Posted!</div>
-    <div class="score-toast-num" id="toastScore">—</div>
+<!-- ACTION BAR -->
+<div class="action-bar">
+  <div class="action-bar-left">
+    Community Feed · <strong id="postsLeft">3</strong> posts left today
   </div>
-  <div class="score-toast-feedback" id="toastFeedback"></div>
-  <button class="score-toast-close" onclick="closeScoreToast()">Got it</button>
+  <button class="btn-post" id="postBtn" onclick="openSubmit()">📷 Post a Photo</button>
 </div>
 
-<!-- Toast -->
+<!-- FEED -->
+<div class="feed-wrap">
+  <div id="feedContainer"><div class="feed-loading"><div class="feed-spinner"></div></div></div>
+  <button class="load-more-btn" id="loadMoreBtn" style="display:none" onclick="loadMore()">Load more ↓</button>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="bottom-nav-inner">
+    <a href="dashboard.html" class="bottom-nav-item"><span class="bottom-nav-icon">🏠</span><span>Home</span></a>
+    <a href="learn.html" class="bottom-nav-item"><span class="bottom-nav-icon">📚</span><span>Learn</span></a>
+    <a href="feed.html" class="bottom-nav-item active"><span class="bottom-nav-icon">🖼️</span><span>Feed</span></a>
+    <a href="compete.html" class="bottom-nav-item"><span class="bottom-nav-icon">⚔️</span><span>Challenge</span></a>
+    <a href="leaderboard.html" class="bottom-nav-item"><span class="bottom-nav-icon">🏆</span><span>Ranks</span></a>
+    <a href="profile.html" class="bottom-nav-item"><span class="bottom-nav-icon">👤</span><span>Profile</span></a>
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="overlay" id="detailOverlay" onclick="if(event.target===this)closeDetail()">
+  <div class="modal-box">
+    <div class="modal-top-bar"><button class="modal-close" onclick="closeDetail()">✕ Close</button></div>
+    <div class="modal-photo" id="mPhoto"></div>
+    <div class="modal-body">
+      <div class="modal-user-row">
+        <div class="modal-av" id="mAv"></div>
+        <div><div class="modal-uname" id="mName"></div><div class="modal-utime" id="mTime"></div></div>
+      </div>
+      <div class="modal-score-row">
+        <div class="modal-score-big" id="mScore"></div>
+        <div class="modal-score-denom">/10</div>
+      </div>
+      <div class="modal-summary" id="mSummary"></div>
+      <div class="modal-section-label">Score Breakdown</div>
+      <div class="modal-bars" id="mBars"></div>
+      <div class="modal-imps" id="mImps"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SUBMIT MODAL -->
+<div class="s-overlay" id="sOverlay" onclick="if(event.target===this)closeSubmit()">
+  <div class="s-modal">
+    <div class="s-modal-head">
+      <div class="s-modal-title">Post to Feed</div>
+      <button class="s-modal-x" onclick="closeSubmit()">✕</button>
+    </div>
+    <div class="s-modal-body">
+      <div class="drop-zone" id="dropZone"
+        onclick="document.getElementById('fileInput').click()"
+        ondragover="onDragOver(event)"
+        ondragleave="onDragLeave(event)"
+        ondrop="onDrop(event)">
+        <span class="dz-icon">📷</span>
+        <div class="dz-text">Tap to choose a photo<br/><strong>JPG, PNG or WEBP · max 5MB</strong></div>
+      </div>
+      <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="onFileChange(event)"/>
+      <div class="preview-wrap" id="previewWrap">
+        <img class="preview-img" id="previewImg" alt="Preview"/>
+        <button class="preview-rm" onclick="removeFile()">✕ Remove</button>
+      </div>
+      <div class="limit-note">
+        You can post <strong id="limitDisplay">3</strong> photos to the feed per day.<br/>
+        Learn chapter photos don't count toward this limit.
+      </div>
+      <div class="s-error" id="sError"></div>
+      <div class="s-loading" id="sLoading">
+        <div class="s-spinner"></div>
+        <p>Analysing your photo…</p>
+      </div>
+      <button class="btn-analyse" id="analyseBtn" onclick="submitPhoto()" disabled>Analyse &amp; Post →</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
-<div class="auth-gate" id="authGate">
-  <div style="font-size:48px;margin-bottom:16px">📷</div>
-  <h2>Join LensUp</h2>
-  <p>Share your photography with the community</p>
-  <a href="index.html">Get Started</a>
-</div>
-
 <script>
-const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
-const { createClient } = supabase;
-const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+  const CATS = [
+    { key:'subject_focus',   label:'Subject Focus',   color:'var(--c1)' },
+    { key:'color_contrast',  label:'Color & Contrast',color:'var(--c2)' },
+    { key:'composition',     label:'Composition',     color:'var(--c3)' },
+    { key:'lighting',        label:'Lighting',        color:'var(--c4)' },
+    { key:'background_blur', label:'Background Blur', color:'var(--c5)' },
+    { key:'framing',         label:'Framing',         color:'var(--c6)' },
+  ];
+  const PAGE_SIZE = 10;
 
-const PAGE_SIZE = 10;
-let currentUser = null;
-let selectedFile = null;
-let feedOffset = 0;
-let todayCount = 0;
-let likedPosts = new Set(); // analysis IDs liked by current user
+  let currentUser = null;
+  let likedSet    = new Set();
+  let feedItems   = [];
+  let pageNum     = 0;
+  let allLoaded   = false;
+  let uploadB64   = null;
+  let uploadMime  = null;
+  let previewUrl  = null;
 
-async function init() {
-  const { data: { session } } = await sb.auth.getSession();
-  if (!session) { document.getElementById('authGate').classList.add('open'); return; }
-  currentUser = session.user;
-
-  await checkDailyLimit();
-  await loadLikes();
-  await loadFeed();
-}
-
-async function checkDailyLimit() {
-  const today = new Date().toDateString();
-  const { data } = await sb
-    .from('analyses')
-    .select('id', { count: 'exact' })
-    .eq('user_id', currentUser.id)
-    .eq('source', 'feed');
-
-  // Count today's posts
-  const { data: todayData } = await sb
-    .from('analyses')
-    .select('created_at')
-    .eq('user_id', currentUser.id)
-    .eq('source', 'feed')
-    .gte('created_at', new Date(new Date().setHours(0,0,0,0)).toISOString());
-
-  todayCount = todayData?.length || 0;
-  updateLimitUI();
-}
-
-function updateLimitUI() {
-  const remaining = 3 - todayCount;
-  const isFull = todayCount >= 3;
-
-  document.getElementById('dailyBadge').textContent = `📷 ${todayCount}/3 today`;
-  document.getElementById('dailyBadge').className = `daily-badge${isFull ? ' full' : ''}`;
-  document.getElementById('limitLabel').textContent = `${todayCount} / 3 today`;
-  document.getElementById('limitLabel').className = `limit-label${isFull ? ' full' : ''}`;
-
-  if (isFull) {
-    document.getElementById('photoPicker').style.opacity = '0.5';
-    document.getElementById('photoPicker').style.pointerEvents = 'none';
-    document.getElementById('captionInput').disabled = true;
-    document.getElementById('submitBtn').disabled = true;
-    document.getElementById('submitBtn').textContent = '✓ Daily limit reached — come back tomorrow';
-    document.getElementById('submitBtn').style.background = 'var(--success)';
+  // ── HELPERS ──
+  function esc(s) { if(!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#x27;'); }
+  function scoreColor(s) { return s>=8?'var(--green)':s>=6?'var(--gold)':'rgba(240,237,232,0.5)'; }
+  function timeAgo(d) {
+    const m = Math.floor((Date.now()-new Date(d))/60000);
+    if(m<1) return 'just now'; if(m<60) return m+'m ago';
+    const h = Math.floor(m/60); if(h<24) return h+'h ago';
+    return Math.floor(h/24)+'d ago';
   }
-}
-
-async function loadLikes() {
-  try {
-    const { data } = await sb
-      .from('likes')
-      .select('analysis_id')
-      .eq('user_id', currentUser.id);
-    (data || []).forEach(l => likedPosts.add(l.analysis_id));
-  } catch (e) {
-    // likes table may not exist yet — graceful fallback
-    console.log('Likes table not available yet');
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
   }
-}
+  function parseImps(raw) {
+    if(typeof raw==='string'){try{raw=JSON.parse(raw);}catch{return[];}}
+    return Array.isArray(raw)?raw.map(i=>typeof i==='object'?i:{title:String(i),desc:''}):[]; 
+  }
 
-async function loadFeed(append = false) {
-  if (!append) feedOffset = 0;
+  // ── NAV AUTH ──
+  function renderNavAuth() {
+    const name = esc(currentUser.user_metadata?.display_name || currentUser.email.split('@')[0]);
+    document.getElementById('navAuthArea').innerHTML =
+      `<span style="font-size:0.72rem;color:rgba(240,237,232,0.3)">Hi, ${name}</span>
+       <button onclick="signOut()" style="background:none;border:none;cursor:pointer;font-size:0.72rem;letter-spacing:0.07em;text-transform:uppercase;color:rgba(240,237,232,0.3);font-family:'DM Sans',sans-serif" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='rgba(240,237,232,0.3)'">Sign Out</button>`;
+  }
+  function openMobileMenu() {
+    document.getElementById('mobileMenu').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    const el = document.getElementById('mobileMenuUser');
+    if(el) el.textContent = 'Hi, '+(currentUser?.user_metadata?.display_name||currentUser?.email?.split('@')[0]||'');
+  }
+  function closeMobileMenu() { document.getElementById('mobileMenu').classList.remove('open'); document.body.style.overflow=''; }
+  document.addEventListener('keydown', e => { if(e.key==='Escape'){closeDetail();closeSubmit();closeMobileMenu();} });
 
-  const { data: posts, error } = await sb
-    .from('analyses')
-    .select(`
-      id, user_id, score, feedback, image_url, caption,
-      composition_score, lighting_score, color_score, focus_score,
-      created_at, source,
-      profiles ( display_name, avatar_url )
-    `)
-    .in('source', ['feed', 'challenge'])
-    .not('image_url', 'is', null)
-    .order('created_at', { ascending: false })
-    .range(feedOffset, feedOffset + PAGE_SIZE - 1);
-
-  if (error) { console.error(error); return; }
-
-  const container = document.getElementById('feedContainer');
-  if (!append) container.innerHTML = '';
-
-  if (!posts || posts.length === 0) {
-    if (!append) {
-      container.innerHTML = `
-        <div class="empty-feed">
-          <div class="empty-feed-icon">🌅</div>
-          <div class="empty-feed-text">No photos yet</div>
-          <div class="empty-feed-sub">Be the first to post!</div>
-        </div>`;
+  // ── DAILY LIMIT ──
+  async function checkDailyLimit() {
+    const today = new Date().toISOString().split('T')[0];
+    const { data } = await sb.from('analyses').select('id')
+      .eq('user_id', currentUser.id)
+      .eq('source', 'feed')
+      .gte('created_at', today+'T00:00:00Z')
+      .lte('created_at', today+'T23:59:59Z');
+    const used = (data||[]).length;
+    const left = Math.max(0, 3-used);
+    document.getElementById('postsLeft').textContent = left;
+    document.getElementById('limitDisplay').textContent = left;
+    if(left===0) {
+      document.getElementById('postBtn').disabled = true;
+      document.getElementById('postBtn').textContent = '📅 Limit reached';
+    } else {
+      document.getElementById('postBtn').disabled = false;
+      document.getElementById('postBtn').textContent = '📷 Post a Photo';
     }
-    document.getElementById('loadMoreBtn').style.display = 'none';
-    return;
+    return left;
   }
 
-  posts.forEach(post => {
-    const card = buildFeedCard(post);
-    container.insertAdjacentHTML('beforeend', card);
-  });
+  // ── LOAD LIKES ──
+  async function loadMyLikes() {
+    const { data } = await sb.from('likes').select('analysis_id').eq('user_id', currentUser.id);
+    likedSet = new Set((data||[]).map(r => r.analysis_id));
+  }
 
-  feedOffset += posts.length;
-  document.getElementById('loadMoreBtn').style.display = posts.length === PAGE_SIZE ? 'block' : 'none';
-}
+  // ── LOAD LIKE COUNTS ──
+  async function loadLikeCounts() {
+    if(!feedItems.length) return;
+    const ids = feedItems.map(d => d.id);
+    try {
+      const { data } = await sb.from('likes').select('analysis_id').in('analysis_id', ids);
+      const counts = {};
+      (data||[]).forEach(r => { counts[r.analysis_id] = (counts[r.analysis_id]||0)+1; });
+      ids.forEach(id => {
+        const el = document.getElementById('lc-'+id);
+        if(el) el.textContent = counts[id]||0;
+      });
+    } catch(e) {}
+  }
 
-function buildFeedCard(post) {
-  const name = post.profiles?.display_name || 'Photographer';
-  const initials = name.charAt(0).toUpperCase();
-  const avatar = post.profiles?.avatar_url
-    ? `<img src="${post.profiles.avatar_url}" />`
-    : initials;
+  // ── LOAD FEED ──
+  async function loadFeed(reset=false) {
+    if(reset) { pageNum=0; allLoaded=false; feedItems=[]; document.getElementById('feedContainer').innerHTML='<div class="feed-loading"><div class="feed-spinner"></div></div>'; }
+    if(allLoaded) return;
 
-  const timeAgo = getTimeAgo(post.created_at);
-  const isLiked = likedPosts.has(post.id);
-  const isOwn = post.user_id === currentUser?.id;
-  const sourceTag = post.source === 'challenge'
-    ? `<span style="font-size:10px;background:#FFF8E7;border:1px solid #F0D080;border-radius:20px;padding:2px 8px;color:var(--gold);font-weight:600;margin-left:6px">🏆 Challenge</span>`
-    : '';
+    const { data, error } = await sb.from('analyses')
+      .select('id,user_id,display_name,overall,subject_focus,color_contrast,composition,lighting,background_blur,framing,summary,improvements,thumbnail,image_url,created_at')
+      .eq('source','feed')
+      .order('created_at', { ascending:false })
+      .range(pageNum*PAGE_SIZE, (pageNum+1)*PAGE_SIZE-1);
 
-  return `
-    <div class="feed-card" id="card-${post.id}">
-      <div class="feed-card-header">
-        <div class="feed-avatar">${avatar}</div>
-        <div class="feed-user-info">
-          <div class="feed-username">${escHtml(name)}${sourceTag}</div>
-          <div class="feed-time">${timeAgo}</div>
+    if(error||!data) {
+      document.getElementById('feedContainer').innerHTML='<div class="feed-empty"><span class="feed-empty-icon">😕</span><p>Could not load feed.</p></div>';
+      return;
+    }
+
+    feedItems = [...feedItems, ...data];
+    pageNum++;
+    if(data.length < PAGE_SIZE) { allLoaded=true; document.getElementById('loadMoreBtn').style.display='none'; }
+    else document.getElementById('loadMoreBtn').style.display='block';
+
+    renderFeed();
+    setTimeout(loadLikeCounts, 100);
+  }
+
+  function renderFeed() {
+    const container = document.getElementById('feedContainer');
+    if(!feedItems.length) {
+      container.innerHTML='<div class="feed-empty"><span class="feed-empty-icon">📷</span><p>No posts yet. Be the first to post a photo!</p></div>';
+      return;
+    }
+    container.innerHTML = feedItems.map((item,i) => renderCard(item,i)).join('');
+  }
+
+  function renderCard(item, i) {
+    const init = (item.display_name||'A').charAt(0).toUpperCase();
+    const src  = item.thumbnail ? 'data:image/jpeg;base64,'+item.thumbnail : (item.image_url||null);
+    const liked = likedSet.has(item.id);
+    const score = item.overall||0;
+    const catPills = CATS.map(c => {
+      const v = item[c.key]; if(!v) return '';
+      return `<span class="cat-pill" style="color:${c.color};border-color:${c.color}33;background:${c.color}11">${v} ${c.label.split(' ')[0]}</span>`;
+    }).join('');
+
+    return `<div class="feed-card" style="animation-delay:${(i%PAGE_SIZE)*0.04}s">
+      <div class="card-header">
+        <div class="card-avatar" onclick="goProfile('${esc(item.user_id)}')">${esc(init)}</div>
+        <div class="card-user">
+          <div class="card-name" onclick="goProfile('${esc(item.user_id)}')">${esc(item.display_name||'Photographer')}</div>
+          <div class="card-time">${timeAgo(item.created_at)}</div>
         </div>
-        ${post.score ? `<div class="feed-score-badge">⭐ ${post.score}</div>` : ''}
+        <div class="card-score" style="color:${scoreColor(score)}">${score}<span>/10</span></div>
       </div>
-      <img class="feed-image" src="${post.image_url}" loading="lazy" />
-      <div class="feed-card-footer">
-        <div class="feed-actions">
-          <button
-            class="like-btn ${isLiked ? 'liked' : ''}"
-            id="like-btn-${post.id}"
-            onclick="toggleLike('${post.id}', ${isLiked})"
-          >
-            <svg fill="${isLiked ? '#E53935' : 'none'}" stroke="${isLiked ? '#E53935' : 'currentColor'}" stroke-width="1.8" viewBox="0 0 24 24">
-              <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
-            </svg>
-            <span id="like-count-${post.id}">Like</span>
-          </button>
-        </div>
-        ${post.caption ? `<div class="feed-caption"><span class="bold">${escHtml(name)}</span> ${escHtml(post.caption)}</div>` : ''}
-        ${post.feedback ? `<div class="feed-feedback">💬 ${escHtml(post.feedback)}</div>` : ''}
+      ${src
+        ? `<div class="card-photo" onclick="openDetail('${esc(item.id)}')"><img src="${esc(src)}" loading="lazy" alt="" onerror="this.parentElement.innerHTML='<div class=\\'card-photo-empty\\'>📷</div>'"></div>`
+        : `<div class="card-photo-empty">📷</div>`}
+      ${item.summary ? `<div class="card-summary">${esc(item.summary)}</div>` : ''}
+      ${catPills ? `<div class="card-cats">${catPills}</div>` : ''}
+      <div class="card-actions">
+        <button class="like-btn${liked?' liked':''}" id="lb-${esc(item.id)}" onclick="toggleLike('${esc(item.id)}')">
+          ${liked?'❤️':'🤍'} <span id="lc-${esc(item.id)}">—</span>
+        </button>
+        <button class="see-more-btn" onclick="openDetail('${esc(item.id)}')">See full analysis →</button>
       </div>
     </div>`;
-}
+  }
 
-async function toggleLike(analysisId, isCurrentlyLiked) {
-  if (!currentUser) return;
-  const btn = document.getElementById(`like-btn-${analysisId}`);
-  const countEl = document.getElementById(`like-count-${analysisId}`);
+  function loadMore() { loadFeed(false); }
 
-  try {
-    if (isCurrentlyLiked) {
-      await sb.from('likes').delete()
-        .eq('user_id', currentUser.id)
-        .eq('analysis_id', analysisId);
-      likedPosts.delete(analysisId);
-      btn.classList.remove('liked');
-      btn.querySelector('svg').setAttribute('fill', 'none');
-      btn.querySelector('svg').setAttribute('stroke', 'currentColor');
-      btn.onclick = () => toggleLike(analysisId, false);
+  // ── LIKE ──
+  async function toggleLike(id) {
+    const liked = likedSet.has(id);
+    const btn   = document.getElementById('lb-'+id);
+    const cnt   = document.getElementById('lc-'+id);
+    const n     = parseInt(cnt?.textContent)||0;
+    if(liked) {
+      likedSet.delete(id);
+      if(btn) { btn.classList.remove('liked'); btn.innerHTML=`🤍 <span id="lc-${id}">${Math.max(0,n-1)}</span>`; }
+      await sb.from('likes').delete().eq('user_id',currentUser.id).eq('analysis_id',id);
     } else {
-      await sb.from('likes').insert({ user_id: currentUser.id, analysis_id: analysisId });
-      likedPosts.add(analysisId);
-      btn.classList.add('liked');
-      btn.querySelector('svg').setAttribute('fill', '#E53935');
-      btn.querySelector('svg').setAttribute('stroke', '#E53935');
-      btn.onclick = () => toggleLike(analysisId, true);
+      likedSet.add(id);
+      if(btn) { btn.classList.add('liked'); btn.innerHTML=`❤️ <span id="lc-${id}">${n+1}</span>`; }
+      await sb.from('likes').upsert({user_id:currentUser.id,analysis_id:id},{onConflict:'user_id,analysis_id'});
     }
-  } catch (e) {
-    showToast('Like feature coming soon!');
   }
-}
 
-// ── SUBMIT FLOW ──
-function triggerPicker() {
-  if (todayCount >= 3) return;
-  const input = document.getElementById('photoFileInput');
-  input.value = '';
-  input.onchange = handleFileChosen;
-  input.click();
-}
+  // ── DETAIL MODAL ──
+  function openDetail(id) {
+    const item = feedItems.find(d => d.id===id);
+    if(!item) return;
+    const src = item.thumbnail?'data:image/jpeg;base64,'+item.thumbnail:(item.image_url||null);
+    const score = item.overall||0;
 
-function handleFileChosen(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  selectedFile = file;
+    document.getElementById('mPhoto').innerHTML = src
+      ? `<img src="${esc(src)}" style="width:100%;object-fit:cover;display:block;max-height:280px" alt="">`
+      : '';
+    document.getElementById('mAv').textContent  = (item.display_name||'A').charAt(0).toUpperCase();
+    document.getElementById('mName').textContent = item.display_name||'Photographer';
+    document.getElementById('mTime').textContent = timeAgo(item.created_at);
+    const scoreEl = document.getElementById('mScore');
+    scoreEl.textContent = score; scoreEl.style.color = scoreColor(score);
+    document.getElementById('mSummary').textContent = item.summary||'';
 
-  const reader = new FileReader();
-  reader.onload = ev => {
-    const picker = document.getElementById('photoPicker');
-    picker.classList.add('has-image');
-    picker.innerHTML = `<img src="${ev.target.result}" />`;
-    picker.onclick = triggerPicker; // allow re-pick
-    document.getElementById('submitBtn').disabled = false;
-    document.getElementById('submitBtn').textContent = 'Post to Feed';
-  };
-  reader.readAsDataURL(file);
-}
+    document.getElementById('mBars').innerHTML = CATS.map(c => {
+      const v = item[c.key]||0;
+      return `<div class="bar-row">
+        <div class="bar-lbl">${c.label}</div>
+        <div class="bar-track"><div class="bar-fill" style="background:${c.color}" data-w="${v*10}%"></div></div>
+        <div class="bar-val" style="color:${c.color}">${v}</div>
+      </div>`;
+    }).join('');
 
-async function submitFeedPhoto() {
-  if (!selectedFile || todayCount >= 3) return;
+    const imps = parseImps(item.improvements);
+    document.getElementById('mImps').innerHTML = imps.length
+      ? `<div class="modal-section-label" style="margin-top:1rem">How to Improve</div>`
+        + imps.map((imp,i)=>`<div class="imp-item">
+            <div class="imp-num">${i+1}</div>
+            <div><div class="imp-title">${esc(imp.title||imp)}</div>${imp.desc?`<div class="imp-desc">${esc(imp.desc)}</div>`:''}</div>
+          </div>`).join('')
+      : '';
 
-  const btn = document.getElementById('submitBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<div class="analyzing-spinner" style="width:18px;height:18px;border-width:2px"></div> Posting…';
-  document.getElementById('analyzingOverlay').classList.add('open');
+    document.getElementById('detailOverlay').classList.add('open');
+    document.body.style.overflow='hidden';
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      document.querySelectorAll('.bar-fill').forEach(el=>{ el.style.width=el.dataset.w; });
+    }));
+  }
+  function closeDetail() { document.getElementById('detailOverlay').classList.remove('open'); document.body.style.overflow=''; }
+  function goProfile(uid) { window.location.href='profile.html?user='+uid; }
 
-  try {
-    const base64 = await fileToBase64(selectedFile);
-    const caption = document.getElementById('captionInput').value.trim();
+  // ── SUBMIT MODAL ──
+  function openSubmit()  { document.getElementById('sOverlay').classList.add('open'); document.body.style.overflow='hidden'; }
+  function closeSubmit() {
+    document.getElementById('sOverlay').classList.remove('open');
+    document.body.style.overflow='';
+    removeFile();
+    document.getElementById('sError').classList.remove('show');
+    document.getElementById('sLoading').style.display='none';
+    document.getElementById('analyseBtn').style.display='block';
+    document.getElementById('analyseBtn').disabled=true;
+  }
 
-    // AI analysis
-    const result = await analyzePhoto(base64);
+  // ── FILE HANDLING ──
+  function onDragOver(e) { e.preventDefault(); document.getElementById('dropZone').classList.add('drag'); }
+  function onDragLeave()  { document.getElementById('dropZone').classList.remove('drag'); }
+  function onDrop(e)      { e.preventDefault(); document.getElementById('dropZone').classList.remove('drag'); handleFile(e.dataTransfer.files[0]); }
+  function onFileChange(e){ handleFile(e.target.files[0]); }
 
-    // Upload to storage
-    const fileName = `feed/${currentUser.id}/${Date.now()}.jpg`;
-    const byteArr = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
-    const blob = new Blob([byteArr], { type: 'image/jpeg' });
-    const { data: uploadData } = await sb.storage.from('photos').upload(fileName, blob);
-    let imageUrl = null;
-    if (uploadData?.path) {
-      const { data: urlData } = sb.storage.from('photos').getPublicUrl(uploadData.path);
-      imageUrl = urlData?.publicUrl;
-    }
+  function handleFile(file) {
+    if(!file) return;
+    if(!['image/jpeg','image/png','image/webp'].includes(file.type)) { showSError('Please select a JPG, PNG or WEBP image.'); return; }
+    if(file.size > 5*1024*1024) { showSError('Image must be under 5MB.'); return; }
+    const reader = new FileReader();
+    reader.onload = e => {
+      const url = e.target.result;
+      const img = new Image();
+      img.onload = () => {
+        const MAX=1024; let w=img.width, h=img.height;
+        if(w>h&&w>MAX){h=Math.round(h*MAX/w);w=MAX;}else if(h>MAX){w=Math.round(w*MAX/h);h=MAX;}
+        const c=document.createElement('canvas'); c.width=w; c.height=h;
+        c.getContext('2d').drawImage(img,0,0,w,h);
+        uploadB64 = c.toDataURL('image/jpeg',0.92).split(',')[1];
+        uploadMime = 'image/jpeg'; previewUrl = url;
+        document.getElementById('previewImg').src = url;
+        document.getElementById('previewWrap').style.display='block';
+        document.getElementById('dropZone').style.display='none';
+        document.getElementById('analyseBtn').disabled=false;
+      };
+      img.src=url;
+    };
+    reader.readAsDataURL(file);
+  }
 
-    // Save
-    await sb.from('analyses').insert({
-      user_id: currentUser.id,
-      source: 'feed',
-      score: result.score,
-      composition_score: result.composition,
-      lighting_score: result.lighting,
-      color_score: result.color,
-      focus_score: result.focus,
-      feedback: result.feedback,
-      caption: caption || null,
-      image_url: imageUrl,
-      created_at: new Date().toISOString()
+  function removeFile() {
+    uploadB64=null; uploadMime=null; previewUrl=null;
+    document.getElementById('previewWrap').style.display='none';
+    document.getElementById('dropZone').style.display='flex';
+    document.getElementById('analyseBtn').disabled=true;
+    document.getElementById('fileInput').value='';
+  }
+  function showSError(msg) { const el=document.getElementById('sError'); el.textContent=msg; el.classList.add('show'); }
+
+  // ── THUMBNAIL ──
+  async function generateThumb(dataUrl) {
+    return new Promise(resolve => {
+      const img=new Image();
+      img.onload=()=>{
+        const MAX=600; let w=img.width,h=img.height;
+        if(w>h&&w>MAX){h=Math.round(h*MAX/w);w=MAX;}else if(h>MAX){w=Math.round(w*MAX/h);h=MAX;}
+        const c=document.createElement('canvas'); c.width=w; c.height=h;
+        c.getContext('2d').drawImage(img,0,0,w,h);
+        resolve(c.toDataURL('image/jpeg',0.85).split(',')[1]);
+      };
+      img.onerror=()=>resolve(null);
+      img.src=dataUrl;
     });
-
-    todayCount++;
-    updateLimitUI();
-
-    // Reset form
-    document.getElementById('analyzingOverlay').classList.remove('open');
-    const picker = document.getElementById('photoPicker');
-    picker.classList.remove('has-image');
-    picker.innerHTML = `<div class="picker-icon">📷</div><div class="picker-label">Tap to choose a photo</div><div class="picker-sub">JPG, PNG · Max 10MB</div>`;
-    picker.onclick = triggerPicker;
-    document.getElementById('captionInput').value = '';
-    selectedFile = null;
-    btn.disabled = false;
-    btn.textContent = 'Post to Feed';
-
-    // Show score toast
-    document.getElementById('toastScore').textContent = result.score;
-    document.getElementById('toastFeedback').textContent = result.feedback;
-    document.getElementById('scoreToast').classList.add('show');
-
-    // Reload feed
-    await loadFeed();
-
-  } catch (err) {
-    console.error('Submit error:', err);
-    document.getElementById('analyzingOverlay').classList.remove('open');
-    showToast('Failed to post. Please try again.');
-    btn.disabled = false;
-    btn.textContent = 'Post to Feed';
   }
-}
 
-async function analyzePhoto(base64) {
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'anthropic-version': '2023-06-01' },
-    body: JSON.stringify({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 300,
-      messages: [{
-        role: 'user',
-        content: [
-          { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: base64 } },
-          { type: 'text', text: `You are an expert photography coach. Score this photo on: composition (0-100), lighting (0-100), color (0-100), focus (0-100), and overall (0-100). Provide 1-2 sentences of specific, encouraging feedback.
+  // ── SUBMIT ──
+  async function submitPhoto() {
+    if(!uploadB64) return;
+    const left = await checkDailyLimit();
+    if(left===0) { showSError("You've reached today's limit of 3 posts. Come back tomorrow!"); return; }
 
-Respond ONLY in this exact JSON format (no markdown):
-{"composition":75,"lighting":70,"color":65,"focus":80,"overall":73,"feedback":"Your feedback here."}` }
-        ]
-      }]
-    })
-  });
-  const data = await response.json();
-  const text = data.content?.[0]?.text || '{}';
-  try {
-    const parsed = JSON.parse(text.replace(/```json|```/g, '').trim());
-    return { score: parsed.overall || 70, composition: parsed.composition || 70, lighting: parsed.lighting || 70, color: parsed.color || 70, focus: parsed.focus || 70, feedback: parsed.feedback || 'Great shot!' };
-  } catch {
-    return { score: 70, composition: 70, lighting: 70, color: 70, focus: 70, feedback: 'Nice photo! Keep shooting.' };
+    document.getElementById('sError').classList.remove('show');
+    document.getElementById('sLoading').style.display='block';
+    document.getElementById('analyseBtn').style.display='none';
+
+    try {
+      const { data:{ session } } = await sb.auth.getSession();
+      const token = session?.access_token;
+
+      const resp = await fetch(window.location.origin+'/api/analyse', {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json', ...(token?{Authorization:'Bearer '+token}:{}) },
+        body: JSON.stringify({
+          imageContent: { type:'image', source:{ type:'base64', media_type:uploadMime, data:uploadB64 } }
+        })
+      });
+
+      const raw = await resp.text();
+      let parsed; try { parsed=JSON.parse(raw); } catch { throw new Error('Invalid server response'); }
+
+      if(resp.status===429) { showSError(parsed.message||'Daily limit reached.'); document.getElementById('sLoading').style.display='none'; document.getElementById('analyseBtn').style.display='block'; return; }
+      if(!resp.ok)          { throw new Error(parsed.error||'Analysis failed'); }
+      if(parsed.rejected)   { showSError('Real photos only — '+parsed.reason); document.getElementById('sLoading').style.display='none'; document.getElementById('analyseBtn').style.display='block'; return; }
+
+      // Save with source='feed'
+      const thumb = await generateThumb(previewUrl);
+      parsed.source = 'feed';
+      const { error } = await saveAnalysis(currentUser, 'feed-post', parsed, thumb);
+      if(error) throw new Error(error.message);
+
+      closeSubmit();
+      showToast('Posted! ✓ Your photo is now in the feed.');
+      await checkDailyLimit();
+      await loadFeed(true);
+      await loadLikeCounts();
+
+    } catch(err) {
+      showSError('Failed: '+err.message);
+      document.getElementById('sLoading').style.display='none';
+      document.getElementById('analyseBtn').style.display='block';
+    }
   }
-}
 
-function loadMore() { loadFeed(true); }
+  // ── INIT ──
+  async function init() {
+    const timeout = setTimeout(()=>{ window.location.href='login.html'; }, 5000);
+    try {
+      initSupabase();
+      currentUser = await getUser();
+      clearTimeout(timeout);
+      if(!currentUser) { window.location.href='login.html'; return; }
+      document.body.classList.add('auth-ready');
+      renderNavAuth();
+      await Promise.all([loadMyLikes(), checkDailyLimit(), loadFeed(true)]);
+      await loadLikeCounts();
+    } catch(e) {
+      clearTimeout(timeout);
+      window.location.href='login.html';
+    }
+  }
 
-function closeScoreToast() { document.getElementById('scoreToast').classList.remove('show'); }
-
-async function fileToBase64(file) {
-  return new Promise((res, rej) => {
-    const r = new FileReader();
-    r.onload = e => res(e.target.result.split(',')[1]);
-    r.onerror = rej;
-    r.readAsDataURL(file);
-  });
-}
-
-function getTimeAgo(iso) {
-  const diff = Date.now() - new Date(iso).getTime();
-  const m = Math.floor(diff / 60000);
-  if (m < 1) return 'just now';
-  if (m < 60) return `${m}m ago`;
-  const h = Math.floor(m / 60);
-  if (h < 24) return `${h}h ago`;
-  return `${Math.floor(h / 24)}d ago`;
-}
-
-function escHtml(str) {
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3000);
-}
-
-init();
+  init();
 </script>
 </body>
 </html>
