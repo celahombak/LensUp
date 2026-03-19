@@ -170,7 +170,7 @@
 
   <script>
     initSupabase();
-    (async () => { const user = await getUser(); if (user) window.location.href = 'learn.html'; })();
+    (async () => { const user = await getUser(); if (user) window.location.href = 'dashboard.html'; })();
 
     function showError(msg) {
       const el = document.getElementById('errorAlert');
@@ -236,7 +236,7 @@
         localStorage.setItem('lensup_name', name);
         showSuccess('Account created! Check your email to confirm, then sign in.');
         btn.textContent = 'Account Created ✓';
-        setTimeout(() => window.location.href = 'learn.html', 2000);
+        setTimeout(() => window.location.href = 'dashboard.html', 2000);
       }
     }
   </script>

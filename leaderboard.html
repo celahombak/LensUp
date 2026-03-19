@@ -223,27 +223,48 @@
       <a href="profile.html" class="nav-link">Profile</a>
       <span id="navAuthArea"></span>
     </div>
-    <button class="nav-burger" id="navBurger" onclick="openMobileMenu()" aria-label="Menu">
+  <button class="nav-burger" id="navBurger" onclick="openMobileMenu()" aria-label="Menu">
     <span></span><span></span><span></span>
   </button>
   </nav>
 
   <!-- MOBILE OVERLAY MENU -->
-  <div class="mobile-menu" id="mobileMenu">
-    <button class="mobile-menu-close" onclick="closeMobileMenu()">✕</button>
-    <div class="mobile-menu-logo">Lens<span>Up</span></div>
-    <a href="compete.html" class="">⚔️ Challenge</a>
-    <a href="app.html" class="">📷 Analyse</a>
-    <a href="leaderboard.html" class="leaderboard active">🏆 Leaderboard</a>
-    <a href="gallery.html" class="">🖼️ Gallery</a>
-    <a href="profile.html" class="">👤 Profile</a>
-    <a href="learn.html" class="">📚 Learn</a>
-    <div class="mobile-menu-divider"></div>
+          <div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-menu-close" onclick="closeMobileMenu()">✕</button>
+  <div class="mobile-menu-logo">Lens<span>Up</span></div>
+  <a href="dashboard.html">🏠 Dashboard</a>
+  <a href="learn.html">📚 Learn</a>
+  <a href="feed.html">🖼️ Feed</a>
+  <a href="compete.html">⚔️ Challenge</a>
+  <a href="leaderboard.html" class="active">🏆 Leaderboard</a>
+  <a href="profile.html">👤 Profile</a>
+  <div class="mobile-menu-divider"></div>
+  <div class="mobile-menu-auth">
+    <span id="mobileMenuUser"></span>
+    <button class="mobile-menu-signout" onclick="signOut()">Sign Out</button>
+  </div>
+</div>
+
+
+  <!-- <div class="mobile-menu-auth">
+    <span id="mobileMenuUser"></span>
+    <button class="mobile-menu-signout" onclick="signOut()">Sign Out</button>
+  </div>
+</div>
+
+
+  <div class="mobile-menu-auth">
+    <span id="mobileMenuUser"></span>
+    <button class="mobile-menu-signout" onclick="signOut()">Sign Out</button>
+  </div>
+</div>
+
+
     <div class="mobile-menu-auth">
       <span id="mobileMenuUser"></span>
       <button class="mobile-menu-signout" onclick="signOut()">Sign Out</button>
     </div>
-  </div>
+  </div> -->
 
   <!-- HERO -->
   <div class="page-hero">
@@ -461,7 +482,7 @@
   </script>
 
   <!-- BOTTOM NAV -->
-  <div class="bottom-nav">
+          <div class="bottom-nav">
     <div class="bottom-nav-inner">
       <a href="compete.html" class="bottom-nav-item">
         <span class="bottom-nav-icon">⚔️</span>
@@ -485,5 +506,6 @@
       </a>
     </div>
   </div>
+
 </body>
 </html>

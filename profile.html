@@ -144,36 +144,57 @@
 <body>
 
   <nav>
-    <a href="index.html" class="nav-logo">Lens<span>Up</span></a>
-    <div class="nav-links">
+    <a href="dashboard.html" class="nav-logo">Lens<span>Up</span></a>
+              <div class="nav-links">
+      <a href="dashboard.html" class="nav-link">🏠 Dashboard</a>
+      <a href="learn.html" class="nav-link">📚 Learn</a>
+      <a href="feed.html" class="nav-link">🖼️ Feed</a>
       <a href="compete.html" class="nav-link">⚔️ Challenge</a>
       <a href="leaderboard.html" class="nav-link">🏆 Leaderboard</a>
-      <a href="learn.html" class="nav-link">Learn</a>
-      <a href="app.html" class="nav-link">Analyse</a>
-      <a href="gallery.html" class="nav-link">Gallery</a>
-      <a href="profile.html" class="nav-link active">Profile</a>
+      <a href="profile.html" class="nav-link active">👤 Profile</a>
       <span id="navAuthArea"></span>
     </div>
-    <button class="nav-burger" id="navBurger" onclick="openMobileMenu()" aria-label="Menu">
+  <button class="nav-burger" id="navBurger" onclick="openMobileMenu()" aria-label="Menu">
       <span></span><span></span><span></span>
     </button>
   </nav>
 
-  <div class="mobile-menu" id="mobileMenu">
-    <button class="mobile-menu-close" onclick="closeMobileMenu()">✕</button>
-    <div class="mobile-menu-logo">Lens<span>Up</span></div>
-    <a href="compete.html">⚔️ Challenge</a>
-    <a href="app.html">📷 Analyse</a>
-    <a href="leaderboard.html">🏆 Leaderboard</a>
-    <a href="gallery.html">🖼️ Gallery</a>
-    <a href="profile.html" class="active">👤 Profile</a>
-    <a href="learn.html">📚 Learn</a>
-    <div class="mobile-menu-divider"></div>
-    <div class="mobile-menu-auth">
+        <div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-menu-close" onclick="closeMobileMenu()">✕</button>
+  <div class="mobile-menu-logo">Lens<span>Up</span></div>
+  <a href="dashboard.html">🏠 Dashboard</a>
+  <a href="learn.html">📚 Learn</a>
+  <a href="feed.html">🖼️ Feed</a>
+  <a href="compete.html">⚔️ Challenge</a>
+  <a href="leaderboard.html">🏆 Leaderboard</a>
+  <a href="profile.html" class="active">👤 Profile</a>
+  <div class="mobile-menu-divider"></div>
+  <div class="mobile-menu-auth">
+    <span id="mobileMenuUser"></span>
+    <button class="mobile-menu-signout" onclick="signOut()">Sign Out</button>
+  </div>
+</div>
+
+
+  <!-- <div class="mobile-menu-auth">
+    <span id="mobileMenuUser"></span>
+    <button class="mobile-menu-signout" onclick="signOut()">Sign Out</button>
+  </div> -->
+<!-- </div> -->
+
+
+  <!-- <div class="mobile-menu-auth">
+    <span id="mobileMenuUser"></span>
+    <button class="mobile-menu-signout" onclick="signOut()">Sign Out</button>
+  </div> -->
+<!-- </div> -->
+
+
+    <!-- <div class="mobile-menu-auth">
       <span id="mobileMenuUser"></span>
       <button class="mobile-menu-signout" onclick="signOut()">Sign Out</button>
-    </div>
-  </div>
+    </div> -->
+  <!-- </div> -->
 
   <div class="page-hero">
     <div class="hero-inner">
@@ -531,12 +552,13 @@
     init();
   </script>
 
-  <div class="bottom-nav">
+          <div class="bottom-nav">
     <div class="bottom-nav-inner">
+      <a href="dashboard.html" class="bottom-nav-item"><span class="bottom-nav-icon">🏠</span><span>Home</span></a>
+      <a href="learn.html" class="bottom-nav-item"><span class="bottom-nav-icon">📚</span><span>Learn</span></a>
+      <a href="feed.html" class="bottom-nav-item"><span class="bottom-nav-icon">🖼️</span><span>Feed</span></a>
       <a href="compete.html" class="bottom-nav-item"><span class="bottom-nav-icon">⚔️</span><span>Challenge</span></a>
-      <a href="app.html" class="bottom-nav-item"><span class="bottom-nav-icon">📷</span><span>Analyse</span></a>
       <a href="leaderboard.html" class="bottom-nav-item"><span class="bottom-nav-icon">🏆</span><span>Ranks</span></a>
-      <a href="gallery.html" class="bottom-nav-item"><span class="bottom-nav-icon">🖼️</span><span>Gallery</span></a>
       <a href="profile.html" class="bottom-nav-item active"><span class="bottom-nav-icon">👤</span><span>Profile</span></a>
     </div>
   </div>
