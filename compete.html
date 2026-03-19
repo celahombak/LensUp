@@ -137,46 +137,6 @@
     .coming-countdown { font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem; letter-spacing: 0.06em; }
     .coming-lock { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mid); border: 1px solid var(--border); padding: 0.3rem 0.8rem; }
 
-
-    /* PAST CHALLENGES */
-    .past-section { max-width: 960px; margin: 0 auto; padding: 0 2rem 5rem; }
-    .section-header { display: flex; align-items: center; justify-content: space-between; padding: 2.5rem 0 1.2rem; border-top: 1px solid var(--border); flex-wrap: wrap; gap: 0.8rem; }
-    .section-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; letter-spacing: 0.06em; }
-    .section-sub { font-size: 0.72rem; color: var(--mid); }
-    .past-list { display: flex; flex-direction: column; gap: 1px; background: var(--border); }
-    .past-row { background: var(--dark); display: flex; align-items: center; gap: 1rem; padding: 1rem 1.2rem; cursor: pointer; transition: background 0.15s; }
-    .past-row:hover { background: var(--dark2); }
-    .past-row.open { background: var(--dark2); border-bottom: 1px solid var(--border); }
-    .past-week-badge { font-family: 'Bebas Neue', sans-serif; font-size: 0.8rem; letter-spacing: 0.1em; color: var(--mid); background: rgba(255,255,255,0.04); border: 1px solid var(--border); padding: 0.2rem 0.6rem; flex-shrink: 0; }
-    .past-theme-name { font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem; letter-spacing: 0.04em; flex: 1; }
-    .past-winner { display: flex; align-items: center; gap: 0.6rem; flex-shrink: 0; }
-    .past-winner-label { font-size: 0.6rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--mid); }
-    .past-winner-name { font-size: 0.82rem; font-weight: 600; color: var(--gold); }
-    .past-winner-score { font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem; color: var(--gold); margin-left: 0.3rem; }
-    .past-count { font-size: 0.68rem; color: var(--mid); flex-shrink: 0; margin-left: auto; }
-    .past-chevron { color: var(--mid); font-size: 0.8rem; flex-shrink: 0; transition: transform 0.2s; }
-    .past-row.open .past-chevron { transform: rotate(180deg); }
-    .past-entries { display: none; background: rgba(8,8,8,0.5); border-bottom: 1px solid var(--border); }
-    .past-entries.show { display: block; }
-    .past-entries-inner { padding: 1.2rem; }
-    .past-entries-winner-bar { display: flex; align-items: center; gap: 1rem; background: rgba(232,184,75,0.06); border: 1px solid rgba(232,184,75,0.2); padding: 0.8rem 1rem; margin-bottom: 1rem; }
-    .winner-crown { font-size: 1.4rem; }
-    .winner-info { flex: 1; }
-    .winner-title { font-size: 0.62rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.2rem; }
-    .winner-name-big { font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem; letter-spacing: 0.04em; }
-    .winner-score-big { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; color: var(--gold); }
-    .past-entries-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 1px; background: var(--border); }
-    .past-entry-card { background: var(--dark); cursor: pointer; transition: background 0.15s; position: relative; }
-    .past-entry-card:hover { background: var(--dark2); }
-    .past-entry-thumb { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; background: var(--dark2); }
-    .past-entry-placeholder { width: 100%; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: var(--mid); background: var(--dark2); }
-    .past-entry-info { padding: 0.5rem 0.6rem; }
-    .past-entry-name { font-size: 0.72rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 0.1rem; }
-    .past-entry-score { font-family: 'Bebas Neue', sans-serif; font-size: 1rem; color: var(--gold); }
-    .past-entry-rank { position: absolute; top: 0.3rem; left: 0.3rem; font-size: 0.62rem; font-family: 'Bebas Neue', sans-serif; padding: 0.1rem 0.35rem; }
-    .past-loading { text-align: center; padding: 2rem; font-size: 0.82rem; color: var(--mid); }
-    .past-load-spinner { width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; vertical-align: middle; margin-right: 0.5rem; }
-
     @media (max-width: 700px) {
       nav { padding: 1rem 1.2rem; }
       .challenge-hero { padding: 1.8rem 1.2rem 1.5rem; }
@@ -276,13 +236,53 @@
       .bottom-nav { display: block; }
       body { padding-bottom: 60px; }
     }
+
+    /* PAST CHALLENGES */
+    .past-section { max-width: 960px; margin: 0 auto; padding: 0 2rem 5rem; }
+    .section-header { display: flex; align-items: center; justify-content: space-between; padding: 2.5rem 0 1.2rem; border-top: 1px solid var(--border); flex-wrap: wrap; gap: 0.8rem; }
+    .section-title { font-family: "Bebas Neue", sans-serif; font-size: 1.4rem; letter-spacing: 0.06em; }
+    .section-sub { font-size: 0.72rem; color: var(--mid); }
+    .past-list { display: flex; flex-direction: column; gap: 1px; background: var(--border); }
+    .past-row { background: var(--dark); display: grid; grid-template-columns: auto 1fr auto auto; align-items: center; gap: 1rem; padding: 1rem 1.2rem; cursor: pointer; transition: background 0.15s; }
+    .past-row:hover { background: var(--dark2); }
+    .past-week-badge { font-family: "Bebas Neue", sans-serif; font-size: 0.78rem; color: var(--mid); background: rgba(255,255,255,0.04); border: 1px solid var(--border); padding: 0.2rem 0.6rem; flex-shrink: 0; }
+    .past-theme-name { font-family: "Bebas Neue", sans-serif; font-size: 1.2rem; letter-spacing: 0.04em; }
+    .past-winner-block { text-align: right; }
+    .past-winner-label { font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--mid); }
+    .past-winner-name { font-size: 0.82rem; font-weight: 600; color: var(--gold); }
+    .past-winner-score { font-family: "Bebas Neue", sans-serif; font-size: 1rem; color: var(--gold); }
+    .past-chevron { color: var(--mid); font-size: 0.75rem; transition: transform 0.2s; }
+    .past-row.is-open .past-chevron { transform: rotate(180deg); }
+    .past-entries-panel { display: none; background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--border); padding: 1.2rem; }
+    .past-entries-panel.show { display: block; }
+    .winner-bar { display: flex; align-items: center; gap: 1rem; background: rgba(232,184,75,0.06); border: 1px solid rgba(232,184,75,0.2); padding: 0.8rem 1rem; margin-bottom: 1rem; }
+    .winner-bar-crown { font-size: 1.4rem; }
+    .winner-bar-info { flex: 1; }
+    .winner-bar-label { font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.2rem; }
+    .winner-bar-name { font-family: "Bebas Neue", sans-serif; font-size: 1.3rem; letter-spacing: 0.04em; }
+    .winner-bar-score { font-family: "Bebas Neue", sans-serif; font-size: 2rem; color: var(--gold); }
+    .past-entries-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 1px; background: var(--border); }
+    .pe-card { background: var(--dark); cursor: pointer; transition: background 0.15s; position: relative; }
+    .pe-card:hover { background: var(--dark2); }
+    .pe-thumb { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; background: var(--dark2); }
+    .pe-placeholder { width: 100%; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: var(--mid); background: var(--dark2); }
+    .pe-info { padding: 0.45rem 0.6rem; }
+    .pe-name { font-size: 0.7rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 0.1rem; }
+    .pe-score { font-family: "Bebas Neue", sans-serif; font-size: 1rem; color: var(--gold); }
+    .pe-rank { position: absolute; top: 0.3rem; left: 0.3rem; font-size: 1rem; line-height: 1; }
+    .past-loading-msg { padding: 1.5rem; text-align: center; font-size: 0.82rem; color: var(--mid); }
+    @media (max-width: 700px) {
+      .past-row { grid-template-columns: auto 1fr auto; }
+      .past-winner-block { display: none; }
+    }
+
   </style>
 </head>
 <body>
 
   <nav>
     <a href="dashboard.html" class="nav-logo">Lens<span>Up</span></a>
-              <div class="nav-links">
+      <div class="nav-links">
       <a href="dashboard.html" class="nav-link">🏠 Dashboard</a>
       <a href="learn.html" class="nav-link">📚 Learn</a>
       <a href="feed.html" class="nav-link">🖼️ Feed</a>
@@ -290,30 +290,27 @@
       <a href="leaderboard.html" class="nav-link">🏆 Leaderboard</a>
       <a href="profile.html" class="nav-link">👤 Profile</a>
       <span id="navAuthArea"></span>
-    </div>
-  <button class="nav-burger" id="navBurger" onclick="openMobileMenu()" aria-label="Menu">
+    </div><button class="nav-burger" id="navBurger" onclick="openMobileMenu()" aria-label="Menu">
     <span></span><span></span><span></span>
   </button>
   </nav>
 
   <!-- MOBILE OVERLAY MENU -->
-          <div class="mobile-menu" id="mobileMenu">
-  <button class="mobile-menu-close" onclick="closeMobileMenu()">✕</button>
-  <div class="mobile-menu-logo">Lens<span>Up</span></div>
-  <a href="dashboard.html">🏠 Dashboard</a>
-  <a href="learn.html">📚 Learn</a>
-  <a href="feed.html">🖼️ Feed</a>
-  <a href="compete.html" class="active">⚔️ Challenge</a>
-  <a href="leaderboard.html">🏆 Leaderboard</a>
-  <a href="profile.html">👤 Profile</a>
-  <div class="mobile-menu-divider"></div>
-  <div class="mobile-menu-auth">
-    <span id="mobileMenuUser"></span>
-    <button class="mobile-menu-signout" onclick="signOut()">Sign Out</button>
+    <div class="mobile-menu" id="mobileMenu">
+    <button class="mobile-menu-close" onclick="closeMobileMenu()">&#x2715;</button>
+    <div class="mobile-menu-logo">Lens<span>Up</span></div>
+    <a href="dashboard.html">🏠 Dashboard</a>
+    <a href="learn.html">📚 Learn</a>
+    <a href="feed.html">🖼️ Feed</a>
+    <a href="compete.html" class="active">⚔️ Challenge</a>
+    <a href="leaderboard.html">🏆 Leaderboard</a>
+    <a href="profile.html">👤 Profile</a>
+    <div class="mobile-menu-divider"></div>
+    <div class="mobile-menu-auth">
+      <span id="mobileMenuUser"></span>
+      <button class="mobile-menu-signout" onclick="signOut()">Sign Out</button>
+    </div>
   </div>
-</div>
-
-
 
 
   <!-- HERO — filled by JS -->
@@ -372,7 +369,7 @@
   <!-- PAST CHALLENGES -->
   <div class="past-section" id="pastSection" style="display:none">
     <div class="section-header">
-      <span class="section-title">🏛️ Past Challenges</span>
+      <span class="section-title">Past Challenges</span>
       <span class="section-sub" id="pastCount"></span>
     </div>
     <div class="past-list" id="pastList"></div>
@@ -647,179 +644,182 @@
     }
 
 
-    // ── PAST CHALLENGES ──
-    let pastThemes = [];
-    let pastEntriesCache = {};
+    // ─────────────────────────────────────────
+    // PAST CHALLENGES
+    // ─────────────────────────────────────────
+    var pastCache = {};
 
     async function loadPastChallenges() {
       try {
-        const { data, error } = await sb
-          .from('themes')
-          .select('*')
+        var res = await sb.from('themes').select('*')
           .lt('ends_at', new Date().toISOString())
           .order('ends_at', { ascending: false });
-
-        if (error || !data || !data.length) return;
-        pastThemes = data;
+        var data = res.data || [];
+        if (!data.length) return;
 
         document.getElementById('pastSection').style.display = 'block';
-        document.getElementById('pastCount').textContent = `${data.length} completed challenge${data.length !== 1 ? 's' : ''}`;
+        document.getElementById('pastCount').textContent =
+          data.length + ' completed challenge' + (data.length !== 1 ? 's' : '');
 
-        // Fetch winner (top entry) for each past theme
-        const list = document.getElementById('pastList');
-        list.innerHTML = data.map((t, i) =>
-          `<div class="past-row" id="prow-${i}" onclick="togglePast(${i}, '${t.name.replace(/'/g,"\'")}', '${t.id}')">
-            <span class="past-week-badge">WK ${t.week_number}</span>
-            <span class="past-theme-name">${t.name}</span>
-            <div class="past-winner" id="pwinner-${i}">
-              <div><div class="past-winner-label">Winner</div><div class="past-winner-name" id="pwname-${i}">Loading…</div></div>
-              <span class="past-winner-score" id="pwscore-${i}"></span>
-            </div>
-            <span class="past-chevron">▼</span>
-          </div>
-          <div class="past-entries" id="pentries-${i}"></div>`
-        ).join('');
-
-        // Load winners in parallel
-        data.forEach((t, i) => loadWinner(t, i));
-
-      } catch(e) {
-        console.warn('Past challenges failed:', e);
+        var html = '';
+        data.forEach(function(t, i) {
+          html +=
+            '<div class="past-row" id="pr' + i + '" onclick="expandPast(' + i + ',\'' +
+              t.name.replace(/\\/g,'\\\\').replace(/'/g,"\'") + '\',\'' + t.id + '\')">' +
+            '<span class="past-week-badge">WK ' + (t.week_number || '?') + '</span>' +
+            '<span class="past-theme-name">' + (t.name || '') + '</span>' +
+            '<div class="past-winner-block"><div class="past-winner-label">Winner</div>' +
+            '<div class="past-winner-name" id="pwn' + i + '">…</div>' +
+            '<div class="past-winner-score" id="pws' + i + '"></div></div>' +
+            '<span class="past-chevron" id="pc' + i + '">&#9660;</span></div>' +
+            '<div class="past-entries-panel" id="pp' + i + '"></div>';
+        });
+        document.getElementById('pastList').innerHTML = html;
+        data.forEach(function(t, i) { loadPastWinner(t, i); });
+      } catch(err) {
+        console.warn('Past load failed', err);
       }
     }
 
-    async function loadWinner(theme, idx) {
+    async function loadPastWinner(theme, idx) {
       try {
-        const { data } = await sb
-          .from('analyses')
-          .select('display_name, overall')
-          .eq('theme_name', theme.name)
-          .order('overall', { ascending: false })
-          .limit(1);
-
-        const winner = data?.[0];
-        if (winner) {
-          document.getElementById('pwname-'+idx).textContent = winner.display_name || 'Anonymous';
-          document.getElementById('pwscore-'+idx).textContent = winner.overall + '/10';
-        } else {
-          document.getElementById('pwname-'+idx).textContent = 'No entries';
-          document.getElementById('pwscore-'+idx).textContent = '';
+        var res = await sb.from('analyses').select('display_name, overall')
+          .eq('theme_name', theme.name).order('overall', { ascending: false }).limit(1);
+        var w = (res.data || [])[0];
+        var nameEl  = document.getElementById('pwn' + idx);
+        var scoreEl = document.getElementById('pws' + idx);
+        if (w && nameEl) {
+          nameEl.textContent  = w.display_name || 'Anonymous';
+          scoreEl.textContent = w.overall + '/10';
+        } else if (nameEl) {
+          nameEl.textContent = 'No entries';
         }
       } catch(e) {}
     }
 
-    async function togglePast(idx, themeName, themeId) {
-      const row = document.getElementById('prow-'+idx);
-      const panel = document.getElementById('pentries-'+idx);
-      const isOpen = row.classList.contains('open');
+    var openPastIdx = -1;
+    async function expandPast(idx, themeName, themeId) {
+      var row   = document.getElementById('pr' + idx);
+      var panel = document.getElementById('pp' + idx);
+      var chev  = document.getElementById('pc' + idx);
 
-      // Close all
-      document.querySelectorAll('.past-row.open').forEach(r => r.classList.remove('open'));
-      document.querySelectorAll('.past-entries.show').forEach(p => p.classList.remove('show'));
-
-      if (isOpen) return; // was open, just close it
-
-      row.classList.add('open');
+      // Close if already open
+      if (openPastIdx === idx) {
+        row.classList.remove('is-open');
+        panel.classList.remove('show');
+        openPastIdx = -1;
+        return;
+      }
+      // Close previously open
+      if (openPastIdx >= 0) {
+        var or = document.getElementById('pr' + openPastIdx);
+        var op = document.getElementById('pp' + openPastIdx);
+        if (or) or.classList.remove('is-open');
+        if (op) op.classList.remove('show');
+      }
+      openPastIdx = idx;
+      row.classList.add('is-open');
       panel.classList.add('show');
 
-      // Load entries if not cached
-      if (pastEntriesCache[themeId]) {
-        renderPastEntries(idx, pastEntriesCache[themeId]);
+      // Use cache if available
+      if (pastCache[themeId]) {
+        renderPastEntries(idx, pastCache[themeId]);
         return;
       }
 
-      panel.innerHTML = '<div class="past-loading"><div class="past-load-spinner"></div>Loading entries…</div>';
+      panel.innerHTML = '<div class="past-loading-msg">Loading entries…</div>';
 
       try {
-        const { data } = await sb
-          .from('analyses')
-          .select('id, user_id, display_name, overall, thumbnail, created_at')
+        var res = await sb.from('analyses')
+          .select('id, user_id, display_name, overall, subject_focus, color_contrast, composition, lighting, background_blur, framing, theme_relevance, summary, thumbnail, created_at')
           .eq('theme_name', themeName)
           .order('overall', { ascending: false });
-
-        pastEntriesCache[themeId] = data || [];
-        renderPastEntries(idx, data || []);
+        var entries = res.data || [];
+        pastCache[themeId] = entries;
+        renderPastEntries(idx, entries);
       } catch(e) {
-        panel.innerHTML = '<div class="past-loading">Could not load entries.</div>';
+        panel.innerHTML = '<div class="past-loading-msg">Could not load entries.</div>';
       }
     }
 
     function renderPastEntries(idx, entries) {
-      const panel = document.getElementById('pentries-'+idx);
+      var panel = document.getElementById('pp' + idx);
       if (!entries.length) {
-        panel.innerHTML = '<div class="past-loading">No entries were submitted for this challenge.</div>';
+        panel.innerHTML = '<div class="past-loading-msg">No entries were submitted.</div>';
         return;
       }
+      var winner = entries[0];
+      var isYouW = currentUser && winner.user_id === currentUser.id;
+      var winnerBar =
+        '<div class="winner-bar">' +
+        '<span class="winner-bar-crown">&#x1F3C6;</span>' +
+        '<div class="winner-bar-info">' +
+        '<div class="winner-bar-label">Challenge Winner</div>' +
+        '<div class="winner-bar-name">' + (winner.display_name || 'Anonymous') + (isYouW ? ' (you!)' : '') + '</div>' +
+        '</div>' +
+        '<span class="winner-bar-score">' + winner.overall + '/10</span>' +
+        '</div>';
 
-      const winner = entries[0];
-      const isYouWinner = currentUser && winner.user_id === currentUser.id;
-
-      const winnerBar = `
-        <div class="past-entries-winner-bar">
-          <span class="winner-crown">🏆</span>
-          <div class="winner-info">
-            <div class="winner-title">Challenge Winner</div>
-            <div class="winner-name-big">${winner.display_name || 'Anonymous'}${isYouWinner ? ' <span style="font-size:0.7rem;color:var(--gold)">— That's you!</span>' : ''}</div>
-          </div>
-          <span class="winner-score-big">${winner.overall}/10</span>
-        </div>`;
-
-      const grid = entries.map((e, i) => {
-        const isYou = currentUser && e.user_id === currentUser.id;
-        const thumb = e.thumbnail
-          ? `<img class="past-entry-thumb" src="data:image/jpeg;base64,${e.thumbnail}" loading="lazy" alt=""/>`
-          : `<div class="past-entry-placeholder">📷</div>`;
-        const rankBadge = i < 3
-          ? `<div class="past-entry-rank rank-${i+1}">${['🥇','🥈','🥉'][i]}</div>` : '';
-        return `
-          <div class="past-entry-card" onclick="openModal('${e.id}', ${JSON.stringify(entries)})">
-            ${rankBadge}${thumb}
-            <div class="past-entry-info">
-              <div class="past-entry-name">${e.display_name || 'Anonymous'}${isYou ? ' (you)' : ''}</div>
-              <div class="past-entry-score">${e.overall}/10</div>
-            </div>
-          </div>`;
+      var RANKS = ['&#x1F947;','&#x1F948;','&#x1F949;'];
+      var cards = entries.map(function(e, i) {
+        var isYou = currentUser && e.user_id === currentUser.id;
+        var thumb = e.thumbnail
+          ? '<img class="pe-thumb" src="data:image/jpeg;base64,' + e.thumbnail + '" loading="lazy" alt=""/>'
+          : '<div class="pe-placeholder">&#x1F4F7;</div>';
+        var rank = i < 3 ? '<span class="pe-rank">' + RANKS[i] + '</span>' : '';
+        // Store entry in pastCache to retrieve on modal open
+        return '<div class="pe-card" onclick="openPastModal('' + e.id + '',' + idx + ')">' +
+          rank + thumb +
+          '<div class="pe-info">' +
+          '<div class="pe-name">' + (e.display_name || 'Anonymous') + (isYou ? ' (you)' : '') + '</div>' +
+          '<div class="pe-score">' + e.overall + '/10</div>' +
+          '</div></div>';
       }).join('');
 
-      panel.innerHTML = `<div class="past-entries-inner">${winnerBar}<div class="past-entries-grid">${grid}</div></div>`;
+      panel.innerHTML = winnerBar + '<div class="past-entries-grid">' + cards + '</div>';
     }
 
-    // Extend openModal to accept an optional entries array (for past challenges)
-    const _originalOpenModal = openModal;
-    function openModal(id, entriesOverride) {
-      const entries = entriesOverride || allEntries;
-      const e = entries.find ? entries.find(x => x.id === id) : allEntries.find(x => x.id === id);
+    function openPastModal(entryId, pastIdx) {
+      // Find entry from the cached theme entries
+      var entries = [];
+      Object.values(pastCache).forEach(function(arr) {
+        var found = arr.find(function(x) { return x.id === entryId; });
+        if (found) entries.push(found);
+      });
+      var e = entries[0];
       if (!e) return;
-      const isYou = currentUser && e.user_id === currentUser.id;
-      const name  = e.display_name || 'Anonymous';
 
+      var isYou = currentUser && e.user_id === currentUser.id;
+      var name  = e.display_name || 'Anonymous';
       document.getElementById('modalName').innerHTML =
-        `${name}${isYou ? ' <span style="font-size:0.65rem;color:var(--gold);background:rgba(232,184,75,0.1);padding:0.1rem 0.5rem;">YOU</span>' : ''} — ${new Date(e.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' })}`;
+        name + (isYou ? ' <span style="font-size:0.65rem;color:var(--gold);background:rgba(232,184,75,0.1);padding:0.1rem 0.5rem;">YOU</span>' : '') +
+        ' &mdash; ' + new Date(e.created_at).toLocaleDateString('en-GB', {day:'numeric',month:'long',year:'numeric'});
       document.getElementById('modalPhoto').innerHTML = e.thumbnail
-        ? `<img src="data:image/jpeg;base64,${e.thumbnail}" alt="${name}" style="width:100%;height:100%;object-fit:contain;display:block;"/>`
-        : `<div class="modal-photo-placeholder">📷</div>`;
-      const scoreEl = document.getElementById('modalScore');
+        ? '<img src="data:image/jpeg;base64,' + e.thumbnail + '" alt="' + name + '" style="width:100%;height:100%;object-fit:contain;display:block;"/>'
+        : '<div class="modal-photo-placeholder">&#x1F4F7;</div>';
+      var scoreEl = document.getElementById('modalScore');
       scoreEl.textContent = e.overall;
       scoreEl.style.color = e.overall >= 7 ? 'var(--gold)' : e.overall >= 5 ? '#60a5fa' : '#fb923c';
       document.getElementById('modalVerdict').textContent = getVerdict(e.overall);
       document.getElementById('modalSummary').textContent = e.summary || '';
 
-      const catKeys = ['subject_focus','color_contrast','composition','lighting','background_blur','framing'];
+      var catKeys = ['subject_focus','color_contrast','composition','lighting','background_blur','framing'];
       if (e.theme_relevance) catKeys.push('theme_relevance');
-      document.getElementById('modalBars').innerHTML = catKeys.map(k => {
-        const score = e[k] || 0;
-        const color = CAT_COLORS[k];
-        return `<div class="modal-bar-row">
-          <div class="modal-bar-label">${CAT_LABELS[k]}</div>
-          <div class="modal-bar-track"><div class="modal-bar-fill" style="background:${color}" data-w="${score*10}%"></div></div>
-          <div class="modal-bar-val" style="color:${color}">${score}</div>
-        </div>`;
+      document.getElementById('modalBars').innerHTML = catKeys.map(function(k) {
+        var score = e[k] || 0;
+        var color = CAT_COLORS[k];
+        return '<div class="modal-bar-row">' +
+          '<div class="modal-bar-label">' + CAT_LABELS[k] + '</div>' +
+          '<div class="modal-bar-track"><div class="modal-bar-fill" style="background:' + color + '" data-w="' + (score*10) + '%"></div></div>' +
+          '<div class="modal-bar-val" style="color:' + color + '">' + score + '</div></div>';
       }).join('');
 
       document.getElementById('modalBg').classList.add('open');
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        document.querySelectorAll('.modal-bar-fill').forEach(el => { el.style.width = el.dataset.w; });
-      }));
+      requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+          document.querySelectorAll('.modal-bar-fill').forEach(function(el) { el.style.width = el.dataset.w; });
+        });
+      });
     }
 
     async function init() {
@@ -862,7 +862,7 @@
   </script>
 
   <!-- BOTTOM NAV -->
-          <div class="bottom-nav">
+    <div class="bottom-nav">
     <div class="bottom-nav-inner">
       <a href="dashboard.html" class="bottom-nav-item"><span class="bottom-nav-icon">🏠</span><span>Home</span></a>
       <a href="learn.html" class="bottom-nav-item"><span class="bottom-nav-icon">📚</span><span>Learn</span></a>
@@ -872,6 +872,5 @@
       <a href="profile.html" class="bottom-nav-item"><span class="bottom-nav-icon">👤</span><span>Profile</span></a>
     </div>
   </div>
-
 </body>
 </html>
