@@ -411,7 +411,10 @@
       <a href="feed.html" class="nav-link">🖼️ Feed</a>
       <a href="compete.html" class="nav-link">⚔️ Challenge</a>
       <a href="leaderboard.html" class="nav-link">🏆 Leaderboard</a>
-      <a href="profile.html" class="nav-link">👤 Profile</a>
+      <a href="learn.html" class="nav-link active">Learn</a>
+      <a href="app.html" class="nav-link">Analyse</a>
+      <a href="gallery.html" class="nav-link">Gallery</a>
+      <a href="profile.html" class="nav-link">Profile</a>
       <span id="navAuthArea"></span>
     </div>
   <button class="nav-burger" id="navBurger" onclick="openMobileMenu()" aria-label="Menu">
@@ -420,37 +423,16 @@
   </nav>
 
   <!-- MOBILE OVERLAY MENU -->
-          <div class="mobile-menu" id="mobileMenu">
-  <button class="mobile-menu-close" onclick="closeMobileMenu()">✕</button>
-  <div class="mobile-menu-logo">Lens<span>Up</span></div>
-  <a href="dashboard.html">🏠 Dashboard</a>
-  <a href="learn.html" class="active">📚 Learn</a>
-  <a href="feed.html">🖼️ Feed</a>
-  <a href="compete.html">⚔️ Challenge</a>
-  <a href="leaderboard.html">🏆 Leaderboard</a>
-  <a href="profile.html">👤 Profile</a>
-  <div class="mobile-menu-divider"></div>
-  <div class="mobile-menu-auth">
-    <span id="mobileMenuUser"></span>
-    <button class="mobile-menu-signout" onclick="signOut()">Sign Out</button>
-  </div>
-</div>
-
-
-  <div class="mobile-menu-auth">
-    <span id="mobileMenuUser"></span>
-    <button class="mobile-menu-signout" onclick="signOut()">Sign Out</button>
-  </div>
-</div>
-
-
-  <div class="mobile-menu-auth">
-    <span id="mobileMenuUser"></span>
-    <button class="mobile-menu-signout" onclick="signOut()">Sign Out</button>
-  </div>
-</div>
-
-
+  <div class="mobile-menu" id="mobileMenu">
+    <button class="mobile-menu-close" onclick="closeMobileMenu()">✕</button>
+    <div class="mobile-menu-logo">Lens<span>Up</span></div>
+    <a href="compete.html" class="">⚔️ Challenge</a>
+    <a href="app.html" class="">📷 Analyse</a>
+    <a href="leaderboard.html" class="">🏆 Leaderboard</a>
+    <a href="gallery.html" class="">🖼️ Gallery</a>
+    <a href="profile.html" class="">👤 Profile</a>
+    <a href="learn.html" class="learn active">📚 Learn</a>
+    <div class="mobile-menu-divider"></div>
     <div class="mobile-menu-auth">
       <span id="mobileMenuUser"></span>
       <button class="mobile-menu-signout" onclick="signOut()">Sign Out</button>
@@ -493,24 +475,6 @@
           <div class="chapter-meta">
             <div class="chapter-num">Chapter 01</div>
             <h2>Composition</h2>
-          </div>
-        </div>
-
-        <p>Composition is how you arrange the elements inside your frame. It's the single most powerful tool a photographer has — and unlike lighting or gear, it costs nothing. A well-composed photo guides the viewer's eye exactly where you want it to go.</p>
-
-        <h3>The Rule of Thirds</h3>
-        <p>Imagine dividing your frame into a 3×3 grid. The four points where the lines intersect are called "power points." Placing your subject on one of these points — rather than dead centre — creates natural tension and visual interest.</p>
-
-        <div class="rule-visual">
-          <div class="grid-demo">
-            <div class="grid-line-v" style="left:33.3%"></div>
-            <div class="grid-line-v" style="left:66.6%"></div>
-            <div class="grid-line-h" style="top:33.3%"></div>
-            <div class="grid-line-h" style="top:66.6%"></div>
-            <div class="grid-dot" style="left:33.3%;top:33.3%"></div>
-            <div class="grid-dot" style="left:66.6%;top:33.3%"></div>
-            <div class="grid-dot" style="left:33.3%;top:66.6%"></div>
-            <div class="grid-dot" style="left:66.6%;top:66.6%"></div>
           </div>
           <div class="grid-label">Place subjects<br/>on power points</div>
         </div>
@@ -606,6 +570,59 @@
         </div>
       </div>
 
+      <!-- CHAPTER 2: LIGHTING -->
+      <div class="chapter" id="lighting">
+        <div class="chapter-header">
+          <div class="chapter-icon">💡</div>
+          <div class="chapter-meta">
+            <div class="chapter-num">Chapter 02</div>
+            <h2>Lighting</h2>
+          </div>
+        </div>
+
+        <p>Photography literally means "writing with light." The quality, direction, and colour of light determines the mood, texture, and drama of your image more than any other single factor.</p>
+
+        <h3>Golden Hour</h3>
+        <p>The hour after sunrise and the hour before sunset produce warm, soft, directional light that flatters almost any subject. Shadows are long, colours are rich, and the light has a natural glow that's nearly impossible to replicate artificially. If you can only shoot at one time of day, shoot golden hour.</p>
+
+        <h3>Hard vs Soft Light</h3>
+        <p>Hard light (midday sun, bare flash) creates strong shadows and high contrast — great for dramatic, graphic images. Soft light (overcast sky, window light, diffused flash) creates gentle gradients and flattering skin tones. Neither is better — they serve different stories.</p>
+
+        <h3>Light Direction</h3>
+        <p>Front lighting is flat and safe. Side lighting (also called Rembrandt lighting) creates shadows that reveal texture and depth. Backlighting creates silhouettes and rim light — dramatic but requires careful exposure. Understanding where your light source is coming from is the first step to controlling it.</p>
+
+        <div class="callout">
+          <div class="callout-label">💡 Pro Tip</div>
+          <p>Overcast days are a photographer's best friend for portraits. The entire sky becomes one giant soft box, giving you even, flattering light from everywhere with no harsh shadows.</p>
+        </div>
+
+        <h3>Exposure Triangle</h3>
+        <p>If you're shooting with a camera or advanced phone settings, three factors control exposure: <strong style="color:var(--white)">ISO</strong> (sensor sensitivity), <strong style="color:var(--white)">Aperture</strong> (how much light enters), and <strong style="color:var(--white)">Shutter Speed</strong> (how long the sensor is exposed). Balancing these three is the foundation of technical photography.</p>
+
+        <div class="tip-grid">
+          <div class="tip-card">
+            <span class="tip-card-icon">🌅</span>
+            <h4>Golden Hour</h4>
+            <p>Warm, soft light just after sunrise or before sunset.</p>
+          </div>
+          <div class="tip-card">
+            <span class="tip-card-icon">☁️</span>
+            <h4>Overcast = Soft Box</h4>
+            <p>Clouds diffuse sunlight into perfect portrait lighting.</p>
+          </div>
+          <div class="tip-card">
+            <span class="tip-card-icon">🔦</span>
+            <h4>Side Lighting</h4>
+            <p>Reveals texture and adds dramatic depth to any subject.</p>
+          </div>
+          <div class="tip-card">
+            <span class="tip-card-icon">🌑</span>
+            <h4>Backlighting</h4>
+            <p>Creates silhouettes and glowing rim light effects.</p>
+          </div>
+        </div>
+      </div>
+
       <!-- CHAPTER 3: COLOUR & MOOD -->
       <div class="chapter" id="colour">
         <div class="chapter-header">
@@ -615,6 +632,7 @@
             <h2>Colour & Mood</h2>
           </div>
         </div>
+      </div>
 
         <p>Colour is one of the most emotionally powerful tools in photography. Viewers feel colour before they consciously process it. A deliberate colour palette can make a technically average photo feel unforgettable.</p>
 
