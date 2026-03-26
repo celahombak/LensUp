@@ -4,241 +4,275 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>LensUp — Create Your Account</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase.js"></script>
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --black: #080808; --white: #f0ede8; --dark: #111010; --dark2: #181615;
-      --mid: #5a5550; --border: rgba(255,255,255,0.07);
-      --gold: #e8b84b; --gold2: #f5d07a; --red: #ff4444; --green: #00e676; --cyan: #00d4ff;
+      --sky: #00B4D8; --sky-dark: #0096B4; --sky-light: #90E0EF; --sky-pale: #EAF8FC;
+      --teal: #1A936F; --teal-pale: #E8F6F1;
+      --coral: #FF6B6B;
+      --yellow: #FFD166; --yellow-pale: #FFFBEE;
+      --bg: #FAFCFE; --surface: #FFFFFF; --surface2: #F4F8FA;
+      --text: #1A2B3C; --text-mid: #5A7080; --text-light: #9BB0BC;
+      --border: rgba(0,180,216,0.15); --border-input: #D4E8F0;
+      --shadow-sm: 0 2px 8px rgba(0,100,140,0.08);
+      --shadow-md: 0 8px 24px rgba(0,100,140,0.12);
+      --shadow-lg: 0 20px 60px rgba(0,100,140,0.15);
+      --radius-sm: 10px; --radius-md: 16px; --radius-lg: 24px;
+      --error: #EF4444; --error-pale: #FEF2F2;
+      --success: #1A936F; --success-pale: #E8F6F1;
     }
-    html, body { height: 100%; }
-    body { background: var(--black); color: var(--white); font-family: 'DM Sans', sans-serif; font-weight: 300; min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: 'DM Sans', sans-serif; font-weight: 400;
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; padding: 2rem 1rem;
+    }
+    .back-link { position: fixed; top: 1.2rem; left: 1.5rem; display: flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; font-weight: 600; color: var(--text-mid); text-decoration: none; transition: color 0.2s; }
+    .back-link:hover { color: var(--sky); }
 
-    /* ── LEFT PANEL ── */
-    .left-panel { position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; padding: 2.5rem; background: var(--dark); border-right: 1px solid var(--border); }
-    .left-bg::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 80% 60% at 80% 30%, rgba(0,212,255,0.05) 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 10% 80%, rgba(232,184,75,0.06) 0%, transparent 60%); }
-    .left-grid { position: absolute; inset: 0; opacity: 0.035; background-image: linear-gradient(rgba(232,184,75,1) 1px, transparent 1px), linear-gradient(90deg, rgba(232,184,75,1) 1px, transparent 1px); background-size: 60px 60px; }
-    .left-top { position: relative; }
-    .logo { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 0.08em; color: var(--gold); text-decoration: none; display: block; margin-bottom: 3rem; }
-    .logo span { color: var(--white); }
+    .auth-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); padding: 2.5rem 2.2rem; width: 100%; max-width: 460px; animation: fadeUp 0.4s ease both; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
 
-    .left-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(3rem, 5.5vw, 5rem); letter-spacing: 0.03em; line-height: 0.9; margin-bottom: 1.2rem; }
-    .left-title span { color: var(--gold); display: block; }
-    .left-desc { font-size: 0.88rem; line-height: 1.8; color: rgba(240,237,232,0.45); max-width: 340px; margin-bottom: 2.5rem; }
+    .auth-logo { display: flex; align-items: center; justify-content: center; gap: 0.4rem; font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.4rem; color: var(--sky); text-decoration: none; margin-bottom: 1.5rem; }
 
-    /* Perks */
-    .perks { position: relative; display: flex; flex-direction: column; gap: 0.8rem; }
-    .perk { display: flex; align-items: flex-start; gap: 0.9rem; padding: 1rem 1.2rem; background: rgba(255,255,255,0.02); border: 1px solid var(--border); }
-    .perk-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 0.05rem; }
-    .perk-title { font-size: 0.82rem; font-weight: 600; margin-bottom: 0.15rem; }
-    .perk-desc { font-size: 0.72rem; color: rgba(240,237,232,0.4); line-height: 1.5; }
+    .auth-title { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.7rem; letter-spacing: -0.02em; color: var(--text); margin-bottom: 0.3rem; text-align: center; }
+    .auth-sub { font-size: 0.88rem; color: var(--text-mid); text-align: center; margin-bottom: 1.8rem; line-height: 1.6; }
 
-    .left-bottom { position: relative; }
-    .left-bottom p { font-size: 0.7rem; color: var(--mid); }
+    /* Chapter 1 preview — what they're about to unlock */
+    .chapter1-preview {
+      background: var(--sky-pale); border: 1.5px solid rgba(0,180,216,0.2);
+      border-radius: var(--radius-md); padding: 1rem 1.1rem;
+      display: flex; align-items: center; gap: 0.9rem; margin-bottom: 1.8rem;
+    }
+    .ch1-num { width: 40px; height: 40px; background: var(--sky); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; color: #fff; font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 0.82rem; flex-shrink: 0; }
+    .ch1-info { flex: 1; }
+    .ch1-tag { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--sky); }
+    .ch1-name { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.92rem; color: var(--text); }
+    .ch1-desc { font-size: 0.72rem; color: var(--text-mid); margin-top: 0.1rem; }
+    .ch1-free { background: var(--teal); color: #fff; font-size: 0.6rem; font-weight: 700; padding: 0.2rem 0.55rem; border-radius: 6px; flex-shrink: 0; }
 
-    /* ── RIGHT PANEL ── */
-    .right-panel { display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 3rem 2rem; background: var(--black); overflow-y: auto; }
-    .auth-box { width: 100%; max-width: 380px; animation: fadeUp 0.5s ease both; }
+    /* Alert */
+    .alert { display: none; padding: 0.75rem 1rem; border-radius: var(--radius-sm); font-size: 0.82rem; line-height: 1.5; margin-bottom: 1.2rem; border: 1.5px solid; }
+    .alert.show { display: flex; align-items: flex-start; gap: 0.5rem; }
+    .alert-error { background: var(--error-pale); border-color: rgba(239,68,68,0.3); color: #B91C1C; }
+    .alert-success { background: var(--success-pale); border-color: rgba(26,147,111,0.3); color: var(--teal); }
 
-    .auth-box-title { font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; letter-spacing: 0.05em; margin-bottom: 0.3rem; }
-    .auth-box-sub { font-size: 0.82rem; color: rgba(240,237,232,0.4); margin-bottom: 2rem; }
-
-    /* FORM */
+    /* Form */
     .form-group { margin-bottom: 1rem; }
-    .form-label { display: block; font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(240,237,232,0.5); margin-bottom: 0.5rem; }
-    .form-input { width: 100%; background: var(--dark); border: 1px solid var(--border); color: var(--white); padding: 0.85rem 1rem; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; outline: none; transition: border-color 0.2s; border-radius: 0; }
-    .form-input:focus { border-color: var(--gold); background: var(--dark2); }
-    .form-input::placeholder { color: rgba(240,237,232,0.18); }
-
-    /* Invite code */
-    .invite-input { letter-spacing: 0.18em; text-transform: uppercase; font-weight: 600; font-size: 1rem; text-align: center; }
+    .form-label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-mid); margin-bottom: 0.4rem; }
+    .form-hint { font-size: 0.72rem; color: var(--text-light); margin-top: 0.3rem; }
+    .form-input { width: 100%; background: var(--surface2); border: 1.5px solid var(--border-input); color: var(--text); padding: 0.8rem 1rem; font-family: 'DM Sans', sans-serif; font-size: 0.95rem; border-radius: var(--radius-sm); outline: none; transition: all 0.2s; }
+    .form-input:focus { border-color: var(--sky); background: var(--surface); box-shadow: 0 0 0 3px rgba(0,180,216,0.12); }
+    .form-input::placeholder { color: var(--text-light); }
 
     /* Password strength */
-    .strength-bar { height: 3px; background: var(--border); margin-top: 0.5rem; overflow: hidden; }
-    .strength-fill { height: 100%; transition: width 0.3s, background 0.3s; width: 0%; }
-    .strength-label { font-size: 0.68rem; color: var(--mid); margin-top: 0.3rem; }
+    .strength-bar { height: 5px; background: var(--surface2); border-radius: 3px; margin-top: 0.5rem; overflow: hidden; }
+    .strength-fill { height: 100%; border-radius: 3px; transition: width 0.3s, background 0.3s; width: 0%; }
+    .strength-label { font-size: 0.7rem; margin-top: 0.3rem; }
 
-    .form-hint { font-size: 0.68rem; color: var(--mid); margin-top: 0.35rem; line-height: 1.5; }
+    /* Experience level picker */
+    .level-picker { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; margin-top: 0.4rem; }
+    .level-btn { background: var(--surface2); border: 1.5px solid var(--border-input); border-radius: var(--radius-sm); padding: 0.75rem 0.5rem; text-align: center; cursor: pointer; transition: all 0.2s; }
+    .level-btn:hover { border-color: var(--sky-light); background: var(--sky-pale); }
+    .level-btn.selected { border-color: var(--sky); background: var(--sky-pale); box-shadow: 0 0 0 2px rgba(0,180,216,0.15); }
+    .level-icon { font-size: 1.4rem; display: block; margin-bottom: 0.3rem; }
+    .level-label { font-size: 0.72rem; font-weight: 700; color: var(--text); }
+    .level-desc { font-size: 0.62rem; color: var(--text-light); margin-top: 0.1rem; }
 
-    .btn-submit { width: 100%; background: var(--gold); color: var(--black); border: none; padding: 0.95rem; font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; letter-spacing: 0.12em; cursor: pointer; transition: all 0.2s; margin-top: 0.8rem; clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%); }
-    .btn-submit:hover:not(:disabled) { background: var(--gold2); transform: translateY(-1px); }
-    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+    /* Invite code */
+    .invite-input { letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; text-align: center; font-size: 1.1rem; }
 
-    .auth-footer { text-align: center; margin-top: 1.2rem; font-size: 0.78rem; color: rgba(240,237,232,0.35); }
-    .auth-footer a { color: var(--gold); text-decoration: none; font-weight: 500; }
-    .auth-footer a:hover { color: var(--gold2); }
+    /* Submit */
+    .btn-submit { width: 100%; background: var(--sky); color: #fff; border: none; padding: 0.9rem; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1rem; border-radius: var(--radius-sm); cursor: pointer; transition: all 0.2s; margin-top: 0.5rem; box-shadow: 0 4px 14px rgba(0,180,216,0.35); display: flex; align-items: center; justify-content: center; gap: 0.4rem; }
+    .btn-submit:hover:not(:disabled) { background: var(--sky-dark); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,180,216,0.45); }
+    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .btn-submit .spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.6s linear infinite; display: none; }
+    .btn-submit.loading .spinner { display: block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    .terms { font-size: 0.68rem; color: rgba(240,237,232,0.25); line-height: 1.6; margin-top: 0.8rem; text-align: center; }
+    .terms { font-size: 0.72rem; color: var(--text-light); line-height: 1.6; text-align: center; margin-top: 0.8rem; }
+    .auth-footer { text-align: center; margin-top: 1.2rem; font-size: 0.85rem; color: var(--text-mid); }
+    .auth-footer a { color: var(--sky); font-weight: 700; text-decoration: none; }
+    .auth-footer a:hover { color: var(--sky-dark); }
 
-    /* ALERTS */
-    .alert { padding: 0.75rem 1rem; font-size: 0.8rem; line-height: 1.5; margin-bottom: 1.2rem; display: none; border-left: 3px solid; }
-    .alert.show { display: block; }
-    .alert-error { background: rgba(255,68,68,0.08); border-color: var(--red); color: #ff8080; }
-    .alert-success { background: rgba(0,230,118,0.07); border-color: var(--green); color: var(--green); }
-
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-
-    @media (max-width: 768px) {
-      body { grid-template-columns: 1fr; }
-      .left-panel { display: none; }
-      .right-panel { padding: 3rem 1.5rem; min-height: 100vh; }
-    }
+    @media (max-width: 480px) { .auth-card { padding: 2rem 1.4rem; border-radius: var(--radius-md); } }
   </style>
 </head>
 <body>
 
-  <!-- LEFT -->
-  <div class="left-panel">
-    <div class="left-bg"></div>
-    <div class="left-grid"></div>
-    <div class="left-top">
-      <a href="index.html" class="logo">Lens<span>Up</span></a>
-      <div class="left-title">Learn.<br/><span>Shoot Better.</span></div>
-      <p class="left-desc">Step-by-step chapters. Real photo missions. Honest AI feedback. The fastest way to go from guessing to knowing.</p>
-      <div class="perks">
-        <div class="perk">
-          <span class="perk-icon">📅</span>
-          <div><div class="perk-title">36 Learning Chapters</div><div class="perk-desc">From Rule of Thirds to Advanced Lighting — structured lessons with real photo missions.</div></div>
-        </div>
-        <div class="perk">
-          <span class="perk-icon">🤖</span>
-          <div><div class="perk-title">Honest AI Feedback</div><div class="perk-desc">Every photo scored on exactly the skill you're practising. Know what worked and why.</div></div>
-        </div>
-        <div class="perk">
-          <span class="perk-icon">🏆</span>
-          <div><div class="perk-title">Weekly Challenge</div><div class="perk-desc">Apply your skills to weekly themes. Compete on the leaderboard and track your improvement.</div></div>
-        </div>
-        <div class="perk">
-          <span class="perk-icon">📈</span>
-          <div><div class="perk-title">First 3 Chapters Free</div><div class="perk-desc">Start learning today, no payment needed. Upgrade when you're ready for more.</div></div>
-        </div>
-      </div>
+<a href="index.html" class="back-link">← Back</a>
+
+<div class="auth-card">
+
+  <a href="index.html" class="auth-logo">📷 LensUp</a>
+
+  <!-- Chapter 1 preview -->
+  <div class="chapter1-preview">
+    <div class="ch1-num">Ch 1</div>
+    <div class="ch1-info">
+      <div class="ch1-tag">Starting point · Composition</div>
+      <div class="ch1-name">Rule of Thirds</div>
+      <div class="ch1-desc">Your first mission unlocks immediately after sign up</div>
     </div>
-    <div class="left-bottom">
-      <p>© 2026 LensUp · Powered by Claude AI</p>
-    </div>
+    <span class="ch1-free">FREE</span>
   </div>
 
-  <!-- RIGHT -->
-  <div class="right-panel">
-    <div class="auth-box">
-      <div class="auth-box-title">Create Account</div>
-      <div class="auth-box-sub">Start your learning journey — first 3 chapters free</div>
+  <div class="auth-title">Create your account</div>
+  <div class="auth-sub">Start learning photography today — free, no credit card needed</div>
 
-      <div class="alert alert-error" id="errorAlert"></div>
-      <div class="alert alert-success" id="successAlert"></div>
+  <div class="alert alert-error" id="errorAlert"></div>
+  <div class="alert alert-success" id="successAlert"></div>
 
-      <div class="form-group">
-        <label class="form-label">Display Name</label>
-        <input type="text" class="form-input" id="nameInput" placeholder="How you appear on the leaderboard" maxlength="40"/>
+  <div class="form-group">
+    <label class="form-label" for="nameInput">Your name</label>
+    <input type="text" class="form-input" id="nameInput" placeholder="How you'll appear on the leaderboard" maxlength="40" autocomplete="name"/>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label" for="emailInput">Email address</label>
+    <input type="email" class="form-input" id="emailInput" placeholder="you@example.com" autocomplete="email"/>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label" for="passwordInput">Password</label>
+    <input type="password" class="form-input" id="passwordInput" placeholder="At least 6 characters" autocomplete="new-password" oninput="checkStrength(this.value)"/>
+    <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+    <div class="strength-label" id="strengthLabel" style="color:var(--text-light)">Enter a password</div>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label" for="confirmInput">Confirm password</label>
+    <input type="password" class="form-input" id="confirmInput" placeholder="Repeat your password" autocomplete="new-password"/>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">How would you describe your photography experience?</label>
+    <div class="level-picker" id="levelPicker">
+      <div class="level-btn" data-level="beginner" onclick="selectLevel(this)">
+        <span class="level-icon">🌱</span>
+        <div class="level-label">Beginner</div>
+        <div class="level-desc">Just starting out</div>
       </div>
-
-      <div class="form-group">
-        <label class="form-label">Email</label>
-        <input type="email" class="form-input" id="emailInput" placeholder="you@example.com"/>
+      <div class="level-btn" data-level="some" onclick="selectLevel(this)">
+        <span class="level-icon">📸</span>
+        <div class="level-label">Some experience</div>
+        <div class="level-desc">I shoot regularly</div>
       </div>
-
-      <div class="form-group">
-        <label class="form-label">Password</label>
-        <input type="password" class="form-input" id="passwordInput" placeholder="At least 6 characters" oninput="checkStrength(this.value)"/>
-        <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
-        <div class="strength-label" id="strengthLabel">Enter a password</div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Confirm Password</label>
-        <input type="password" class="form-input" id="confirmInput" placeholder="Repeat your password"/>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Invite Code</label>
-        <input type="text" class="form-input invite-input" id="inviteInput" placeholder="XXXXXXXX" onkeydown="if(event.key==='Enter') register()"/>
-        <div class="form-hint">Don't have a code? Request one from the app owner.</div>
-      </div>
-
-      <button class="btn-submit" id="submitBtn" onclick="register()">Create Account →</button>
-      <div class="terms">By signing up you agree to use LensUp responsibly.</div>
-
-      <div class="auth-footer">
-        Already have an account? <a href="login.html">Sign in →</a>
+      <div class="level-btn" data-level="intermediate" onclick="selectLevel(this)">
+        <span class="level-icon">🎯</span>
+        <div class="level-label">Intermediate</div>
+        <div class="level-desc">Know the basics</div>
       </div>
     </div>
   </div>
 
-  <script>
-    initSupabase();
-    (async () => { const user = await getUser(); if (user) window.location.href = 'dashboard.html'; })();
+  <div class="form-group">
+    <label class="form-label" for="inviteInput">Invite code</label>
+    <input type="text" class="form-input invite-input" id="inviteInput" placeholder="XXXXXXXX" onkeydown="if(event.key==='Enter') register()" autocomplete="off"/>
+    <div class="form-hint">Don't have a code? Request one from the app owner.</div>
+  </div>
 
-    function showError(msg) {
-      const el = document.getElementById('errorAlert');
-      el.textContent = msg; el.classList.add('show');
-      document.getElementById('successAlert').classList.remove('show');
-    }
-    function showSuccess(msg) {
-      const el = document.getElementById('successAlert');
-      el.textContent = msg; el.classList.add('show');
-      document.getElementById('errorAlert').classList.remove('show');
-    }
+  <button class="btn-submit" id="submitBtn" onclick="register()">
+    <div class="spinner"></div>
+    <span class="btn-text">Create Account &amp; Start Learning →</span>
+  </button>
+  <div class="terms">By signing up you agree to use LensUp responsibly.</div>
 
-    function checkStrength(val) {
-      const fill = document.getElementById('strengthFill');
-      const label = document.getElementById('strengthLabel');
-      if (!val) { fill.style.width = '0%'; label.textContent = 'Enter a password'; return; }
-      let score = 0;
-      if (val.length >= 6) score++;
-      if (val.length >= 10) score++;
-      if (/[A-Z]/.test(val)) score++;
-      if (/[0-9]/.test(val)) score++;
-      if (/[^A-Za-z0-9]/.test(val)) score++;
-      const levels = [
-        { pct: '20%', color: '#ff4444', text: 'Very weak' },
-        { pct: '40%', color: '#ff7a1a', text: 'Weak' },
-        { pct: '60%', color: '#e8b84b', text: 'Fair' },
-        { pct: '80%', color: '#a8c87e', text: 'Good' },
-        { pct: '100%', color: '#00e676', text: '💪 Strong' },
-      ];
-      const lvl = levels[Math.min(score - 1, 4)] || levels[0];
-      fill.style.width = lvl.pct;
-      fill.style.background = lvl.color;
-      label.textContent = lvl.text;
-      label.style.color = lvl.color;
-    }
+  <div class="auth-footer">
+    Already have an account? <a href="login.html">Sign in →</a>
+  </div>
 
-    async function register() {
-      const name    = document.getElementById('nameInput').value.trim();
-      const email   = document.getElementById('emailInput').value.trim();
-      const password = document.getElementById('passwordInput').value;
-      const confirm  = document.getElementById('confirmInput').value;
-      const invite   = document.getElementById('inviteInput').value.trim().toUpperCase();
-      const btn = document.getElementById('submitBtn');
+</div>
 
-      if (!name)              { showError('Please enter your display name.'); return; }
-      if (!email)             { showError('Please enter your email address.'); return; }
-      if (password.length < 6){ showError('Password must be at least 6 characters.'); return; }
-      if (password !== confirm){ showError('Passwords do not match.'); return; }
-      if (!invite)            { showError('Please enter your invite code.'); return; }
-      if (invite !== INVITE_CODE) { showError('Invalid invite code. Please check with the app owner.'); return; }
+<script>
+  initSupabase();
+  (async () => {
+    try { const user = await getUser(); if (user) window.location.href = 'learn.html'; } catch(e) {}
+  })();
 
-      btn.disabled = true; btn.textContent = 'Creating account…';
+  let selectedLevel = 'beginner';
 
-      const { data, error } = await sb.auth.signUp({
-        email, password,
-        options: { data: { display_name: name } }
-      });
+  function selectLevel(el) {
+    document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedLevel = el.dataset.level;
+  }
+  // Default select beginner
+  document.querySelector('[data-level="beginner"]').classList.add('selected');
 
-      if (error) {
-        showError(error.message || 'Registration failed. Please try again.');
-        btn.disabled = false; btn.textContent = 'Create Account →';
-      } else {
-        localStorage.setItem('lensup_name', name);
-        showSuccess('Account created! Check your email to confirm, then sign in.');
-        btn.textContent = 'Account Created ✓';
-        setTimeout(() => window.location.href = 'dashboard.html', 2000);
+  function checkStrength(val) {
+    const fill  = document.getElementById('strengthFill');
+    const label = document.getElementById('strengthLabel');
+    if (!val) { fill.style.width='0%'; label.textContent='Enter a password'; label.style.color='var(--text-light)'; return; }
+    let score = 0;
+    if (val.length >= 6)  score++;
+    if (val.length >= 10) score++;
+    if (/[A-Z]/.test(val)) score++;
+    if (/[0-9]/.test(val)) score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+    const levels = [
+      { pct:'20%', color:'#EF4444', text:'Too short' },
+      { pct:'40%', color:'#F97316', text:'Weak' },
+      { pct:'60%', color:'#EAB308', text:'Fair' },
+      { pct:'80%', color:'#84CC16', text:'Good' },
+      { pct:'100%', color:'var(--teal)', text:'Strong 💪' },
+    ];
+    const lvl = levels[Math.min(score-1, 4)] || levels[0];
+    fill.style.width = lvl.pct;
+    fill.style.background = lvl.color;
+    label.textContent = lvl.text;
+    label.style.color = lvl.color;
+  }
+
+  function showError(msg) {
+    const el = document.getElementById('errorAlert');
+    el.textContent = '⚠️ ' + msg; el.classList.add('show');
+    document.getElementById('successAlert').classList.remove('show');
+  }
+  function showSuccess(msg) {
+    const el = document.getElementById('successAlert');
+    el.textContent = '✓ ' + msg; el.classList.add('show');
+    document.getElementById('errorAlert').classList.remove('show');
+  }
+
+  async function register() {
+    const name     = document.getElementById('nameInput').value.trim();
+    const email    = document.getElementById('emailInput').value.trim();
+    const password = document.getElementById('passwordInput').value;
+    const confirm  = document.getElementById('confirmInput').value;
+    const invite   = document.getElementById('inviteInput').value.trim().toUpperCase();
+    const btn      = document.getElementById('submitBtn');
+
+    if (!name)               { showError('Please enter your name.'); return; }
+    if (!email)              { showError('Please enter your email address.'); return; }
+    if (password.length < 6) { showError('Password must be at least 6 characters.'); return; }
+    if (password !== confirm) { showError('Passwords do not match.'); return; }
+    if (!invite)             { showError('Please enter your invite code.'); return; }
+    if (invite !== INVITE_CODE) { showError('Invalid invite code. Request one from the app owner.'); return; }
+
+    btn.disabled = true; btn.classList.add('loading');
+
+    const { data, error } = await sb.auth.signUp({
+      email, password,
+      options: {
+        data: {
+          display_name: name,
+          experience_level: selectedLevel
+        }
       }
+    });
+
+    if (error) {
+      showError(error.message || 'Registration failed. Please try again.');
+      btn.disabled = false; btn.classList.remove('loading');
+    } else {
+      showSuccess('Account created! Taking you to Chapter 1…');
+      setTimeout(() => window.location.href = 'learn.html', 1200);
     }
-  </script>
+  }
+</script>
 </body>
 </html>
