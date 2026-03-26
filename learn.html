@@ -1,916 +1,1026 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>LensUp — Learn Photography</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
   <style>
+    body { visibility: hidden; }
+    body.auth-ready { visibility: visible; }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --black: #080808;
-      --white: #f5f2ee;
-      --gold: #c9a96e;
-      --gold-light: #e8d5b0;
-      --dark: #1a1714;
-      --dark2: #141210;
-      --mid: #6b6560;
-      --border: rgba(201,169,110,0.15);
+      --black: #080808; --white: #f0ede8; --dark: #111010; --dark2: #181615;
+      --mid: #5a5550; --border: rgba(255,255,255,0.07);
+      --gold: #e8b84b; --gold2: #f5d07a; --green: #00e676; --red: #ff4444;
     }
+    body { background: var(--black); color: var(--white); font-family: 'DM Sans', sans-serif; font-weight: 300; min-height: 100vh; }
 
-    html { scroll-behavior: smooth; }
-    body {
-      background: var(--black);
-      color: var(--white);
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 300;
-      min-height: 100vh;
-    }
-
-    /* ── NAV ── */
-    nav { display: flex; align-items: center; justify-content: space-between; padding: 1.2rem 3rem; border-bottom: 1px solid var(--border); background: rgba(10,10,10,0.97); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px); }
-    .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; letter-spacing: 0.04em; color: var(--gold); text-decoration: none; }
+    /* NAV */
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 1rem 3rem; border-bottom: 1px solid var(--border); background: rgba(8,8,8,0.97); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(16px); }
+    .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; letter-spacing: 0.08em; color: var(--gold); text-decoration: none; }
     .nav-logo span { color: var(--white); }
-    .nav-links { display: flex; align-items: center; gap: 2rem; flex-wrap: wrap; }
-    .nav-link { font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(245,242,238,0.5); text-decoration: none; transition: color 0.2s; }
-    .nav-link:hover { color: var(--gold); }
-    .nav-link.active { color: var(--gold); }
-
-    /* ── HERO ── */
-    .page-hero {
-      padding: 4rem 3rem 3rem;
-      border-bottom: 1px solid var(--border);
-      position: relative; overflow: hidden;
-    }
-    .page-hero::before {
-      content: '';
-      position: absolute; inset: 0;
-      background: radial-gradient(ellipse 50% 100% at 80% 50%, rgba(201,169,110,0.05) 0%, transparent 70%);
-    }
-    .page-hero-inner { position: relative; max-width: 600px; }
-    .page-tag {
-      display: inline-block; color: var(--gold);
-      font-size: 0.7rem; letter-spacing: 0.2em;
-      text-transform: uppercase; margin-bottom: 0.8rem;
-    }
-    .page-hero h1 {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(2rem, 5vw, 3.2rem);
-      letter-spacing: 0.04em; line-height: 1.1;
-      margin-bottom: 0.8rem;
-    }
-    .page-hero h1 em { font-style: normal; color: var(--gold); }
-    .page-hero p {
-      color: rgba(245,242,238,0.55);
-      font-size: 0.95rem; line-height: 1.8;
-    }
-
-    /* ── LAYOUT ── */
-    .learn-wrap {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 3rem 2rem 5rem;
-      display: grid;
-      grid-template-columns: 220px 1fr;
-      gap: 3rem;
-      align-items: start;
-    }
-
-    /* ── SIDEBAR ── */
-    .sidebar {
-      position: sticky; top: 80px;
-    }
-    .sidebar-title {
-      font-size: 0.68rem; letter-spacing: 0.18em;
-      text-transform: uppercase; color: var(--mid);
-      margin-bottom: 1rem;
-    }
-    .sidebar-nav { list-style: none; }
-    .sidebar-nav li { margin-bottom: 0.15rem; }
-    .sidebar-nav a {
-      display: block; padding: 0.45rem 0.8rem;
-      color: rgba(245,242,238,0.5); text-decoration: none;
-      font-size: 0.82rem; border-radius: 2px;
-      border-left: 2px solid transparent;
-      transition: all 0.2s; line-height: 1.4;
-    }
-    .sidebar-nav a:hover { color: var(--white); background: rgba(201,169,110,0.05); }
-    .sidebar-nav a.active { color: var(--gold); border-left-color: var(--gold); background: rgba(201,169,110,0.06); }
-    .sidebar-divider { height: 1px; background: var(--border); margin: 0.8rem 0; }
-
-    /* ── CONTENT ── */
-    .content { min-width: 0; }
-
-    .chapter {
-      margin-bottom: 4rem;
-      scroll-margin-top: 100px;
-    }
-    .chapter-header {
-      display: flex; align-items: center; gap: 1rem;
-      margin-bottom: 1.5rem;
-      padding-bottom: 1rem;
-      border-bottom: 1px solid var(--border);
-    }
-    .chapter-icon { font-size: 1.8rem; }
-    .chapter-meta {}
-    .chapter-num {
-      font-size: 0.68rem; letter-spacing: 0.18em;
-      text-transform: uppercase; color: var(--gold);
-      margin-bottom: 0.2rem;
-    }
-    .chapter h2 {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.6rem; letter-spacing: 0.04em;
-    }
-
-    .chapter p {
-      font-size: 0.92rem; line-height: 1.85;
-      color: rgba(245,242,238,0.7);
-      margin-bottom: 1.2rem;
-    }
-    .chapter p:last-child { margin-bottom: 0; }
-
-    .chapter h3 {
-      font-size: 0.95rem; font-weight: 500;
-      color: var(--white); margin: 1.8rem 0 0.6rem;
-      letter-spacing: 0.02em;
-    }
-
-    /* ── TIP CARDS ── */
-    .tip-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1rem; margin: 1.5rem 0;
-    }
-    .tip-card {
-      background: var(--dark);
-      border: 1px solid var(--border);
-      border-radius: 4px; padding: 1.4rem;
-      transition: border-color 0.2s;
-    }
-    .tip-card:hover { border-color: rgba(201,169,110,0.35); }
-    .tip-card-icon { font-size: 1.4rem; margin-bottom: 0.7rem; display: block; }
-    .tip-card h4 {
-      font-size: 0.88rem; font-weight: 500;
-      margin-bottom: 0.4rem;
-    }
-    .tip-card p {
-      font-size: 0.8rem; line-height: 1.6;
-      color: rgba(245,242,238,0.5); margin: 0;
-    }
-
-    /* ── RULE VISUAL ── */
-    .rule-visual {
-      background: var(--dark);
-      border: 1px solid var(--border);
-      border-radius: 4px; padding: 1.5rem;
-      margin: 1.5rem 0;
-      display: flex; align-items: center;
-      justify-content: center;
-    }
-    .grid-demo {
-      width: 240px; height: 160px;
-      border: 2px solid rgba(201,169,110,0.4);
-      position: relative; border-radius: 2px;
-      background: linear-gradient(135deg, #1e1a16, #2a2520);
-    }
-    .grid-line-v {
-      position: absolute; top: 0; bottom: 0;
-      width: 1px; background: rgba(201,169,110,0.5);
-    }
-    .grid-line-h {
-      position: absolute; left: 0; right: 0;
-      height: 1px; background: rgba(201,169,110,0.5);
-    }
-    .grid-dot {
-      position: absolute; width: 8px; height: 8px;
-      background: var(--gold); border-radius: 50%;
-      transform: translate(-50%, -50%);
-    }
-    .grid-label {
-      font-size: 0.68rem; color: var(--gold);
-      letter-spacing: 0.1em; text-transform: uppercase;
-      margin-left: 1.5rem;
-    }
-
-    /* ── CALLOUT ── */
-    .callout {
-      background: rgba(201,169,110,0.06);
-      border-left: 3px solid var(--gold);
-      padding: 1.2rem 1.5rem;
-      border-radius: 0 4px 4px 0;
-      margin: 1.5rem 0;
-    }
-    .callout-label {
-      font-size: 0.68rem; letter-spacing: 0.15em;
-      text-transform: uppercase; color: var(--gold);
-      margin-bottom: 0.4rem;
-    }
-    .callout p {
-      font-size: 0.85rem; line-height: 1.7;
-      color: rgba(245,242,238,0.75); margin: 0;
-    }
-
-    /* ── SCORE TABLE ── */
-    .score-table {
-      width: 100%; border-collapse: collapse;
-      margin: 1.5rem 0; font-size: 0.85rem;
-    }
-    .score-table th {
-      text-align: left; padding: 0.7rem 1rem;
-      font-size: 0.68rem; letter-spacing: 0.12em;
-      text-transform: uppercase; color: var(--gold);
-      border-bottom: 1px solid var(--border);
-    }
-    .score-table td {
-      padding: 0.8rem 1rem;
-      border-bottom: 1px solid rgba(201,169,110,0.07);
-      color: rgba(245,242,238,0.7); line-height: 1.5;
-      vertical-align: top;
-    }
-    .score-table tr:last-child td { border-bottom: none; }
-    .score-table tr:hover td { background: rgba(201,169,110,0.03); }
-    .badge {
-      display: inline-block; padding: 0.15rem 0.5rem;
-      border-radius: 2px; font-size: 0.7rem;
-      font-weight: 500; letter-spacing: 0.05em;
-    }
-    .badge-gold { background: rgba(201,169,110,0.15); color: var(--gold); }
-    .badge-green { background: rgba(100,200,100,0.12); color: #7ecf7e; }
-    .badge-blue { background: rgba(100,150,255,0.12); color: #8ab4f8; }
-
-    /* ── GLOSSARY ── */
-    .glossary-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 1rem; margin-top: 1.5rem;
-    }
-    .glossary-item {
-      background: var(--dark);
-      border: 1px solid var(--border);
-      border-radius: 4px; padding: 1.2rem 1.4rem;
-    }
-    .glossary-term {
-      font-size: 0.9rem; font-weight: 500;
-      color: var(--gold); margin-bottom: 0.4rem;
-    }
-    .glossary-def {
-      font-size: 0.82rem; line-height: 1.6;
-      color: rgba(245,242,238,0.55);
-    }
-
-    /* ── CTA BANNER ── */
-    .cta-banner {
-      background: var(--dark);
-      border: 1px solid var(--border);
-      border-radius: 4px; padding: 2rem;
-      text-align: center; margin-top: 2rem;
-    }
-    .cta-banner h3 {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.3rem; margin-bottom: 0.5rem;
-    }
-    .cta-banner p {
-      font-size: 0.85rem; color: rgba(245,242,238,0.5);
-      margin-bottom: 1.2rem;
-    }
-    .btn-gold {
-      background: var(--gold); color: var(--black);
-      padding: 0.75rem 2rem; border-radius: 2px;
-      text-decoration: none; font-size: 0.82rem;
-      font-weight: 500; letter-spacing: 0.1em;
-      text-transform: uppercase; transition: background 0.2s;
-      display: inline-block;
-    }
-    .btn-gold:hover { background: var(--gold-light); }
-
-    /* ── FOOTER ── */
-    footer {
-      padding: 2rem 3rem;
-      border-top: 1px solid var(--border);
-      display: flex; align-items: center;
-      justify-content: space-between; flex-wrap: wrap; gap: 1rem;
-    }
-    .footer-logo {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.1rem; color: var(--gold); letter-spacing: 0.04em;
-    }
-    .footer-logo span { color: var(--white); }
-    footer p { font-size: 0.78rem; opacity: 0.4; }
-
-    /* ── MOBILE ── */
-    @media (max-width: 768px) {
-      nav { padding: 1rem 1.2rem; }
-      .nav-links { display: none; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; background: var(--black); padding: 1.2rem 1.5rem; gap: 1.2rem; border-bottom: 1px solid var(--border); }
-      .nav-links.open { display: flex; }
-      .nav-cta { display: none; }
-      .hamburger { display: flex; }
-      .page-hero { padding: 2.5rem 1.5rem 2rem; }
-      .learn-wrap { grid-template-columns: 1fr; padding: 2rem 1.2rem 4rem; gap: 0; }
-      .sidebar { display: none; }
-      footer { padding: 1.5rem; flex-direction: column; text-align: center; }
-    }
-
-    /* ═══════════════════════════════════════
-       MOBILE NAV — shared across all pages
-    ═══════════════════════════════════════ */
-
-    /* Hide desktop nav links on mobile, show burger */
+    .nav-links { display: flex; align-items: center; gap: 2rem; }
+    .nav-link { font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(240,237,232,0.45); text-decoration: none; transition: color 0.2s; }
+    .nav-link:hover, .nav-link.active { color: var(--gold); }
     .nav-burger { display: none; background: none; border: none; cursor: pointer; padding: 0.4rem; color: var(--white); flex-direction: column; gap: 5px; align-items: center; justify-content: center; }
-    .nav-burger span { display: block; width: 22px; height: 2px; background: var(--white); transition: all 0.3s; border-radius: 2px; }
-    .nav-burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-    .nav-burger.open span:nth-child(2) { opacity: 0; }
-    .nav-burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    .nav-burger span { display: block; width: 22px; height: 2px; background: var(--white); border-radius: 2px; }
 
-    /* Overlay menu */
-    .mobile-menu {
-      display: none;
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(8,8,8,0.98);
-      z-index: 99;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 0;
-      backdrop-filter: blur(16px);
-    }
-    .mobile-menu.open { display: flex; animation: menuFadeIn 0.2s ease both; }
-    @keyframes menuFadeIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
-    .mobile-menu-close {
-      position: absolute; top: 1.2rem; right: 1.5rem;
-      background: none; border: none; color: var(--mid);
-      font-size: 1.5rem; cursor: pointer; padding: 0.4rem;
-      transition: color 0.2s;
-    }
-    .mobile-menu-close:hover { color: var(--white); }
-    .mobile-menu-logo {
-      font-family: 'Bebas Neue', sans-serif; font-size: 2rem;
-      letter-spacing: 0.08em; color: var(--gold);
-      margin-bottom: 2.5rem;
-    }
+    /* MOBILE MENU */
+    .mobile-menu { display: none; position: fixed; inset: 0; background: rgba(8,8,8,0.98); z-index: 200; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(16px); }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu-close { position: absolute; top: 1.2rem; right: 1.5rem; background: none; border: none; color: var(--mid); font-size: 1.5rem; cursor: pointer; }
+    .mobile-menu-logo { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; color: var(--gold); margin-bottom: 2rem; }
     .mobile-menu-logo span { color: var(--white); }
-    .mobile-menu a {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 2rem; letter-spacing: 0.06em;
-      color: rgba(240,237,232,0.55); text-decoration: none;
-      padding: 0.7rem 2rem; transition: color 0.2s;
-      text-align: center;
-    }
+    .mobile-menu a { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; letter-spacing: 0.06em; color: rgba(240,237,232,0.55); text-decoration: none; padding: 0.5rem 2rem; transition: color 0.2s; }
     .mobile-menu a:hover, .mobile-menu a.active { color: var(--gold); }
     .mobile-menu-divider { width: 40px; height: 1px; background: var(--border); margin: 0.8rem 0; }
-    .mobile-menu-auth { margin-top: 1.5rem; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mid); text-align: center; }
-    .mobile-menu-auth span { color: rgba(240,237,232,0.5); display: block; margin-bottom: 0.8rem; font-size: 0.72rem; }
-    .mobile-menu-signout { background: none; border: 1px solid var(--border); color: var(--mid); padding: 0.5rem 1.5rem; font-family: 'DM Sans', sans-serif; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+    .mobile-menu-auth { margin-top: 1rem; text-align: center; color: var(--mid); font-size: 0.72rem; }
+    .mobile-menu-auth span { color: rgba(240,237,232,0.5); display: block; margin-bottom: 0.6rem; }
+    .mobile-menu-signout { background: none; border: 1px solid var(--border); color: var(--mid); padding: 0.5rem 1.5rem; font-family: 'DM Sans', sans-serif; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; }
     .mobile-menu-signout:hover { border-color: var(--gold); color: var(--gold); }
 
-    /* Bottom nav bar */
-    .bottom-nav {
-      display: none;
-      position: fixed; bottom: 0; left: 0; right: 0;
-      background: rgba(10,10,10,0.97);
-      border-top: 1px solid var(--border);
-      backdrop-filter: blur(16px);
-      z-index: 98;
-      padding-bottom: env(safe-area-inset-bottom);
-    }
-    .bottom-nav-inner { display: flex; align-items: stretch; }
-    .bottom-nav-item {
-      flex: 1; display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      padding: 0.6rem 0.3rem;
-      text-decoration: none;
-      color: rgba(240,237,232,0.35);
-      font-size: 0.55rem; letter-spacing: 0.08em;
-      text-transform: uppercase; gap: 0.25rem;
-      transition: color 0.2s;
-      border-top: 2px solid transparent;
-    }
-    .bottom-nav-item:hover { color: rgba(240,237,232,0.7); }
-    .bottom-nav-item.active { color: var(--gold); border-top-color: var(--gold); }
-    .bottom-nav-icon { font-size: 1.25rem; line-height: 1; }
+    /* HERO */
+    .page-hero { padding: 2.5rem 3rem 2rem; border-bottom: 1px solid var(--border); background: linear-gradient(135deg, rgba(232,184,75,0.04) 0%, transparent 60%); }
+    .hero-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 2rem; flex-wrap: wrap; }
+    .hero-left {}
+    .page-tag { font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); display: block; margin-bottom: 0.4rem; }
+    .page-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2rem, 4vw, 3rem); letter-spacing: 0.04em; line-height: 1; margin-bottom: 0.4rem; }
+    .page-title em { font-style: normal; color: var(--gold); }
+    .page-sub { font-size: 0.82rem; color: rgba(240,237,232,0.4); line-height: 1.7; max-width: 440px; }
+    .hero-stats { display: flex; gap: 2rem; }
+    .hstat { text-align: center; }
+    .hstat-val { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 0.04em; display: block; color: var(--gold); }
+    .hstat-lbl { font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--mid); }
 
-    /* Add bottom padding to page body so content isn't hidden behind bottom nav */
+    /* PROGRESS BAR */
+    .progress-bar-wrap { max-width: 1100px; margin: 0 auto; padding: 1rem 3rem; display: flex; align-items: center; gap: 1rem; border-bottom: 1px solid var(--border); }
+    .progress-bar-bg { flex: 1; height: 4px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; background: var(--gold); border-radius: 2px; transition: width 1s ease; width: 0%; }
+    .progress-label { font-size: 0.68rem; color: var(--mid); white-space: nowrap; }
+
+    /* CATALOGUE */
+    .catalogue { max-width: 1100px; margin: 0 auto; padding: 2rem 3rem 6rem; }
+    .module-label { font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin: 2rem 0 0.8rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+    .module-label:first-child { margin-top: 0; }
+    .chapter-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1px; background: var(--border); margin-bottom: 0.5rem; }
+    .chapter-card { background: var(--dark); padding: 1.2rem; cursor: pointer; transition: background 0.15s; position: relative; border-top: 2px solid transparent; }
+    .chapter-card:hover { background: var(--dark2); }
+    .chapter-card.done { border-top-color: var(--green); }
+    .chapter-card.in-progress { border-top-color: var(--gold); }
+    .ch-num { font-family: 'Bebas Neue', sans-serif; font-size: 0.78rem; letter-spacing: 0.1em; color: var(--mid); margin-bottom: 0.3rem; }
+    .ch-name { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; letter-spacing: 0.04em; margin-bottom: 0.3rem; line-height: 1.2; }
+    .ch-desc { font-size: 0.72rem; color: rgba(240,237,232,0.35); line-height: 1.6; margin-bottom: 0.8rem; }
+    .ch-footer { display: flex; align-items: center; justify-content: space-between; }
+    .ch-dots { display: flex; gap: 3px; }
+    .ch-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.08); }
+    .ch-dot.done { background: var(--green); }
+    .ch-dot.active { background: var(--gold); }
+    .ch-badge { font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.15rem 0.5rem; border-radius: 10px; }
+    .badge-done { background: rgba(0,230,118,0.1); color: var(--green); border: 1px solid rgba(0,230,118,0.25); }
+    .badge-progress { background: rgba(232,184,75,0.1); color: var(--gold); border: 1px solid rgba(232,184,75,0.25); }
+    .badge-new { background: rgba(255,255,255,0.04); color: var(--mid); border: 1px solid var(--border); }
+
+    /* MODAL OVERLAY */
+    .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 300; overflow-y: auto; padding: 2rem 1rem; }
+    .overlay.open { display: flex; align-items: flex-start; justify-content: center; }
+    .modal { background: var(--dark); border: 1px solid var(--border); width: 100%; max-width: 640px; margin: auto; position: relative; }
+
+    /* MODAL VIEWS — controlled by data-view on .modal */
+    .view-lesson, .view-mission, .view-result, .view-complete { display: none; }
+    .modal[data-view="lesson"]   .view-lesson   { display: block; }
+    .modal[data-view="mission"]  .view-mission  { display: block; }
+    .modal[data-view="result"]   .view-result   { display: block; }
+    .modal[data-view="complete"] .view-complete { display: block; }
+
+    /* MODAL HEADER */
+    .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.4rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--dark); z-index: 10; }
+    .modal-header-left { }
+    .modal-ch-num { font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.15rem; }
+    .modal-ch-name { font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem; letter-spacing: 0.04em; }
+    .modal-close { background: none; border: none; color: var(--mid); font-size: 1.2rem; cursor: pointer; padding: 0.3rem 0.5rem; transition: color 0.2s; }
+    .modal-close:hover { color: var(--white); }
+
+    /* LESSON VIEW */
+    .lesson-body { padding: 1.5rem 1.4rem; }
+    .lesson-section-label { font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.8rem; }
+    .lesson-text p { font-size: 0.88rem; line-height: 1.85; color: rgba(240,237,232,0.6); margin-bottom: 0.9rem; }
+    .lesson-text p:last-child { margin-bottom: 0; }
+    .lesson-tips { margin: 1.2rem 0; display: flex; flex-direction: column; gap: 0.5rem; }
+    .lesson-tip { display: flex; gap: 0.7rem; align-items: flex-start; padding: 0.6rem 0.8rem; background: rgba(255,255,255,0.02); border-left: 2px solid rgba(232,184,75,0.3); }
+    .tip-icon { font-size: 0.9rem; flex-shrink: 0; margin-top: 0.05rem; }
+    .tip-text { font-size: 0.8rem; line-height: 1.6; color: rgba(240,237,232,0.5); }
+    .tip-text strong { color: rgba(240,237,232,0.8); }
+    .lesson-diagram { margin: 1.2rem 0; background: var(--dark2); border: 1px solid var(--border); }
+    .lesson-diagram svg { display: block; width: 100%; }
+    .lesson-mission-preview { background: rgba(232,184,75,0.04); border: 1px solid rgba(232,184,75,0.15); padding: 1rem 1.2rem; margin-top: 1.2rem; }
+    .mission-preview-label { font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.4rem; }
+    .mission-preview-text { font-size: 0.82rem; line-height: 1.7; color: rgba(240,237,232,0.55); }
+    .lesson-footer { padding: 1rem 1.4rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 0.8rem; }
+
+    /* MISSION VIEW */
+    .mission-body { padding: 1.4rem; }
+    .mission-progress { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1.4rem; }
+    .mission-dots { display: flex; gap: 6px; }
+    .mission-dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.08); transition: background 0.3s; }
+    .mission-dot.done { background: var(--green); }
+    .mission-dot.active { background: var(--gold); }
+    .mission-count { font-size: 0.72rem; color: var(--mid); }
+    .mission-instruction { background: rgba(232,184,75,0.04); border: 1px solid rgba(232,184,75,0.15); padding: 1rem 1.2rem; margin-bottom: 1.2rem; }
+    .mission-instruction-label { font-size: 0.58rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.35rem; }
+    .mission-instruction-text { font-size: 0.84rem; line-height: 1.7; color: rgba(240,237,232,0.65); }
+    .drop-zone { border: 2px dashed rgba(255,255,255,0.1); padding: 2rem 1rem; text-align: center; cursor: pointer; transition: border-color 0.2s; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+    .drop-zone:hover, .drop-zone.drag { border-color: rgba(232,184,75,0.5); }
+    .dz-icon { font-size: 2rem; }
+    .dz-text { font-size: 0.8rem; color: rgba(240,237,232,0.35); line-height: 1.6; }
+    .dz-text strong { color: var(--gold); }
+    .preview-wrap { display: none; position: relative; }
+    .preview-img { width: 100%; max-height: 220px; object-fit: contain; display: block; background: var(--dark2); }
+    .preview-rm { position: absolute; top: 0.4rem; right: 0.4rem; background: rgba(0,0,0,0.75); border: none; color: var(--white); font-size: 0.72rem; padding: 0.25rem 0.5rem; cursor: pointer; border-radius: 3px; }
+    .mission-error { background: rgba(255,68,68,0.08); border: 1px solid rgba(255,68,68,0.2); color: #ff8080; padding: 0.65rem 0.9rem; font-size: 0.78rem; margin-top: 0.8rem; display: none; }
+    .mission-error.show { display: block; }
+    .mission-loading { display: none; text-align: center; padding: 1.5rem; }
+    .spinner { width: 26px; height: 26px; border: 2px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 0.6rem; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .mission-loading p { font-size: 0.8rem; color: var(--mid); }
+    .mission-footer { padding: 1rem 1.4rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 0.8rem; }
+
+    /* RESULT VIEW */
+    .result-body { padding: 1.4rem; }
+    .result-score-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.2rem; padding-bottom: 1.2rem; border-bottom: 1px solid var(--border); }
+    .result-score-big { font-family: 'Bebas Neue', sans-serif; font-size: 3.5rem; line-height: 1; }
+    .result-score-big.high { color: var(--green); }
+    .result-score-big.mid  { color: var(--gold); }
+    .result-score-big.low  { color: rgba(240,237,232,0.4); }
+    .result-score-denom { font-size: 1rem; color: var(--mid); }
+    .result-label { font-size: 0.88rem; font-weight: 500; margin-bottom: 0.2rem; }
+    .result-sub { font-size: 0.72rem; color: var(--mid); }
+    .result-feedback { font-size: 0.84rem; line-height: 1.8; color: rgba(240,237,232,0.5); margin-bottom: 1rem; }
+    .result-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 1rem; }
+    .result-col-label { font-size: 0.58rem; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 0.4rem; }
+    .result-col-label.worked { color: var(--green); }
+    .result-col-label.improve { color: var(--gold); }
+    .result-col-text { font-size: 0.78rem; line-height: 1.6; color: rgba(240,237,232,0.45); }
+    .result-progress-note { font-size: 0.72rem; color: var(--mid); background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 0.6rem 0.8rem; }
+    .result-footer { padding: 1rem 1.4rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 0.8rem; }
+
+    /* COMPLETE VIEW */
+    .complete-body { padding: 2rem 1.4rem; text-align: center; }
+    .complete-icon { font-size: 3rem; display: block; margin-bottom: 0.8rem; }
+    .complete-title { font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; letter-spacing: 0.04em; margin-bottom: 0.3rem; color: var(--green); }
+    .complete-sub { font-size: 0.85rem; color: rgba(240,237,232,0.4); margin-bottom: 0.5rem; }
+    .complete-score { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; color: var(--gold); margin-bottom: 1.5rem; }
+    .canvas-wrap { display: none; margin: 0 auto 1rem; max-width: 100%; }
+    .canvas-wrap canvas { max-width: 100%; display: block; }
+    .complete-footer { padding: 1rem 1.4rem; border-top: 1px solid var(--border); display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap; }
+
+    /* BUTTONS */
+    .btn-primary { background: var(--gold); color: var(--black); border: none; padding: 0.7rem 1.5rem; font-family: 'Bebas Neue', sans-serif; font-size: 0.95rem; letter-spacing: 0.1em; cursor: pointer; transition: all 0.2s; clip-path: polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%); }
+    .btn-primary:hover { background: var(--gold2); }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-ghost { background: none; border: 1px solid var(--border); color: rgba(240,237,232,0.4); padding: 0.7rem 1.5rem; font-family: 'Bebas Neue', sans-serif; font-size: 0.95rem; letter-spacing: 0.1em; cursor: pointer; transition: all 0.2s; clip-path: polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%); }
+    .btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* BOTTOM NAV */
+    .bottom-nav { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: rgba(8,8,8,0.97); border-top: 1px solid var(--border); backdrop-filter: blur(16px); z-index: 98; padding-bottom: env(safe-area-inset-bottom); }
+    .bottom-nav-inner { display: flex; }
+    .bottom-nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0.6rem 0.3rem; text-decoration: none; color: rgba(240,237,232,0.35); font-size: 0.55rem; letter-spacing: 0.08em; text-transform: uppercase; gap: 0.25rem; border-top: 2px solid transparent; transition: color 0.2s; }
+    .bottom-nav-item.active { color: var(--gold); border-top-color: var(--gold); }
+    .bottom-nav-icon { font-size: 1.2rem; line-height: 1; }
+
+    /* TOAST */
+    .toast { position: fixed; bottom: 5rem; left: 50%; transform: translateX(-50%) translateY(12px); background: var(--dark); border: 1px solid var(--border); padding: 0.65rem 1.3rem; font-size: 0.8rem; opacity: 0; transition: all 0.3s; z-index: 999; pointer-events: none; white-space: nowrap; }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
     @media (max-width: 768px) {
-      .nav-burger { display: flex; }
-      .nav-links { display: none !important; }
       nav { padding: 0.9rem 1.2rem; }
+      .nav-links { display: none !important; }
+      .nav-burger { display: flex; }
       .bottom-nav { display: block; }
-      body { padding-bottom: 60px; }
+      body { padding-bottom: 70px; }
+      .page-hero { padding: 1.5rem 1.2rem; }
+      .progress-bar-wrap { padding: 0.8rem 1.2rem; }
+      .catalogue { padding: 1.5rem 1rem 5rem; }
+      .chapter-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+      .result-cols { grid-template-columns: 1fr; }
+      .overlay { padding: 0; align-items: flex-end; }
+      .modal { max-height: 95vh; overflow-y: auto; }
     }
   </style>
 </head>
 <body>
 
-  <!-- NAV -->
-  <nav>
-    <a href="dashboard.html" class="nav-logo">Lens<span>Up</span></a>
-              <div class="nav-links">
-      <a href="dashboard.html" class="nav-link">🏠 Dashboard</a>
-      <a href="learn.html" class="nav-link active">📚 Learn</a>
-      <a href="feed.html" class="nav-link">🖼️ Feed</a>
-      <a href="compete.html" class="nav-link">⚔️ Challenge</a>
-      <a href="leaderboard.html" class="nav-link">🏆 Leaderboard</a>
-      <a href="learn.html" class="nav-link active">Learn</a>
-      <a href="app.html" class="nav-link">Analyse</a>
-      <a href="gallery.html" class="nav-link">Gallery</a>
-      <a href="profile.html" class="nav-link">Profile</a>
-      <span id="navAuthArea"></span>
-    </div>
-  <button class="nav-burger" id="navBurger" onclick="openMobileMenu()" aria-label="Menu">
-    <span></span><span></span><span></span>
-  </button>
-  </nav>
-
-  <!-- MOBILE OVERLAY MENU -->
-  <div class="mobile-menu" id="mobileMenu">
-    <button class="mobile-menu-close" onclick="closeMobileMenu()">✕</button>
-    <div class="mobile-menu-logo">Lens<span>Up</span></div>
-    <a href="compete.html" class="">⚔️ Challenge</a>
-    <a href="app.html" class="">📷 Analyse</a>
-    <a href="leaderboard.html" class="">🏆 Leaderboard</a>
-    <a href="gallery.html" class="">🖼️ Gallery</a>
-    <a href="profile.html" class="">👤 Profile</a>
-    <a href="learn.html" class="learn active">📚 Learn</a>
-    <div class="mobile-menu-divider"></div>
-    <div class="mobile-menu-auth">
-      <span id="mobileMenuUser"></span>
-      <button class="mobile-menu-signout" onclick="signOut()">Sign Out</button>
-    </div>
+<nav>
+  <a href="dashboard.html" class="nav-logo">Lens<span>Up</span></a>
+  <div class="nav-links">
+    <a href="dashboard.html" class="nav-link">🏠 Dashboard</a>
+    <a href="learn.html" class="nav-link active">📚 Learn</a>
+    <a href="feed.html" class="nav-link">🖼️ Feed</a>
+    <a href="compete.html" class="nav-link">⚔️ Challenge</a>
+    <a href="leaderboard.html" class="nav-link">🏆 Leaderboard</a>
+    <a href="profile.html" class="nav-link">👤 Profile</a>
+    <span id="navAuthArea"></span>
   </div>
+  <button class="nav-burger" onclick="openMobileMenu()"><span></span><span></span><span></span></button>
+</nav>
 
-  <!-- HERO -->
-  <div class="page-hero">
-    <div class="page-hero-inner">
-      <div class="page-tag">Photography School</div>
-      <h1>Learn to Shoot<br/>Like a <em>Pro</em></h1>
-      <p>Everything you need to understand what makes a great photo — from the basics to what Claude AI looks for when analysing your shots.</p>
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-menu-close" onclick="closeMobileMenu()">✕</button>
+  <div class="mobile-menu-logo">Lens<span>Up</span></div>
+  <a href="dashboard.html">🏠 Dashboard</a>
+  <a href="learn.html" class="active">📚 Learn</a>
+  <a href="feed.html">🖼️ Feed</a>
+  <a href="compete.html">⚔️ Challenge</a>
+  <a href="leaderboard.html">🏆 Leaderboard</a>
+  <a href="profile.html">👤 Profile</a>
+  <div class="mobile-menu-divider"></div>
+  <div class="mobile-menu-auth">
+    <span id="mobileMenuUser"></span>
+    <button class="mobile-menu-signout" onclick="signOut()">Sign Out</button>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="page-hero">
+  <div class="hero-inner">
+    <div class="hero-left">
+      <span class="page-tag">Photography School</span>
+      <div class="page-title">36 Chapters.<br/><em>One Lens.</em></div>
+      <p class="page-sub">Learn the skills. Shoot the mission. Get honest AI feedback. Complete 3 photos per chapter to earn your badge.</p>
+    </div>
+    <div class="hero-stats">
+      <div class="hstat"><span class="hstat-val" id="statDone">0</span><span class="hstat-lbl">Done</span></div>
+      <div class="hstat"><span class="hstat-val" id="statLeft" style="color:rgba(240,237,232,0.3)">36</span><span class="hstat-lbl">Remaining</span></div>
     </div>
   </div>
+</div>
 
-  <div class="learn-wrap">
+<!-- PROGRESS BAR -->
+<div class="progress-bar-wrap">
+  <div class="progress-bar-bg"><div class="progress-bar-fill" id="progBar"></div></div>
+  <span class="progress-label" id="progLabel">0 / 36 chapters complete</span>
+</div>
 
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-      <div class="sidebar-title">Chapters</div>
-      <ul class="sidebar-nav">
-        <li><a href="#composition" class="active">01 · Composition</a></li>
-        <li><a href="#lighting">02 · Lighting</a></li>
-        <li><a href="#colour">03 · Colour & Mood</a></li>
-        <li><a href="#focus">04 · Focus & Depth</a></li>
-        <li><a href="#scores">05 · Understanding Scores</a></li>
-        <li><a href="#tips">06 · Quick Win Tips</a></li>
-        <div class="sidebar-divider"></div>
-        <li><a href="#glossary">Glossary</a></li>
-      </ul>
-    </aside>
+<!-- CATALOGUE -->
+<div class="catalogue" id="catalogue">
+  <div style="text-align:center;padding:3rem;color:var(--mid);font-size:0.88rem">Loading chapters…</div>
+</div>
 
-    <!-- CONTENT -->
-    <main class="content">
-
-      <!-- CHAPTER 1: COMPOSITION -->
-      <div class="chapter" id="composition">
-        <div class="chapter-header">
-          <div class="chapter-icon">🎯</div>
-          <div class="chapter-meta">
-            <div class="chapter-num">Chapter 01</div>
-            <h2>Composition</h2>
-          </div>
-          <div class="grid-label">Place subjects<br/>on power points</div>
-        </div>
-
-        <div class="callout">
-          <div class="callout-label">💡 Pro Tip</div>
-          <p>Most smartphones have a grid overlay built into the camera app. Turn it on in settings — it's the fastest way to train your eye for the rule of thirds.</p>
-        </div>
-
-        <h3>Leading Lines</h3>
-        <p>Roads, fences, rivers, stairways — any line that draws the eye from the foreground into the background creates depth and guides the viewer through the image. The strongest leading lines point toward your subject.</p>
-
-        <h3>Framing</h3>
-        <p>Use natural elements like doorways, windows, archways, or tree branches to frame your subject. This creates layers in the image and adds a sense of depth that flat compositions lack.</p>
-
-        <h3>Negative Space</h3>
-        <p>Leaving empty space around your subject isn't wasted space — it gives the eye room to breathe and makes the subject feel more powerful. Minimalist compositions with strong negative space often score very well.</p>
-
-        <div class="tip-grid">
-          <div class="tip-card">
-            <span class="tip-card-icon">📐</span>
-            <h4>Rule of Thirds</h4>
-            <p>Off-centre subjects create visual tension and feel more dynamic.</p>
-          </div>
-          <div class="tip-card">
-            <span class="tip-card-icon">↗️</span>
-            <h4>Leading Lines</h4>
-            <p>Draw the eye through the frame toward your main subject.</p>
-          </div>
-          <div class="tip-card">
-            <span class="tip-card-icon">🪟</span>
-            <h4>Framing</h4>
-            <p>Use natural elements to frame and isolate your subject.</p>
-          </div>
-          <div class="tip-card">
-            <span class="tip-card-icon">⬜</span>
-            <h4>Negative Space</h4>
-            <p>Empty space isn't wasted — it makes subjects pop.</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- CHAPTER 2: LIGHTING -->
-      <div class="chapter" id="lighting">
-        <div class="chapter-header">
-          <div class="chapter-icon">💡</div>
-          <div class="chapter-meta">
-            <div class="chapter-num">Chapter 02</div>
-            <h2>Lighting</h2>
-          </div>
-        </div>
-
-        <p>Photography literally means "writing with light." The quality, direction, and colour of light determines the mood, texture, and drama of your image more than any other single factor.</p>
-
-        <h3>Golden Hour</h3>
-        <p>The hour after sunrise and the hour before sunset produce warm, soft, directional light that flatters almost any subject. Shadows are long, colours are rich, and the light has a natural glow that's nearly impossible to replicate artificially. If you can only shoot at one time of day, shoot golden hour.</p>
-
-        <h3>Hard vs Soft Light</h3>
-        <p>Hard light (midday sun, bare flash) creates strong shadows and high contrast — great for dramatic, graphic images. Soft light (overcast sky, window light, diffused flash) creates gentle gradients and flattering skin tones. Neither is better — they serve different stories.</p>
-
-        <h3>Light Direction</h3>
-        <p>Front lighting is flat and safe. Side lighting (also called Rembrandt lighting) creates shadows that reveal texture and depth. Backlighting creates silhouettes and rim light — dramatic but requires careful exposure. Understanding where your light source is coming from is the first step to controlling it.</p>
-
-        <div class="callout">
-          <div class="callout-label">💡 Pro Tip</div>
-          <p>Overcast days are a photographer's best friend for portraits. The entire sky becomes one giant soft box, giving you even, flattering light from everywhere with no harsh shadows.</p>
-        </div>
-
-        <h3>Exposure Triangle</h3>
-        <p>If you're shooting with a camera or advanced phone settings, three factors control exposure: <strong style="color:var(--white)">ISO</strong> (sensor sensitivity), <strong style="color:var(--white)">Aperture</strong> (how much light enters), and <strong style="color:var(--white)">Shutter Speed</strong> (how long the sensor is exposed). Balancing these three is the foundation of technical photography.</p>
-
-        <div class="tip-grid">
-          <div class="tip-card">
-            <span class="tip-card-icon">🌅</span>
-            <h4>Golden Hour</h4>
-            <p>Warm, soft light just after sunrise or before sunset.</p>
-          </div>
-          <div class="tip-card">
-            <span class="tip-card-icon">☁️</span>
-            <h4>Overcast = Soft Box</h4>
-            <p>Clouds diffuse sunlight into perfect portrait lighting.</p>
-          </div>
-          <div class="tip-card">
-            <span class="tip-card-icon">🔦</span>
-            <h4>Side Lighting</h4>
-            <p>Reveals texture and adds dramatic depth to any subject.</p>
-          </div>
-          <div class="tip-card">
-            <span class="tip-card-icon">🌑</span>
-            <h4>Backlighting</h4>
-            <p>Creates silhouettes and glowing rim light effects.</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- CHAPTER 2: LIGHTING -->
-      <div class="chapter" id="lighting">
-        <div class="chapter-header">
-          <div class="chapter-icon">💡</div>
-          <div class="chapter-meta">
-            <div class="chapter-num">Chapter 02</div>
-            <h2>Lighting</h2>
-          </div>
-        </div>
-
-        <p>Photography literally means "writing with light." The quality, direction, and colour of light determines the mood, texture, and drama of your image more than any other single factor.</p>
-
-        <h3>Golden Hour</h3>
-        <p>The hour after sunrise and the hour before sunset produce warm, soft, directional light that flatters almost any subject. Shadows are long, colours are rich, and the light has a natural glow that's nearly impossible to replicate artificially. If you can only shoot at one time of day, shoot golden hour.</p>
-
-        <h3>Hard vs Soft Light</h3>
-        <p>Hard light (midday sun, bare flash) creates strong shadows and high contrast — great for dramatic, graphic images. Soft light (overcast sky, window light, diffused flash) creates gentle gradients and flattering skin tones. Neither is better — they serve different stories.</p>
-
-        <h3>Light Direction</h3>
-        <p>Front lighting is flat and safe. Side lighting (also called Rembrandt lighting) creates shadows that reveal texture and depth. Backlighting creates silhouettes and rim light — dramatic but requires careful exposure. Understanding where your light source is coming from is the first step to controlling it.</p>
-
-        <div class="callout">
-          <div class="callout-label">💡 Pro Tip</div>
-          <p>Overcast days are a photographer's best friend for portraits. The entire sky becomes one giant soft box, giving you even, flattering light from everywhere with no harsh shadows.</p>
-        </div>
-
-        <h3>Exposure Triangle</h3>
-        <p>If you're shooting with a camera or advanced phone settings, three factors control exposure: <strong style="color:var(--white)">ISO</strong> (sensor sensitivity), <strong style="color:var(--white)">Aperture</strong> (how much light enters), and <strong style="color:var(--white)">Shutter Speed</strong> (how long the sensor is exposed). Balancing these three is the foundation of technical photography.</p>
-
-        <div class="tip-grid">
-          <div class="tip-card">
-            <span class="tip-card-icon">🌅</span>
-            <h4>Golden Hour</h4>
-            <p>Warm, soft light just after sunrise or before sunset.</p>
-          </div>
-          <div class="tip-card">
-            <span class="tip-card-icon">☁️</span>
-            <h4>Overcast = Soft Box</h4>
-            <p>Clouds diffuse sunlight into perfect portrait lighting.</p>
-          </div>
-          <div class="tip-card">
-            <span class="tip-card-icon">🔦</span>
-            <h4>Side Lighting</h4>
-            <p>Reveals texture and adds dramatic depth to any subject.</p>
-          </div>
-          <div class="tip-card">
-            <span class="tip-card-icon">🌑</span>
-            <h4>Backlighting</h4>
-            <p>Creates silhouettes and glowing rim light effects.</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- CHAPTER 3: COLOUR & MOOD -->
-      <div class="chapter" id="colour">
-        <div class="chapter-header">
-          <div class="chapter-icon">🎨</div>
-          <div class="chapter-meta">
-            <div class="chapter-num">Chapter 03</div>
-            <h2>Colour & Mood</h2>
-          </div>
-        </div>
-      </div>
-
-        <p>Colour is one of the most emotionally powerful tools in photography. Viewers feel colour before they consciously process it. A deliberate colour palette can make a technically average photo feel unforgettable.</p>
-
-        <h3>Warm vs Cool Tones</h3>
-        <p>Warm tones (oranges, reds, yellows) feel energetic, intimate, and inviting. Cool tones (blues, greens, purples) feel calm, distant, and melancholic. Most great photos lean intentionally one way or the other rather than sitting neutrally in the middle.</p>
-
-        <h3>Colour Harmony</h3>
-        <p>Complementary colours (opposite on the colour wheel, like orange and blue) create vibrant contrast. Analogous colours (neighbours on the wheel, like yellow, orange, and red) feel harmonious and natural. Both work — the key is being intentional rather than accidental.</p>
-
-        <h3>Colour as Story</h3>
-        <p>Think about what story your colours are telling. Desaturated, faded tones feel nostalgic. Rich, vibrant saturation feels bold and modern. Moody, dark tones feel cinematic. Before editing, ask yourself: what feeling do I want this photo to create?</p>
-
-        <div class="callout">
-          <div class="callout-label">💡 Pro Tip</div>
-          <p>The most iconic travel photos often have a single dominant colour that ties the whole frame together. Look for scenes where one colour dominates — yellow tuk-tuks, a red door, a blue boat — and simplify around it.</p>
-        </div>
-      </div>
-
-      <!-- CHAPTER 4: FOCUS & DEPTH -->
-      <div class="chapter" id="focus">
-        <div class="chapter-header">
-          <div class="chapter-icon">🔍</div>
-          <div class="chapter-meta">
-            <div class="chapter-num">Chapter 04</div>
-            <h2>Focus & Depth of Field</h2>
-          </div>
-        </div>
-
-        <p>Where you focus in a photo is a creative decision, not just a technical one. What's sharp draws the eye. What's blurred recedes. Controlling this separation is one of the most powerful ways to direct attention.</p>
-
-        <h3>Shallow Depth of Field</h3>
-        <p>A wide aperture (low f-number like f/1.8 or f/2.8) blurs the background into a smooth wash called "bokeh." This isolates your subject and is the signature look of portrait photography. The subject is sharp; the world melts away behind it.</p>
-
-        <h3>Deep Depth of Field</h3>
-        <p>A narrow aperture (high f-number like f/11 or f/16) keeps everything sharp from foreground to background. Essential for landscapes, architecture, and street photography where context and environment are part of the story.</p>
-
-        <h3>Focus Points</h3>
-        <p>Always focus on the most important part of your subject. For portraits, that's the eyes — specifically the eye closest to the camera. A photo where the nose is sharp but eyes are blurry feels fundamentally wrong to every viewer, even if they can't explain why.</p>
-
-        <div class="callout">
-          <div class="callout-label">💡 Pro Tip</div>
-          <p>On a smartphone, tap the screen where you want to focus before shooting. Most phones also let you lock focus and exposure separately — look for the AF/AE lock option.</p>
-        </div>
-      </div>
-
-      <!-- CHAPTER 5: UNDERSTANDING SCORES -->
-      <div class="chapter" id="scores">
-        <div class="chapter-header">
-          <div class="chapter-icon">📊</div>
-          <div class="chapter-meta">
-            <div class="chapter-num">Chapter 05</div>
-            <h2>Understanding Your LensUp Scores</h2>
-          </div>
-        </div>
-
-        <p>When you analyse a photo with LensUp, Claude AI evaluates it across five dimensions. Here's exactly what each score means and how to improve it.</p>
-
-        <table class="score-table">
-          <thead>
-            <tr>
-              <th>Score</th>
-              <th>What It Measures</th>
-              <th>How to Improve</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><span class="badge badge-gold">Composition</span></td>
-              <td>How well the frame is arranged — rule of thirds, leading lines, balance, framing</td>
-              <td>Enable grid overlay on your camera app. Slow down before shooting.</td>
-            </tr>
-            <tr>
-              <td><span class="badge badge-blue">Lighting</span></td>
-              <td>Quality, direction, and exposure of light — is it flattering, dramatic, or harsh?</td>
-              <td>Shoot during golden hour. Use shade to soften harsh midday sun.</td>
-            </tr>
-            <tr>
-              <td><span class="badge badge-gold">Colour</span></td>
-              <td>Colour palette, harmony, saturation, and whether the tones serve the mood</td>
-              <td>Look for scenes with a dominant colour. Edit with intention, not randomly.</td>
-            </tr>
-            <tr>
-              <td><span class="badge badge-green">Focus</span></td>
-              <td>Sharpness of the subject, appropriate depth of field, correct focal point</td>
-              <td>Tap to focus on your subject. For portraits, always focus on the nearest eye.</td>
-            </tr>
-            <tr>
-              <td><span class="badge badge-blue">Mood</span></td>
-              <td>Emotional impact — does the photo tell a story or evoke a feeling?</td>
-              <td>Ask "what is this photo about?" before pressing the shutter.</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <div class="callout">
-          <div class="callout-label">📈 Score Benchmarks</div>
-          <p><strong style="color:var(--white)">1–4:</strong> Learning phase — focus on one dimension at a time. &nbsp;|&nbsp; <strong style="color:var(--white)">5–7:</strong> Solid foundations — refine and be more intentional. &nbsp;|&nbsp; <strong style="color:var(--white)">8–10:</strong> Strong work — push creative boundaries.</p>
-        </div>
-      </div>
-
-      <!-- CHAPTER 6: QUICK TIPS -->
-      <div class="chapter" id="tips">
-        <div class="chapter-header">
-          <div class="chapter-icon">⚡</div>
-          <div class="chapter-meta">
-            <div class="chapter-num">Chapter 06</div>
-            <h2>Quick Win Tips</h2>
-          </div>
-        </div>
-
-        <p>These are small changes that make an immediate difference to your scores — no new gear required.</p>
-
-        <div class="tip-grid">
-          <div class="tip-card">
-            <span class="tip-card-icon">🔲</span>
-            <h4>Turn on the grid</h4>
-            <p>Camera grid overlay trains your eye for composition without thinking.</p>
-          </div>
-          <div class="tip-card">
-            <span class="tip-card-icon">🚶</span>
-            <h4>Move your feet</h4>
-            <p>Change your angle before zooming. Walking closer or lower changes everything.</p>
-          </div>
-          <div class="tip-card">
-            <span class="tip-card-icon">🧹</span>
-            <h4>Clean the background</h4>
-            <p>Look behind your subject. Remove distractions before shooting, not after.</p>
-          </div>
-          <div class="tip-card">
-            <span class="tip-card-icon">⏱️</span>
-            <h4>Wait for the moment</h4>
-            <p>Set up your composition first, then wait for the right light or action.</p>
-          </div>
-          <div class="tip-card">
-            <span class="tip-card-icon">📏</span>
-            <h4>Get lower</h4>
-            <p>Shooting from eye level is safe. Shooting from knee or ground level is memorable.</p>
-          </div>
-          <div class="tip-card">
-            <span class="tip-card-icon">🔁</span>
-            <h4>Shoot more frames</h4>
-            <p>Pro photographers take dozens of shots of the same scene. Quantity leads to quality.</p>
-          </div>
-          <div class="tip-card">
-            <span class="tip-card-icon">✂️</span>
-            <h4>Crop ruthlessly</h4>
-            <p>A tight crop can rescue a weak composition. Remove anything that doesn't add to the story.</p>
-          </div>
-          <div class="tip-card">
-            <span class="tip-card-icon">🌤️</span>
-            <h4>Embrace bad weather</h4>
-            <p>Fog, rain, and overcast skies create mood that perfect sunny days never can.</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- GLOSSARY -->
-      <div class="chapter" id="glossary">
-        <div class="chapter-header">
-          <div class="chapter-icon">📖</div>
-          <div class="chapter-meta">
-            <div class="chapter-num">Reference</div>
-            <h2>Glossary</h2>
-          </div>
-        </div>
-        <p>Key terms you'll encounter in your LensUp analyses and in photography generally.</p>
-        <div class="glossary-grid">
-          <div class="glossary-item">
-            <div class="glossary-term">Aperture</div>
-            <div class="glossary-def">The opening in a lens that controls how much light reaches the sensor. Measured in f-stops (f/1.8, f/8). Lower number = wider opening = more light + blurrier background.</div>
-          </div>
-          <div class="glossary-item">
-            <div class="glossary-term">Bokeh</div>
-            <div class="glossary-def">The aesthetic quality of the out-of-focus blur in a photograph. Creamy, smooth bokeh is highly prized in portrait photography.</div>
-          </div>
-          <div class="glossary-item">
-            <div class="glossary-term">Composition</div>
-            <div class="glossary-def">The arrangement of visual elements within the frame. How you position subjects, lines, shapes, and space relative to each other.</div>
-          </div>
-          <div class="glossary-item">
-            <div class="glossary-term">Depth of Field</div>
-            <div class="glossary-def">The range of distance in a photo that appears acceptably sharp. Shallow DoF = blurry background. Deep DoF = everything sharp.</div>
-          </div>
-          <div class="glossary-item">
-            <div class="glossary-term">Exposure</div>
-            <div class="glossary-def">How bright or dark the final image is. Controlled by ISO, aperture, and shutter speed together — the "exposure triangle."</div>
-          </div>
-          <div class="glossary-item">
-            <div class="glossary-term">Golden Hour</div>
-            <div class="glossary-def">The period shortly after sunrise and before sunset when sunlight is warm, soft, and directional. Considered the best natural light for photography.</div>
-          </div>
-          <div class="glossary-item">
-            <div class="glossary-term">ISO</div>
-            <div class="glossary-def">The sensitivity of the camera sensor to light. Higher ISO brightens images in dark conditions but introduces grain (noise).</div>
-          </div>
-          <div class="glossary-item">
-            <div class="glossary-term">Leading Lines</div>
-            <div class="glossary-def">Lines within the frame (roads, fences, rivers) that guide the viewer's eye toward the main subject or through the image.</div>
-          </div>
-          <div class="glossary-item">
-            <div class="glossary-term">Negative Space</div>
-            <div class="glossary-def">Empty or uncluttered areas around the subject. Gives the eye room to breathe and makes subjects feel more powerful and isolated.</div>
-          </div>
-          <div class="glossary-item">
-            <div class="glossary-term">Rule of Thirds</div>
-            <div class="glossary-def">A compositional guideline that divides the frame into a 3×3 grid. Placing subjects at the intersections creates natural visual balance.</div>
-          </div>
-          <div class="glossary-item">
-            <div class="glossary-term">Shutter Speed</div>
-            <div class="glossary-def">How long the camera sensor is exposed to light. Fast speeds freeze motion; slow speeds create motion blur and light trails.</div>
-          </div>
-          <div class="glossary-item">
-            <div class="glossary-term">White Balance</div>
-            <div class="glossary-def">A camera setting that adjusts colours so whites appear neutral under different light sources (daylight, tungsten, fluorescent).</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- CTA BANNER -->
-      <div class="cta-banner">
-        <h3>Ready to Put This Into Practice?</h3>
-        <p>Analyse a photo now and see your scores across all five dimensions.</p>
-        <a href="app.html" class="btn-gold">Analyse a Photo</a>
-      </div>
-
-    </main>
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="bottom-nav-inner">
+    <a href="dashboard.html" class="bottom-nav-item"><span class="bottom-nav-icon">🏠</span><span>Home</span></a>
+    <a href="learn.html" class="bottom-nav-item active"><span class="bottom-nav-icon">📚</span><span>Learn</span></a>
+    <a href="feed.html" class="bottom-nav-item"><span class="bottom-nav-icon">🖼️</span><span>Feed</span></a>
+    <a href="compete.html" class="bottom-nav-item"><span class="bottom-nav-icon">⚔️</span><span>Challenge</span></a>
+    <a href="leaderboard.html" class="bottom-nav-item"><span class="bottom-nav-icon">🏆</span><span>Ranks</span></a>
+    <a href="profile.html" class="bottom-nav-item"><span class="bottom-nav-icon">👤</span><span>Profile</span></a>
   </div>
+</div>
 
-  <!-- FOOTER -->
-  <footer>
-    <div class="footer-logo">Lens<span>Up</span></div>
-    <p>© 2025 LensUp · AI-Powered Photo Analysis</p>
-  </footer>
+<!-- CHAPTER MODAL -->
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modal" data-view="lesson">
 
-  <script>
-    function toggleNav() {
-      document.getElementById('navLinks').classList.toggle('open');
-    }
-
-    // Highlight sidebar link on scroll
-    const chapters = document.querySelectorAll('.chapter');
-    const sidebarLinks = document.querySelectorAll('.sidebar-nav a');
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          sidebarLinks.forEach(link => {
-            link.classList.toggle('active', link.getAttribute('href') === '#' + entry.target.id);
-          });
-        }
-      });
-    }, { rootMargin: '-20% 0px -70% 0px' });
-
-    chapters.forEach(c => observer.observe(c));
-  </script>
-
-  <!-- BOTTOM NAV -->
-          <div class="bottom-nav">
-    <div class="bottom-nav-inner">
-      <a href="dashboard.html" class="bottom-nav-item"><span class="bottom-nav-icon">🏠</span><span>Home</span></a>
-      <a href="learn.html" class="bottom-nav-item active"><span class="bottom-nav-icon">📚</span><span>Learn</span></a>
-      <a href="feed.html" class="bottom-nav-item"><span class="bottom-nav-icon">🖼️</span><span>Feed</span></a>
-      <a href="compete.html" class="bottom-nav-item"><span class="bottom-nav-icon">⚔️</span><span>Challenge</span></a>
-      <a href="leaderboard.html" class="bottom-nav-item"><span class="bottom-nav-icon">🏆</span><span>Ranks</span></a>
-      <a href="profile.html" class="bottom-nav-item"><span class="bottom-nav-icon">👤</span><span>Profile</span></a>
+    <div class="modal-header">
+      <div class="modal-header-left">
+        <div class="modal-ch-num" id="mChNum"></div>
+        <div class="modal-ch-name" id="mChName"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
+
+    <!-- LESSON VIEW -->
+    <div class="view-lesson">
+      <div class="lesson-body">
+        <div class="lesson-section-label">The Lesson</div>
+        <div class="lesson-text" id="lessonText"></div>
+        <div class="lesson-tips" id="lessonTips"></div>
+        <div class="lesson-diagram" id="lessonDiagram" style="display:none"></div>
+        <div class="lesson-mission-preview">
+          <div class="mission-preview-label">Your Mission</div>
+          <div class="mission-preview-text" id="missionPreview"></div>
+        </div>
+      </div>
+      <div class="lesson-footer">
+        <button class="btn-ghost" onclick="closeModal()">Close</button>
+        <button class="btn-primary" id="startMissionBtn" onclick="startMission()">Start Mission →</button>
+      </div>
+    </div>
+
+    <!-- MISSION VIEW -->
+    <div class="view-mission">
+      <div class="mission-body">
+        <div class="mission-progress">
+          <div class="mission-dots" id="missionDots"></div>
+          <span class="mission-count" id="missionCount"></span>
+        </div>
+        <div class="mission-instruction">
+          <div class="mission-instruction-label">Mission</div>
+          <div class="mission-instruction-text" id="missionText"></div>
+        </div>
+        <div class="drop-zone" id="dropZone"
+          onclick="document.getElementById('fileInput').click()"
+          ondragover="onDragOver(event)" ondragleave="onDragLeave()" ondrop="onDrop(event)">
+          <span class="dz-icon">📷</span>
+          <div class="dz-text">Tap to choose a photo<br/><strong>JPG, PNG or WEBP · max 5MB</strong></div>
+        </div>
+        <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="onFileChange(event)"/>
+        <div class="preview-wrap" id="previewWrap">
+          <img class="preview-img" id="previewImg" alt=""/>
+          <button class="preview-rm" onclick="removeFile()">✕</button>
+        </div>
+        <div class="mission-error" id="missionError"></div>
+        <div class="mission-loading" id="missionLoading">
+          <div class="spinner"></div>
+          <p>Analysing your photo…</p>
+        </div>
+      </div>
+      <div class="mission-footer">
+        <button class="btn-ghost" onclick="setView('lesson')">← Back to Lesson</button>
+        <button class="btn-primary" id="analyseBtn" onclick="analysePhoto()" disabled>Analyse This Shot →</button>
+      </div>
+    </div>
+
+    <!-- RESULT VIEW -->
+    <div class="view-result">
+      <div class="result-body">
+        <div class="result-score-row">
+          <div>
+            <div class="result-score-big" id="rScore"></div>
+            <div class="result-score-denom">/10</div>
+          </div>
+          <div>
+            <div class="result-label" id="rLabel"></div>
+            <div class="result-sub" id="rSub"></div>
+          </div>
+        </div>
+        <div class="result-feedback" id="rFeedback"></div>
+        <div class="result-cols">
+          <div>
+            <div class="result-col-label worked">✓ What Worked</div>
+            <div class="result-col-text" id="rWorked"></div>
+          </div>
+          <div>
+            <div class="result-col-label improve">↑ Improve</div>
+            <div class="result-col-text" id="rImprove"></div>
+          </div>
+        </div>
+        <div class="result-progress-note" id="rProgressNote"></div>
+      </div>
+      <div class="result-footer">
+        <button class="btn-primary" id="nextShotBtn" onclick="nextShot()">Next Shot →</button>
+      </div>
+    </div>
+
+    <!-- COMPLETE VIEW -->
+    <div class="view-complete">
+      <div class="complete-body">
+        <span class="complete-icon">🎓</span>
+        <div class="complete-title">Chapter Complete!</div>
+        <div class="complete-sub" id="cSub"></div>
+        <div class="complete-score" id="cScore"></div>
+        <div class="canvas-wrap" id="canvasWrap">
+          <canvas id="shareCanvas" width="800" height="400"></canvas>
+        </div>
+      </div>
+      <div class="complete-footer">
+        <button class="btn-ghost" onclick="downloadCard()">⬇ Download Card</button>
+        <button class="btn-primary" onclick="closeModal()">Continue Learning →</button>
+      </div>
+    </div>
+
   </div>
+</div>
+
+<div class="toast" id="toast"></div>
 
 <script>
-    function openMobileMenu() {
-      document.getElementById('mobileMenu').classList.add('open');
-      document.body.style.overflow = 'hidden';
+// ═══════════════════════════════════════════
+// DATA — 36 CHAPTERS
+// ═══════════════════════════════════════════
+const CHAPTERS = [
+  // MODULE 1 — COMPOSITION
+  { id:1, module:'Composition', name:'Rule of Thirds',
+    lesson:'The Rule of Thirds is the first composition principle every photographer learns — and the one that keeps giving for a lifetime. Divide your frame into a 3×3 grid: two horizontal lines, two vertical lines. The four points where they cross are called power points.\n\nPlace your main subject at one of these power points instead of dead centre. The result feels more natural, more dynamic, and instantly more engaging to the eye. The same applies to horizons — push them to the upper or lower third rather than splitting the frame in half.\n\nMost cameras and phones let you enable a grid overlay in settings. Turn it on and train your eye before every shot. After a few weeks, you will see the grid automatically.',
+    tips:['Enable grid overlay in your camera settings to practise actively','For portraits, place the nearest eye on the upper third line','Horizons on the bottom third emphasise sky; top third emphasises ground'],
+    diagram:'thirds',
+    mission:'Photograph any subject — a person, object, flower, building — where the main subject sits clearly at one of the four rule-of-thirds intersection points. Avoid placing it dead centre.' },
+
+  { id:2, module:'Composition', name:'Leading Lines',
+    lesson:'Leading lines are any lines in your scene that guide the viewer\'s eye from one part of the frame toward your subject. Roads, fences, rivers, corridors, shadows, staircases — all of these can become powerful compositional tools when used intentionally.\n\nThe key is direction and destination. A line that leads nowhere is just a line. A line that carries the eye toward your subject is a composition decision. Diagonal lines create energy and movement. Converging lines — like a road disappearing toward the horizon — create a powerful sense of depth.\n\nPosition yourself so the lines serve the story. Get low to the ground to exaggerate converging lines. Move left or right until a fence or path enters the frame at the corner and leads to your subject.',
+    tips:['Get low — shooting from ground level makes converging lines dramatic','Diagonal lines feel more dynamic than horizontal or vertical ones','The line needs a destination: lead the eye to your subject, not out of frame'],
+    mission:'Photograph any scene where a strong line (road, path, fence, river, shadow, corridor) clearly leads the eye toward a focal point in the frame. The line should enter from the edge and guide inward.' },
+
+  { id:3, module:'Composition', name:'Framing',
+    lesson:'Framing means using elements within the scene — a doorway, window, archway, tree branches, cave opening — to create a secondary frame around your subject inside the photograph.\n\nIt works for three reasons: it directs the eye straight to your subject, it adds layers of depth (foreground, subject, background), and it gives the photo a sense of place and context that a plain shot cannot.\n\nThe frame does not have to be sharp. A slightly soft foreground frame often feels more natural and immersive. What matters is that it supports your subject rather than competing with it.',
+    tips:['The frame can be out of focus — soft foreground framing adds depth naturally','Look for frames everywhere: gaps between buildings, arches, tree canopies','Ensure the frame supports the subject — if the frame is more interesting, recompose'],
+    diagram:'framing',
+    mission:'Photograph a subject where a natural or architectural element (doorway, window, branches, arch, gap) creates a visible frame around or partially surrounding them. The subject should sit inside the frame.' },
+
+  { id:4, module:'Composition', name:'Symmetry & Patterns',
+    lesson:'Symmetry gives a photo an instant sense of order and calm. When you find perfect bilateral symmetry — a reflection, a corridor, a building facade — and shoot it straight on, the result can be strikingly powerful. Our brains are wired to find symmetry satisfying.\n\nPatterns work differently. Repetition creates rhythm — rows of windows, tiles on a floor, identical trees. The eye enjoys the repetition and the sense of scale it creates. The best pattern shots often break the pattern at one point, creating a focal point through contrast.\n\nThe challenge with both is precision. Symmetry requires a level horizon and centred composition. Any tilt destroys the effect.',
+    tips:['Shoot perfectly straight — even slight angles break bilateral symmetry','Reflections in water or glass create instant symmetry for free','Breaking a pattern at one point immediately creates a focal point'],
+    mission:'Photograph either a scene with strong bilateral symmetry (architecture, reflection, corridor) shot dead-centre, OR a strong repeating pattern. For bonus impact, break the pattern at one point.' },
+
+  { id:5, module:'Composition', name:'Negative Space',
+    lesson:'Negative space is the empty area around your subject — sky, a plain wall, water, open floor. Beginners tend to fill the frame. Learning to leave space intentionally is a sign of compositional maturity.\n\nNegative space does two things: it isolates the subject so the eye has nowhere else to go, and it creates mood. A person standing alone in a vast, empty landscape conveys loneliness, freedom, or scale in a way that a tight crop never could.\n\nThe subject should be small but the undisputed focal point. Choose backgrounds that are clean and uncluttered — sky is your best friend here.',
+    tips:['The subject should be small but the clear focal point — do not bury it in noise','Sky, water, plain walls, and open floor all make excellent negative space','Combine with Rule of Thirds: place the subject at a power point, leave space in the remaining thirds'],
+    mission:'Photograph a subject that occupies 20–30% of the frame maximum, with the remaining space being intentional, clean negative space. The subject must still be the clear focal point.' },
+
+  { id:6, module:'Composition', name:'Foreground Interest',
+    lesson:'Great landscape and travel photography almost always includes a strong foreground element. Without it, photos feel flat — two-dimensional representations of a three-dimensional world. A foreground element creates depth layers: near, mid, and far.\n\nThe foreground does not have to be the subject — it often is not. Rocks, flowers, patterns in sand, a railing, puddles — any element that is interesting up close and leads the eye back into the scene works.\n\nThis technique forces you to get low and close, which changes your perspective dramatically. Most people photograph the world standing up at eye level. Get down to the ground and the same scene becomes completely different.',
+    tips:['Get low and close to the foreground element — it needs to feel genuinely near','The foreground should complement the background subject, not compete with it','Wide-angle perspective exaggerates the foreground-to-background relationship'],
+    mission:'Photograph a scene with a clear three-layer composition: an interesting foreground element close to the camera, a mid-ground subject, and a background. All three should be visible and contribute to the image.' },
+
+  { id:7, module:'Composition', name:'The Golden Ratio',
+    lesson:'The Golden Ratio (approximately 1:1.618) appears throughout nature, art, and architecture. In photography, it describes a spiral composition where the eye enters at the wide end and travels inward to the focal point at the tight centre of the spiral — similar to a nautilus shell.\n\nIn practice, you do not need to trace a spiral. The Phi grid — a slightly refined version of the Rule of Thirds — places the key lines closer to the centre. Placing your subject where the spiral terminates creates a composition that feels intuitively balanced.\n\nThe Golden Ratio is harder to apply than Rule of Thirds but produces compositions that feel more organic and refined when done well.',
+    tips:['Think of it as a more refined Rule of Thirds — the subject sits slightly more centred','The spiral enters from a corner — lead the eye in from one corner to the focal point','Works beautifully in architecture, nature, and abstract photography'],
+    mission:'Photograph a scene where the composition follows a clear spiral or curved S-shape flow, leading the eye from the outer edge of the frame inward to the subject. Road curves, rivers, and staircases are natural starting points.' },
+
+  // MODULE 2 — LIGHT
+  { id:8, module:'Light', name:'Golden Hour',
+    lesson:'Golden hour — the hour after sunrise and the hour before sunset — produces the most flattering, dramatic, and warm light available to photographers. The sun is low, the light travels through more atmosphere, and the result is warm, soft, directional illumination that makes almost everything beautiful.\n\nShoot toward the light for silhouettes and dramatic rim lighting. Shoot with the light behind you for warm, soft fill. Shoot at 90 degrees to the light for beautiful side-lighting that reveals texture in faces, walls, and landscapes.\n\nThe window is short — often only 20–30 minutes of truly magic light. Scout your location in advance so you are ready to shoot the moment the light arrives.',
+    tips:['Golden hour is roughly 1 hour after sunrise and 1 hour before sunset — check a sunset app','Shoot toward the light for silhouettes; turn your back to it for warm, glowing subjects','Long shadows appear during golden hour — use them as leading lines or compositional elements'],
+    mission:'Photograph during golden hour (within 1 hour of sunrise or sunset). Submit at least one shot that clearly uses the warm, directional light — a silhouette, rim-lit subject, or long shadow composition.' },
+
+  { id:9, module:'Light', name:'Blue Hour',
+    lesson:'Blue hour is the 20–40 minute window after sunset (or before sunrise) when the sky turns a deep, saturated cobalt blue. The artificial lights of the city are on, but the sky still has detail and colour — creating a perfect balance between natural and artificial light.\n\nThis is the most cinematic light available. Cities, bridges, buildings, and street scenes come alive. The sky is never fully dark, so you avoid the flatness of pure night photography while gaining the drama of lit environments.\n\nYou will need to stabilise your camera — shutter speeds get long. Lean against a wall, use a mini tripod, or brace your elbows on a surface.',
+    tips:['Blue hour is 20–40 minutes after sunset — do not miss it by arriving too late','Stabilise your camera: lean against a wall or rest on a surface for sharp shots','Artificial lights (neon, street lights, windows) become part of the composition here'],
+    mission:'Photograph during blue hour or at night. At least one submission should include artificial light sources as intentional compositional elements — not just as background blur.' },
+
+  { id:10, module:'Light', name:'Window Light',
+    lesson:'A window is a natural soft box. Light from a window is directional, soft (because the sky is large), and free. It is one of the most versatile light sources available and requires no equipment.\n\nThe distance from the window matters enormously. Close to the window: bright, high contrast, dramatic shadows. Far from the window: soft, even, low contrast. Sheer curtains diffuse the light further, creating a beautifully soft wrap.\n\nFor portraits, position your subject at 45 degrees to the window for classic side-lighting. For food or objects, a window behind or to the side creates beautiful depth.',
+    tips:['Position subject at 45 degrees to window for classic portrait lighting','Sheer curtains diffuse harsh sunlight into a beautiful soft box','Move closer for drama, further away for soft even light — experiment with both'],
+    mission:'Photograph a portrait or still life using only natural window light — no artificial lights or flash. Show clear directionality in the light: visible shadows on one side of the subject.' },
+
+  { id:11, module:'Light', name:'Shadows as Subject',
+    lesson:'Most photographers treat shadows as problems to fix. The best photographers treat them as subjects to photograph. Shadows create graphic patterns, add mystery, reveal texture, and turn ordinary scenes into abstract compositions.\n\nHard shadows — from direct sun at midday or a bare bulb — are sharp-edged and dramatic. Soft shadows — from cloudy days or diffused windows — are gradual and subtle. Both have their place.\n\nLook for shadows cast by fences, railings, trees, and architectural elements. Photograph the shadow, not just the object casting it. The shadow is often more interesting.',
+    tips:['Harsh midday sun (usually avoided) creates perfect hard-edged graphic shadows','Shoot the shadow itself as the subject — not just the object casting it','Shadows reveal texture in surfaces: walls, sand, and fabric come alive'],
+    mission:'Photograph a scene where a shadow is the primary subject or a dominant compositional element. The shadow itself — its shape, pattern, or graphic quality — should be what makes the image interesting.' },
+
+  { id:12, module:'Light', name:'Silhouettes',
+    lesson:'A silhouette is one of the most powerful and recognisable photographic forms. The subject is dark against a bright background — all detail is stripped away, leaving only shape and form.\n\nThe key to a strong silhouette is a subject with a recognisable, clear outline. People with interesting poses, trees against sky, birds in flight — all read clearly as silhouettes. Cluttered or ambiguous shapes become muddy.\n\nExpose for the background (the bright sky or backlight), not the subject. Your camera wants to expose for the dark subject and will wash out the background. Override it: meter on the bright area and let the subject go dark.',
+    tips:['Expose for the bright background — meter on the sky, not the subject','The subject\'s silhouette must have a clear, recognisable shape — avoid cluttered outlines','Shoot at golden hour or against any bright light source: windows, lamps, sky'],
+    mission:'Photograph a strong silhouette where the subject is completely dark against a bright background. The shape of the subject should be immediately recognisable without any internal detail.' },
+
+  { id:13, module:'Light', name:'Colour Temperature',
+    lesson:'Light has colour. Daylight is blue-white. Candlelight and tungsten bulbs are warm orange. Fluorescent lights are green-tinged. This quality is called colour temperature, measured in Kelvin.\n\nYour camera\'s Auto White Balance usually compensates for this automatically, making everything look neutral. But sometimes the colour cast IS the mood — the warm orange of a cafe at night, the cool blue of early morning — and you should preserve it.\n\nLearning to set a custom white balance or adjust it in editing gives you creative control over the emotional temperature of your images.',
+    tips:['Auto White Balance removes colour casts — switch to daylight WB to preserve warm light','Cool (blue) tones feel calm, distant, or melancholy; warm (orange) tones feel intimate','Shooting RAW lets you adjust white balance non-destructively in editing'],
+    mission:'Photograph two contrasting light environments that show clearly different colour temperatures — one warm (golden, orange), one cool (blue, white). Submit both as separate shots.' },
+
+  // MODULE 3 — PEOPLE
+  { id:14, module:'People & Storytelling', name:'Portrait Basics',
+    lesson:'A great portrait captures the essence of a person — their character, mood, or a moment of genuine expression. It is not about having perfect lighting or the right lens. It is about connection.\n\nFocus on the nearest eye. The eye is the anchor of any portrait — if it is not sharp, nothing else matters. Use portrait or aperture priority mode with a wide aperture to blur the background and isolate the face.\n\nThe best portraits happen when subjects forget the camera exists. Talk to them. Give them something to think about. The moment they relax and stop performing is usually when the real shot happens.',
+    tips:['Always focus on the nearest eye — it is the anchor of any portrait','Wide aperture (f/1.8–f/2.8) blurs background and isolates the face beautifully','The shot happens when they stop posing — keep shooting through the relaxed moments'],
+    mission:'Photograph a portrait of a person (or pet) where the nearest eye is in sharp focus and the background is clearly separated from the subject. The subject should appear natural and unforced.' },
+
+  { id:15, module:'People & Storytelling', name:'Candid Photography',
+    lesson:'Candid photography captures genuine, unposed moments. It is the decisive moment — the laugh, the glance, the gesture — that reveals something true about a person or a scene that a posed photograph never could.\n\nThe challenge is invisibility. People behave differently when they know they are being photographed. Use a small camera, shoot from the hip, use a zoom from a distance, or work in environments where cameras are expected (markets, events, streets).\n\nPre-focus. Anticipate. Have your settings ready. The decisive moment is brief — there is no time to adjust exposure when it arrives.',
+    tips:['Pre-focus on an area and wait for subjects to move into it rather than chasing them','Use a 50mm or longer focal length to keep distance and reduce self-consciousness','Continuous shooting mode helps capture the exact peak expression'],
+    mission:'Photograph three candid moments — unposed, natural, genuine. The subjects should appear unaware of or unaffected by the camera. Street scenes, family moments, and public gatherings all work well.' },
+
+  { id:16, module:'People & Storytelling', name:'Environmental Portraits',
+    lesson:'An environmental portrait places a person in their context — their workplace, home, hobby space, or daily environment. The setting reveals as much about the person as their expression does.\n\nThe environment should take up significant space in the frame — at least 40%. The person should be interacting with or related to their environment, not simply standing in front of it.\n\nThink like a photojournalist. What does this space say about this person? What objects or elements carry meaning? Include visual clues to their personality, passion, or role.',
+    tips:['Give the subject something to do — interact with their environment, not just stand in it','Include environmental details that tell the story: tools, objects, textures','Wide lenses emphasise the environment; telephoto compresses and isolates the person'],
+    mission:'Photograph a person in an environment that tells us something about who they are — their job, hobby, home, or daily life. The setting should take up at least 40% of the frame.' },
+
+  { id:17, module:'People & Storytelling', name:'Storytelling in One Frame',
+    lesson:'A great photograph tells a story. Not a caption — a story. Something happened before the shutter clicked, and something will happen after. The photograph is one moment in a narrative, and the best ones make us feel that.\n\nThe ingredients of a strong story photograph: a clear subject, some form of action or emotion, and environmental context. The action does not have to be dramatic — a vendor counting change, a child looking at something off-frame, two people in conversation — all imply a world beyond the edge of the image.\n\nAsk yourself: what is the question this photograph asks the viewer? If a photo does not raise a question, it rarely tells a story.',
+    tips:['Action implies narrative — even small actions suggest what happened before and after','Someone looking off-frame invites the viewer to wonder what they are looking at','Environmental context anchors the story in a specific time and place'],
+    mission:'Photograph a single image that tells a clear story — there is a subject, an implied action or emotion, and enough context to suggest a world beyond the frame. The viewer should want to know more.' },
+
+  // MODULE 4 — URBAN & ENVIRONMENT
+  { id:18, module:'Urban & Environment', name:'Architecture',
+    lesson:'Architecture photography is about finding the geometry, scale, and beauty in built structures. Buildings are designed — every angle, line, and proportion was chosen. Your job is to find the angle that reveals the designer\'s intention most clearly.\n\nShoot upward for dramatic perspective and converging vertical lines. Shoot straight on for symmetry and graphic power. Look for the abstract detail — a pattern of windows, the curve of a staircase — as a counterpoint to the wide establishing shot.\n\nEarly morning light is best. The sun is low, the shadows reveal texture, and the streets are empty.',
+    tips:['Shoot upward for dramatic perspective — converging lines add power and scale','Early morning gives low light and empty streets — perfect for clean architecture shots','Look for the abstract detail inside the larger structure: windows, grids, curves'],
+    mission:'Photograph a building or structure from at least two perspectives: one wide shot showing scale and context, and one detail or abstract shot focusing on a geometric element of the structure.' },
+
+  { id:19, module:'Urban & Environment', name:'Urban Geometry',
+    lesson:'Cities are full of abstract geometry — lines, shapes, patterns, and forms created by architecture, infrastructure, and design. Training your eye to see pure geometry rather than recognisable structures is a skill that transforms urban photography.\n\nLook up, look down, look close. Geometry hides in unexpected places: the pattern of a drain cover, the lines of a multi-storey car park, the shadow grid cast by a fire escape.\n\nConvert to black and white to strip away colour and emphasise form. Geometry becomes much more powerful when you remove the distraction of colour.',
+    tips:['Look up, down, and close — geometry hides everywhere in urban environments','Convert to black and white to emphasise form and line over colour','Shadows create temporary geometric patterns all day — watch how they shift'],
+    mission:'Photograph three abstract geometric compositions in an urban environment. The images should be primarily about form, line, shape, or pattern — not about a recognisable subject or narrative.' },
+
+  { id:20, module:'Urban & Environment', name:'Landscapes',
+    lesson:'Landscape photography is the art of making the viewer feel present in a place. The technical challenges are real — dynamic range between sky and ground, the need for sharp focus throughout, the patience to wait for the right light — but the fundamental challenge is compositional.\n\nA strong foreground element is almost always required. Without it, landscapes feel flat. Include rocks, flowers, leading lines, or textures in the foreground to create depth.\n\nLight transforms landscapes. The same scene at noon and at golden hour are completely different photographs. Plan your shooting around the light, not the location.',
+    tips:['A strong foreground element is essential — without it landscapes feel flat and empty','Return to the same location at different times of day — light changes everything','Include a sky only when it is interesting; an empty blue sky adds little'],
+    mission:'Photograph a landscape that includes a strong foreground element, an interesting mid-ground, and a sky or distant background. Shoot during golden or blue hour if possible for the best light.' },
+
+  { id:21, module:'Urban & Environment', name:'Macro & Close-Up',
+    lesson:'The macro world is a parallel universe hiding in plain sight. Flowers, insects, water drops, fabric, rust, skin — at extreme close range, everyday objects become alien and beautiful.\n\nSharp focus at macro distances is incredibly difficult to achieve. The depth of field becomes razor thin. Even breathing can cause blur. Stabilise yourself completely — brace your arms, use a surface, hold your breath for the shot.\n\nLight is also challenging up close. Getting the camera close to a subject often blocks the light. Use a reflector, shoot near a window, or use a ring flash if available.',
+    tips:['Stabilise completely — even breathing causes blur at macro distances','Use continuous autofocus or manual focus, and take many shots to get one sharp one','Natural window light works well for macro — position the subject near a window'],
+    mission:'Photograph an extreme close-up of a natural subject (flower, leaf, insect, water drop) and a manmade object. The camera should be as close as your phone or lens allows.' },
+
+  { id:22, module:'Urban & Environment', name:'Reflections',
+    lesson:'Reflective surfaces — puddles, windows, mirrors, polished metal, still water — create natural opportunities for surreal, layered, or symmetrical images. The reflection either doubles the world or inverts it, and both effects are visually compelling.\n\nShoot low to maximise puddle reflections. Even a thin film of water on a pavement after rain creates mirror-like surfaces. The golden hour is perfect for puddle shots.\n\nReflections in glass allow you to layer the world inside with the world outside — people on the street appearing to float inside buildings, cityscapes superimposed on faces.',
+    tips:['Shoot low to the ground to maximise puddle and water surface reflections','Glass reflections let you layer interior and exterior worlds — experiment with angles','Still water gives the sharpest reflections — even slight wind causes distortion'],
+    mission:'Photograph three reflections using different reflective surfaces (puddle, glass, mirror, metal). At least one should be an abstract reflection where the original subject is not immediately obvious.' },
+
+  // MODULE 5 — TECHNICAL
+  { id:23, module:'Technical', name:'Exposure Triangle',
+    lesson:'Every photograph is determined by three variables: aperture (the size of the lens opening), shutter speed (how long the sensor is exposed), and ISO (the sensitivity of the sensor). These three form the exposure triangle — change one, and you must compensate with another.\n\nAperture controls depth of field: wide aperture (f/1.8) = blurry background; narrow aperture (f/16) = everything sharp. Shutter speed controls motion: fast shutter freezes action; slow shutter blurs movement. ISO controls grain: low ISO is clean; high ISO adds noise.\n\nThe skill is knowing which trade-off to make for the look you want.',
+    tips:['On phones, use Pro/Manual mode to access these controls independently','Wide aperture (f/1.8–f/2.8) = subject sharp, background blurred; great for portraits','Fast shutter (1/500+) freezes action; slow shutter (1/30 or slower) blurs motion creatively'],
+    mission:'Demonstrate intentional exposure control: one photo with deliberate motion blur (slow shutter or simulated), and one photo with intentionally shallow depth of field (wide aperture or portrait mode).' },
+
+  { id:24, module:'Technical', name:'Depth of Field',
+    lesson:'Depth of field describes how much of the image is in sharp focus. Shallow depth of field (only the subject sharp, background blurred) creates subject isolation and a professional look. Deep depth of field (everything sharp from near to far) works for landscapes and architecture.\n\nOn a camera, aperture controls depth of field directly. On a phone, portrait mode simulates shallow depth of field using computational blur. Physical DOF on a phone is limited by sensor size, but getting very close to your subject increases the blur naturally.\n\nLearning to control depth of field intentionally — rather than accepting whatever the camera decides — is a significant step in photographic maturity.',
+    tips:['Get physically closer to your subject to increase background blur, even on a phone','Portrait mode works well for people; for objects, try getting very close instead','A background with distance from the subject blurs more easily than one right behind'],
+    mission:'Photograph the same subject twice: once with maximum background blur (portrait mode, wide aperture, or getting very close), and once with everything in sharp focus (landscape mode or small aperture).' },
+
+  { id:25, module:'Technical', name:'Freezing Motion',
+    lesson:'Photographing fast-moving subjects — people running, water splashing, birds flying — requires understanding shutter speed. A fast enough shutter freezes the motion, creating a sharp image of something that was moving too fast for the eye to see clearly.\n\nFor general sports and action: 1/500s or faster. For splashing water and very fast action: 1/1000s or faster. For birds in flight: 1/2000s minimum.\n\nOn phones, use Sport mode, continuous shooting, or burst mode. In bright daylight, fast shutter speeds are achievable — in darker conditions you will need to raise ISO and accept some grain.',
+    tips:['Burst/continuous shooting captures the peak moment you would otherwise miss','Pre-focus on a spot and wait for the subject to move into the frame','Bright daylight allows fast shutter speeds without noise — shoot action outdoors'],
+    mission:'Photograph moving subjects (people, water, animals, vehicles) where the motion is clearly frozen sharp. The subject should be mid-action — not static — and the result should be tack sharp.' },
+
+  { id:26, module:'Technical', name:'Motion Blur',
+    lesson:'Motion blur, used intentionally, is a powerful creative tool. Rather than freezing action, you let moving subjects blur while keeping stationary elements sharp. The result conveys movement, energy, and the passage of time in a way that frozen action cannot.\n\nPanning is the most dramatic technique: follow a moving subject with the camera during a slow exposure. The background blurs while the subject stays relatively sharp. This requires practice — 20–30 attempts to get a clean panning shot is normal.\n\nSlower shutter speeds (1/15s to 1 second) blur anything moving. Stabilise the camera on a surface for the static parts to be sharp.',
+    tips:['For panning: follow the subject smoothly, keep the shutter at 1/30–1/60s, and practice many times','Stabilise the camera on a surface for blur of moving elements with sharp backgrounds','Long exposure water shots (waterfalls, waves) require a tripod or solid surface support'],
+    mission:'Photograph a scene with intentional, creative motion blur. The blur should feel deliberate — either through panning (moving subject relatively sharp, background blurred) or long exposure (static scene, moving elements blurred).' },
+
+  { id:27, module:'Technical', name:'Low Light Photography',
+    lesson:'Low light forces every technical skill to converge. You need high ISO (accepting noise), wide aperture (for maximum light), and slow shutter (risking blur). The skill is managing these trade-offs intelligently.\n\nStabilisation is everything in low light. The human hand becomes a liability at shutter speeds below about 1/60s. Press your camera against a wall, rest it on a table, use your elbows as a tripod.\n\nModern phones and cameras handle high ISO far better than they used to. ISO 3200 on a current phone is often usable. Do not be afraid to push ISO — a slightly grainy shot of a great moment beats a sharp shot of nothing.',
+    tips:['Stabilise against any solid surface — walls, tables, railings — for sharp low-light shots','On phones, use Night Mode which stacks multiple exposures for cleaner results','Embrace grain — a grainy photograph with atmosphere beats a technically perfect nothing'],
+    mission:'Photograph three images in genuinely low-light conditions (evening, night, dimly lit interior). At least one should include artificial light sources as part of the composition.' },
+
+  // MODULE 6 — CREATIVE
+  { id:28, module:'Creative', name:'Black & White',
+    lesson:'Removing colour forces the viewer to see tone, contrast, and texture. In black and white, a mediocre colour photograph often improves dramatically — but a truly great black and white photograph requires you to see in monochrome before you shoot.\n\nLook for tonal contrast (light areas next to dark areas), strong shadows, and interesting texture. Colour photographs rely partly on colour relationships; black and white photographs must stand entirely on their tonal relationships.\n\nShoot in colour and convert in editing — this gives you full control over the conversion. Converting a colour photograph to black and white is not the same as seeing in black and white from the start, but it is a good way to train your eye.',
+    tips:['Look for tonal contrast first — a photo with similar tones throughout is flat in B&W','Texture becomes far more prominent in B&W: skin, bark, brick, fabric all come alive','High contrast (deep blacks, bright whites) is more powerful than flat grey midtones'],
+    mission:'Photograph three images specifically designed to work in black and white — high contrast, strong shadows or texture, or graphic composition. Convert them to black and white before submitting.' },
+
+  { id:29, module:'Creative', name:'Colour as Subject',
+    lesson:'Sometimes colour itself is the point. A photo built around a colour relationship — complementary colours, a monochromatic palette, or a single accent colour against neutral surroundings — can be stunning even without strong composition or dramatic light.\n\nComplementary colour pairs: blue and orange (the most powerful), red and green, yellow and purple. These pairs are opposite on the colour wheel and create maximum visual vibration when placed together.\n\nMonochromatic palettes — multiple shades of the same colour — create a sense of calm, cohesion, and sophistication. All-blue photographs, all-green scenes, dusty all-pink environments all work beautifully.',
+    tips:['Blue and orange is the most powerful complementary pair — the basis of most film looks','Monochromatic does not mean black and white — it means all shades of one colour','One bold accent colour on a neutral background (red door on grey wall) pops immediately'],
+    mission:'Photograph three images where colour is the primary subject: one with complementary colours (blue/orange, red/green, or yellow/purple), one monochromatic, and one with a single accent colour on a neutral background.' },
+
+  { id:30, module:'Creative', name:'Abstracts',
+    lesson:'Abstract photography removes the literal and asks the viewer to respond to pure form, colour, texture, or pattern. The subject becomes unrecognisable — or barely recognisable — and what remains is a purely visual experience.\n\nExplore extreme close-ups (a soap bubble, the pattern of a cut vegetable), intentional camera movement during a long exposure, deliberate out-of-focus shots that reduce subjects to blurs of colour, or reflections so distorted that the original is lost.\n\nStrong composition matters MORE in abstract photography, not less. Without a recognisable subject, the image must stand entirely on its formal qualities.',
+    tips:['Extreme close-ups of everyday objects create instantly abstract images','Intentional camera movement during a slow exposure creates streaks and blur abstraction','Out-of-focus shots reduce subjects to blobs of colour — beautiful for bokeh abstracts'],
+    mission:'Photograph three images where the subject is completely abstract or barely recognisable — viewers should respond to colour, form, texture, or pattern rather than identifying a literal subject.' },
+
+  { id:31, module:'Creative', name:'Street Photography',
+    lesson:'Street photography is the most challenging and rewarding genre: documenting real life in public spaces, candidly, with intention. The great street photographers — Cartier-Bresson, Vivian Maier, Garry Winogrand — created an archive of human life that no other medium could.\n\nBe present. Walk slowly. Observe before you photograph. Look for the decisive moment — the instant when gesture, expression, light, and composition align. Pre-focus on a distance and shoot as subjects enter that zone.\n\nStreet photography requires practice, patience, and thick skin. Most shots will not work. The ones that do are worth everything.',
+    tips:['Pre-focus at a distance (3–5 metres) and wait for subjects to enter your zone','The decisive moment is brief — continuous shooting helps capture it','Walk the same area repeatedly at different times — you learn what to expect and where'],
+    mission:'Photograph three street images that capture genuine human life in public spaces: one showing human interaction, one that is essentially an environmental shot with a human presence, and one decisive-moment shot.' },
+
+  { id:32, module:'Creative', name:'Food Photography',
+    lesson:'Food photography is everywhere, but great food photography is rare. The difference between a snapshot of a meal and a compelling food photograph is almost entirely about light, angle, and styling.\n\nNatural window light is the best light for food. Harsh overhead light flattens and dulls food. Side-lighting from a window reveals texture and creates depth. A white card reflector on the shadow side fills the shadows without adding another light source.\n\nAngle choices: directly overhead (flat lay) for showing arrangement and quantity; 45-degree angle for showing height and layers; side-on for drinks and stacked items showing their layers.',
+    tips:['Natural side window light is almost always the best light for food photography','Add a white card reflector opposite the window to fill shadows gently','Shoot from directly above (flat lay) for arrangements; 45 degrees for height and texture'],
+    mission:'Photograph food or drink with clearly intentional styling and lighting. Submit from at least two different angles. Natural light only — no flash.' },
+
+  { id:33, module:'Creative', name:'Nature & Details',
+    lesson:'Nature offers infinite photographic subject matter — but photographing it well requires slowing down. The best nature photographs come from patience and proximity, not from walking quickly through a landscape and snapping what you see.\n\nGet close. Most people photograph nature at a distance where individual subjects lose their character. Get close enough that a flower fills the frame, an insect becomes a portrait, a leaf reveals its structure.\n\nReturn to the same place repeatedly. Seasons, weather, and time of day completely change what is available to photograph. A bare tree in winter and the same tree in full bloom are completely different photographs.',
+    tips:['Get much closer than feels natural — nature reveals character at close range','Return to the same location across seasons — the same tree is different every month','Patience is the most important skill: wait for a butterfly to land, a bird to pose'],
+    mission:'Photograph nature subjects from very close range — flowers, leaves, insects, water, bark, or similar. The camera should be as close as possible. Show detail and texture that would be invisible from a normal distance.' },
+
+  { id:34, module:'Creative', name:'Night Photography',
+    lesson:'Pure night photography — after blue hour, when the sky is black — creates a completely different visual world. Artificial lights become the only illumination, and the rules of daytime photography are reversed.\n\nLight trails from cars create dramatic leading lines and convey the energy of the city. Star trails require very long exposures (minutes to hours) and dark skies far from city lights. Neon signs and lit windows become natural beauty lighting.\n\nStabilisation is now essential rather than just helpful. Rest your camera on a surface or use a tripod. Shutter speeds of seconds to minutes are common.',
+    tips:['Rest camera on a solid surface for exposures longer than 1–2 seconds','Light trails require 5–30 second exposures on a stable surface — find a traffic junction','Neon signs make beautiful natural light sources for portraits and street scenes at night'],
+    mission:'Photograph three night images after full dark. At least one should feature light trails or artificial light as a primary compositional element. All should be sharp (stabilise the camera).' },
+
+  { id:35, module:'Creative', name:'Mobile Photography',
+    lesson:'The best camera is the one you have with you — and for most people, that is a smartphone. Modern phone cameras are extraordinary tools, but they are underused because most people rely entirely on automatic modes.\n\nLearn the Pro or Manual mode on your phone. Control ISO to manage noise, shutter speed for motion, and white balance for creative colour. Learn which of your phone\'s lenses (wide, standard, telephoto) to use for which situation.\n\nPhone cameras are particularly strong for street photography (inconspicuous), food (close focus, good macro performance), and architecture (wide angle on the primary lens).',
+    tips:['Use Pro/Manual mode — controlling ISO and shutter speed transforms mobile photography','The ultrawide lens distorts perspective dramatically — use it intentionally, not by default','Lock focus and exposure separately on phones: tap to focus, then slide the exposure'],
+    mission:'Photograph using only your phone\'s manual/pro controls — not the standard auto mode. Submit images that demonstrate intentional exposure control: one low-ISO clean image, one high-ISO atmospheric image, and one with deliberate shutter speed choice.' },
+
+  { id:36, module:'Creative', name:'Your Signature Style',
+    lesson:'After 35 chapters, you have developed a body of photographic knowledge and, whether consciously or not, a photographic eye. This final chapter asks you to identify and demonstrate what makes YOUR photography distinctive.\n\nLook back at your best photographs from this journey. What do they have in common? A preference for certain light? A recurring subject matter? A compositional tendency — wide and empty, or tight and detailed? These consistencies are the beginning of your style.\n\nStyle is not invented — it is discovered through looking carefully at your own work. The photographers with the strongest styles are not those who tried hardest to be distinctive; they are the ones who were most honest about what they were naturally drawn to.',
+    tips:['Look at your 10 best photos — what do they have in common? That is your style emerging','Consistency over perfection: a coherent body of work is more powerful than isolated great shots','Your limitations are often your strengths — embrace what your eye naturally finds'],
+    mission:'Photograph three images that best represent your personal photographic style — the shots that most feel like YOU. Write a one-sentence description in your mind: "My photography is about…" Let that guide your selection.' }
+];
+
+const MODULES = ['Composition','Light','People & Storytelling','Urban & Environment','Technical','Creative'];
+
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+let currentUser = null;
+let progress    = {}; // { chId: { count, scores, avgScore } }
+let activeChapter = null;
+let uploadB64   = null;
+let uploadMime  = null;
+let previewUrl  = null;
+let sessionCount = 0;  // submissions this session for active chapter
+let sessionScores = [];
+
+// ═══════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════
+function esc(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function scoreColor(s){ return s>=8?'var(--green)':s>=6?'var(--gold)':'rgba(240,237,232,0.5)'; }
+function scoreClass(s){ return s>=8?'high':s>=6?'mid':'low'; }
+function showToast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
+
+// ═══════════════════════════════════════════
+// NAV
+// ═══════════════════════════════════════════
+function renderNavAuth(){
+  const n = esc(currentUser.user_metadata?.display_name || currentUser.email.split('@')[0]);
+  document.getElementById('navAuthArea').innerHTML =
+    `<span style="font-size:0.72rem;color:rgba(240,237,232,0.3)">Hi, ${n}</span>
+     <button onclick="signOut()" style="background:none;border:none;cursor:pointer;font-size:0.72rem;letter-spacing:0.07em;text-transform:uppercase;color:rgba(240,237,232,0.3);font-family:'DM Sans',sans-serif" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='rgba(240,237,232,0.3)'">Sign Out</button>`;
+}
+function openMobileMenu(){
+  document.getElementById('mobileMenu').classList.add('open');
+  document.body.style.overflow='hidden';
+  const el = document.getElementById('mobileMenuUser');
+  if(el) el.textContent = 'Hi, '+(currentUser?.user_metadata?.display_name||currentUser?.email?.split('@')[0]||'');
+}
+function closeMobileMenu(){ document.getElementById('mobileMenu').classList.remove('open'); document.body.style.overflow=''; }
+document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal(); closeMobileMenu(); }});
+
+// ═══════════════════════════════════════════
+// PROGRESS
+// ═══════════════════════════════════════════
+async function loadProgress(){
+  try {
+    const { data } = await sb.from('chapter_submissions').select('chapter_id,score,passed').eq('user_id', currentUser.id);
+    progress = {};
+    (data||[]).forEach(r => {
+      if(!progress[r.chapter_id]) progress[r.chapter_id] = { count:0, scores:[] };
+      progress[r.chapter_id].count++;
+      if(r.score) progress[r.chapter_id].scores.push(r.score);
+    });
+    Object.keys(progress).forEach(k => {
+      const s = progress[k].scores;
+      progress[k].avgScore = s.length ? Math.round(s.reduce((a,b)=>a+b,0)/s.length) : 0;
+    });
+  } catch(e){ console.warn('Progress load failed', e); }
+}
+
+function getChProg(chId){ return progress['ch-'+chId] || { count:0, scores:[], avgScore:0 }; }
+function isComplete(chId){ return getChProg(chId).count >= 3; }
+
+async function saveSubmission(chId, score, feedback){
+  try {
+    await sb.from('chapter_submissions').insert({
+      user_id: currentUser.id,
+      chapter_id: 'ch-'+chId,
+      score,
+      passed: true,
+      feedback: feedback || ''
+    });
+    if(!progress['ch-'+chId]) progress['ch-'+chId] = { count:0, scores:[], avgScore:0 };
+    progress['ch-'+chId].count++;
+    progress['ch-'+chId].scores.push(score);
+    const s = progress['ch-'+chId].scores;
+    progress['ch-'+chId].avgScore = Math.round(s.reduce((a,b)=>a+b,0)/s.length);
+  } catch(e){ console.warn('Save submission failed', e); }
+}
+
+// ═══════════════════════════════════════════
+// CATALOGUE RENDER
+// ═══════════════════════════════════════════
+function renderCatalogue(){
+  const done = CHAPTERS.filter(c => isComplete(c.id)).length;
+  document.getElementById('statDone').textContent = done;
+  document.getElementById('statLeft').textContent = 36 - done;
+  document.getElementById('progBar').style.width = Math.round((done/36)*100)+'%';
+  document.getElementById('progLabel').textContent = done+' / 36 chapters complete';
+
+  let html = '';
+  MODULES.forEach(mod => {
+    const chs = CHAPTERS.filter(c => c.module === mod);
+    html += `<div class="module-label">${mod}</div><div class="chapter-grid">`;
+    chs.forEach(ch => {
+      const prog = getChProg(ch.id);
+      const done3 = prog.count >= 3;
+      const started = prog.count > 0;
+      const dots = [0,1,2].map(i =>
+        `<div class="ch-dot ${i < prog.count ? 'done' : (i === prog.count && !done3 ? 'active' : '')}"></div>`
+      ).join('');
+      const badge = done3
+        ? `<span class="ch-badge badge-done">✓ ${prog.avgScore}/10</span>`
+        : started
+          ? `<span class="ch-badge badge-progress">${prog.count}/3</span>`
+          : `<span class="ch-badge badge-new">New</span>`;
+      html += `<div class="chapter-card ${done3?'done':started?'in-progress':''}" onclick="openChapter(${ch.id})">
+        <div class="ch-num">Ch ${String(ch.id).padStart(2,'0')} · ${ch.module}</div>
+        <div class="ch-name">${esc(ch.name)}</div>
+        <div class="ch-desc">${esc(ch.lesson.slice(0,90))}…</div>
+        <div class="ch-footer"><div class="ch-dots">${dots}</div>${badge}</div>
+      </div>`;
+    });
+    html += `</div>`;
+  });
+  document.getElementById('catalogue').innerHTML = html;
+}
+
+// ═══════════════════════════════════════════
+// MODAL
+// ═══════════════════════════════════════════
+function setView(v){ document.getElementById('modal').dataset.view = v; }
+
+function openChapter(id){
+  const ch = CHAPTERS.find(c => c.id === id);
+  if(!ch) return;
+  activeChapter = ch;
+  sessionCount = 0;
+  sessionScores = [];
+  uploadB64 = null; uploadMime = null; previewUrl = null;
+
+  document.getElementById('mChNum').textContent = 'Chapter '+String(id).padStart(2,'0')+' · '+ch.module;
+  document.getElementById('mChName').textContent = ch.name;
+
+  // Lesson
+  document.getElementById('lessonText').innerHTML = ch.lesson.split('\n\n').map(p=>`<p>${esc(p)}</p>`).join('');
+  document.getElementById('lessonTips').innerHTML = ch.tips.map(t=>
+    `<div class="lesson-tip"><span class="tip-icon">→</span><span class="tip-text">${esc(t)}</span></div>`
+  ).join('');
+  document.getElementById('missionPreview').textContent = ch.mission;
+
+  // Diagram
+  const diag = document.getElementById('lessonDiagram');
+  if(ch.diagram === 'thirds'){
+    diag.style.display = 'block';
+    diag.innerHTML = `<svg viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg">
+      <rect width="360" height="240" fill="#0d1a20"/>
+      <line x1="120" y1="0" x2="120" y2="240" stroke="rgba(232,184,75,0.35)" stroke-width="1" stroke-dasharray="4,3"/>
+      <line x1="240" y1="0" x2="240" y2="240" stroke="rgba(232,184,75,0.35)" stroke-width="1" stroke-dasharray="4,3"/>
+      <line x1="0" y1="80"  x2="360" y2="80"  stroke="rgba(232,184,75,0.35)" stroke-width="1" stroke-dasharray="4,3"/>
+      <line x1="0" y1="160" x2="360" y2="160" stroke="rgba(232,184,75,0.35)" stroke-width="1" stroke-dasharray="4,3"/>
+      <circle cx="120" cy="80"  r="6" fill="rgba(232,184,75,0.9)"/>
+      <circle cx="240" cy="80"  r="6" fill="rgba(232,184,75,0.9)"/>
+      <circle cx="120" cy="160" r="6" fill="rgba(232,184,75,0.9)"/>
+      <circle cx="240" cy="160" r="6" fill="rgba(232,184,75,0.9)"/>
+      <text x="180" y="228" text-anchor="middle" fill="rgba(232,184,75,0.4)" font-size="10" font-family="DM Sans, sans-serif">Place subject on any power point — not dead centre</text>
+    </svg>`;
+  } else if(ch.diagram === 'framing'){
+    diag.style.display = 'block';
+    diag.innerHTML = `<svg viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg">
+      <rect width="360" height="240" fill="#0a1015"/>
+      <rect x="60" y="30" width="240" height="180" fill="#0d2030"/>
+      <rect x="0"   y="0" width="60"  height="240" fill="#1a1208"/>
+      <rect x="300" y="0" width="60"  height="240" fill="#1a1208"/>
+      <rect x="0"   y="0" width="360" height="30"  fill="#1a1208"/>
+      <path d="M60,30 Q180,5 300,30" fill="#1a1208"/>
+      <circle cx="180" cy="130" r="22" fill="rgba(232,184,75,0.6)"/>
+      <rect x="168" y="152" width="24" height="38" fill="#1e3050" rx="2"/>
+      <rect x="60" y="30" width="240" height="180" fill="none" stroke="rgba(232,184,75,0.2)" stroke-width="1" stroke-dasharray="4,3"/>
+      <text x="180" y="228" text-anchor="middle" fill="rgba(232,184,75,0.4)" font-size="10" font-family="DM Sans, sans-serif">Arch creates a frame — eye goes to subject</text>
+    </svg>`;
+  } else {
+    diag.style.display = 'none';
+  }
+
+  // Reset mission UI
+  document.getElementById('missionError').classList.remove('show');
+  document.getElementById('missionLoading').style.display = 'none';
+  document.getElementById('analyseBtn').disabled = true;
+  document.getElementById('previewWrap').style.display = 'none';
+  document.getElementById('dropZone').style.display = 'flex';
+  document.getElementById('fileInput').value = '';
+
+  // If already complete
+  const prog = getChProg(ch.id);
+  const startBtn = document.getElementById('startMissionBtn');
+  if(prog.count >= 3){
+    startBtn.textContent = '✓ Completed';
+    startBtn.disabled = true;
+    startBtn.style.opacity = '0.5';
+  } else {
+    startBtn.textContent = 'Start Mission →';
+    startBtn.disabled = false;
+    startBtn.style.opacity = '';
+  }
+
+  setView('lesson');
+  document.getElementById('overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(){
+  document.getElementById('overlay').classList.remove('open');
+  document.body.style.overflow = '';
+  renderCatalogue();
+}
+
+function startMission(){
+  updateMissionDots();
+  document.getElementById('missionText').textContent = activeChapter.mission;
+  setView('mission');
+}
+
+function updateMissionDots(){
+  const total = getChProg(activeChapter.id).count + sessionCount;
+  let html = '';
+  for(let i=0;i<3;i++){
+    let cls = 'ch-dot';
+    if(i < total) cls += ' done';
+    else if(i === total) cls += ' active';
+    html += `<div class="${cls}"></div>`;
+  }
+  document.getElementById('missionDots').innerHTML = html;
+  const remaining = Math.max(0, 3 - total);
+  document.getElementById('missionCount').textContent = `${total}/3 submitted · ${remaining} remaining`;
+}
+
+// ═══════════════════════════════════════════
+// FILE HANDLING
+// ═══════════════════════════════════════════
+function onDragOver(e){ e.preventDefault(); document.getElementById('dropZone').classList.add('drag'); }
+function onDragLeave(){ document.getElementById('dropZone').classList.remove('drag'); }
+function onDrop(e){ e.preventDefault(); document.getElementById('dropZone').classList.remove('drag'); handleFile(e.dataTransfer.files[0]); }
+function onFileChange(e){ handleFile(e.target.files[0]); }
+
+function handleFile(file){
+  if(!file) return;
+  if(!['image/jpeg','image/png','image/webp'].includes(file.type)){ showMissionError('Please select a JPG, PNG or WEBP image.'); return; }
+  if(file.size > 5*1024*1024){ showMissionError('Image must be under 5MB.'); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    const url = e.target.result;
+    const img = new Image();
+    img.onload = () => {
+      const MAX=1024; let w=img.width, h=img.height;
+      if(w>h&&w>MAX){h=Math.round(h*MAX/w);w=MAX;} else if(h>MAX){w=Math.round(w*MAX/h);h=MAX;}
+      const c=document.createElement('canvas'); c.width=w; c.height=h;
+      c.getContext('2d').drawImage(img,0,0,w,h);
+      uploadB64 = c.toDataURL('image/jpeg',0.92).split(',')[1];
+      uploadMime = 'image/jpeg'; previewUrl = url;
+      document.getElementById('previewImg').src = url;
+      document.getElementById('previewWrap').style.display = 'block';
+      document.getElementById('dropZone').style.display = 'none';
+      document.getElementById('analyseBtn').disabled = false;
+    };
+    img.src = url;
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeFile(){
+  uploadB64=null; uploadMime=null; previewUrl=null;
+  document.getElementById('previewWrap').style.display = 'none';
+  document.getElementById('dropZone').style.display = 'flex';
+  document.getElementById('analyseBtn').disabled = true;
+  document.getElementById('fileInput').value = '';
+}
+
+function showMissionError(msg){ const el=document.getElementById('missionError'); el.textContent=msg; el.classList.add('show'); }
+
+// ═══════════════════════════════════════════
+// ANALYSE
+// ═══════════════════════════════════════════
+async function analysePhoto(){
+  if(!uploadB64 || !activeChapter) return;
+  document.getElementById('missionError').classList.remove('show');
+  document.getElementById('missionLoading').style.display = 'block';
+  document.getElementById('analyseBtn').disabled = true;
+  document.getElementById('previewWrap').style.display = 'none';
+  document.getElementById('dropZone').style.display = 'none';
+
+  try {
+    const { data:{ session } } = await sb.auth.getSession();
+    const token = session?.access_token;
+    const resp = await fetch(window.location.origin+'/api/chapter', {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json', ...(token?{Authorization:'Bearer '+token}:{}) },
+      body: JSON.stringify({
+        imageContent: { type:'image', source:{ type:'base64', media_type:uploadMime, data:uploadB64 } },
+        chapterId: 'ch-'+activeChapter.id,
+        chapterName: activeChapter.name,
+        chapterMission: activeChapter.mission
+      })
+    });
+
+    const raw = await resp.text();
+    let result;
+    try { result = JSON.parse(raw); } catch { throw new Error('Invalid server response'); }
+    if(!resp.ok) throw new Error(result.error || 'Analysis failed');
+    if(result.rejected){ showMissionError('Real photos only — '+result.reason); document.getElementById('missionLoading').style.display='none'; document.getElementById('dropZone').style.display='flex'; document.getElementById('analyseBtn').disabled=false; return; }
+
+    const score = result.score || result.composition_score || result.overall || 7;
+    const feedback = result.feedback || '';
+    const whatWorked = result.what_worked || result.worked || '';
+    const improve = result.improvement || result.improve || '';
+
+    // Save to DB
+    await saveSubmission(activeChapter.id, score, feedback);
+    sessionCount++;
+    sessionScores.push(score);
+
+    // Show result
+    document.getElementById('missionLoading').style.display = 'none';
+    const scoreEl = document.getElementById('rScore');
+    scoreEl.textContent = score;
+    scoreEl.className = 'result-score-big ' + scoreClass(score);
+    scoreEl.style.color = scoreColor(score);
+    document.getElementById('rLabel').textContent = score >= 8 ? 'Excellent shot!' : score >= 6 ? 'Good effort!' : 'Keep practising!';
+    document.getElementById('rSub').textContent = activeChapter.name + ' · Photo '+(getChProg(activeChapter.id).count)+'/3';
+    document.getElementById('rFeedback').textContent = feedback;
+    document.getElementById('rWorked').textContent = whatWorked || '—';
+    document.getElementById('rImprove').textContent = improve || '—';
+
+    const totalNow = getChProg(activeChapter.id).count;
+    const remaining = Math.max(0, 3 - totalNow);
+    if(totalNow >= 3){
+      document.getElementById('rProgressNote').textContent = 'Chapter complete! 🎓 See your scorecard below.';
+      document.getElementById('nextShotBtn').textContent = 'See Scorecard →';
+      document.getElementById('nextShotBtn').onclick = showComplete;
+    } else {
+      document.getElementById('rProgressNote').textContent = remaining+' more photo'+(remaining!==1?'s':'')+' needed to complete this chapter.';
+      document.getElementById('nextShotBtn').textContent = 'Submit Next Photo →';
+      document.getElementById('nextShotBtn').onclick = nextShot;
     }
-    function closeMobileMenu() {
-      document.getElementById('mobileMenu').classList.remove('open');
-      document.body.style.overflow = '';
-    }
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMobileMenu(); });
-  </script>
+
+    setView('result');
+
+  } catch(err){
+    document.getElementById('missionLoading').style.display = 'none';
+    showMissionError('Failed: '+err.message);
+    document.getElementById('dropZone').style.display = 'flex';
+    document.getElementById('analyseBtn').disabled = false;
+  }
+}
+
+function nextShot(){
+  uploadB64=null; uploadMime=null; previewUrl=null;
+  document.getElementById('previewWrap').style.display='none';
+  document.getElementById('dropZone').style.display='flex';
+  document.getElementById('analyseBtn').disabled=true;
+  document.getElementById('fileInput').value='';
+  document.getElementById('missionError').classList.remove('show');
+  updateMissionDots();
+  setView('mission');
+}
+
+function showComplete(){
+  const ch = activeChapter;
+  const prog = getChProg(ch.id);
+  const avg = prog.avgScore;
+  document.getElementById('cSub').textContent = ch.name + ' · ' + ch.module;
+  document.getElementById('cScore').textContent = 'Average Score: ' + avg + '/10';
+
+  // Generate share card
+  const wrap = document.getElementById('canvasWrap');
+  wrap.style.display = 'block';
+  const canvas = document.getElementById('shareCanvas');
+  const ctx = canvas.getContext('2d');
+  const W=800, H=400;
+  ctx.fillStyle='#080808'; ctx.fillRect(0,0,W,H);
+  // Grid
+  ctx.strokeStyle='rgba(232,184,75,0.04)'; ctx.lineWidth=1;
+  for(let x=0;x<W;x+=60){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=60){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  // Gold bar
+  const g=ctx.createLinearGradient(0,0,0,H); g.addColorStop(0,'#e8b84b'); g.addColorStop(1,'#c49a2a');
+  ctx.fillStyle=g; ctx.fillRect(0,0,5,H);
+  // LensUp
+  ctx.font='bold 16px sans-serif';
+  ctx.fillStyle='#e8b84b'; ctx.fillText('LENS',50,50);
+  ctx.fillStyle='#f0ede8'; ctx.fillText('UP',50+ctx.measureText('LENS').width,50);
+  // Chapter complete
+  ctx.fillStyle='#f0ede8'; ctx.font='bold 42px sans-serif'; ctx.fillText('CHAPTER COMPLETE',50,130);
+  // Chapter name
+  ctx.fillStyle='#e8b84b'; ctx.font='24px sans-serif'; ctx.fillText(ch.name+' · '+ch.module,50,170);
+  // Divider
+  ctx.strokeStyle='rgba(232,184,75,0.2)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(50,195); ctx.lineTo(W-50,195); ctx.stroke();
+  // Score
+  ctx.fillStyle='#e8b84b'; ctx.font='bold 72px sans-serif'; ctx.fillText(avg,50,290);
+  ctx.fillStyle='rgba(240,237,232,0.4)'; ctx.font='22px sans-serif'; ctx.fillText('/10 average score',50+ctx.measureText(avg).width+12,285);
+  // Name
+  const name = currentUser?.user_metadata?.display_name || currentUser?.email?.split('@')[0] || 'Photographer';
+  const dateStr = new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+  ctx.fillStyle='rgba(240,237,232,0.5)'; ctx.font='17px sans-serif'; ctx.fillText('Completed by '+name,50,340);
+  ctx.fillStyle='rgba(240,237,232,0.25)'; ctx.font='13px sans-serif'; ctx.fillText(dateStr,50,362);
+  ctx.fillStyle='rgba(232,184,75,0.4)'; ctx.font='12px sans-serif'; ctx.fillText('lensup.vercel.app',W-170,H-20);
+
+  setView('complete');
+}
+
+function downloadCard(){
+  const canvas = document.getElementById('shareCanvas');
+  const ch = activeChapter;
+  const a = document.createElement('a');
+  a.download = 'lensup-ch'+ch.id+'-'+ch.name.toLowerCase().replace(/\s+/g,'-')+'.jpg';
+  a.href = canvas.toDataURL('image/jpeg',0.92);
+  a.click();
+}
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+async function init(){
+  const timeout = setTimeout(()=>{ window.location.href='login.html'; }, 5000);
+  try {
+    initSupabase();
+    currentUser = await getUser();
+    clearTimeout(timeout);
+    if(!currentUser){ window.location.href='login.html'; return; }
+    document.body.classList.add('auth-ready');
+    renderNavAuth();
+    await loadProgress();
+    renderCatalogue();
+  } catch(e){
+    clearTimeout(timeout);
+    window.location.href='login.html';
+  }
+}
+
+init();
+</script>
 </body>
 </html>
