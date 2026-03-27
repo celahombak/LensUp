@@ -1101,16 +1101,30 @@ async function analysePhoto(){
     const raw = await resp.text();
     let result;
     try { result = JSON.parse(raw); } catch { throw new Error('Invalid server response'); }
-    if(!resp.ok) throw new Error(result.error || 'Analysis failed');
-    if(result.rejected){ showMissionError('Real photos only — '+result.reason); document.getElementById('missionLoading').style.display='none'; document.getElementById('dropZone').style.display='flex'; document.getElementById('analyseBtn').disabled=false; return; }
+
+    // Chapter already complete — just show the scorecard
+    if (result.error === 'chapter_complete') {
+      document.getElementById('missionLoading').style.display = 'none';
+      showComplete();
+      return;
+    }
+
+    if (!resp.ok) throw new Error(result.error || 'Analysis failed');
+    if (result.rejected) { showMissionError('Real photos only — ' + result.reason); document.getElementById('missionLoading').style.display='none'; document.getElementById('dropZone').style.display='flex'; document.getElementById('analyseBtn').disabled=false; return; }
 
     const score = result.score || result.composition_score || result.overall || 7;
     const feedback = result.feedback || '';
     const whatWorked = result.what_worked || result.worked || '';
     const improve = result.improvement || result.improve || '';
 
-    // Save to DB
-    await saveSubmission(activeChapter.id, score, feedback);
+    // API already saved to DB — update local progress cache from API response
+    const totalNow = result.total_submitted || 1;
+    const chKey = 'ch-' + activeChapter.id;
+    if (!progress[chKey]) progress[chKey] = { count: 0, scores: [], avgScore: 0 };
+    progress[chKey].count = totalNow;
+    progress[chKey].scores.push(score);
+    const allScores = progress[chKey].scores;
+    progress[chKey].avgScore = Math.round(allScores.reduce((a,b) => a+b, 0) / allScores.length);
     sessionCount++;
     sessionScores.push(score);
 
@@ -1121,19 +1135,18 @@ async function analysePhoto(){
     scoreEl.className = 'result-score-big ' + scoreClass(score);
     scoreEl.style.color = scoreColor(score);
     document.getElementById('rLabel').textContent = score >= 8 ? 'Excellent shot!' : score >= 6 ? 'Good effort!' : 'Keep practising!';
-    document.getElementById('rSub').textContent = activeChapter.name + ' · Photo '+(getChProg(activeChapter.id).count)+'/3';
+    document.getElementById('rSub').textContent = activeChapter.name + ' · Photo ' + totalNow + '/3';
     document.getElementById('rFeedback').textContent = feedback;
     document.getElementById('rWorked').textContent = whatWorked || '—';
     document.getElementById('rImprove').textContent = improve || '—';
 
-    const totalNow = getChProg(activeChapter.id).count;
     const remaining = Math.max(0, 3 - totalNow);
-    if(totalNow >= 3){
+    if (totalNow >= 3) {
       document.getElementById('rProgressNote').textContent = 'Chapter complete! 🎓 See your scorecard below.';
       document.getElementById('nextShotBtn').textContent = 'See Scorecard →';
       document.getElementById('nextShotBtn').onclick = showComplete;
     } else {
-      document.getElementById('rProgressNote').textContent = remaining+' more photo'+(remaining!==1?'s':'')+' needed to complete this chapter.';
+      document.getElementById('rProgressNote').textContent = remaining + ' more photo' + (remaining !== 1 ? 's' : '') + ' needed to complete this chapter.';
       document.getElementById('nextShotBtn').textContent = 'Submit Next Photo →';
       document.getElementById('nextShotBtn').onclick = nextShot;
     }
