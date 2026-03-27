@@ -32,7 +32,7 @@ module.exports = async (req, res) => {
   // ── Daily limit: 1 submission per day ──
   const today = new Date().toISOString().split('T')[0];
   const limitRes = await fetch(
-    `${SB_URL}/rest/v1/analyses?user_id=eq.${userId}&created_at=gte.${today}T00:00:00.000Z&created_at=lte.${today}T23:59:59.999Z&select=id`,
+    `${SB_URL}/rest/v1/analyses?user_id=eq.${userId}&source=eq.feed&created_at=gte.${today}T00:00:00.000Z&created_at=lte.${today}T23:59:59.999Z&select=id`,
     { headers: { 'Authorization': authHeader, 'apikey': SB_ANON_KEY } }
   );
   const todayAnalyses = await limitRes.json();
