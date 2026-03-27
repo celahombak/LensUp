@@ -4,236 +4,397 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>LensUp — Learn Photography</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase.js"></script>
   <style>
-    body { visibility: hidden; }
-    body.auth-ready { visibility: visible; }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --black: #080808; --white: #f0ede8; --dark: #111010; --dark2: #181615;
-      --mid: #5a5550; --border: rgba(255,255,255,0.07);
-      --gold: #e8b84b; --gold2: #f5d07a; --green: #00e676; --red: #ff4444;
+      --sky: #00B4D8; --sky-dark: #0096B4; --sky-light: #90E0EF;
+      --sky-pale: #EAF8FC; --sky-xpale: #F4FCFE;
+      --teal: #1A936F; --teal-pale: #E8F6F1;
+      --coral: #FF6B6B; --coral-pale: #FFF0F0;
+      --yellow: #FFD166; --yellow-pale: #FFFBEE;
+      --purple: #7C3AED; --purple-pale: #F5F3FF;
+      --orange: #F97316; --orange-pale: #FFF7ED;
+      --bg: #FAFCFE; --surface: #FFFFFF; --surface2: #F4F8FA;
+      --text: #1A2B3C; --text-mid: #5A7080; --text-light: #9BB0BC;
+      --border: rgba(0,180,216,0.12); --border-input: #D4E8F0;
+      --shadow-sm: 0 2px 8px rgba(0,100,140,0.06);
+      --shadow-md: 0 8px 24px rgba(0,100,140,0.10);
+      --shadow-lg: 0 20px 60px rgba(0,100,140,0.14);
+      --radius-sm: 10px; --radius-md: 16px; --radius-lg: 24px;
+      /* Module colours */
+      --m1: #00B4D8; --m2: #FFD166; --m3: #FF6B6B;
+      --m4: #1A936F; --m5: #7C3AED; --m6: #F97316;
     }
-    body { background: var(--black); color: var(--white); font-family: 'DM Sans', sans-serif; font-weight: 300; min-height: 100vh; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: 'DM Sans', sans-serif; font-weight: 400;
+      min-height: 100vh; visibility: hidden;
+    }
+    body.auth-ready { visibility: visible; }
 
-    /* NAV */
-    nav { display: flex; align-items: center; justify-content: space-between; padding: 1rem 3rem; border-bottom: 1px solid var(--border); background: rgba(8,8,8,0.97); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(16px); }
-    .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; letter-spacing: 0.08em; color: var(--gold); text-decoration: none; }
-    .nav-logo span { color: var(--white); }
-    .nav-links { display: flex; align-items: center; gap: 2rem; }
-    .nav-link { font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(240,237,232,0.45); text-decoration: none; transition: color 0.2s; }
-    .nav-link:hover, .nav-link.active { color: var(--gold); }
-    .nav-burger { display: none; background: none; border: none; cursor: pointer; padding: 0.4rem; color: var(--white); flex-direction: column; gap: 5px; align-items: center; justify-content: center; }
-    .nav-burger span { display: block; width: 22px; height: 2px; background: var(--white); border-radius: 2px; }
+    /* ── NAV ── */
+    .top-nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(250,252,254,0.94); backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem; height: 60px;
+    }
+    .nav-logo { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.35rem; color: var(--sky); text-decoration: none; display: flex; align-items: center; gap: 0.35rem; }
+    .nav-links { display: flex; align-items: center; gap: 0.2rem; }
+    .nav-link { font-size: 0.82rem; font-weight: 600; color: var(--text-mid); text-decoration: none; padding: 0.45rem 0.8rem; border-radius: var(--radius-sm); transition: all 0.2s; }
+    .nav-link:hover { background: var(--sky-pale); color: var(--sky); }
+    .nav-link.active { background: var(--sky-pale); color: var(--sky); }
+    .nav-auth { display: flex; align-items: center; gap: 0.75rem; font-size: 0.82rem; }
+    .nav-user { font-weight: 600; color: var(--text-mid); }
+    .nav-signout { background: none; border: 1.5px solid var(--border-input); color: var(--text-mid); padding: 0.35rem 0.8rem; border-radius: var(--radius-sm); cursor: pointer; font-size: 0.78rem; font-family: 'DM Sans', sans-serif; font-weight: 600; transition: all 0.2s; }
+    .nav-signout:hover { border-color: var(--sky); color: var(--sky); }
+    .nav-burger { display: none; background: none; border: none; cursor: pointer; padding: 0.4rem; flex-direction: column; gap: 5px; align-items: center; justify-content: center; }
+    .nav-burger span { display: block; width: 22px; height: 2px; background: var(--text-mid); border-radius: 2px; }
 
-    /* MOBILE MENU */
-    .mobile-menu { display: none; position: fixed; inset: 0; background: rgba(8,8,8,0.98); z-index: 200; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(16px); }
+    /* ── MOBILE MENU ── */
+    .mobile-menu { display: none; position: fixed; inset: 0; background: rgba(250,252,254,0.98); z-index: 200; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(16px); }
     .mobile-menu.open { display: flex; }
-    .mobile-menu-close { position: absolute; top: 1.2rem; right: 1.5rem; background: none; border: none; color: var(--mid); font-size: 1.5rem; cursor: pointer; }
-    .mobile-menu-logo { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; color: var(--gold); margin-bottom: 2rem; }
-    .mobile-menu-logo span { color: var(--white); }
-    .mobile-menu a { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; letter-spacing: 0.06em; color: rgba(240,237,232,0.55); text-decoration: none; padding: 0.5rem 2rem; transition: color 0.2s; }
-    .mobile-menu a:hover, .mobile-menu a.active { color: var(--gold); }
-    .mobile-menu-divider { width: 40px; height: 1px; background: var(--border); margin: 0.8rem 0; }
-    .mobile-menu-auth { margin-top: 1rem; text-align: center; color: var(--mid); font-size: 0.72rem; }
-    .mobile-menu-auth span { color: rgba(240,237,232,0.5); display: block; margin-bottom: 0.6rem; }
-    .mobile-menu-signout { background: none; border: 1px solid var(--border); color: var(--mid); padding: 0.5rem 1.5rem; font-family: 'DM Sans', sans-serif; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; }
-    .mobile-menu-signout:hover { border-color: var(--gold); color: var(--gold); }
+    .mobile-menu-close { position: absolute; top: 1rem; right: 1.5rem; background: none; border: none; font-size: 1.5rem; color: var(--text-mid); cursor: pointer; }
+    .mobile-menu-logo { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.5rem; color: var(--sky); margin-bottom: 2rem; }
+    .mobile-menu a { font-family: 'Nunito', sans-serif; font-size: 1.5rem; font-weight: 800; color: var(--text-mid); text-decoration: none; padding: 0.6rem 2rem; transition: color 0.2s; }
+    .mobile-menu a:hover, .mobile-menu a.active { color: var(--sky); }
+    .mobile-menu-divider { width: 40px; height: 2px; background: var(--border); margin: 0.8rem 0; border-radius: 1px; }
+    .mobile-menu-auth { margin-top: 1rem; text-align: center; font-size: 0.82rem; color: var(--text-mid); }
+    .mobile-menu-auth span { display: block; margin-bottom: 0.6rem; font-weight: 600; }
+    .mobile-menu-signout { background: none; border: 1.5px solid var(--border-input); color: var(--text-mid); padding: 0.5rem 1.5rem; font-family: 'DM Sans', sans-serif; font-size: 0.82rem; font-weight: 600; cursor: pointer; border-radius: var(--radius-sm); transition: all 0.2s; }
+    .mobile-menu-signout:hover { border-color: var(--sky); color: var(--sky); }
 
-    /* HERO */
-    .page-hero { padding: 2.5rem 3rem 2rem; border-bottom: 1px solid var(--border); background: linear-gradient(135deg, rgba(232,184,75,0.04) 0%, transparent 60%); }
-    .hero-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 2rem; flex-wrap: wrap; }
-    .hero-left {}
-    .page-tag { font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); display: block; margin-bottom: 0.4rem; }
-    .page-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2rem, 4vw, 3rem); letter-spacing: 0.04em; line-height: 1; margin-bottom: 0.4rem; }
-    .page-title em { font-style: normal; color: var(--gold); }
-    .page-sub { font-size: 0.82rem; color: rgba(240,237,232,0.4); line-height: 1.7; max-width: 440px; }
-    .hero-stats { display: flex; gap: 2rem; }
-    .hstat { text-align: center; }
-    .hstat-val { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 0.04em; display: block; color: var(--gold); }
-    .hstat-lbl { font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--mid); }
+    /* ── HUD (hero bar) ── */
+    .hud {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 2rem;
+    }
+    .hud-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;
+    }
+    .hud-greeting { flex: 1; min-width: 180px; }
+    .hud-greeting-name { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.2rem; color: var(--text); }
+    .hud-greeting-sub { font-size: 0.78rem; color: var(--text-mid); margin-top: 0.1rem; }
+    .hud-stats { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+    .hud-stat {
+      display: flex; align-items: center; gap: 0.5rem;
+      background: var(--surface2); border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm); padding: 0.5rem 0.9rem;
+    }
+    .hud-stat-icon { font-size: 1.1rem; }
+    .hud-stat-val { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.1rem; color: var(--text); }
+    .hud-stat-lbl { font-size: 0.68rem; color: var(--text-light); font-weight: 600; }
+    .hud-stat.streak .hud-stat-val { color: var(--orange); }
+    .hud-stat.done .hud-stat-val { color: var(--teal); }
+    .hud-stat.xp .hud-stat-val { color: var(--sky); }
 
-    /* PROGRESS BAR */
-    .progress-bar-wrap { max-width: 1100px; margin: 0 auto; padding: 1rem 3rem; display: flex; align-items: center; gap: 1rem; border-bottom: 1px solid var(--border); }
-    .progress-bar-bg { flex: 1; height: 4px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; }
-    .progress-bar-fill { height: 100%; background: var(--gold); border-radius: 2px; transition: width 1s ease; width: 0%; }
-    .progress-label { font-size: 0.68rem; color: var(--mid); white-space: nowrap; }
+    /* Progress bar */
+    .hud-progress { display: flex; align-items: center; gap: 0.8rem; }
+    .hud-prog-bg { width: 160px; height: 8px; background: var(--surface2); border-radius: 4px; overflow: hidden; border: 1.5px solid var(--border); }
+    .hud-prog-fill { height: 100%; background: linear-gradient(90deg, var(--sky), var(--teal)); border-radius: 4px; transition: width 1s ease; }
+    .hud-prog-label { font-size: 0.72rem; font-weight: 700; color: var(--text-mid); white-space: nowrap; }
 
-    /* CATALOGUE */
-    .catalogue { max-width: 1100px; margin: 0 auto; padding: 2rem 3rem 6rem; }
-    .module-label { font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin: 2rem 0 0.8rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
-    .module-label:first-child { margin-top: 0; }
-    .chapter-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1px; background: var(--border); margin-bottom: 0.5rem; }
-    .chapter-card { background: var(--dark); padding: 1.2rem; cursor: pointer; transition: background 0.15s; position: relative; border-top: 2px solid transparent; }
-    .chapter-card:hover { background: var(--dark2); }
-    .chapter-card.done { border-top-color: var(--green); }
-    .chapter-card.in-progress { border-top-color: var(--gold); }
-    .ch-num { font-family: 'Bebas Neue', sans-serif; font-size: 0.78rem; letter-spacing: 0.1em; color: var(--mid); margin-bottom: 0.3rem; }
-    .ch-name { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; letter-spacing: 0.04em; margin-bottom: 0.3rem; line-height: 1.2; }
-    .ch-desc { font-size: 0.72rem; color: rgba(240,237,232,0.35); line-height: 1.6; margin-bottom: 0.8rem; }
-    .ch-footer { display: flex; align-items: center; justify-content: space-between; }
-    .ch-dots { display: flex; gap: 3px; }
-    .ch-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.08); }
-    .ch-dot.done { background: var(--green); }
-    .ch-dot.active { background: var(--gold); }
-    .ch-badge { font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.15rem 0.5rem; border-radius: 10px; }
-    .badge-done { background: rgba(0,230,118,0.1); color: var(--green); border: 1px solid rgba(0,230,118,0.25); }
-    .badge-progress { background: rgba(232,184,75,0.1); color: var(--gold); border: 1px solid rgba(232,184,75,0.25); }
-    .badge-new { background: rgba(255,255,255,0.04); color: var(--mid); border: 1px solid var(--border); }
+    /* ── CATALOGUE ── */
+    .catalogue { max-width: 1100px; margin: 0 auto; padding: 2rem 2rem 5rem; }
+    .module-section { margin-bottom: 2.5rem; }
+    .module-header {
+      display: flex; align-items: center; gap: 0.8rem;
+      margin-bottom: 1rem; padding-bottom: 0.8rem;
+      border-bottom: 2px solid var(--border);
+    }
+    .module-color-bar { width: 4px; height: 32px; border-radius: 2px; flex-shrink: 0; }
+    .module-icon-badge { width: 36px; height: 36px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+    .module-title { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1rem; color: var(--text); }
+    .module-progress-text { font-size: 0.75rem; color: var(--text-light); margin-left: auto; font-weight: 600; }
 
-    /* MODAL OVERLAY */
-    .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 300; overflow-y: auto; padding: 2rem 1rem; }
+    /* Chapter grid */
+    .chapter-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.75rem; }
+
+    /* Chapter card — the game level tile */
+    .chapter-card {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative; overflow: hidden;
+      display: flex; flex-direction: column; gap: 0.5rem;
+    }
+    .chapter-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      border-radius: var(--radius-md) var(--radius-md) 0 0;
+      background: var(--border-input); transition: background 0.3s;
+    }
+    .chapter-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); border-color: var(--sky-light); }
+    .chapter-card:hover::before { background: var(--sky-light); }
+    .chapter-card.done { border-color: rgba(26,147,111,0.3); background: linear-gradient(135deg, rgba(26,147,111,0.04) 0%, var(--surface) 60%); }
+    .chapter-card.done::before { background: var(--teal); }
+    .chapter-card.in-progress { border-color: rgba(0,180,216,0.35); }
+    .chapter-card.in-progress::before { background: var(--sky); }
+    .chapter-card.just-completed { animation: completedPop 0.6s ease both; }
+    @keyframes completedPop { 0%{transform:scale(1)} 40%{transform:scale(1.06)} 70%{transform:scale(0.97)} 100%{transform:scale(1)} }
+
+    .ch-number {
+      font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 0.65rem;
+      letter-spacing: 0.08em; color: var(--text-light); text-transform: uppercase;
+    }
+    .ch-name {
+      font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.95rem;
+      color: var(--text); line-height: 1.2;
+    }
+    .ch-desc { font-size: 0.72rem; color: var(--text-light); line-height: 1.5; flex: 1; }
+    .ch-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 0.2rem; }
+    .ch-dots { display: flex; gap: 4px; align-items: center; }
+    .ch-dot { width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid var(--border-input); background: transparent; transition: all 0.3s; }
+    .ch-dot.done { background: var(--teal); border-color: var(--teal); }
+    .ch-dot.active { background: var(--sky); border-color: var(--sky); box-shadow: 0 0 0 2px rgba(0,180,216,0.2); }
+    .ch-badge { font-size: 0.62rem; font-weight: 700; padding: 0.18rem 0.5rem; border-radius: 6px; }
+    .badge-done { background: var(--teal-pale); color: var(--teal); }
+    .badge-progress { background: var(--sky-pale); color: var(--sky-dark); }
+    .badge-new { background: var(--surface2); color: var(--text-light); }
+
+    /* Done check overlay on card */
+    .ch-done-check {
+      position: absolute; top: 0.6rem; right: 0.6rem;
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--teal); color: #fff;
+      font-size: 0.7rem; display: flex; align-items: center; justify-content: center;
+      font-weight: 900;
+    }
+
+    /* ── MODAL OVERLAY ── */
+    .overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(15,30,45,0.75); z-index: 300;
+      overflow-y: auto; padding: 1.5rem 1rem;
+      backdrop-filter: blur(4px);
+    }
     .overlay.open { display: flex; align-items: flex-start; justify-content: center; }
-    .modal { background: var(--dark); border: 1px solid var(--border); width: 100%; max-width: 640px; margin: auto; position: relative; }
+    .modal {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      width: 100%; max-width: 600px; margin: auto;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden; position: relative;
+    }
 
-    /* MODAL VIEWS — controlled by data-view on .modal */
+    /* Modal view switch */
     .view-lesson, .view-mission, .view-result, .view-complete { display: none; }
     .modal[data-view="lesson"]   .view-lesson   { display: block; }
     .modal[data-view="mission"]  .view-mission  { display: block; }
     .modal[data-view="result"]   .view-result   { display: block; }
     .modal[data-view="complete"] .view-complete { display: block; }
 
-    /* MODAL HEADER */
-    .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.4rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--dark); z-index: 10; }
-    .modal-header-left { }
-    .modal-ch-num { font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.15rem; }
-    .modal-ch-name { font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem; letter-spacing: 0.04em; }
-    .modal-close { background: none; border: none; color: var(--mid); font-size: 1.2rem; cursor: pointer; padding: 0.3rem 0.5rem; transition: color 0.2s; }
-    .modal-close:hover { color: var(--white); }
+    /* Modal header */
+    .modal-header {
+      display: flex; align-items: center; gap: 0.8rem;
+      padding: 1rem 1.4rem; border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; background: var(--surface); z-index: 10;
+    }
+    .modal-ch-badge {
+      width: 40px; height: 40px; border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 0.8rem;
+      color: #fff; flex-shrink: 0;
+    }
+    .modal-ch-info { flex: 1; }
+    .modal-ch-num { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-light); }
+    .modal-ch-name { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.05rem; color: var(--text); }
+    .modal-close { background: none; border: none; color: var(--text-light); font-size: 1.3rem; cursor: pointer; padding: 0.3rem 0.5rem; border-radius: var(--radius-sm); transition: all 0.2s; }
+    .modal-close:hover { background: var(--surface2); color: var(--text); }
 
-    /* LESSON VIEW */
+    /* ── LESSON VIEW ── */
     .lesson-body { padding: 1.5rem 1.4rem; }
-    .lesson-section-label { font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.8rem; }
-    .lesson-text p { font-size: 0.88rem; line-height: 1.85; color: rgba(240,237,232,0.6); margin-bottom: 0.9rem; }
+    .lesson-section-label { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--sky); margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.4rem; }
+    .lesson-section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .lesson-text p { font-size: 0.88rem; line-height: 1.85; color: var(--text-mid); margin-bottom: 0.9rem; }
     .lesson-text p:last-child { margin-bottom: 0; }
     .lesson-tips { margin: 1.2rem 0; display: flex; flex-direction: column; gap: 0.5rem; }
-    .lesson-tip { display: flex; gap: 0.7rem; align-items: flex-start; padding: 0.6rem 0.8rem; background: rgba(255,255,255,0.02); border-left: 2px solid rgba(232,184,75,0.3); }
+    .lesson-tip { display: flex; gap: 0.7rem; align-items: flex-start; padding: 0.65rem 0.9rem; background: var(--sky-pale); border-radius: var(--radius-sm); border-left: 3px solid var(--sky); }
     .tip-icon { font-size: 0.9rem; flex-shrink: 0; margin-top: 0.05rem; }
-    .tip-text { font-size: 0.8rem; line-height: 1.6; color: rgba(240,237,232,0.5); }
-    .tip-text strong { color: rgba(240,237,232,0.8); }
-    .lesson-diagram { margin: 1.2rem 0; background: var(--dark2); border: 1px solid var(--border); }
+    .tip-text { font-size: 0.8rem; line-height: 1.6; color: var(--text-mid); }
+    .tip-text strong { color: var(--text); font-weight: 600; }
+    .lesson-diagram { margin: 1.2rem 0; background: var(--surface2); border-radius: var(--radius-sm); overflow: hidden; border: 1.5px solid var(--border); }
     .lesson-diagram svg { display: block; width: 100%; }
-    .lesson-mission-preview { background: rgba(232,184,75,0.04); border: 1px solid rgba(232,184,75,0.15); padding: 1rem 1.2rem; margin-top: 1.2rem; }
-    .mission-preview-label { font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.4rem; }
-    .mission-preview-text { font-size: 0.82rem; line-height: 1.7; color: rgba(240,237,232,0.55); }
-    .lesson-footer { padding: 1rem 1.4rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 0.8rem; }
+    .mission-box {
+      background: linear-gradient(135deg, var(--sky-pale) 0%, var(--teal-pale) 100%);
+      border: 1.5px solid rgba(0,180,216,0.2);
+      border-radius: var(--radius-md); padding: 1rem 1.2rem; margin-top: 1.2rem;
+    }
+    .mission-box-label { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--teal); margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.4rem; }
+    .mission-box-text { font-size: 0.85rem; line-height: 1.7; color: var(--text); font-weight: 500; }
+    .lesson-footer { padding: 1rem 1.4rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 0.8rem; background: var(--surface); }
 
-    /* MISSION VIEW */
+    /* ── MISSION VIEW ── */
     .mission-body { padding: 1.4rem; }
-    .mission-progress { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1.4rem; }
+    .mission-hud {
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--surface2); border-radius: var(--radius-sm);
+      padding: 0.7rem 1rem; margin-bottom: 1.2rem;
+      border: 1.5px solid var(--border);
+    }
+    .mission-hud-left { display: flex; flex-direction: column; gap: 0.2rem; }
+    .mission-hud-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-light); }
+    .mission-hud-count { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1rem; color: var(--text); }
     .mission-dots { display: flex; gap: 6px; }
-    .mission-dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.08); transition: background 0.3s; }
-    .mission-dot.done { background: var(--green); }
-    .mission-dot.active { background: var(--gold); }
-    .mission-count { font-size: 0.72rem; color: var(--mid); }
-    .mission-instruction { background: rgba(232,184,75,0.04); border: 1px solid rgba(232,184,75,0.15); padding: 1rem 1.2rem; margin-bottom: 1.2rem; }
-    .mission-instruction-label { font-size: 0.58rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.35rem; }
-    .mission-instruction-text { font-size: 0.84rem; line-height: 1.7; color: rgba(240,237,232,0.65); }
-    .drop-zone { border: 2px dashed rgba(255,255,255,0.1); padding: 2rem 1rem; text-align: center; cursor: pointer; transition: border-color 0.2s; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
-    .drop-zone:hover, .drop-zone.drag { border-color: rgba(232,184,75,0.5); }
-    .dz-icon { font-size: 2rem; }
-    .dz-text { font-size: 0.8rem; color: rgba(240,237,232,0.35); line-height: 1.6; }
-    .dz-text strong { color: var(--gold); }
-    .preview-wrap { display: none; position: relative; }
-    .preview-img { width: 100%; max-height: 220px; object-fit: contain; display: block; background: var(--dark2); }
-    .preview-rm { position: absolute; top: 0.4rem; right: 0.4rem; background: rgba(0,0,0,0.75); border: none; color: var(--white); font-size: 0.72rem; padding: 0.25rem 0.5rem; cursor: pointer; border-radius: 3px; }
-    .mission-error { background: rgba(255,68,68,0.08); border: 1px solid rgba(255,68,68,0.2); color: #ff8080; padding: 0.65rem 0.9rem; font-size: 0.78rem; margin-top: 0.8rem; display: none; }
+    .mission-dot { width: 13px; height: 13px; border-radius: 50%; border: 2px solid var(--border-input); background: transparent; transition: all 0.3s; }
+    .mission-dot.done { background: var(--teal); border-color: var(--teal); }
+    .mission-dot.active { background: var(--sky); border-color: var(--sky); box-shadow: 0 0 0 3px rgba(0,180,216,0.2); animation: dotPulse 1.5s ease-in-out infinite; }
+    @keyframes dotPulse { 0%,100%{box-shadow:0 0 0 3px rgba(0,180,216,0.2)} 50%{box-shadow:0 0 0 5px rgba(0,180,216,0.1)} }
+
+    .mission-instruction {
+      background: var(--yellow-pale); border: 1.5px solid rgba(255,209,102,0.4);
+      border-radius: var(--radius-sm); padding: 0.9rem 1rem; margin-bottom: 1.2rem;
+    }
+    .mission-instruction-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #B45309; margin-bottom: 0.3rem; }
+    .mission-instruction-text { font-size: 0.85rem; line-height: 1.7; color: var(--text); font-weight: 500; }
+
+    /* Upload zone */
+    .drop-zone {
+      border: 2.5px dashed var(--border-input);
+      border-radius: var(--radius-md); padding: 2.2rem 1rem;
+      text-align: center; cursor: pointer; transition: all 0.2s;
+      display: flex; flex-direction: column; align-items: center; gap: 0.6rem;
+      background: var(--surface2);
+    }
+    .drop-zone:hover, .drop-zone.drag { border-color: var(--sky); background: var(--sky-pale); }
+    .dz-icon { font-size: 2.2rem; }
+    .dz-title { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.92rem; color: var(--text); }
+    .dz-sub { font-size: 0.75rem; color: var(--text-light); }
+    .dz-sub strong { color: var(--sky); }
+    .preview-wrap { display: none; position: relative; border-radius: var(--radius-sm); overflow: hidden; }
+    .preview-img { width: 100%; max-height: 220px; object-fit: contain; display: block; background: var(--surface2); }
+    .preview-rm { position: absolute; top: 0.5rem; right: 0.5rem; background: rgba(255,255,255,0.9); border: none; color: var(--text); font-size: 0.75rem; padding: 0.25rem 0.5rem; cursor: pointer; border-radius: 6px; font-weight: 600; }
+    .mission-error { background: var(--coral-pale); border: 1.5px solid rgba(255,107,107,0.3); color: #B91C1C; padding: 0.7rem 0.9rem; border-radius: var(--radius-sm); font-size: 0.82rem; margin-top: 0.8rem; display: none; }
     .mission-error.show { display: block; }
-    .mission-loading { display: none; text-align: center; padding: 1.5rem; }
-    .spinner { width: 26px; height: 26px; border: 2px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 0.6rem; }
+    .mission-loading { display: none; text-align: center; padding: 2rem; }
+    .spinner { width: 28px; height: 28px; border: 3px solid var(--border); border-top-color: var(--sky); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 0.8rem; }
+    .loading-text { font-size: 0.82rem; color: var(--text-mid); font-weight: 500; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .mission-loading p { font-size: 0.8rem; color: var(--mid); }
     .mission-footer { padding: 1rem 1.4rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 0.8rem; }
 
-    /* RESULT VIEW */
+    /* ── RESULT VIEW ── */
     .result-body { padding: 1.4rem; }
-    .result-score-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.2rem; padding-bottom: 1.2rem; border-bottom: 1px solid var(--border); }
-    .result-score-big { font-family: 'Bebas Neue', sans-serif; font-size: 3.5rem; line-height: 1; }
-    .result-score-big.high { color: var(--green); }
-    .result-score-big.mid  { color: var(--gold); }
-    .result-score-big.low  { color: rgba(240,237,232,0.4); }
-    .result-score-denom { font-size: 1rem; color: var(--mid); }
-    .result-label { font-size: 0.88rem; font-weight: 500; margin-bottom: 0.2rem; }
-    .result-sub { font-size: 0.72rem; color: var(--mid); }
-    .result-feedback { font-size: 0.84rem; line-height: 1.8; color: rgba(240,237,232,0.5); margin-bottom: 1rem; }
+    .result-score-card {
+      background: linear-gradient(135deg, var(--sky-pale) 0%, var(--surface) 100%);
+      border: 1.5px solid rgba(0,180,216,0.2);
+      border-radius: var(--radius-md); padding: 1.2rem 1.4rem;
+      display: flex; align-items: center; gap: 1.2rem;
+      margin-bottom: 1.2rem;
+    }
+    .result-score-big { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 4rem; line-height: 1; }
+    .result-score-big.high { color: var(--teal); }
+    .result-score-big.mid  { color: var(--sky); }
+    .result-score-big.low  { color: var(--text-light); }
+    .result-score-denom { font-size: 1rem; color: var(--text-light); font-weight: 600; }
+    .result-label { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1.05rem; color: var(--text); margin-bottom: 0.2rem; }
+    .result-sub { font-size: 0.75rem; color: var(--text-light); font-weight: 600; }
+    .result-feedback { font-size: 0.86rem; line-height: 1.8; color: var(--text-mid); margin-bottom: 1rem; padding: 0.8rem 1rem; background: var(--surface2); border-radius: var(--radius-sm); border-left: 3px solid var(--sky); }
     .result-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 1rem; }
-    .result-col-label { font-size: 0.58rem; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 0.4rem; }
-    .result-col-label.worked { color: var(--green); }
-    .result-col-label.improve { color: var(--gold); }
-    .result-col-text { font-size: 0.78rem; line-height: 1.6; color: rgba(240,237,232,0.45); }
-    .result-progress-note { font-size: 0.72rem; color: var(--mid); background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 0.6rem 0.8rem; }
+    .result-col { background: var(--surface2); border-radius: var(--radius-sm); padding: 0.8rem; }
+    .result-col-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.4rem; }
+    .result-col-label.worked { color: var(--teal); }
+    .result-col-label.improve { color: var(--sky); }
+    .result-col-text { font-size: 0.78rem; line-height: 1.6; color: var(--text-mid); }
+    .result-progress-note { font-size: 0.78rem; font-weight: 600; color: var(--text-mid); text-align: center; padding: 0.6rem; background: var(--surface2); border-radius: var(--radius-sm); }
     .result-footer { padding: 1rem 1.4rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 0.8rem; }
 
-    /* COMPLETE VIEW */
-    .complete-body { padding: 2rem 1.4rem; text-align: center; }
-    .complete-icon { font-size: 3rem; display: block; margin-bottom: 0.8rem; }
-    .complete-title { font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; letter-spacing: 0.04em; margin-bottom: 0.3rem; color: var(--green); }
-    .complete-sub { font-size: 0.85rem; color: rgba(240,237,232,0.4); margin-bottom: 0.5rem; }
-    .complete-score { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; color: var(--gold); margin-bottom: 1.5rem; }
-    .canvas-wrap { display: none; margin: 0 auto 1rem; max-width: 100%; }
+    /* ── COMPLETE VIEW ── */
+    .complete-view {
+      padding: 2rem 1.4rem; text-align: center;
+      background: linear-gradient(135deg, var(--sky-pale) 0%, var(--teal-pale) 50%, var(--surface) 100%);
+    }
+    .complete-icon { font-size: 3.5rem; display: block; margin-bottom: 0.8rem; animation: bounceIn 0.5s ease both; }
+    @keyframes bounceIn { 0%{transform:scale(0.5);opacity:0} 70%{transform:scale(1.1)} 100%{transform:scale(1);opacity:1} }
+    .complete-title { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.8rem; color: var(--teal); letter-spacing: -0.02em; margin-bottom: 0.3rem; }
+    .complete-sub { font-size: 0.9rem; color: var(--text-mid); margin-bottom: 0.5rem; font-weight: 500; }
+    .complete-score { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.3rem; color: var(--sky); margin-bottom: 1.5rem; }
+    .canvas-wrap { display: none; margin: 0 auto 1rem; border-radius: var(--radius-sm); overflow: hidden; border: 1.5px solid var(--border); }
     .canvas-wrap canvas { max-width: 100%; display: block; }
-    .complete-footer { padding: 1rem 1.4rem; border-top: 1px solid var(--border); display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap; }
+    .complete-footer { padding: 1rem 1.4rem; border-top: 1px solid var(--border); display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap; background: var(--surface); }
 
-    /* BUTTONS */
-    .btn-primary { background: var(--gold); color: var(--black); border: none; padding: 0.7rem 1.5rem; font-family: 'Bebas Neue', sans-serif; font-size: 0.95rem; letter-spacing: 0.1em; cursor: pointer; transition: all 0.2s; clip-path: polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%); }
-    .btn-primary:hover { background: var(--gold2); }
-    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
-    .btn-ghost { background: none; border: 1px solid var(--border); color: rgba(240,237,232,0.4); padding: 0.7rem 1.5rem; font-family: 'Bebas Neue', sans-serif; font-size: 0.95rem; letter-spacing: 0.1em; cursor: pointer; transition: all 0.2s; clip-path: polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%); }
-    .btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+    /* Confetti */
+    .confetti-container { position: fixed; top: 0; left: 0; right: 0; pointer-events: none; z-index: 400; overflow: hidden; height: 100vh; }
+    .confetti-piece { position: absolute; top: -10px; width: 10px; height: 10px; border-radius: 2px; animation: confettiFall linear forwards; }
+    @keyframes confettiFall { to { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
 
-    /* BOTTOM NAV */
-    .bottom-nav { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: rgba(8,8,8,0.97); border-top: 1px solid var(--border); backdrop-filter: blur(16px); z-index: 98; padding-bottom: env(safe-area-inset-bottom); }
-    .bottom-nav-inner { display: flex; }
-    .bottom-nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0.6rem 0.3rem; text-decoration: none; color: rgba(240,237,232,0.35); font-size: 0.55rem; letter-spacing: 0.08em; text-transform: uppercase; gap: 0.25rem; border-top: 2px solid transparent; transition: color 0.2s; }
-    .bottom-nav-item.active { color: var(--gold); border-top-color: var(--gold); }
-    .bottom-nav-icon { font-size: 1.2rem; line-height: 1; }
+    /* ── BUTTONS ── */
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      background: var(--sky); color: #fff;
+      font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.9rem;
+      border: none; padding: 0.7rem 1.4rem; border-radius: var(--radius-sm);
+      cursor: pointer; transition: all 0.2s; text-decoration: none;
+      box-shadow: 0 3px 10px rgba(0,180,216,0.3);
+    }
+    .btn-primary:hover { background: var(--sky-dark); transform: translateY(-1px); box-shadow: 0 5px 14px rgba(0,180,216,0.4); }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+    .btn-ghost {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      background: none; color: var(--text-mid);
+      font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.9rem;
+      border: 1.5px solid var(--border-input); padding: 0.7rem 1.4rem; border-radius: var(--radius-sm);
+      cursor: pointer; transition: all 0.2s; text-decoration: none;
+    }
+    .btn-ghost:hover { border-color: var(--sky); color: var(--sky); }
+    .btn-teal { background: var(--teal); box-shadow: 0 3px 10px rgba(26,147,111,0.3); }
+    .btn-teal:hover { background: #157a5c; box-shadow: 0 5px 14px rgba(26,147,111,0.4); }
 
-    /* TOAST */
-    .toast { position: fixed; bottom: 5rem; left: 50%; transform: translateX(-50%) translateY(12px); background: var(--dark); border: 1px solid var(--border); padding: 0.65rem 1.3rem; font-size: 0.8rem; opacity: 0; transition: all 0.3s; z-index: 999; pointer-events: none; white-space: nowrap; }
+    /* ── TOAST ── */
+    .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(16px); background: var(--text); color: #fff; padding: 0.7rem 1.4rem; border-radius: var(--radius-sm); font-size: 0.82rem; font-weight: 600; opacity: 0; transition: all 0.3s; z-index: 999; pointer-events: none; white-space: nowrap; box-shadow: var(--shadow-md); }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .hud-prog-bg { width: 100px; }
+    }
     @media (max-width: 768px) {
-      nav { padding: 0.9rem 1.2rem; }
-      .nav-links { display: none !important; }
+      .top-nav { padding: 0 1.2rem; }
+      .nav-links, .nav-auth { display: none; }
       .nav-burger { display: flex; }
-      .bottom-nav { display: block; }
-      body { padding-bottom: 70px; }
-      .page-hero { padding: 1.5rem 1.2rem; }
-      .progress-bar-wrap { padding: 0.8rem 1.2rem; }
-      .catalogue { padding: 1.5rem 1rem 5rem; }
-      .chapter-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+      .hud { padding: 0.8rem 1.2rem; }
+      .catalogue { padding: 1.5rem 1rem 4rem; }
+      .chapter-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.6rem; }
       .result-cols { grid-template-columns: 1fr; }
       .overlay { padding: 0; align-items: flex-end; }
-      .modal { max-height: 95vh; overflow-y: auto; }
+      .modal { border-radius: var(--radius-lg) var(--radius-lg) 0 0; max-height: 92vh; overflow-y: auto; }
     }
   </style>
 </head>
 <body>
 
-<nav>
-  <a href="dashboard.html" class="nav-logo">Lens<span>Up</span></a>
+<!-- TOP NAV -->
+<nav class="top-nav">
+  <a href="dashboard.html" class="nav-logo">📷 LensUp</a>
   <div class="nav-links">
-    <a href="dashboard.html" class="nav-link">🏠 Dashboard</a>
+    <a href="dashboard.html" class="nav-link">🏠 Home</a>
     <a href="learn.html" class="nav-link active">📚 Learn</a>
     <a href="feed.html" class="nav-link">🖼️ Feed</a>
     <a href="compete.html" class="nav-link">⚔️ Challenge</a>
-    <a href="leaderboard.html" class="nav-link">🏆 Leaderboard</a>
+    <a href="leaderboard.html" class="nav-link">🏆 Ranks</a>
     <a href="profile.html" class="nav-link">👤 Profile</a>
-    <span id="navAuthArea"></span>
   </div>
+  <div class="nav-auth" id="navAuthArea"></div>
   <button class="nav-burger" onclick="openMobileMenu()"><span></span><span></span><span></span></button>
 </nav>
 
+<!-- MOBILE MENU -->
 <div class="mobile-menu" id="mobileMenu">
   <button class="mobile-menu-close" onclick="closeMobileMenu()">✕</button>
-  <div class="mobile-menu-logo">Lens<span>Up</span></div>
-  <a href="dashboard.html">🏠 Dashboard</a>
+  <div class="mobile-menu-logo">📷 LensUp</div>
+  <a href="dashboard.html">🏠 Home</a>
   <a href="learn.html" class="active">📚 Learn</a>
   <a href="feed.html">🖼️ Feed</a>
   <a href="compete.html">⚔️ Challenge</a>
-  <a href="leaderboard.html">🏆 Leaderboard</a>
+  <a href="leaderboard.html">🏆 Ranks</a>
   <a href="profile.html">👤 Profile</a>
   <div class="mobile-menu-divider"></div>
   <div class="mobile-menu-auth">
@@ -242,50 +403,58 @@
   </div>
 </div>
 
-<!-- HERO -->
-<div class="page-hero">
-  <div class="hero-inner">
-    <div class="hero-left">
-      <span class="page-tag">Photography School</span>
-      <div class="page-title">36 Chapters.<br/><em>One Lens.</em></div>
-      <p class="page-sub">Learn the skills. Shoot the mission. Get honest AI feedback. Complete 3 photos per chapter to earn your badge.</p>
+<!-- HUD -->
+<div class="hud">
+  <div class="hud-inner">
+    <div class="hud-greeting">
+      <div class="hud-greeting-name" id="hudName">Loading…</div>
+      <div class="hud-greeting-sub" id="hudSub">Your learning journey</div>
     </div>
-    <div class="hero-stats">
-      <div class="hstat"><span class="hstat-val" id="statDone">0</span><span class="hstat-lbl">Done</span></div>
-      <div class="hstat"><span class="hstat-val" id="statLeft" style="color:rgba(240,237,232,0.3)">36</span><span class="hstat-lbl">Remaining</span></div>
+    <div class="hud-stats">
+      <div class="hud-stat streak">
+        <span class="hud-stat-icon">🔥</span>
+        <div>
+          <div class="hud-stat-val" id="statStreak">0</div>
+          <div class="hud-stat-lbl">Day streak</div>
+        </div>
+      </div>
+      <div class="hud-stat done">
+        <span class="hud-stat-icon">🎓</span>
+        <div>
+          <div class="hud-stat-val" id="statDone">0</div>
+          <div class="hud-stat-lbl">Chapters done</div>
+        </div>
+      </div>
+      <div class="hud-stat xp">
+        <span class="hud-stat-icon">⭐</span>
+        <div>
+          <div class="hud-stat-val" id="statXP">0</div>
+          <div class="hud-stat-lbl">Total XP</div>
+        </div>
+      </div>
+    </div>
+    <div class="hud-progress">
+      <div class="hud-prog-bg"><div class="hud-prog-fill" id="progBar" style="width:0%"></div></div>
+      <div class="hud-prog-label" id="progLabel">0 / 36</div>
     </div>
   </div>
-</div>
-
-<!-- PROGRESS BAR -->
-<div class="progress-bar-wrap">
-  <div class="progress-bar-bg"><div class="progress-bar-fill" id="progBar"></div></div>
-  <span class="progress-label" id="progLabel">0 / 36 chapters complete</span>
 </div>
 
 <!-- CATALOGUE -->
 <div class="catalogue" id="catalogue">
-  <div style="text-align:center;padding:3rem;color:var(--mid);font-size:0.88rem">Loading chapters…</div>
+  <div style="text-align:center;padding:3rem;color:var(--text-light);font-size:0.9rem">Loading your chapters…</div>
 </div>
 
-<!-- BOTTOM NAV -->
-<div class="bottom-nav">
-  <div class="bottom-nav-inner">
-    <a href="dashboard.html" class="bottom-nav-item"><span class="bottom-nav-icon">🏠</span><span>Home</span></a>
-    <a href="learn.html" class="bottom-nav-item active"><span class="bottom-nav-icon">📚</span><span>Learn</span></a>
-    <a href="feed.html" class="bottom-nav-item"><span class="bottom-nav-icon">🖼️</span><span>Feed</span></a>
-    <a href="compete.html" class="bottom-nav-item"><span class="bottom-nav-icon">⚔️</span><span>Challenge</span></a>
-    <a href="leaderboard.html" class="bottom-nav-item"><span class="bottom-nav-icon">🏆</span><span>Ranks</span></a>
-    <a href="profile.html" class="bottom-nav-item"><span class="bottom-nav-icon">👤</span><span>Profile</span></a>
-  </div>
-</div>
+<!-- CONFETTI CONTAINER -->
+<div class="confetti-container" id="confettiContainer"></div>
 
 <!-- CHAPTER MODAL -->
 <div class="overlay" id="overlay" onclick="if(event.target===this)closeModal()">
   <div class="modal" id="modal" data-view="lesson">
 
     <div class="modal-header">
-      <div class="modal-header-left">
+      <div class="modal-ch-badge" id="mChBadge">01</div>
+      <div class="modal-ch-info">
         <div class="modal-ch-num" id="mChNum"></div>
         <div class="modal-ch-name" id="mChName"></div>
       </div>
@@ -295,13 +464,13 @@
     <!-- LESSON VIEW -->
     <div class="view-lesson">
       <div class="lesson-body">
-        <div class="lesson-section-label">The Lesson</div>
+        <div class="lesson-section-label">📖 The Lesson</div>
         <div class="lesson-text" id="lessonText"></div>
         <div class="lesson-tips" id="lessonTips"></div>
         <div class="lesson-diagram" id="lessonDiagram" style="display:none"></div>
-        <div class="lesson-mission-preview">
-          <div class="mission-preview-label">Your Mission</div>
-          <div class="mission-preview-text" id="missionPreview"></div>
+        <div class="mission-box">
+          <div class="mission-box-label">🎯 Your Mission</div>
+          <div class="mission-box-text" id="missionPreview"></div>
         </div>
       </div>
       <div class="lesson-footer">
@@ -313,33 +482,37 @@
     <!-- MISSION VIEW -->
     <div class="view-mission">
       <div class="mission-body">
-        <div class="mission-progress">
+        <div class="mission-hud">
+          <div class="mission-hud-left">
+            <div class="mission-hud-label">Photo submissions</div>
+            <div class="mission-hud-count" id="missionCount">0 / 3 submitted</div>
+          </div>
           <div class="mission-dots" id="missionDots"></div>
-          <span class="mission-count" id="missionCount"></span>
         </div>
         <div class="mission-instruction">
-          <div class="mission-instruction-label">Mission</div>
+          <div class="mission-instruction-label">🎯 Mission Brief</div>
           <div class="mission-instruction-text" id="missionText"></div>
         </div>
         <div class="drop-zone" id="dropZone"
           onclick="document.getElementById('fileInput').click()"
           ondragover="onDragOver(event)" ondragleave="onDragLeave()" ondrop="onDrop(event)">
           <span class="dz-icon">📷</span>
-          <div class="dz-text">Tap to choose a photo<br/><strong>JPG, PNG or WEBP · max 5MB</strong></div>
+          <div class="dz-title">Tap to choose a photo</div>
+          <div class="dz-sub"><strong>JPG, PNG or WEBP</strong> · max 5MB</div>
         </div>
         <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="onFileChange(event)"/>
         <div class="preview-wrap" id="previewWrap">
           <img class="preview-img" id="previewImg" alt=""/>
-          <button class="preview-rm" onclick="removeFile()">✕</button>
+          <button class="preview-rm" onclick="removeFile()">✕ Remove</button>
         </div>
         <div class="mission-error" id="missionError"></div>
         <div class="mission-loading" id="missionLoading">
           <div class="spinner"></div>
-          <p>Analysing your photo…</p>
+          <div class="loading-text">Analysing your photo…</div>
         </div>
       </div>
       <div class="mission-footer">
-        <button class="btn-ghost" onclick="setView('lesson')">← Back to Lesson</button>
+        <button class="btn-ghost" onclick="setView('lesson')">← Lesson</button>
         <button class="btn-primary" id="analyseBtn" onclick="analysePhoto()" disabled>Analyse This Shot →</button>
       </div>
     </div>
@@ -347,9 +520,9 @@
     <!-- RESULT VIEW -->
     <div class="view-result">
       <div class="result-body">
-        <div class="result-score-row">
+        <div class="result-score-card">
           <div>
-            <div class="result-score-big" id="rScore"></div>
+            <div class="result-score-big" id="rScore">—</div>
             <div class="result-score-denom">/10</div>
           </div>
           <div>
@@ -359,12 +532,12 @@
         </div>
         <div class="result-feedback" id="rFeedback"></div>
         <div class="result-cols">
-          <div>
-            <div class="result-col-label worked">✓ What Worked</div>
+          <div class="result-col">
+            <div class="result-col-label worked">✓ What worked</div>
             <div class="result-col-text" id="rWorked"></div>
           </div>
-          <div>
-            <div class="result-col-label improve">↑ Improve</div>
+          <div class="result-col">
+            <div class="result-col-label improve">↑ To improve</div>
             <div class="result-col-text" id="rImprove"></div>
           </div>
         </div>
@@ -377,7 +550,7 @@
 
     <!-- COMPLETE VIEW -->
     <div class="view-complete">
-      <div class="complete-body">
+      <div class="complete-view">
         <span class="complete-icon">🎓</span>
         <div class="complete-title">Chapter Complete!</div>
         <div class="complete-sub" id="cSub"></div>
@@ -387,8 +560,8 @@
         </div>
       </div>
       <div class="complete-footer">
-        <button class="btn-ghost" onclick="downloadCard()">⬇ Download Card</button>
-        <button class="btn-primary" onclick="closeModal()">Continue Learning →</button>
+        <button class="btn-ghost" onclick="downloadCard()">⬇ Download Badge</button>
+        <button class="btn-primary btn-teal" onclick="closeModal()">Continue Learning →</button>
       </div>
     </div>
 
@@ -609,7 +782,7 @@ let sessionScores = [];
 // HELPERS
 // ═══════════════════════════════════════════
 function esc(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function scoreColor(s){ return s>=8?'var(--green)':s>=6?'var(--gold)':'rgba(240,237,232,0.5)'; }
+function scoreColor(s){ return s>=8?'var(--teal)':s>=6?'var(--sky)':'var(--text-light)'; }
 function scoreClass(s){ return s>=8?'high':s>=6?'mid':'low'; }
 function showToast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
 
@@ -618,9 +791,12 @@ function showToast(m){ const t=document.getElementById('toast'); t.textContent=m
 // ═══════════════════════════════════════════
 function renderNavAuth(){
   const n = esc(currentUser.user_metadata?.display_name || currentUser.email.split('@')[0]);
+  const streak = parseInt(localStorage.getItem('lensup_streak') || '0');
   document.getElementById('navAuthArea').innerHTML =
-    `<span style="font-size:0.72rem;color:rgba(240,237,232,0.3)">Hi, ${n}</span>
-     <button onclick="signOut()" style="background:none;border:none;cursor:pointer;font-size:0.72rem;letter-spacing:0.07em;text-transform:uppercase;color:rgba(240,237,232,0.3);font-family:'DM Sans',sans-serif" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='rgba(240,237,232,0.3)'">Sign Out</button>`;
+    '<span class="nav-user">Hi, ' + n + '</span>' +
+    '<button class="nav-signout" onclick="signOut()">Sign Out</button>';
+  const el = document.getElementById('statStreak');
+  if(el) el.textContent = streak + 'd';
 }
 function openMobileMenu(){
   document.getElementById('mobileMenu').classList.add('open');
@@ -670,20 +846,48 @@ async function saveSubmission(chId, score, feedback){
   } catch(e){ console.warn('Save submission failed', e); }
 }
 
-// ═══════════════════════════════════════════
-// CATALOGUE RENDER
-// ═══════════════════════════════════════════
 function renderCatalogue(){
   const done = CHAPTERS.filter(c => isComplete(c.id)).length;
+  const xp = CHAPTERS.reduce((sum, c) => {
+    const p = getChProg(c.id);
+    return sum + (p.scores.reduce((a,b) => a+b, 0));
+  }, 0);
+
   document.getElementById('statDone').textContent = done;
-  document.getElementById('statLeft').textContent = 36 - done;
+  document.getElementById('statXP').textContent = xp;
   document.getElementById('progBar').style.width = Math.round((done/36)*100)+'%';
-  document.getElementById('progLabel').textContent = done+' / 36 chapters complete';
+  document.getElementById('progLabel').textContent = done + ' / 36';
+
+  const name = currentUser?.user_metadata?.display_name || currentUser?.email?.split('@')[0] || 'Photographer';
+  document.getElementById('hudName').textContent = name;
+  document.getElementById('hudSub').textContent = done === 0
+    ? 'Start Chapter 1 to begin your journey 🚀'
+    : done === 36 ? '🎉 All 36 chapters complete! You are a master.'
+    : `${done} chapter${done!==1?'s':''} complete · ${36-done} to go`;
+
+  const MOD_META = {
+    'Composition':            { icon: '🎯', color: 'var(--m1)' },
+    'Light':                  { icon: '💡', color: 'var(--m2)' },
+    'People & Storytelling':  { icon: '👤', color: 'var(--m3)' },
+    'Urban & Environment':    { icon: '🏙️', color: 'var(--m4)' },
+    'Technical':              { icon: '⚙️', color: 'var(--m5)' },
+    'Creative':               { icon: '🎨', color: 'var(--m6)' },
+  };
 
   let html = '';
   MODULES.forEach(mod => {
     const chs = CHAPTERS.filter(c => c.module === mod);
-    html += `<div class="module-label">${mod}</div><div class="chapter-grid">`;
+    const modDone = chs.filter(c => isComplete(c.id)).length;
+    const meta = MOD_META[mod] || { icon: '📷', color: 'var(--sky)' };
+    html += `<div class="module-section">
+      <div class="module-header">
+        <div class="module-color-bar" style="background:${meta.color}"></div>
+        <div class="module-icon-badge" style="background:${meta.color}22">${meta.icon}</div>
+        <div class="module-title">${mod}</div>
+        <div class="module-progress-text">${modDone}/${chs.length} done</div>
+      </div>
+      <div class="chapter-grid">`;
+
     chs.forEach(ch => {
       const prog = getChProg(ch.id);
       const done3 = prog.count >= 3;
@@ -696,14 +900,18 @@ function renderCatalogue(){
         : started
           ? `<span class="ch-badge badge-progress">${prog.count}/3</span>`
           : `<span class="ch-badge badge-new">New</span>`;
-      html += `<div class="chapter-card ${done3?'done':started?'in-progress':''}" onclick="openChapter(${ch.id})">
-        <div class="ch-num">Ch ${String(ch.id).padStart(2,'0')} · ${ch.module}</div>
+      const doneCheck = done3 ? `<div class="ch-done-check">✓</div>` : '';
+
+      html += `<div class="chapter-card ${done3?'done':started?'in-progress':''}" onclick="openChapter(${ch.id})" id="ch-card-${ch.id}"
+        style="--mod-color:${meta.color}">
+        ${doneCheck}
+        <div class="ch-number">Ch ${String(ch.id).padStart(2,'0')}</div>
         <div class="ch-name">${esc(ch.name)}</div>
-        <div class="ch-desc">${esc(ch.lesson.slice(0,90))}…</div>
+        <div class="ch-desc">${esc(ch.lesson.slice(0,80))}…</div>
         <div class="ch-footer"><div class="ch-dots">${dots}</div>${badge}</div>
       </div>`;
     });
-    html += `</div>`;
+    html += `</div></div>`;
   });
   document.getElementById('catalogue').innerHTML = html;
 }
@@ -721,6 +929,11 @@ function openChapter(id){
   sessionScores = [];
   uploadB64 = null; uploadMime = null; previewUrl = null;
 
+  const modColors = {'Composition':'var(--m1)','Light':'var(--m2)','People & Storytelling':'var(--m3)','Urban & Environment':'var(--m4)','Technical':'var(--m5)','Creative':'var(--m6)'};
+  const mColor = modColors[ch.module] || 'var(--sky)';
+  const badge = document.getElementById('mChBadge');
+  badge.textContent = String(id).padStart(2,'0');
+  badge.style.background = mColor;
   document.getElementById('mChNum').textContent = 'Chapter '+String(id).padStart(2,'0')+' · '+ch.module;
   document.getElementById('mChName').textContent = ch.name;
 
@@ -951,53 +1164,115 @@ function showComplete(){
   const prog = getChProg(ch.id);
   const avg = prog.avgScore;
   document.getElementById('cSub').textContent = ch.name + ' · ' + ch.module;
-  document.getElementById('cScore').textContent = 'Average Score: ' + avg + '/10';
+  document.getElementById('cScore').textContent = '⭐ Average Score: ' + avg + '/10';
 
-  // Generate share card
+  // Confetti!
+  launchConfetti();
+
+  // Update streak
+  updateLearningStreak();
+
+  // Generate share card in new theme
   const wrap = document.getElementById('canvasWrap');
   wrap.style.display = 'block';
   const canvas = document.getElementById('shareCanvas');
   const ctx = canvas.getContext('2d');
   const W=800, H=400;
-  ctx.fillStyle='#080808'; ctx.fillRect(0,0,W,H);
-  // Grid
-  ctx.strokeStyle='rgba(232,184,75,0.04)'; ctx.lineWidth=1;
-  for(let x=0;x<W;x+=60){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
-  for(let y=0;y<H;y+=60){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
-  // Gold bar
-  const g=ctx.createLinearGradient(0,0,0,H); g.addColorStop(0,'#e8b84b'); g.addColorStop(1,'#c49a2a');
-  ctx.fillStyle=g; ctx.fillRect(0,0,5,H);
-  // LensUp
-  ctx.font='bold 16px sans-serif';
-  ctx.fillStyle='#e8b84b'; ctx.fillText('LENS',50,50);
-  ctx.fillStyle='#f0ede8'; ctx.fillText('UP',50+ctx.measureText('LENS').width,50);
+
+  // Background
+  const bg = ctx.createLinearGradient(0,0,W,H);
+  bg.addColorStop(0,'#EAF8FC'); bg.addColorStop(1,'#E8F6F1');
+  ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+
+  // Dot pattern
+  ctx.fillStyle='rgba(0,180,216,0.08)';
+  for(let x=20;x<W;x+=32) for(let y=20;y<H;y+=32) { ctx.beginPath(); ctx.arc(x,y,2,0,Math.PI*2); ctx.fill(); }
+
+  // Top accent bar
+  const bar = ctx.createLinearGradient(0,0,W,0);
+  bar.addColorStop(0,'#00B4D8'); bar.addColorStop(1,'#1A936F');
+  ctx.fillStyle=bar; ctx.fillRect(0,0,W,6);
+
+  // Logo
+  ctx.font='bold 18px sans-serif';
+  ctx.fillStyle='#00B4D8'; ctx.fillText('LensUp', 50, 55);
+
   // Chapter complete
-  ctx.fillStyle='#f0ede8'; ctx.font='bold 42px sans-serif'; ctx.fillText('CHAPTER COMPLETE',50,130);
+  ctx.fillStyle='#1A2B3C'; ctx.font='bold 48px sans-serif'; ctx.fillText('Chapter Complete!', 50,130);
+
   // Chapter name
-  ctx.fillStyle='#e8b84b'; ctx.font='24px sans-serif'; ctx.fillText(ch.name+' · '+ch.module,50,170);
+  ctx.fillStyle='#00B4D8'; ctx.font='bold 26px sans-serif'; ctx.fillText(ch.name, 50,170);
+  ctx.fillStyle='#5A7080'; ctx.font='18px sans-serif'; ctx.fillText(ch.module, 50,198);
+
   // Divider
-  ctx.strokeStyle='rgba(232,184,75,0.2)'; ctx.lineWidth=1;
-  ctx.beginPath(); ctx.moveTo(50,195); ctx.lineTo(W-50,195); ctx.stroke();
+  ctx.strokeStyle='rgba(0,180,216,0.25)'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(50,218); ctx.lineTo(W-50,218); ctx.stroke();
+
   // Score
-  ctx.fillStyle='#e8b84b'; ctx.font='bold 72px sans-serif'; ctx.fillText(avg,50,290);
-  ctx.fillStyle='rgba(240,237,232,0.4)'; ctx.font='22px sans-serif'; ctx.fillText('/10 average score',50+ctx.measureText(avg).width+12,285);
-  // Name
-  const name = currentUser?.user_metadata?.display_name || currentUser?.email?.split('@')[0] || 'Photographer';
+  ctx.fillStyle='#1A936F'; ctx.font='bold 80px sans-serif'; ctx.fillText(avg, 50,318);
+  ctx.fillStyle='#5A7080'; ctx.font='22px sans-serif'; ctx.fillText(' / 10  average score', 50+ctx.measureText(avg).width, 312);
+
+  // Name + date
+  const uname = currentUser?.user_metadata?.display_name || currentUser?.email?.split('@')[0] || 'Photographer';
   const dateStr = new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
-  ctx.fillStyle='rgba(240,237,232,0.5)'; ctx.font='17px sans-serif'; ctx.fillText('Completed by '+name,50,340);
-  ctx.fillStyle='rgba(240,237,232,0.25)'; ctx.font='13px sans-serif'; ctx.fillText(dateStr,50,362);
-  ctx.fillStyle='rgba(232,184,75,0.4)'; ctx.font='12px sans-serif'; ctx.fillText('lensup.vercel.app',W-170,H-20);
+  ctx.fillStyle='#5A7080'; ctx.font='16px sans-serif'; ctx.fillText('Completed by ' + uname, 50, 358);
+  ctx.fillStyle='#9BB0BC'; ctx.font='13px sans-serif'; ctx.fillText(dateStr + '  ·  lensup.vercel.app', 50, 380);
 
   setView('complete');
+
+  // Pop the card on catalogue
+  setTimeout(() => {
+    const card = document.getElementById('ch-card-' + ch.id);
+    if(card) card.classList.add('just-completed');
+    renderCatalogue();
+  }, 500);
 }
+
+function launchConfetti(){
+  const container = document.getElementById('confettiContainer');
+  container.innerHTML = '';
+  const colors = ['#00B4D8','#1A936F','#FFD166','#FF6B6B','#7C3AED','#F97316'];
+  for(let i=0;i<80;i++){
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    el.style.cssText = [
+      'left:'+Math.random()*100+'%',
+      'background:'+colors[Math.floor(Math.random()*colors.length)],
+      'width:'+(6+Math.random()*8)+'px',
+      'height:'+(6+Math.random()*8)+'px',
+      'border-radius:'+(Math.random()>0.5?'50%':'2px'),
+      'animation-duration:'+(1.5+Math.random()*2)+'s',
+      'animation-delay:'+(Math.random()*0.8)+'s',
+      'transform:rotate('+Math.floor(Math.random()*360)+'deg)',
+    ].join(';');
+    container.appendChild(el);
+  }
+  setTimeout(()=>{ container.innerHTML=''; }, 4000);
+}
+
+
 
 function downloadCard(){
   const canvas = document.getElementById('shareCanvas');
   const ch = activeChapter;
   const a = document.createElement('a');
-  a.download = 'lensup-ch'+ch.id+'-'+ch.name.toLowerCase().replace(/\s+/g,'-')+'.jpg';
-  a.href = canvas.toDataURL('image/jpeg',0.92);
+  a.download = 'lensup-ch' + ch.id + '-' + ch.name.toLowerCase().replace(/\s+/g,'-') + '.jpg';
+  a.href = canvas.toDataURL('image/jpeg', 0.92);
   a.click();
+}
+
+function updateLearningStreak(){
+  const today = new Date().toDateString();
+  const last = localStorage.getItem('lensup_last_learn');
+  let streak = parseInt(localStorage.getItem('lensup_streak') || '0');
+  if(last !== today){
+    const yesterday = new Date(Date.now() - 86400000).toDateString();
+    streak = (last === yesterday) ? streak + 1 : 1;
+    localStorage.setItem('lensup_streak', streak);
+    localStorage.setItem('lensup_last_learn', today);
+    const el = document.getElementById('statStreak');
+    if(el) el.textContent = streak + 'd';
+  }
 }
 
 // ═══════════════════════════════════════════
@@ -1014,6 +1289,11 @@ async function init(){
     renderNavAuth();
     await loadProgress();
     renderCatalogue();
+    // Auto-open chapter 1 for brand new users
+    const totalDone = Object.values(progress).reduce((s,p) => s + p.count, 0);
+    if(totalDone === 0){
+      setTimeout(() => openChapter(1), 600);
+    }
   } catch(e){
     clearTimeout(timeout);
     window.location.href='login.html';
