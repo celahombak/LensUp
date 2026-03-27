@@ -4,192 +4,245 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>LensUp — Sign In</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase.js"></script>
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --black: #080808; --white: #f0ede8; --dark: #111010; --dark2: #181615;
-      --mid: #5a5550; --border: rgba(255,255,255,0.07);
-      --gold: #e8b84b; --gold2: #f5d07a; --red: #ff4444; --green: #00e676;
+      --sky: #00B4D8; --sky-dark: #0096B4; --sky-light: #90E0EF; --sky-pale: #EAF8FC; --sky-xpale: #F4FCFE;
+      --teal: #1A936F; --teal-pale: #E8F6F1;
+      --coral: #FF6B6B; --coral-pale: #FFF0F0;
+      --yellow: #FFD166;
+      --bg: #FAFCFE; --surface: #FFFFFF; --surface2: #F4F8FA;
+      --text: #1A2B3C; --text-mid: #5A7080; --text-light: #9BB0BC;
+      --border: rgba(0,180,216,0.15);
+      --border-input: #D4E8F0;
+      --shadow-sm: 0 2px 8px rgba(0,100,140,0.08);
+      --shadow-md: 0 8px 24px rgba(0,100,140,0.12);
+      --shadow-lg: 0 20px 60px rgba(0,100,140,0.15);
+      --radius-sm: 10px; --radius-md: 16px; --radius-lg: 24px;
+      --error: #EF4444; --error-pale: #FEF2F2;
+      --success: #1A936F; --success-pale: #E8F6F1;
     }
-    html, body { height: 100%; }
-    body { background: var(--black); color: var(--white); font-family: 'DM Sans', sans-serif; font-weight: 300; min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { min-height: 100%; }
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: 'DM Sans', sans-serif; font-weight: 400;
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 2rem 1rem;
+    }
 
-    /* ── LEFT PANEL ── */
-    .left-panel { position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; padding: 2.5rem; background: var(--dark); border-right: 1px solid var(--border); }
-    .left-bg { position: absolute; inset: 0; }
-    .left-bg::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 80% 60% at 20% 70%, rgba(232,184,75,0.08) 0%, transparent 60%), radial-gradient(ellipse 60% 40% at 80% 20%, rgba(0,212,255,0.04) 0%, transparent 60%); }
-    .left-grid { position: absolute; inset: 0; opacity: 0.035; background-image: linear-gradient(rgba(232,184,75,1) 1px, transparent 1px), linear-gradient(90deg, rgba(232,184,75,1) 1px, transparent 1px); background-size: 60px 60px; }
+    /* Back link */
+    .back-link {
+      position: fixed; top: 1.2rem; left: 1.5rem;
+      display: flex; align-items: center; gap: 0.4rem;
+      font-size: 0.82rem; font-weight: 600; color: var(--text-mid);
+      text-decoration: none; transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--sky); }
 
-    .left-top { position: relative; }
-    .logo { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 0.08em; color: var(--gold); text-decoration: none; display: block; margin-bottom: 3rem; }
-    .logo span { color: var(--white); }
+    /* Card */
+    .auth-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      padding: 2.5rem 2.2rem;
+      width: 100%; max-width: 420px;
+      animation: fadeUp 0.4s ease both;
+    }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
 
-    .left-headline { position: relative; }
-    .left-tag { font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem; }
-    .live-dot { width: 6px; height: 6px; background: var(--red); border-radius: 50%; animation: pulse 1.5s ease-in-out infinite; flex-shrink: 0; }
-    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
-    .left-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(3.5rem, 6vw, 5.5rem); letter-spacing: 0.03em; line-height: 0.9; color: var(--white); margin-bottom: 1.2rem; }
-    .left-title span { color: var(--gold); display: block; }
-    .left-desc { font-size: 0.88rem; line-height: 1.8; color: rgba(240,237,232,0.45); max-width: 340px; }
+    /* Logo */
+    .auth-logo {
+      display: flex; align-items: center; justify-content: center; gap: 0.4rem;
+      font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.4rem;
+      color: var(--sky); text-decoration: none; margin-bottom: 1.8rem;
+    }
+    .auth-logo-icon { font-size: 1.3rem; }
 
-    /* Theme card */
-    .theme-card { position: relative; margin-top: 2.5rem; background: rgba(232,184,75,0.06); border: 1px solid rgba(232,184,75,0.2); border-left: 3px solid var(--gold); padding: 1.2rem 1.5rem; }
-    .theme-week { font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.4rem; }
-    .theme-name { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; letter-spacing: 0.05em; margin-bottom: 0.2rem; }
-    .theme-desc { font-size: 0.75rem; color: rgba(240,237,232,0.4); }
+    /* Header */
+    .auth-title {
+      font-family: 'Nunito', sans-serif; font-weight: 900;
+      font-size: 1.7rem; letter-spacing: -0.02em;
+      color: var(--text); margin-bottom: 0.3rem; text-align: center;
+    }
+    .auth-sub {
+      font-size: 0.88rem; color: var(--text-mid);
+      text-align: center; margin-bottom: 1.8rem; line-height: 1.6;
+    }
 
-    /* Mini leaderboard */
-    .mini-lb { position: relative; margin-top: 1.5rem; }
-    .mini-lb-title { font-size: 0.6rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--mid); margin-bottom: 0.8rem; }
-    .mini-lb-row { display: flex; align-items: center; gap: 0.8rem; padding: 0.55rem 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
-    .mini-lb-row:last-child { border-bottom: none; }
-    .mini-rank { font-family: 'Bebas Neue', sans-serif; font-size: 0.9rem; width: 18px; text-align: center; color: var(--mid); flex-shrink: 0; }
-    .mini-rank.r1 { color: var(--gold); }
-    .mini-name { flex: 1; font-size: 0.78rem; }
-    .mini-score { font-family: 'Bebas Neue', sans-serif; font-size: 1rem; color: var(--green); }
+    /* Alert */
+    .alert {
+      display: none; padding: 0.75rem 1rem;
+      border-radius: var(--radius-sm); font-size: 0.82rem;
+      line-height: 1.5; margin-bottom: 1.2rem;
+      border: 1.5px solid;
+    }
+    .alert.show { display: flex; align-items: flex-start; gap: 0.5rem; }
+    .alert-error { background: var(--error-pale); border-color: rgba(239,68,68,0.3); color: #B91C1C; }
+    .alert-success { background: var(--success-pale); border-color: rgba(26,147,111,0.3); color: var(--teal); }
 
-    .left-bottom { position: relative; }
-    .left-bottom p { font-size: 0.7rem; color: var(--mid); }
-
-    /* ── RIGHT PANEL ── */
-    .right-panel { display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 3rem 2rem; background: var(--black); }
-    .auth-box { width: 100%; max-width: 380px; animation: fadeUp 0.5s ease both; }
-
-    .auth-box-title { font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; letter-spacing: 0.05em; margin-bottom: 0.3rem; }
-    .auth-box-sub { font-size: 0.82rem; color: rgba(240,237,232,0.4); margin-bottom: 2rem; }
-
-    /* FORM */
+    /* Form */
     .form-group { margin-bottom: 1.1rem; }
-    .form-label { display: block; font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(240,237,232,0.5); margin-bottom: 0.5rem; }
-    .form-input { width: 100%; background: var(--dark); border: 1px solid var(--border); color: var(--white); padding: 0.85rem 1rem; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; outline: none; transition: border-color 0.2s; border-radius: 0; }
-    .form-input:focus { border-color: var(--gold); background: var(--dark2); }
-    .form-input::placeholder { color: rgba(240,237,232,0.18); }
+    .form-label {
+      display: block; font-size: 0.8rem; font-weight: 600;
+      color: var(--text-mid); margin-bottom: 0.4rem;
+    }
+    .form-input {
+      width: 100%; background: var(--surface2);
+      border: 1.5px solid var(--border-input);
+      color: var(--text); padding: 0.8rem 1rem;
+      font-family: 'DM Sans', sans-serif; font-size: 0.95rem;
+      border-radius: var(--radius-sm); outline: none;
+      transition: all 0.2s;
+    }
+    .form-input:focus { border-color: var(--sky); background: var(--surface); box-shadow: 0 0 0 3px rgba(0,180,216,0.12); }
+    .form-input::placeholder { color: var(--text-light); }
+    .form-input.error { border-color: var(--error); background: var(--error-pale); }
 
-    .forgot-link { display: block; text-align: right; font-size: 0.7rem; color: var(--mid); text-decoration: none; margin-top: 0.4rem; transition: color 0.2s; }
-    .forgot-link:hover { color: var(--gold); }
+    /* Password row */
+    .password-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem; }
+    .forgot-link { font-size: 0.78rem; font-weight: 600; color: var(--sky); text-decoration: none; transition: color 0.2s; }
+    .forgot-link:hover { color: var(--sky-dark); }
 
-    .btn-submit { width: 100%; background: var(--gold); color: var(--black); border: none; padding: 0.95rem; font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; letter-spacing: 0.12em; cursor: pointer; transition: all 0.2s; margin-top: 0.5rem; clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%); }
-    .btn-submit:hover:not(:disabled) { background: var(--gold2); transform: translateY(-1px); }
-    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+    /* Strength bar */
+    .strength-bar { height: 4px; background: var(--surface2); border-radius: 2px; margin-top: 0.5rem; overflow: hidden; }
+    .strength-fill { height: 100%; border-radius: 2px; transition: width 0.3s, background 0.3s; width: 0%; }
+    .strength-label { font-size: 0.72rem; color: var(--text-light); margin-top: 0.3rem; }
 
-    .auth-footer { text-align: center; margin-top: 1.5rem; font-size: 0.78rem; color: rgba(240,237,232,0.35); }
-    .auth-footer a { color: var(--gold); text-decoration: none; font-weight: 500; }
-    .auth-footer a:hover { color: var(--gold2); }
+    /* Submit button */
+    .btn-submit {
+      width: 100%; background: var(--sky); color: #fff;
+      border: none; padding: 0.9rem;
+      font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1rem;
+      border-radius: var(--radius-sm); cursor: pointer;
+      transition: all 0.2s; margin-top: 0.5rem;
+      box-shadow: 0 4px 14px rgba(0,180,216,0.35);
+      display: flex; align-items: center; justify-content: center; gap: 0.4rem;
+    }
+    .btn-submit:hover:not(:disabled) { background: var(--sky-dark); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,180,216,0.45); }
+    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .btn-submit .spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.6s linear infinite; display: none; }
+    .btn-submit.loading .spinner { display: block; }
+    .btn-submit.loading .btn-text { opacity: 0.7; }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ALERTS */
-    .alert { padding: 0.75rem 1rem; font-size: 0.8rem; line-height: 1.5; margin-bottom: 1.2rem; display: none; border-left: 3px solid; }
-    .alert.show { display: block; }
-    .alert-error { background: rgba(255,68,68,0.08); border-color: var(--red); color: #ff8080; }
-    .alert-success { background: rgba(0,230,118,0.07); border-color: var(--green); color: var(--green); }
+    /* Divider */
+    .auth-divider { text-align: center; margin: 1.4rem 0; font-size: 0.78rem; color: var(--text-light); position: relative; }
+    .auth-divider::before, .auth-divider::after { content: ''; position: absolute; top: 50%; width: 40%; height: 1px; background: var(--border); }
+    .auth-divider::before { left: 0; }
+    .auth-divider::after { right: 0; }
 
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    /* Footer link */
+    .auth-footer { text-align: center; margin-top: 1.4rem; font-size: 0.85rem; color: var(--text-mid); }
+    .auth-footer a { color: var(--sky); font-weight: 700; text-decoration: none; }
+    .auth-footer a:hover { color: var(--sky-dark); }
 
-    @media (max-width: 768px) {
-      body { grid-template-columns: 1fr; }
-      .left-panel { display: none; }
-      .right-panel { padding: 3rem 1.5rem; min-height: 100vh; }
+    /* Progress bubbles (decorative, shows what awaits) */
+    .auth-chapter-preview {
+      display: flex; align-items: center; justify-content: center; gap: 0.4rem;
+      margin-bottom: 1.5rem;
+    }
+    .mini-bubble {
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.62rem;
+    }
+    .mb-done { background: var(--teal); color: #fff; }
+    .mb-active { background: var(--sky); color: #fff; }
+    .mb-next { background: var(--surface2); color: var(--text-light); border: 1.5px solid var(--border); }
+    .mini-dots { color: var(--text-light); font-size: 0.8rem; letter-spacing: 0.1em; }
+
+    @media (max-width: 480px) {
+      .auth-card { padding: 2rem 1.4rem; border-radius: var(--radius-md); }
     }
   </style>
 </head>
 <body>
 
-  <!-- LEFT -->
-  <div class="left-panel">
-    <div class="left-bg"></div>
-    <div class="left-grid"></div>
-    <div class="left-top">
-      <a href="index.html" class="logo">Lens<span>Up</span></a>
-      <div class="left-headline">
-        <div class="left-tag"><span class="live-dot"></span> Week 1 Challenge Active</div>
-        <div class="left-title">Shoot.<br/><span>Compete.</span><br/>Improve.</div>
-        <p class="left-desc">A year-long photography quest with weekly themes, AI scoring, and a leaderboard that keeps you honest.</p>
-      </div>
-      <div class="theme-card">
-        <div class="theme-week">📅 This Week's Theme</div>
-        <div class="theme-name">Golden Hour</div>
-        <div class="theme-desc">Capture the magic of the first or last hour of sunlight</div>
-      </div>
-      <div class="mini-lb">
-        <div class="mini-lb-title">Today's Top Shots</div>
-        <div class="mini-lb-row"><span class="mini-rank r1">1</span><span class="mini-name">Ahmad R.</span><span class="mini-score">9.4</span></div>
-        <div class="mini-lb-row"><span class="mini-rank">2</span><span class="mini-name">Sarah K.</span><span class="mini-score">9.1</span></div>
-        <div class="mini-lb-row"><span class="mini-rank">3</span><span class="mini-name">Faiz M.</span><span class="mini-score">8.7</span></div>
-      </div>
-    </div>
-    <div class="left-bottom">
-      <p>© 2026 LensUp · Powered by Claude AI</p>
-    </div>
+<a href="index.html" class="back-link">← Back</a>
+
+<div class="auth-card">
+
+  <a href="index.html" class="auth-logo">
+    <span class="auth-logo-icon">📷</span> LensUp
+  </a>
+
+  <!-- Decorative chapter bubbles — shows progress waiting for them -->
+  <div class="auth-chapter-preview">
+    <div class="mini-bubble mb-done">✓</div>
+    <div class="mini-bubble mb-done">✓</div>
+    <div class="mini-bubble mb-active">3</div>
+    <div class="mini-bubble mb-next">4</div>
+    <div class="mini-bubble mb-next">5</div>
+    <span class="mini-dots">···</span>
   </div>
 
-  <!-- RIGHT -->
-  <div class="right-panel">
-    <div class="auth-box">
-      <div class="auth-box-title">Welcome Back</div>
-      <div class="auth-box-sub">Sign in to submit your shot and climb the leaderboard</div>
+  <div class="auth-title">Welcome back 👋</div>
+  <div class="auth-sub">Continue your learning journey</div>
 
-      <div class="alert alert-error" id="errorAlert"></div>
-      <div class="alert alert-success" id="successAlert"></div>
+  <div class="alert alert-error" id="errorAlert"></div>
+  <div class="alert alert-success" id="successAlert"></div>
 
-      <div class="form-group">
-        <label class="form-label">Email</label>
-        <input type="email" class="form-input" id="emailInput" placeholder="you@example.com"/>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Password</label>
-        <input type="password" class="form-input" id="passwordInput" placeholder="Your password" onkeydown="if(event.key==='Enter') signIn()"/>
-        <a href="reset-password.html" class="forgot-link">Forgot password?</a>
-      </div>
-
-      <button class="btn-submit" id="submitBtn" onclick="signIn()">Sign In →</button>
-
-      <div class="auth-footer">
-        No account? <a href="register.html">Join the challenge →</a>
-      </div>
-    </div>
+  <div class="form-group">
+    <label class="form-label" for="emailInput">Email address</label>
+    <input type="email" class="form-input" id="emailInput" placeholder="you@example.com" autocomplete="email"/>
   </div>
 
-  <script>
-    initSupabase();
-    (async () => { const user = await getUser(); if (user) window.location.href = 'app.html'; })();
+  <div class="form-group">
+    <div class="password-header">
+      <label class="form-label" for="passwordInput" style="margin-bottom:0">Password</label>
+      <a href="reset-password.html" class="forgot-link">Forgot password?</a>
+    </div>
+    <input type="password" class="form-input" id="passwordInput" placeholder="Your password" autocomplete="current-password" onkeydown="if(event.key==='Enter') signIn()"/>
+  </div>
 
-    function showError(msg) {
-      const el = document.getElementById('errorAlert');
-      el.textContent = msg; el.classList.add('show');
-      document.getElementById('successAlert').classList.remove('show');
-    }
-    function showSuccess(msg) {
-      const el = document.getElementById('successAlert');
-      el.textContent = msg; el.classList.add('show');
-      document.getElementById('errorAlert').classList.remove('show');
-    }
+  <button class="btn-submit" id="submitBtn" onclick="signIn()">
+    <div class="spinner"></div>
+    <span class="btn-text">Sign In →</span>
+  </button>
 
-    async function signIn() {
-      const email = document.getElementById('emailInput').value.trim();
-      const password = document.getElementById('passwordInput').value;
-      const btn = document.getElementById('submitBtn');
-      if (!email || !password) { showError('Please enter your email and password.'); return; }
-      btn.disabled = true; btn.textContent = 'Signing in…';
-      const { data, error } = await sb.auth.signInWithPassword({ email, password });
-      if (error) {
-        showError(error.message || 'Sign in failed. Please check your credentials.');
-        btn.disabled = false; btn.textContent = 'Sign In →';
-      } else {
-        showSuccess('Signed in! Redirecting…');
-        setTimeout(() => window.location.href = 'app.html', 800);
-      }
-    }
+  <div class="auth-footer">
+    No account yet? <a href="register.html">Create one free →</a>
+  </div>
 
-    async function forgotPassword() {
-      const email = document.getElementById('emailInput').value.trim();
-      if (!email) { showError('Enter your email first, then click Forgot Password.'); return; }
-      const { error } = await sb.auth.resetPasswordForEmail(email);
-      if (error) { showError(error.message); }
-      else { showSuccess('Reset email sent — check your inbox.'); }
+</div>
+
+<script>
+  initSupabase();
+  (async () => {
+    try { const user = await getUser(); if (user) window.location.href = 'learn.html'; } catch(e) {}
+  })();
+
+  function showError(msg) {
+    const el = document.getElementById('errorAlert');
+    el.textContent = '⚠️ ' + msg; el.classList.add('show');
+    document.getElementById('successAlert').classList.remove('show');
+  }
+  function showSuccess(msg) {
+    const el = document.getElementById('successAlert');
+    el.textContent = '✓ ' + msg; el.classList.add('show');
+    document.getElementById('errorAlert').classList.remove('show');
+  }
+
+  async function signIn() {
+    const email    = document.getElementById('emailInput').value.trim();
+    const password = document.getElementById('passwordInput').value;
+    const btn      = document.getElementById('submitBtn');
+    if (!email || !password) { showError('Please enter your email and password.'); return; }
+    btn.disabled = true; btn.classList.add('loading');
+    const { data, error } = await sb.auth.signInWithPassword({ email, password });
+    if (error) {
+      showError(error.message || 'Sign in failed. Check your credentials.');
+      btn.disabled = false; btn.classList.remove('loading');
+    } else {
+      showSuccess('Signed in! Loading your chapters…');
+      setTimeout(() => window.location.href = 'learn.html', 800);
     }
-  </script>
+  }
+</script>
 </body>
 </html>

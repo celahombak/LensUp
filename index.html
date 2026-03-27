@@ -3,569 +3,913 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>LensUp — Learn Photography. Shoot Better. Prove It.</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,900;1,700&display=swap" rel="stylesheet"/>
+  <title>LensUp — Learn Photography. One Chapter at a Time.</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    /* ── CSS VARIABLES — light mode, dark mode ready ── */
     :root {
-      --black: #080808;
-      --white: #f0ede8;
-      --dark: #111010;
-      --dark2: #181615;
-      --mid: #5a5550;
-      --border: rgba(255,255,255,0.07);
-      --gold: #e8b84b;
-      --gold2: #f5d07a;
-      --red: #ff4444;
-      --orange: #ff7a1a;
-      --cyan: #00d4ff;
-      --green: #00e676;
-      --purple: #b44bff;
+      --sky: #00B4D8;
+      --sky-dark: #0096B4;
+      --sky-light: #90E0EF;
+      --sky-pale: #EAF8FC;
+      --sky-xpale: #F4FCFE;
+      --teal: #1A936F;
+      --teal-pale: #E8F6F1;
+      --coral: #FF6B6B;
+      --coral-pale: #FFF0F0;
+      --yellow: #FFD166;
+      --yellow-pale: #FFFBEE;
+      --bg: #FAFCFE;
+      --surface: #FFFFFF;
+      --surface2: #F4F8FA;
+      --text: #1A2B3C;
+      --text-mid: #5A7080;
+      --text-light: #9BB0BC;
+      --border: rgba(0,180,216,0.12);
+      --shadow-sm: 0 2px 8px rgba(0,100,140,0.08);
+      --shadow-md: 0 8px 24px rgba(0,100,140,0.12);
+      --shadow-lg: 0 20px 60px rgba(0,100,140,0.15);
+      --radius-sm: 10px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+      --radius-xl: 32px;
     }
+
+    /* Dark mode prep — toggle .dark on <html> later */
+    html.dark {
+      --bg: #0F1923;
+      --surface: #162030;
+      --surface2: #1C2A3A;
+      --text: #E8F4FA;
+      --text-mid: #7EB0C4;
+      --text-light: #4A7080;
+      --border: rgba(0,180,216,0.15);
+      --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
+      --shadow-md: 0 8px 24px rgba(0,0,0,0.35);
+      --shadow-lg: 0 20px 60px rgba(0,0,0,0.4);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
-    body { background: var(--black); color: var(--white); font-family: 'DM Sans', sans-serif; font-weight: 300; overflow-x: hidden; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 400;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
 
     /* ── NAV ── */
-    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 200; display: flex; align-items: center; justify-content: space-between; padding: 1.2rem 3rem; background: rgba(8,8,8,0.92); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); }
-    .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; letter-spacing: 0.08em; color: var(--gold); text-decoration: none; }
-    .nav-logo span { color: var(--white); }
-    .nav-links { display: flex; align-items: center; gap: 2.5rem; list-style: none; }
-    .nav-links a { color: rgba(240,237,232,0.5); text-decoration: none; font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; transition: color 0.2s; }
-    .nav-links a:hover { color: var(--gold); }
-    .nav-cta { background: var(--gold); color: var(--black); padding: 0.6rem 1.6rem; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; text-decoration: none; transition: all 0.2s; clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%); }
-    .nav-cta:hover { background: var(--gold2); transform: translateY(-1px); }
-    .nav-login { color: rgba(240,237,232,0.5); text-decoration: none; font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; transition: color 0.2s; }
-    .nav-login:hover { color: var(--gold); }
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(250,252,254,0.92);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+      transition: background 0.3s;
+    }
+    html.dark .nav { background: rgba(15,25,35,0.92); }
+    .nav-logo {
+      font-family: 'Nunito', sans-serif;
+      font-weight: 900;
+      font-size: 1.5rem;
+      color: var(--sky);
+      text-decoration: none;
+      letter-spacing: -0.02em;
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+    .nav-logo-icon { font-size: 1.3rem; }
+    .nav-links { display: flex; align-items: center; gap: 0.25rem; }
+    .nav-link {
+      font-size: 0.85rem; font-weight: 600;
+      color: var(--text-mid); text-decoration: none;
+      padding: 0.5rem 0.9rem; border-radius: var(--radius-sm);
+      transition: all 0.2s;
+    }
+    .nav-link:hover { color: var(--sky); background: var(--sky-pale); }
+    .nav-actions { display: flex; align-items: center; gap: 0.75rem; }
+    .nav-signin {
+      font-size: 0.85rem; font-weight: 600;
+      color: var(--text-mid); text-decoration: none;
+      padding: 0.5rem 1rem; border-radius: var(--radius-sm);
+      border: 2px solid var(--border);
+      transition: all 0.2s;
+    }
+    .nav-signin:hover { border-color: var(--sky); color: var(--sky); }
+    .btn-nav-cta {
+      font-size: 0.85rem; font-weight: 700;
+      color: #fff; background: var(--sky);
+      text-decoration: none;
+      padding: 0.55rem 1.2rem; border-radius: var(--radius-sm);
+      transition: all 0.2s;
+      box-shadow: 0 4px 12px rgba(0,180,216,0.3);
+    }
+    .btn-nav-cta:hover { background: var(--sky-dark); transform: translateY(-1px); box-shadow: 0 6px 16px rgba(0,180,216,0.4); }
+
+    /* Hamburger */
+    .nav-burger { display: none; background: none; border: none; cursor: pointer; padding: 0.4rem; color: var(--text); flex-direction: column; gap: 5px; align-items: center; justify-content: center; }
+    .nav-burger span { display: block; width: 22px; height: 2px; background: var(--text-mid); border-radius: 2px; transition: all 0.3s; }
+    .mobile-menu {
+      display: none; position: fixed; inset: 0; z-index: 99;
+      background: var(--bg); flex-direction: column;
+      padding: 5rem 2rem 2rem;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu-close { position: absolute; top: 1rem; right: 1.5rem; background: none; border: none; font-size: 1.5rem; color: var(--text-mid); cursor: pointer; }
+    .mobile-menu a { font-family: 'Nunito', sans-serif; font-size: 1.5rem; font-weight: 700; color: var(--text); text-decoration: none; padding: 0.8rem 0; border-bottom: 1px solid var(--border); }
+    .mobile-menu a:hover { color: var(--sky); }
+    .mobile-menu-actions { margin-top: 2rem; display: flex; flex-direction: column; gap: 0.8rem; }
 
     /* ── HERO ── */
-    .hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 8rem 3rem 4rem; position: relative; overflow: hidden; }
+    .hero {
+      min-height: 100vh;
+      padding: 7rem 2rem 4rem;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center;
+      position: relative; overflow: hidden;
+    }
 
-    /* Animated background */
-    .hero-bg { position: absolute; inset: 0; }
-    .hero-bg::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 70% 60% at 20% 60%, rgba(232,184,75,0.06) 0%, transparent 60%), radial-gradient(ellipse 50% 50% at 80% 30%, rgba(0,212,255,0.04) 0%, transparent 60%), radial-gradient(ellipse 40% 40% at 60% 80%, rgba(180,75,255,0.04) 0%, transparent 60%); }
-    .hero-grid { position: absolute; inset: 0; opacity: 0.04; background-image: linear-gradient(rgba(232,184,75,0.8) 1px, transparent 1px), linear-gradient(90deg, rgba(232,184,75,0.8) 1px, transparent 1px); background-size: 80px 80px; }
-    .hero-scanline { position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--gold), transparent); animation: scan 4s ease-in-out infinite; opacity: 0.4; }
-    @keyframes scan { 0%,100% { top: 0%; opacity: 0; } 10% { opacity: 0.4; } 90% { opacity: 0.4; } 50% { top: 100%; } }
+    /* Sky gradient background */
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% -10%, rgba(0,180,216,0.12) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 40% at 10% 80%, rgba(26,147,111,0.07) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 50% at 90% 70%, rgba(255,209,102,0.07) 0%, transparent 60%);
+    }
 
-    .hero-inner { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; max-width: 1200px; margin: 0 auto; width: 100%; }
+    /* Floating dots pattern */
+    .hero-dots {
+      position: absolute; inset: 0; pointer-events: none;
+      background-image: radial-gradient(circle, rgba(0,180,216,0.12) 1.5px, transparent 1.5px);
+      background-size: 32px 32px;
+      background-position: 0 0;
+      mask-image: radial-gradient(ellipse 100% 100% at 50% 50%, black 30%, transparent 80%);
+    }
 
-    /* Left side */
-    .hero-left {}
-    .hero-live-badge { display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255,68,68,0.12); border: 1px solid rgba(255,68,68,0.3); color: var(--red); padding: 0.35rem 0.9rem; font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1.8rem; animation: fadeUp 0.6s ease both; }
-    .live-dot { width: 6px; height: 6px; background: var(--red); border-radius: 50%; animation: pulse 1.5s ease-in-out infinite; }
-    @keyframes pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.7); } }
+    .hero-inner { position: relative; max-width: 760px; margin: 0 auto; }
 
-    .hero h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(4rem, 8vw, 7rem); line-height: 0.92; letter-spacing: 0.03em; margin-bottom: 1.5rem; animation: fadeUp 0.6s 0.1s ease both; }
-    .hero h1 .line2 { color: var(--gold); display: block; }
-    .hero h1 .line3 { color: rgba(240,237,232,0.25); display: block; font-size: 0.6em; letter-spacing: 0.08em; }
+    /* Chapter pill badge */
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: var(--sky-pale); color: var(--sky-dark);
+      border: 1.5px solid rgba(0,180,216,0.25);
+      border-radius: 100px;
+      padding: 0.4rem 1rem;
+      font-size: 0.8rem; font-weight: 700;
+      letter-spacing: 0.02em;
+      margin-bottom: 1.5rem;
+      animation: fadeUp 0.5s ease both;
+    }
+    .badge-dot { width: 7px; height: 7px; background: var(--teal); border-radius: 50%; animation: pulse 2s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
 
-    .hero-desc { font-size: 1rem; line-height: 1.8; color: rgba(240,237,232,0.55); max-width: 440px; margin-bottom: 2rem; animation: fadeUp 0.6s 0.2s ease both; }
+    .hero h1 {
+      font-family: 'Nunito', sans-serif;
+      font-weight: 900;
+      font-size: clamp(2.6rem, 6vw, 4.2rem);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      margin-bottom: 1.2rem;
+      animation: fadeUp 0.5s 0.1s ease both;
+    }
+    .hero h1 em { font-style: normal; color: var(--sky); }
+    .hero h1 .line-green { color: var(--teal); }
 
-    .hero-theme-card { background: var(--dark2); border: 1px solid var(--border); border-left: 3px solid var(--gold); padding: 1.2rem 1.5rem; margin-bottom: 2rem; animation: fadeUp 0.6s 0.3s ease both; }
-    .hero-theme-label { font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.4rem; }
-    .hero-theme-name { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; letter-spacing: 0.05em; margin-bottom: 0.3rem; }
-    .hero-theme-sub { font-size: 0.78rem; color: rgba(240,237,232,0.4); }
-    .hero-theme-timer { display: flex; gap: 1rem; margin-top: 0.8rem; }
-    .timer-unit { text-align: center; }
-    .timer-num { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; color: var(--gold); line-height: 1; display: block; }
-    .timer-label { font-size: 0.55rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mid); }
+    .hero-sub {
+      font-size: 1.05rem; line-height: 1.8;
+      color: var(--text-mid);
+      max-width: 520px; margin: 0 auto 2.2rem;
+      animation: fadeUp 0.5s 0.2s ease both;
+    }
 
-    .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; animation: fadeUp 0.6s 0.4s ease both; }
-    .btn-primary { background: var(--gold); color: var(--black); padding: 0.9rem 2.2rem; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; text-decoration: none; transition: all 0.2s; display: inline-block; clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%); }
-    .btn-primary:hover { background: var(--gold2); transform: translateY(-2px); }
-    .btn-ghost { color: var(--white); text-decoration: none; font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.5; display: flex; align-items: center; gap: 0.4rem; transition: opacity 0.2s; padding: 0.9rem 0; }
-    .btn-ghost:hover { opacity: 1; }
+    /* Chapter preview strip */
+    .hero-chapter-strip {
+      display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+      margin-bottom: 2.2rem;
+      animation: fadeUp 0.5s 0.25s ease both;
+      flex-wrap: wrap;
+    }
+    .chapter-bubble {
+      width: 40px; height: 40px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.75rem;
+      transition: transform 0.2s;
+    }
+    .chapter-bubble:hover { transform: scale(1.15); }
+    .bubble-done { background: var(--teal); color: #fff; }
+    .bubble-active { background: var(--sky); color: #fff; box-shadow: 0 0 0 3px rgba(0,180,216,0.25); }
+    .bubble-next { background: var(--surface); color: var(--text-mid); border: 2px solid var(--border); }
+    .bubble-locked { background: var(--surface2); color: var(--text-light); border: 2px dashed var(--border); }
+    .bubble-dots { color: var(--text-light); font-size: 1.2rem; letter-spacing: 0.1em; padding: 0 0.3rem; }
 
-    /* Right side — leaderboard preview */
-    .hero-right { animation: fadeUp 0.6s 0.5s ease both; }
-    .leaderboard-preview { background: var(--dark); border: 1px solid var(--border); overflow: hidden; }
-    .lb-header { padding: 1rem 1.4rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-    .lb-title { font-family: 'Bebas Neue', sans-serif; font-size: 1rem; letter-spacing: 0.1em; color: var(--gold); }
-    .lb-live { font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--red); display: flex; align-items: center; gap: 0.4rem; }
-    .lb-row { display: flex; align-items: center; gap: 1rem; padding: 0.9rem 1.4rem; border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.2s; }
-    .lb-row:hover { background: rgba(232,184,75,0.04); }
-    .lb-row.gold-row { background: rgba(232,184,75,0.06); border-left: 2px solid var(--gold); }
-    .lb-rank { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; width: 24px; text-align: center; }
-    .lb-rank.r1 { color: var(--gold); }
-    .lb-rank.r2 { color: #c0c0c0; }
-    .lb-rank.r3 { color: #cd7f32; }
-    .lb-photo { width: 42px; height: 42px; background: var(--dark2); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; overflow: hidden; }
-    .lb-info { flex: 1; }
-    .lb-name { font-size: 0.82rem; font-weight: 500; margin-bottom: 0.1rem; }
-    .lb-theme { font-size: 0.68rem; color: var(--mid); }
-    .lb-score { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; }
-    .lb-score.s-high { color: var(--green); }
-    .lb-score.s-mid { color: var(--gold); }
+    /* CTA buttons */
+    .hero-cta {
+      display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
+      animation: fadeUp 0.5s 0.3s ease both;
+      margin-bottom: 3rem;
+    }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: var(--sky); color: #fff;
+      font-family: 'Nunito', sans-serif; font-weight: 800;
+      font-size: 1rem; text-decoration: none;
+      padding: 0.85rem 2rem; border-radius: var(--radius-md);
+      box-shadow: 0 6px 20px rgba(0,180,216,0.35);
+      transition: all 0.2s;
+      border: none; cursor: pointer;
+    }
+    .btn-primary:hover { background: var(--sky-dark); transform: translateY(-2px); box-shadow: 0 10px 28px rgba(0,180,216,0.45); }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: var(--surface); color: var(--text-mid);
+      font-family: 'Nunito', sans-serif; font-weight: 700;
+      font-size: 1rem; text-decoration: none;
+      padding: 0.85rem 2rem; border-radius: var(--radius-md);
+      border: 2px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s;
+    }
+    .btn-secondary:hover { border-color: var(--sky); color: var(--sky); transform: translateY(-1px); }
+    .btn-arrow { font-size: 1.1rem; transition: transform 0.2s; }
+    .btn-primary:hover .btn-arrow { transform: translateX(3px); }
 
-    /* ── TICKER ── */
-    .ticker { background: var(--gold); color: var(--black); padding: 0.6rem 0; overflow: hidden; white-space: nowrap; }
-    .ticker-inner { display: inline-flex; gap: 0; animation: ticker 25s linear infinite; }
-    .ticker-item { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; padding: 0 2rem; }
-    .ticker-sep { opacity: 0.4; }
-    @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+    /* Social proof strip */
+    .hero-social-proof {
+      display: flex; align-items: center; justify-content: center; gap: 2rem; flex-wrap: wrap;
+      animation: fadeUp 0.5s 0.4s ease both;
+    }
+    .proof-item { display: flex; align-items: center; gap: 0.5rem; color: var(--text-mid); font-size: 0.82rem; font-weight: 500; }
+    .proof-icon { font-size: 1rem; }
+    .proof-num { font-family: 'Nunito', sans-serif; font-weight: 800; color: var(--text); }
 
-    /* ── STATS BAR ── */
-    .stats-bar { padding: 3rem; display: flex; justify-content: center; gap: 0; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
-    .stat-item { text-align: center; padding: 1rem 3rem; border-right: 1px solid var(--border); }
-    .stat-item:last-child { border-right: none; }
-    .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 2.8rem; letter-spacing: 0.04em; display: block; line-height: 1; }
-    .stat-label { font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--mid); margin-top: 0.3rem; }
+    /* ── PROGRESS DEMO SECTION ── */
+    .section-progress {
+      padding: 5rem 2rem;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .section-inner { max-width: 1000px; margin: 0 auto; }
+    .section-label { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--sky); margin-bottom: 0.6rem; }
+    .section-title { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: clamp(1.8rem, 4vw, 2.6rem); letter-spacing: -0.02em; color: var(--text); margin-bottom: 0.8rem; line-height: 1.2; }
+    .section-sub { color: var(--text-mid); font-size: 0.95rem; line-height: 1.8; max-width: 500px; margin-bottom: 2.5rem; }
+
+    /* Module cards */
+    .module-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+    .module-card {
+      background: var(--bg); border: 2px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.4rem 1.2rem;
+      transition: all 0.2s;
+      position: relative; overflow: hidden;
+    }
+    .module-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+      border-radius: var(--radius-md) var(--radius-md) 0 0;
+    }
+    .module-card.m1::before { background: var(--sky); }
+    .module-card.m2::before { background: var(--yellow); }
+    .module-card.m3::before { background: var(--coral); }
+    .module-card.m4::before { background: var(--teal); }
+    .module-card.m5::before { background: #A78BFA; }
+    .module-card.m6::before { background: #FB923C; }
+    .module-card:hover { border-color: var(--sky-light); box-shadow: var(--shadow-md); transform: translateY(-2px); }
+    .module-icon { font-size: 1.8rem; margin-bottom: 0.6rem; display: block; }
+    .module-name { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.95rem; color: var(--text); margin-bottom: 0.2rem; }
+    .module-count { font-size: 0.78rem; color: var(--text-light); }
+    .module-chapters { display: flex; gap: 3px; margin-top: 0.8rem; flex-wrap: wrap; }
+    .ch-pip { width: 8px; height: 8px; border-radius: 50%; background: var(--border); }
 
     /* ── HOW IT WORKS ── */
-    .section { padding: 6rem 3rem; max-width: 1200px; margin: 0 auto; }
-    .section-tag { font-size: 0.68rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.8rem; display: block; }
-    .section-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2.5rem, 5vw, 4rem); letter-spacing: 0.04em; line-height: 1; margin-bottom: 1rem; }
-    .section-sub { color: rgba(240,237,232,0.45); font-size: 0.95rem; line-height: 1.8; max-width: 480px; margin-bottom: 3rem; }
+    .section-how { padding: 5rem 2rem; }
+    .steps-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-top: 2.5rem; }
+    .step-card {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.8rem 1.4rem;
+      text-align: center;
+      position: relative;
+      transition: all 0.25s;
+    }
+    .step-card:hover { border-color: var(--sky-light); box-shadow: var(--shadow-md); transform: translateY(-3px); }
+    .step-num-badge {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--sky-pale); color: var(--sky);
+      font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 0.9rem;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1rem;
+    }
+    .step-icon { font-size: 2rem; display: block; margin-bottom: 0.8rem; }
+    .step-title { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1rem; color: var(--text); margin-bottom: 0.5rem; }
+    .step-desc { font-size: 0.82rem; color: var(--text-mid); line-height: 1.7; }
+    .step-connector {
+      position: absolute; right: -1rem; top: 50%;
+      transform: translateY(-50%);
+      color: var(--sky-light); font-size: 1.2rem; z-index: 1;
+    }
+    .step-card:last-child .step-connector { display: none; }
 
-    .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border: 1px solid var(--border); }
-    .step { padding: 2.5rem 2rem; border-right: 1px solid var(--border); position: relative; transition: background 0.3s; }
-    .step:last-child { border-right: none; }
-    .step:hover { background: var(--dark2); }
-    .step-num { font-family: 'Bebas Neue', sans-serif; font-size: 4rem; color: rgba(232,184,75,0.1); line-height: 1; margin-bottom: 1rem; }
-    .step-icon { font-size: 1.6rem; margin-bottom: 1rem; display: block; }
-    .step h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.6rem; letter-spacing: 0.02em; }
-    .step p { font-size: 0.82rem; line-height: 1.7; color: rgba(240,237,232,0.45); }
-    .step-arrow { position: absolute; right: -12px; top: 50%; transform: translateY(-50%); width: 24px; height: 24px; background: var(--black); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.65rem; color: var(--gold); z-index: 1; }
-    .step:last-child .step-arrow { display: none; }
+    /* ── FEEDBACK EXAMPLE ── */
+    .section-feedback { padding: 5rem 2rem; background: var(--sky-xpale); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .feedback-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center; margin-top: 2.5rem; }
+    .feedback-phone {
+      background: var(--surface);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      border: 3px solid var(--border);
+    }
+    .phone-top { background: var(--sky); padding: 1.2rem 1.4rem; }
+    .phone-ch-label { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.7); margin-bottom: 0.2rem; }
+    .phone-ch-name { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.1rem; color: #fff; }
+    .phone-body { padding: 1.2rem 1.4rem; }
+    .phone-score-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.2rem; }
+    .phone-score-big { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 2.8rem; line-height: 1; color: var(--teal); }
+    .phone-score-denom { font-size: 1rem; color: var(--text-light); }
+    .phone-score-label { font-size: 0.82rem; font-weight: 600; color: var(--text); margin-top: 0.2rem; }
+    .phone-feedback-text { font-size: 0.82rem; line-height: 1.7; color: var(--text-mid); margin-bottom: 1rem; background: var(--sky-pale); border-radius: var(--radius-sm); padding: 0.8rem 1rem; border-left: 3px solid var(--sky); }
+    .phone-cats { display: flex; flex-direction: column; gap: 0.5rem; }
+    .phone-cat { display: flex; align-items: center; gap: 0.7rem; }
+    .cat-label { font-size: 0.72rem; color: var(--text-mid); width: 85px; flex-shrink: 0; }
+    .cat-bar-bg { flex: 1; height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+    .cat-bar-fill { height: 100%; border-radius: 3px; }
+    .cat-val { font-size: 0.72rem; font-weight: 700; color: var(--text); width: 16px; text-align: right; }
+    .phone-progress { margin-top: 1.2rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+    .phone-progress-label { font-size: 0.7rem; color: var(--text-light); margin-bottom: 0.4rem; }
+    .phone-progress-dots { display: flex; gap: 5px; }
+    .phone-dot { width: 12px; height: 12px; border-radius: 50%; }
+    .phone-dot.done { background: var(--teal); }
+    .phone-dot.active { background: var(--sky); }
+    .phone-dot.empty { background: var(--surface2); border: 2px solid var(--border); }
+    .phone-next-btn { display: block; width: 100%; background: var(--sky); color: #fff; border: none; border-radius: var(--radius-sm); padding: 0.75rem; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.9rem; cursor: default; margin-top: 1rem; text-align: center; }
 
-    /* ── CHALLENGE PREVIEW ── */
-    .challenges-section { padding: 6rem 3rem; background: var(--dark); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-    .challenges-inner { max-width: 1200px; margin: 0 auto; }
-    .challenge-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); margin-top: 3rem; }
-    .challenge-card { background: var(--black); padding: 2rem; transition: background 0.3s; position: relative; overflow: hidden; }
-    .challenge-card::before { content: ''; position: absolute; inset: 0; opacity: 0; transition: opacity 0.3s; }
-    .challenge-card.c1::before { background: radial-gradient(ellipse at top left, rgba(232,184,75,0.08), transparent 60%); }
-    .challenge-card.c2::before { background: radial-gradient(ellipse at top left, rgba(0,212,255,0.06), transparent 60%); }
-    .challenge-card.c3::before { background: radial-gradient(ellipse at top left, rgba(180,75,255,0.06), transparent 60%); }
-    .challenge-card:hover { background: var(--dark2); }
-    .challenge-card:hover::before { opacity: 1; }
-    .challenge-week { font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 0.6rem; }
-    .challenge-name { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 0.04em; margin-bottom: 0.5rem; }
-    .challenge-desc { font-size: 0.82rem; line-height: 1.7; color: rgba(240,237,232,0.45); margin-bottom: 1.2rem; }
-    .challenge-meta { display: flex; gap: 1rem; }
-    .challenge-tag { font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.25rem 0.7rem; border: 1px solid var(--border); color: rgba(240,237,232,0.4); }
+    .feedback-points { display: flex; flex-direction: column; gap: 1.2rem; }
+    .fpoint { display: flex; gap: 1rem; align-items: flex-start; }
+    .fpoint-icon {
+      width: 44px; height: 44px; border-radius: var(--radius-sm); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 1.3rem;
+    }
+    .fpoint-icon.sky { background: var(--sky-pale); }
+    .fpoint-icon.teal { background: var(--teal-pale); }
+    .fpoint-icon.yellow { background: var(--yellow-pale); }
+    .fpoint-title { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.95rem; color: var(--text); margin-bottom: 0.2rem; }
+    .fpoint-desc { font-size: 0.82rem; color: var(--text-mid); line-height: 1.7; }
 
-    /* ── SCORING ── */
-    .scoring-section { padding: 6rem 3rem; max-width: 1200px; margin: 0 auto; }
-    .scoring-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; margin-top: 3rem; }
-    .score-categories { display: flex; flex-direction: column; gap: 0.8rem; }
-    .score-cat { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.2rem; background: var(--dark); border: 1px solid var(--border); transition: border-color 0.2s; }
-    .score-cat:hover { border-color: rgba(232,184,75,0.3); }
-    .score-cat-icon { font-size: 1.1rem; width: 28px; text-align: center; }
-    .score-cat-info { flex: 1; }
-    .score-cat-name { font-size: 0.82rem; font-weight: 500; margin-bottom: 0.2rem; }
-    .score-cat-desc { font-size: 0.72rem; color: var(--mid); }
-    .score-cat-bar { width: 80px; height: 4px; background: rgba(255,255,255,0.06); overflow: hidden; }
-    .score-cat-fill { height: 100%; transition: width 1s ease; }
-    .score-right { }
-    .score-sample { background: var(--dark); border: 1px solid var(--border); padding: 2rem; }
-    .score-sample-title { font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--mid); margin-bottom: 1.2rem; }
-    .score-overall { font-family: 'Bebas Neue', sans-serif; font-size: 5rem; color: var(--gold); line-height: 1; margin-bottom: 0.3rem; }
-    .score-overall span { font-size: 1.5rem; color: var(--mid); }
-    .score-verdict { font-size: 0.85rem; color: var(--gold); margin-bottom: 1.5rem; }
-    .score-bars { display: flex; flex-direction: column; gap: 0.6rem; }
-    .score-bar-row { display: flex; align-items: center; gap: 0.8rem; }
-    .score-bar-label { font-size: 0.68rem; width: 90px; color: rgba(240,237,232,0.5); text-transform: uppercase; letter-spacing: 0.05em; flex-shrink: 0; }
-    .score-bar-track { flex: 1; height: 4px; background: rgba(255,255,255,0.06); overflow: hidden; }
-    .score-bar-fill { height: 100%; }
-    .score-bar-val { font-size: 0.75rem; font-weight: 600; width: 20px; text-align: right; flex-shrink: 0; }
+    /* ── CHALLENGE TEASER ── */
+    .section-challenge { padding: 5rem 2rem; }
+    .challenge-card-big {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 2.5rem;
+      display: grid; grid-template-columns: 1fr auto;
+      gap: 2rem; align-items: center;
+      box-shadow: var(--shadow-md);
+      position: relative; overflow: hidden;
+    }
+    .challenge-card-big::before {
+      content: ''; position: absolute;
+      top: 0; left: 0; right: 0; height: 5px;
+      background: linear-gradient(90deg, var(--sky), var(--teal));
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    }
+    .challenge-week-tag { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--sky); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.4rem; }
+    .live-pip { width: 7px; height: 7px; background: var(--coral); border-radius: 50%; animation: pulse 1.5s ease-in-out infinite; }
+    .challenge-theme-name { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 2rem; letter-spacing: -0.02em; color: var(--text); margin-bottom: 0.5rem; line-height: 1.1; }
+    .challenge-desc { font-size: 0.9rem; color: var(--text-mid); line-height: 1.7; max-width: 420px; margin-bottom: 1.2rem; }
+    .challenge-timer-row { display: flex; gap: 1rem; }
+    .timer-box { text-align: center; background: var(--sky-pale); border-radius: var(--radius-sm); padding: 0.6rem 1rem; min-width: 56px; }
+    .timer-num { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.4rem; color: var(--sky); line-height: 1; display: block; }
+    .timer-lbl { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-light); }
+    .challenge-right { text-align: center; }
+    .challenge-entries-count { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 3rem; color: var(--sky); line-height: 1; }
+    .challenge-entries-label { font-size: 0.75rem; color: var(--text-light); font-weight: 600; margin-bottom: 1.2rem; }
 
-    /* ── CTA ── */
-    .cta-section { padding: 8rem 3rem; text-align: center; position: relative; overflow: hidden; background: var(--dark); border-top: 1px solid var(--border); }
-    .cta-section::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(232,184,75,0.07) 0%, transparent 70%); }
-    .cta-section > * { position: relative; }
-    .cta-label { font-size: 0.68rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); margin-bottom: 1rem; display: block; }
-    .cta-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(3rem, 7vw, 6rem); letter-spacing: 0.04em; line-height: 1; margin-bottom: 1.2rem; }
-    .cta-title span { color: var(--gold); }
-    .cta-sub { color: rgba(240,237,232,0.45); font-size: 0.95rem; line-height: 1.8; max-width: 460px; margin: 0 auto 2.5rem; }
-    .btn-cta-big { background: var(--gold); color: var(--black); padding: 1.1rem 3.5rem; font-size: 0.88rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; text-decoration: none; transition: all 0.25s; display: inline-block; clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%); }
-    .btn-cta-big:hover { background: var(--gold2); transform: translateY(-3px); box-shadow: 0 12px 40px rgba(232,184,75,0.25); }
+    /* ── STREAK / GAMIFICATION CALLOUT ── */
+    .section-streak { padding: 5rem 2rem; background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .streak-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 2.5rem; }
+    .streak-card {
+      background: var(--bg);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 2rem 1.5rem;
+      text-align: center;
+      transition: all 0.25s;
+    }
+    .streak-card:hover { border-color: var(--sky-light); box-shadow: var(--shadow-md); transform: translateY(-2px); }
+    .streak-icon { font-size: 2.5rem; display: block; margin-bottom: 0.8rem; }
+    .streak-val { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 2.2rem; color: var(--text); line-height: 1; margin-bottom: 0.3rem; }
+    .streak-label { font-size: 0.82rem; color: var(--text-mid); font-weight: 600; }
+
+    /* ── FINAL CTA ── */
+    .section-cta {
+      padding: 6rem 2rem;
+      text-align: center;
+      background: linear-gradient(135deg, var(--sky-pale) 0%, var(--bg) 60%);
+    }
+    .cta-card {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 3.5rem 2rem;
+      max-width: 560px; margin: 0 auto;
+      box-shadow: var(--shadow-lg);
+    }
+    .cta-emoji { font-size: 3rem; display: block; margin-bottom: 1rem; }
+    .cta-title { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: clamp(1.8rem, 4vw, 2.4rem); color: var(--text); letter-spacing: -0.02em; line-height: 1.2; margin-bottom: 0.8rem; }
+    .cta-sub { font-size: 0.95rem; color: var(--text-mid); line-height: 1.8; margin-bottom: 2rem; }
+    .cta-chapter-1 {
+      background: var(--sky-pale); border: 2px solid rgba(0,180,216,0.2);
+      border-radius: var(--radius-md); padding: 1rem 1.2rem;
+      margin-bottom: 1.8rem; text-align: left;
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .ch1-badge { width: 42px; height: 42px; background: var(--sky); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; color: #fff; font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 0.9rem; flex-shrink: 0; }
+    .ch1-text { flex: 1; }
+    .ch1-label { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--sky); }
+    .ch1-name { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.95rem; color: var(--text); }
+    .ch1-mission { font-size: 0.75rem; color: var(--text-mid); margin-top: 0.15rem; }
+    .ch1-free { background: var(--teal); color: #fff; font-size: 0.62rem; font-weight: 700; padding: 0.2rem 0.5rem; border-radius: 6px; flex-shrink: 0; }
+    .btn-cta-big {
+      display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+      background: var(--sky); color: #fff;
+      font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.1rem;
+      text-decoration: none; padding: 1rem 2.5rem;
+      border-radius: var(--radius-md);
+      box-shadow: 0 8px 24px rgba(0,180,216,0.4);
+      transition: all 0.2s; border: none; cursor: pointer; width: 100%;
+    }
+    .btn-cta-big:hover { background: var(--sky-dark); transform: translateY(-2px); box-shadow: 0 12px 32px rgba(0,180,216,0.5); }
+    .cta-footnote { font-size: 0.75rem; color: var(--text-light); margin-top: 0.8rem; }
 
     /* ── FOOTER ── */
-    footer { padding: 2rem 3rem; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
-    .footer-logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; letter-spacing: 0.08em; color: var(--gold); }
-    .footer-logo span { color: var(--white); }
-    footer p { font-size: 0.75rem; color: var(--mid); letter-spacing: 0.05em; }
+    footer {
+      padding: 1.5rem 2rem;
+      border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 1rem;
+    }
+    .footer-logo { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.1rem; color: var(--sky); }
+    footer p { font-size: 0.75rem; color: var(--text-light); }
 
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
 
-    @media (max-width: 900px) {
-      nav { padding: 1rem 1.5rem; }
-      .nav-links { display: none; }
-      .hero { padding: 7rem 1.5rem 3rem; }
-      .hero-inner { grid-template-columns: 1fr; gap: 2rem; }
-      .hero-right { display: none; }
-      .stats-bar { gap: 0; }
-      .stat-item { padding: 1rem 1.5rem; }
-      .section, .scoring-section { padding: 4rem 1.5rem; }
-      .steps { grid-template-columns: 1fr 1fr; }
-      .challenge-grid { grid-template-columns: 1fr; }
-      .scoring-grid { grid-template-columns: 1fr; }
-      .challenges-section { padding: 4rem 1.5rem; }
-      .cta-section { padding: 5rem 1.5rem; }
-      footer { padding: 2rem 1.5rem; flex-direction: column; text-align: center; }
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .nav-links, .nav-actions { display: none; }
+      .nav-burger { display: flex; }
+      .hero { padding: 5.5rem 1.2rem 3rem; }
+      .hero h1 { font-size: 2.2rem; }
+      .hero-chapter-strip { gap: 0.35rem; }
+      .chapter-bubble { width: 34px; height: 34px; font-size: 0.68rem; }
+      .module-grid { grid-template-columns: repeat(2, 1fr); }
+      .steps-grid { grid-template-columns: repeat(2, 1fr); }
+      .step-connector { display: none; }
+      .feedback-grid { grid-template-columns: 1fr; }
+      .challenge-card-big { grid-template-columns: 1fr; }
+      .challenge-right { display: none; }
+      .streak-grid { grid-template-columns: 1fr; gap: 1rem; }
+      .section-progress, .section-how, .section-feedback,
+      .section-challenge, .section-streak, .section-cta { padding: 3.5rem 1.2rem; }
+      .cta-card { padding: 2.5rem 1.2rem; }
+      footer { flex-direction: column; text-align: center; }
+    }
+    @media (max-width: 480px) {
+      .module-grid { grid-template-columns: 1fr; }
+      .steps-grid { grid-template-columns: 1fr; }
+      .hero-social-proof { gap: 1rem; }
     }
   </style>
 </head>
 <body>
 
-  <nav>
-    <a href="index.html" class="nav-logo">Lens<span>Up</span></a>
-    <ul class="nav-links">
-      <li><a href="#how">How It Works</a></li>
-      <li><a href="learn.html" style="color:var(--gold)">📚 Learn</a></li>
-      <li><a href="#challenges">Challenges</a></li>
-      <li><a href="leaderboard.html">Leaderboard</a></li>
-    </ul>
-    <a href="login.html" class="nav-login">Sign In</a>
-    <a href="register.html" class="nav-cta">Start Learning Now</a>
-  </nav>
+<!-- NAV -->
+<nav class="nav" id="mainNav">
+  <a href="index.html" class="nav-logo"><span class="nav-logo-icon">📷</span> LensUp</a>
+  <div class="nav-links">
+    <a href="#how" class="nav-link">How it works</a>
+    <a href="#modules" class="nav-link">36 Chapters</a>
+    <a href="#challenge" class="nav-link">Weekly Challenge</a>
+  </div>
+  <div class="nav-actions">
+    <a href="login.html" class="nav-signin">Sign In</a>
+    <a href="register.html" class="btn-nav-cta">Start Chapter 1 — Free</a>
+  </div>
+  <button class="nav-burger" id="navBurger" onclick="openMenu()">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
 
-  <!-- HERO -->
-  <section class="hero">
-    <div class="hero-bg"></div>
-    <div class="hero-grid"></div>
-    <div class="hero-scanline"></div>
-    <div class="hero-inner">
-      <div class="hero-left">
-        <div class="hero-live-badge" id="heroLiveBadge"><span class="live-dot"></span> Loading…</div>
-        <h1>
-          Learn.
-          <span class="line2">Shoot.</span>
-          <span class="line3">Improve.</span>
-        </h1>
-        <p class="hero-desc">The only photography app that teaches you <em>why</em> your photos work — or don't. Step-by-step lessons, real photo missions, AI feedback, and a weekly challenge to prove your progress.</p>
-        <div class="hero-theme-card">
-          <div class="hero-theme-label">📅 This Week's Theme</div>
-          <div class="hero-theme-name" id="heroThemeName">—</div>
-          <div class="hero-theme-sub" id="heroThemeSub"></div>
-          <div class="hero-theme-timer">
-            <div class="timer-unit"><span class="timer-num" id="timerD">—</span><span class="timer-label">Days</span></div>
-            <div class="timer-unit"><span class="timer-num" id="timerH">—</span><span class="timer-label">Hrs</span></div>
-            <div class="timer-unit"><span class="timer-num" id="timerM">—</span><span class="timer-label">Min</span></div>
-          </div>
-        </div>
-        <div class="hero-actions">
-          <a href="register.html" class="btn-primary">📚 Start Learning Now</a>
-          <a href="login.html" class="btn-ghost">Already have an account? Sign In →</a>
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-menu-close" onclick="closeMenu()">✕</button>
+  <a href="#how" onclick="closeMenu()">How it works</a>
+  <a href="#modules" onclick="closeMenu()">36 Chapters</a>
+  <a href="#challenge" onclick="closeMenu()">Weekly Challenge</a>
+  <a href="login.html">Sign In</a>
+  <div class="mobile-menu-actions">
+    <a href="register.html" class="btn-primary" style="justify-content:center">Start Chapter 1 — Free <span class="btn-arrow">→</span></a>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-dots"></div>
+  <div class="hero-inner">
+
+    <div class="hero-badge">
+      <span class="badge-dot"></span>
+      36 chapters · Free to start · AI feedback on every photo
+    </div>
+
+    <h1>
+      Become a better<br/>
+      <em>photographer</em><br/>
+      <span class="line-green">one chapter at a time.</span>
+    </h1>
+
+    <p class="hero-sub">
+      LensUp teaches you <strong>why</strong> your photos work — or don't.
+      Read the lesson, shoot the mission, get honest AI feedback.
+      Complete 3 photos to unlock the next chapter.
+    </p>
+
+    <!-- Chapter progress visualisation -->
+    <div class="hero-chapter-strip" aria-label="Chapter progress example">
+      <div class="chapter-bubble bubble-done" title="Ch 1 Done">✓</div>
+      <div class="chapter-bubble bubble-done" title="Ch 2 Done">✓</div>
+      <div class="chapter-bubble bubble-done" title="Ch 3 Done">✓</div>
+      <div class="chapter-bubble bubble-active" title="Ch 4 Active">4</div>
+      <div class="chapter-bubble bubble-next" title="Ch 5">5</div>
+      <div class="chapter-bubble bubble-next" title="Ch 6">6</div>
+      <div class="chapter-bubble bubble-locked" title="Ch 7">7</div>
+      <div class="chapter-bubble bubble-locked" title="Ch 8">8</div>
+      <span class="bubble-dots">···</span>
+      <div class="chapter-bubble bubble-locked" title="Ch 36">36</div>
+    </div>
+
+    <div class="hero-cta">
+      <a href="register.html" class="btn-primary">
+        Start Chapter 1 — It's Free <span class="btn-arrow">→</span>
+      </a>
+      <a href="login.html" class="btn-secondary">
+        Sign In
+      </a>
+    </div>
+
+    <div class="hero-social-proof">
+      <div class="proof-item"><span class="proof-icon">📚</span> <span class="proof-num">36</span>&nbsp;chapters</div>
+      <div class="proof-item"><span class="proof-icon">🤖</span> AI feedback on every shot</div>
+      <div class="proof-item"><span class="proof-icon">⚔️</span> Weekly challenge</div>
+      <div class="proof-item"><span class="proof-icon">🆓</span> Free to start</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- 36 CHAPTERS / 6 MODULES -->
+<section class="section-progress" id="modules">
+  <div class="section-inner">
+    <div class="section-label">The Curriculum</div>
+    <div class="section-title">6 modules. 36 chapters.<br/>One complete journey.</div>
+    <p class="section-sub">From your first rule of thirds to developing your signature style. Every chapter has a lesson, a specific photo mission, and AI feedback.</p>
+
+    <div class="module-grid">
+      <div class="module-card m1">
+        <span class="module-icon">🎯</span>
+        <div class="module-name">Composition</div>
+        <div class="module-count">7 chapters</div>
+        <div class="module-chapters">
+          <div class="ch-pip" style="background:var(--sky)"></div>
+          <div class="ch-pip" style="background:var(--sky)"></div>
+          <div class="ch-pip" style="background:var(--sky)"></div>
+          <div class="ch-pip"></div><div class="ch-pip"></div><div class="ch-pip"></div><div class="ch-pip"></div>
         </div>
       </div>
-      <div class="hero-right">
-        <div class="leaderboard-preview">
-          <div class="lb-header">
-            <span class="lb-title">🏆 Today's Top Shots</span>
-            <span class="lb-live"><span class="live-dot"></span> Live</span>
-          </div>
-          <div id="lbPreviewRows">
-            <div style="text-align:center;padding:2rem;color:rgba(240,237,232,0.3);font-size:0.8rem;">Loading…</div>
-          </div>
+      <div class="module-card m2">
+        <span class="module-icon">💡</span>
+        <div class="module-name">Light</div>
+        <div class="module-count">6 chapters</div>
+        <div class="module-chapters">
+          <div class="ch-pip"></div><div class="ch-pip"></div><div class="ch-pip"></div>
+          <div class="ch-pip"></div><div class="ch-pip"></div><div class="ch-pip"></div>
+        </div>
+      </div>
+      <div class="module-card m3">
+        <span class="module-icon">👤</span>
+        <div class="module-name">People & Storytelling</div>
+        <div class="module-count">4 chapters</div>
+        <div class="module-chapters">
+          <div class="ch-pip"></div><div class="ch-pip"></div><div class="ch-pip"></div><div class="ch-pip"></div>
+        </div>
+      </div>
+      <div class="module-card m4">
+        <span class="module-icon">🏙️</span>
+        <div class="module-name">Urban & Environment</div>
+        <div class="module-count">5 chapters</div>
+        <div class="module-chapters">
+          <div class="ch-pip"></div><div class="ch-pip"></div><div class="ch-pip"></div><div class="ch-pip"></div><div class="ch-pip"></div>
+        </div>
+      </div>
+      <div class="module-card m5">
+        <span class="module-icon">⚙️</span>
+        <div class="module-name">Technical</div>
+        <div class="module-count">5 chapters</div>
+        <div class="module-chapters">
+          <div class="ch-pip"></div><div class="ch-pip"></div><div class="ch-pip"></div><div class="ch-pip"></div><div class="ch-pip"></div>
+        </div>
+      </div>
+      <div class="module-card m6">
+        <span class="module-icon">🎨</span>
+        <div class="module-name">Creative</div>
+        <div class="module-count">9 chapters</div>
+        <div class="module-chapters">
+          <div class="ch-pip"></div><div class="ch-pip"></div><div class="ch-pip"></div>
+          <div class="ch-pip"></div><div class="ch-pip"></div><div class="ch-pip"></div>
+          <div class="ch-pip"></div><div class="ch-pip"></div><div class="ch-pip"></div>
         </div>
       </div>
     </div>
-  </section>
-
-  <!-- TICKER -->
-  <div class="ticker">
-    <div class="ticker-inner">
-      <span class="ticker-item" id="tickerTheme">📷 LensUp Weekly Challenge</span><span class="ticker-sep">·</span>
-      <span class="ticker-item">📚 36 Chapters Across 6 Modules</span><span class="ticker-sep">·</span>
-      <span class="ticker-item">🤖 AI Feedback on Every Shot</span><span class="ticker-sep">·</span>
-      <span class="ticker-item">🆓 First 3 Chapters Free</span><span class="ticker-sep">·</span>
-      <span class="ticker-item">⚔️ Weekly Challenge Active</span><span class="ticker-sep">·</span>
-      <span class="ticker-item">🏆 Leaderboard Updated Daily</span><span class="ticker-sep">·</span>
-      <span class="ticker-item" id="tickerTheme2">📷 LensUp Weekly Challenge</span><span class="ticker-sep">·</span>
-      <span class="ticker-item">📚 36 Chapters Across 6 Modules</span><span class="ticker-sep">·</span>
-      <span class="ticker-item">🤖 AI Feedback on Every Shot</span><span class="ticker-sep">·</span>
-      <span class="ticker-item">🆓 First 3 Chapters Free</span><span class="ticker-sep">·</span>
-      <span class="ticker-item">⚔️ Weekly Challenge Active</span><span class="ticker-sep">·</span>
-      <span class="ticker-item">🏆 Leaderboard Updated Daily</span><span class="ticker-sep">·</span>
-    </div>
   </div>
+</section>
 
-  <!-- STATS -->
-  <div class="stats-bar">
-    <div class="stat-item"><span class="stat-num" style="color:var(--gold)">36</span><div class="stat-label">Learning Chapters</div></div>
-    <div class="stat-item"><span class="stat-num" style="color:var(--cyan)">6</span><div class="stat-label">Scoring Categories</div></div>
-    <div class="stat-item"><span class="stat-num" style="color:var(--green)">Free</span><div class="stat-label">First 3 Chapters</div></div>
-    <div class="stat-item"><span class="stat-num" style="color:var(--purple)">AI</span><div class="stat-label">Powered by AI</div></div>
-  </div>
+<!-- HOW IT WORKS -->
+<section class="section-how" id="how">
+  <div class="section-inner">
+    <div class="section-label">How it works</div>
+    <div class="section-title">Learn it. Shoot it. Prove it.</div>
+    <p class="section-sub">Every chapter follows the same satisfying loop — and every loop makes you a better photographer.</p>
 
-  <!-- HOW IT WORKS -->
-  <section class="section" id="how">
-    <span class="section-tag">How It Works</span>
-    <h2 class="section-title">Learn by Doing</h2>
-    <p class="section-sub">Not by reading. Not by watching. You improve by shooting intentionally, getting honest feedback, and coming back better next time.</p>
-    <div class="steps">
-      <div class="step">
-        <div class="step-num">01</div>
-        <span class="step-icon">📚</span>
-        <h3>Take a Lesson</h3>
-        <p>Each chapter focuses on one skill — Rule of Thirds, Leading Lines, Lighting. Short, clear, practical. No fluff.</p>
-        <div class="step-arrow">→</div>
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-num-badge">1</div>
+        <span class="step-icon">📖</span>
+        <div class="step-title">Read the Lesson</div>
+        <p class="step-desc">2–3 paragraphs and 3 actionable tips on one specific photography technique. No fluff.</p>
+        <span class="step-connector">→</span>
       </div>
-      <div class="step">
-        <div class="step-num">02</div>
+      <div class="step-card">
+        <div class="step-num-badge">2</div>
+        <span class="step-icon">🎯</span>
+        <div class="step-title">Get Your Mission</div>
+        <p class="step-desc">A specific photo to take — not "take a nice photo" but exactly what to shoot and how.</p>
+        <span class="step-connector">→</span>
+      </div>
+      <div class="step-card">
+        <div class="step-num-badge">3</div>
         <span class="step-icon">📷</span>
-        <h3>Complete the Mission</h3>
-        <p>Go shoot 5 real photos applying what you learned. Not for likes — for intentional practice with a clear goal.</p>
-        <div class="step-arrow">→</div>
+        <div class="step-title">Submit 3 Photos</div>
+        <p class="step-desc">Upload your attempt. Get honest AI feedback on the specific technique — not just a score.</p>
+        <span class="step-connector">→</span>
       </div>
-      <div class="step">
-        <div class="step-num">03</div>
-        <span class="step-icon">🤖</span>
-        <h3>Get Honest AI Feedback</h3>
-        <p>Every photo is scored specifically on the skill you're practising. Not vibes — precise feedback on what worked and what didn't.</p>
-        <div class="step-arrow">→</div>
-      </div>
-      <div class="step">
-        <div class="step-num">04</div>
-        <span class="step-icon">⚔️</span>
-        <h3>Enter the Weekly Challenge</h3>
-        <p>Apply your growing skills to the weekly theme. Compete on the leaderboard. See your improvement in your scores over time.</p>
-        <div class="step-arrow">→</div>
+      <div class="step-card">
+        <div class="step-num-badge">4</div>
+        <span class="step-icon">🏆</span>
+        <div class="step-title">Earn Your Badge</div>
+        <p class="step-desc">Complete 3 photos to unlock the chapter badge and move to the next. Your progress is saved.</p>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- CHALLENGES PREVIEW -->
-  <section class="challenges-section" id="challenges">
-    <div class="challenges-inner">
-      <span class="section-tag">Upcoming Challenges</span>
-      <h2 class="section-title">What's Coming</h2>
-      <p class="section-sub">Themes are designed to push your creative limits. No two weeks are the same.</p>
-      <div class="challenge-grid" id="challengeGrid">
-        <div style="grid-column:1/-1;text-align:center;padding:3rem;color:rgba(240,237,232,0.3);font-size:0.85rem;">Loading challenges…</div>
-      </div>
-    </div>
-  </section>
+<!-- FEEDBACK EXAMPLE -->
+<section class="section-feedback">
+  <div class="section-inner">
+    <div class="feedback-grid">
+      <div>
+        <div class="section-label">The Feedback</div>
+        <div class="section-title">Not just a score.<br/>A lesson.</div>
+        <p class="section-sub">Every photo you submit gets feedback focused on exactly what you were practising — so you know not just your score but <em>why</em> and what to do differently next time.</p>
 
-  <!-- SCORING -->
-  <section class="scoring-section">
-    <span class="section-tag">AI Scoring System</span>
-    <h2 class="section-title">Scored on What Actually Matters</h2>
-    <p class="section-sub">Not vibes. Not likes. Six objective dimensions scored by AI — the same standard for everyone.</p>
-    <div class="scoring-grid">
-      <div class="score-categories">
-        <div class="score-cat">
-          <span class="score-cat-icon">🎯</span>
-          <div class="score-cat-info"><div class="score-cat-name">Subject Focus</div><div class="score-cat-desc">Is your subject sharp and intentional?</div></div>
-          <div class="score-cat-bar"><div class="score-cat-fill" style="width:88%;background:#60a5fa"></div></div>
-        </div>
-        <div class="score-cat">
-          <span class="score-cat-icon">🎨</span>
-          <div class="score-cat-info"><div class="score-cat-name">Color & Contrast</div><div class="score-cat-desc">Palette harmony and tonal range</div></div>
-          <div class="score-cat-bar"><div class="score-cat-fill" style="width:92%;background:#f472b6"></div></div>
-        </div>
-        <div class="score-cat">
-          <span class="score-cat-icon">📐</span>
-          <div class="score-cat-info"><div class="score-cat-name">Composition</div><div class="score-cat-desc">Rule of thirds, balance, visual flow</div></div>
-          <div class="score-cat-bar"><div class="score-cat-fill" style="width:75%;background:#34d399"></div></div>
-        </div>
-        <div class="score-cat">
-          <span class="score-cat-icon">💡</span>
-          <div class="score-cat-info"><div class="score-cat-name">Lighting</div><div class="score-cat-desc">Quality, direction and mood of light</div></div>
-          <div class="score-cat-bar"><div class="score-cat-fill" style="width:95%;background:#fbbf24"></div></div>
-        </div>
-        <div class="score-cat">
-          <span class="score-cat-icon">✨</span>
-          <div class="score-cat-info"><div class="score-cat-name">Background Blur</div><div class="score-cat-desc">Separation between subject and scene</div></div>
-          <div class="score-cat-bar"><div class="score-cat-fill" style="width:65%;background:#a78bfa"></div></div>
-        </div>
-        <div class="score-cat">
-          <span class="score-cat-icon">✂️</span>
-          <div class="score-cat-info"><div class="score-cat-name">Framing</div><div class="score-cat-desc">How well the subject fills the frame</div></div>
-          <div class="score-cat-bar"><div class="score-cat-fill" style="width:82%;background:#fb923c"></div></div>
-        </div>
-      </div>
-      <div class="score-right">
-        <div class="score-sample">
-          <div class="score-sample-title">Sample Analysis Result</div>
-          <div class="score-overall">9.4<span>/10</span></div>
-          <div class="score-verdict">Mastershot! 🏆</div>
-          <div class="score-bars">
-            <div class="score-bar-row"><span class="score-bar-label">Subject Focus</span><div class="score-bar-track"><div class="score-bar-fill" style="width:90%;background:#60a5fa"></div></div><span class="score-bar-val" style="color:#60a5fa">9</span></div>
-            <div class="score-bar-row"><span class="score-bar-label">Color</span><div class="score-bar-track"><div class="score-bar-fill" style="width:100%;background:#f472b6"></div></div><span class="score-bar-val" style="color:#f472b6">10</span></div>
-            <div class="score-bar-row"><span class="score-bar-label">Composition</span><div class="score-bar-track"><div class="score-bar-fill" style="width:80%;background:#34d399"></div></div><span class="score-bar-val" style="color:#34d399">8</span></div>
-            <div class="score-bar-row"><span class="score-bar-label">Lighting</span><div class="score-bar-track"><div class="score-bar-fill" style="width:100%;background:#fbbf24"></div></div><span class="score-bar-val" style="color:#fbbf24">10</span></div>
-            <div class="score-bar-row"><span class="score-bar-label">BG Blur</span><div class="score-bar-track"><div class="score-bar-fill" style="width:90%;background:#a78bfa"></div></div><span class="score-bar-val" style="color:#a78bfa">9</span></div>
-            <div class="score-bar-row"><span class="score-bar-label">Framing</span><div class="score-bar-track"><div class="score-bar-fill" style="width:90%;background:#fb923c"></div></div><span class="score-bar-val" style="color:#fb923c">9</span></div>
+        <div class="feedback-points">
+          <div class="fpoint">
+            <div class="fpoint-icon sky">🎯</div>
+            <div>
+              <div class="fpoint-title">Technique-specific</div>
+              <div class="fpoint-desc">Feedback is about the chapter's skill — not general photography critique.</div>
+            </div>
+          </div>
+          <div class="fpoint">
+            <div class="fpoint-icon teal">✓</div>
+            <div>
+              <div class="fpoint-title">What worked</div>
+              <div class="fpoint-desc">Always highlights what you got right, so you can repeat it consciously.</div>
+            </div>
+          </div>
+          <div class="fpoint">
+            <div class="fpoint-icon yellow">↑</div>
+            <div>
+              <div class="fpoint-title">One thing to improve</div>
+              <div class="fpoint-desc">One clear, actionable improvement — not a list of everything wrong.</div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </section>
 
-  <!-- CTA -->
-  <section class="cta-section">
-    <span class="cta-label">Start for free today</span>
-    <h2 class="cta-title">Stop Guessing.<br/><span>Start Improving.</span></h2>
-    <p class="cta-sub">Instagram tells you how many likes you got. LensUp tells you <em>why</em> your photo works — and exactly how to make the next one better.</p>
-    <a href="register.html" class="btn-cta-big">📚 Start Learning Now →</a>
-  </section>
-
-  <!-- FOOTER -->
-  <footer>
-    <div class="footer-logo">Lens<span>Up</span></div>
-    <p>© 2026 LensUp · Photography Challenge Platform · Powered by AI</p>
-  </footer>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    const SUPABASE_URL     = 'https://sjjgzuaeqcbtvrnmquex.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqamd6dWFlcWNidHZybm1xdWV4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyMDYzNjIsImV4cCI6MjA4ODc4MjM2Mn0.RRRjWxamVkzTZbEn6FwL3-6bvhFw6njXjnk9Bsu5TiI';
-    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    let activeTheme = null;
-    let timerInterval = null;
-
-    // ── TIMER ──
-    function updateTimer(endsAt) {
-      const diff = new Date(endsAt) - new Date();
-      if (diff <= 0) {
-        document.getElementById('timerD').textContent = '0';
-        document.getElementById('timerH').textContent = '00';
-        document.getElementById('timerM').textContent = '00';
-        return;
-      }
-      const d = Math.floor(diff / 86400000);
-      const h = Math.floor((diff % 86400000) / 3600000);
-      const m = Math.floor((diff % 3600000) / 60000);
-      document.getElementById('timerD').textContent = d;
-      document.getElementById('timerH').textContent = String(h).padStart(2,'0');
-      document.getElementById('timerM').textContent = String(m).padStart(2,'0');
-    }
-
-    // ── LOAD ACTIVE THEME ──
-    async function loadTheme() {
-      const now = new Date().toISOString();
-      const { data, error } = await sb
-        .from('themes')
-        .select('*')
-        .eq('is_active', true)
-        .lte('starts_at', now)
-        .gte('ends_at', now)
-        .limit(1)
-        .single();
-
-      if (error || !data) {
-        document.getElementById('heroLiveBadge').innerHTML = '<span class="live-dot"></span> No Active Challenge';
-        document.getElementById('heroThemeName').textContent = 'Coming Soon';
-        document.getElementById('heroThemeSub').textContent = 'Check back soon for the next weekly theme.';
-        return;
-      }
-
-      activeTheme = data;
-      document.getElementById('heroLiveBadge').innerHTML = `<span class="live-dot"></span> Week ${data.week_number} Challenge Active`;
-      document.getElementById('heroThemeName').textContent = data.name;
-      document.getElementById('heroThemeSub').textContent = data.description || '';
-
-      // Ticker
-      const tickerText = `📷 Week ${data.week_number}: ${data.name}`;
-      document.getElementById('tickerTheme').textContent = tickerText;
-      document.getElementById('tickerTheme2').textContent = tickerText;
-
-      // Timer
-      updateTimer(data.ends_at);
-      if (timerInterval) clearInterval(timerInterval);
-      timerInterval = setInterval(() => updateTimer(data.ends_at), 60000);
-    }
-
-    // ── LOAD LEADERBOARD PREVIEW ──
-    async function loadLeaderboardPreview() {
-      const rankColors = ['r1','r2','r3'];
-      const rankEmojis = ['🥇','🥈','🥉'];
-      try {
-        const { data, error } = await sb
-          .from('analyses')
-          .select('user_id, display_name, overall, theme_name, created_at')
-          .order('overall', { ascending: false })
-          .limit(20);
-
-        if (error || !data || !data.length) {
-          document.getElementById('lbPreviewRows').innerHTML =
-            '<div style="text-align:center;padding:2rem;color:rgba(240,237,232,0.25);font-size:0.78rem;">Be the first to submit a shot!</div>';
-          return;
-        }
-
-        // Dedupe — best score per user
-        const seen = {};
-        const top = [];
-        for (const row of data) {
-          if (!seen[row.user_id]) { seen[row.user_id] = true; top.push(row); }
-          if (top.length >= 5) break;
-        }
-
-        const scoreClass = s => s >= 8 ? 's-high' : s >= 6 ? 's-mid' : '';
-
-        document.getElementById('lbPreviewRows').innerHTML = top.map((row, i) => `
-          <div class="lb-row ${i === 0 ? 'gold-row' : ''}">
-            <span class="lb-rank ${rankColors[i] || ''}" style="${i >= 3 ? 'color:var(--mid)' : ''}">${i + 1}</span>
-            <div class="lb-photo">${rankEmojis[i] || '📷'}</div>
-            <div class="lb-info">
-              <div class="lb-name">${row.display_name || 'Anonymous'}</div>
-              <div class="lb-theme">${row.theme_name || '—'}</div>
+      <!-- Mock phone UI -->
+      <div class="feedback-phone">
+        <div class="phone-top">
+          <div class="phone-ch-label">Chapter 1 · Composition</div>
+          <div class="phone-ch-name">Rule of Thirds</div>
+        </div>
+        <div class="phone-body">
+          <div class="phone-score-row">
+            <div>
+              <div class="phone-score-big">8<span class="phone-score-denom">/10</span></div>
             </div>
-            <span class="lb-score ${scoreClass(row.overall)}">${row.overall}</span>
+            <div>
+              <div class="phone-score-label">Great effort! 🎉</div>
+              <div style="font-size:0.72rem;color:var(--text-light)">Rule of Thirds · Photo 2 of 3</div>
+            </div>
           </div>
-        `).join('');
-      } catch(e) {
-        document.getElementById('lbPreviewRows').innerHTML =
-          '<div style="text-align:center;padding:1.5rem;color:rgba(240,237,232,0.2);font-size:0.78rem;">Could not load scores</div>';
-      }
-    }
-
-    // ── LOAD UPCOMING CHALLENGES ──
-    async function loadChallenges() {
-      const cardColors = ['c1','c2','c3'];
-      const accentColors = ['var(--gold)','var(--cyan)','var(--purple)'];
-      try {
-        const { data, error } = await sb
-          .from('themes')
-          .select('*')
-          .order('week_number', { ascending: true })
-          .limit(6);
-
-        if (error || !data || !data.length) {
-          document.getElementById('challengeGrid').innerHTML =
-            '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:rgba(240,237,232,0.3);font-size:0.85rem;">No challenges found.</div>';
-          return;
-        }
-
-        const now = new Date();
-        document.getElementById('challengeGrid').innerHTML = data.slice(0, 3).map((t, i) => {
-          const isActive = t.is_active && new Date(t.starts_at) <= now && new Date(t.ends_at) >= now;
-          const isPast   = new Date(t.ends_at) < now;
-          const color    = accentColors[i] || accentColors[0];
-          const statusLabel = isActive ? '🔥 Active Now' : isPast ? '✅ Completed' : '⏳ Coming Soon';
-          const statusStyle = isActive
-            ? `border-color:rgba(232,184,75,0.3);color:var(--gold)`
-            : isPast
-              ? `border-color:rgba(0,230,118,0.2);color:var(--green)`
-              : `border-color:rgba(255,255,255,0.1);color:rgba(240,237,232,0.4)`;
-
-          return `
-            <div class="challenge-card ${cardColors[i] || 'c1'}">
-              <div class="challenge-week" style="color:${color}">Week ${t.week_number} · ${isActive ? 'Active Now' : isPast ? 'Completed' : 'Coming Soon'}</div>
-              <div class="challenge-name">${t.name}</div>
-              <div class="challenge-desc">${t.description || ''}</div>
-              <div class="challenge-meta">
-                <span class="challenge-tag" style="${statusStyle}">${statusLabel}</span>
-              </div>
+          <div class="phone-feedback-text">
+            Your subject is well placed at the left power point. The horizon sits cleanly on the upper third — exactly right. Move the subject 5% further from centre next time for a stronger pull.
+          </div>
+          <div class="phone-cats">
+            <div class="phone-cat">
+              <div class="cat-label">Composition</div>
+              <div class="cat-bar-bg"><div class="cat-bar-fill" style="width:80%;background:var(--sky)"></div></div>
+              <div class="cat-val">8</div>
             </div>
-          `;
-        }).join('');
-      } catch(e) {
-        document.getElementById('challengeGrid').innerHTML =
-          '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:rgba(240,237,232,0.3);font-size:0.85rem;">Could not load challenges.</div>';
+            <div class="phone-cat">
+              <div class="cat-label">Lighting</div>
+              <div class="cat-bar-bg"><div class="cat-bar-fill" style="width:70%;background:var(--yellow)"></div></div>
+              <div class="cat-val">7</div>
+            </div>
+            <div class="phone-cat">
+              <div class="cat-label">Focus</div>
+              <div class="cat-bar-bg"><div class="cat-bar-fill" style="width:90%;background:var(--teal)"></div></div>
+              <div class="cat-val">9</div>
+            </div>
+          </div>
+          <div class="phone-progress">
+            <div class="phone-progress-label">Chapter progress</div>
+            <div class="phone-progress-dots">
+              <div class="phone-dot done"></div>
+              <div class="phone-dot active"></div>
+              <div class="phone-dot empty"></div>
+            </div>
+          </div>
+          <div class="phone-next-btn">Submit Next Photo →</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WEEKLY CHALLENGE -->
+<section class="section-challenge" id="challenge">
+  <div class="section-inner">
+    <div class="section-label">Weekly Challenge</div>
+    <div class="section-title">Apply what you learned.<br/>Compete with friends.</div>
+    <p class="section-sub" style="margin-bottom:2rem">Every week, a new theme. One photo per challenge. Scored and ranked against everyone else on the platform.</p>
+
+    <div class="challenge-card-big">
+      <div>
+        <div class="challenge-week-tag">
+          <span class="live-pip"></span>
+          <span id="challengeWeekLabel">This week's challenge</span>
+        </div>
+        <div class="challenge-theme-name" id="challengeThemeName">Loading…</div>
+        <div class="challenge-desc" id="challengeDesc">The current weekly theme will appear here once you sign in.</div>
+        <div class="challenge-timer-row">
+          <div class="timer-box"><span class="timer-num" id="timerD">—</span><span class="timer-lbl">Days</span></div>
+          <div class="timer-box"><span class="timer-num" id="timerH">—</span><span class="timer-lbl">Hours</span></div>
+          <div class="timer-box"><span class="timer-num" id="timerM">—</span><span class="timer-lbl">Min</span></div>
+        </div>
+      </div>
+      <div class="challenge-right">
+        <div class="challenge-entries-count" id="entryCount">—</div>
+        <div class="challenge-entries-label">entries this week</div>
+        <a href="register.html" class="btn-primary" style="font-size:0.85rem;padding:0.7rem 1.4rem;display:inline-flex">
+          Enter Challenge <span class="btn-arrow">→</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GAMIFICATION / STREAK -->
+<section class="section-streak">
+  <div class="section-inner">
+    <div style="text-align:center;margin-bottom:0.5rem">
+      <div class="section-label" style="display:inline-block">Why it works</div>
+    </div>
+    <div class="section-title" style="text-align:center">Progress you can feel.</div>
+    <p class="section-sub" style="text-align:center;margin:0 auto 2.5rem">LensUp is designed around the same principles that make learning stick — small wins, clear next steps, and visible progress.</p>
+
+    <div class="streak-grid">
+      <div class="streak-card">
+        <span class="streak-icon">🔥</span>
+        <div class="streak-val">Day Streak</div>
+        <div class="streak-label">Complete a chapter each day to build your streak. Miss a day, start over. Simple.</div>
+      </div>
+      <div class="streak-card">
+        <span class="streak-icon">🎓</span>
+        <div class="streak-val">Chapter Badges</div>
+        <div class="streak-label">Every completed chapter earns a shareable badge with your average score. Download and share.</div>
+      </div>
+      <div class="streak-card">
+        <span class="streak-icon">📈</span>
+        <div class="streak-val">Score History</div>
+        <div class="streak-label">Your average score across all categories, tracked over time. Watch yourself improve.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="section-cta">
+  <div class="cta-card">
+    <span class="cta-emoji">📷</span>
+    <div class="cta-title">Your first chapter is waiting.</div>
+    <p class="cta-sub">Start with Rule of Thirds — the single most important composition principle in photography. Takes 5 minutes to read, a lifetime to master.</p>
+
+    <div class="cta-chapter-1">
+      <div class="ch1-badge">Ch 1</div>
+      <div class="ch1-text">
+        <div class="ch1-label">Starting point · Module 1 · Composition</div>
+        <div class="ch1-name">Rule of Thirds</div>
+        <div class="ch1-mission">Mission: Place your subject at a power point. 3 photos to complete.</div>
+      </div>
+      <span class="ch1-free">FREE</span>
+    </div>
+
+    <a href="register.html" class="btn-cta-big">
+      Start Learning Now <span class="btn-arrow">→</span>
+    </a>
+    <div class="cta-footnote">No credit card required · All 36 chapters open during trial</div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">📷 LensUp</div>
+  <p>© 2026 LensUp · Learn Photography · Powered by AI</p>
+  <div style="display:flex;gap:1rem">
+    <a href="login.html" style="font-size:0.78rem;color:var(--text-light);text-decoration:none">Sign In</a>
+    <a href="register.html" style="font-size:0.78rem;color:var(--sky);text-decoration:none;font-weight:600">Get Started Free</a>
+  </div>
+</footer>
+
+<script>
+  function openMenu() { document.getElementById('mobileMenu').classList.add('open'); document.body.style.overflow='hidden'; }
+  function closeMenu() { document.getElementById('mobileMenu').classList.remove('open'); document.body.style.overflow=''; }
+  document.addEventListener('keydown', e => { if(e.key==='Escape') closeMenu(); });
+
+  // Redirect if already logged in
+  (async () => {
+    try {
+      initSupabase();
+      const user = await getUser();
+      if (user) window.location.href = 'learn.html';
+    } catch(e) {}
+  })();
+
+  // Load live challenge data
+  async function loadChallenge() {
+    try {
+      const theme = await getActiveTheme();
+      if (theme) {
+        document.getElementById('challengeWeekLabel').textContent = 'Week ' + (theme.week_number || '') + ' · Active Now';
+        document.getElementById('challengeThemeName').textContent = theme.name;
+        document.getElementById('challengeDesc').textContent = theme.description || '';
+        updateTimer(theme.ends_at);
+        setInterval(() => updateTimer(theme.ends_at), 30000);
+      } else {
+        document.getElementById('challengeThemeName').textContent = 'New challenge coming soon';
+        document.getElementById('challengeDesc').textContent = 'A new weekly theme drops every Monday.';
       }
-    }
 
-    // ── INIT ──
-    async function init() {
-      await Promise.all([loadTheme(), loadLeaderboardPreview(), loadChallenges()]);
-    }
+      // Entry count
+      const { data } = await sb.from('analyses').select('id').not('theme_name','is',null);
+      document.getElementById('entryCount').textContent = (data||[]).length;
+    } catch(e) {}
+  }
 
-    init();
-  </script>
+  function updateTimer(endsAt) {
+    const diff = new Date(endsAt) - new Date();
+    if (diff <= 0) { ['D','H','M'].forEach(u => document.getElementById('timer'+u).textContent='0'); return; }
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    document.getElementById('timerD').textContent = d;
+    document.getElementById('timerH').textContent = h;
+    document.getElementById('timerM').textContent = m;
+  }
+
+  loadChallenge();
+</script>
 </body>
 </html>
