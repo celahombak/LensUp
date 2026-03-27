@@ -32,14 +32,19 @@ module.exports = async (req, res) => {
   const userId = userData?.id;
   if (!userId) return res.status(401).json({ error: 'Could not identify user' });
 
-  // Check if already complete (3 submissions)
+  // Check if already complete (3 submissions) — return soft response so frontend shows completion
   const progressRes = await fetch(
     `${SB_URL}/rest/v1/chapter_submissions?user_id=eq.${userId}&chapter_id=eq.${encodeURIComponent(chapterId)}&select=id`,
     { headers: { 'Authorization': authHeader, 'apikey': SB_ANON_KEY } }
   );
   const existing = await progressRes.json();
   if (Array.isArray(existing) && existing.length >= 3) {
-    return res.status(400).json({ error: 'chapter_complete', message: 'This chapter is already complete!' });
+    return res.status(200).json({
+      error: 'chapter_complete',
+      message: 'Chapter already complete!',
+      total_submitted: existing.length,
+      chapter_complete: true
+    });
   }
 
   // Dynamic prompt works for all 36 chapters
