@@ -27,15 +27,8 @@
       --m1: #00B4D8; --m2: #FFD166; --m3: #FF6B6B;
       --m4: #1A936F; --m5: #7C3AED; --m6: #F97316;
     }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body {
-      background: var(--bg); color: var(--text);
-      font-family: 'DM Sans', sans-serif; font-weight: 400;
-      min-height: 100vh; visibility: hidden;
-    }
-    body.auth-ready { visibility: visible; }
 
+    
     /* ── NAV ── */
     .top-nav {
       position: sticky; top: 0; z-index: 100;
@@ -525,6 +518,160 @@
     .unlock-canvas-wrap { margin-bottom: 1.2rem; border-radius: var(--radius-sm); overflow: hidden; border: 1.5px solid var(--border); }
     .unlock-canvas-wrap canvas { max-width: 100%; display: block; }
 
+
+    /* DARK MODE TOGGLE */
+    .dark-toggle {
+      width: 40px; height: 22px; border-radius: 11px;
+      background: var(--border-input); border: none;
+      cursor: pointer; position: relative;
+      transition: background 0.3s; flex-shrink: 0;
+      display: flex; align-items: center; padding: 2px;
+    }
+    .dark-toggle::after {
+      content: ''; width: 18px; height: 18px; border-radius: 50%;
+      background: var(--surface); transition: transform 0.3s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    html.dark .dark-toggle { background: var(--sky); }
+    html.dark .dark-toggle::after { transform: translateX(18px); }
+    .dark-toggle-wrap {
+      display: flex; align-items: center; gap: 0.4rem;
+      font-size: 0.72rem; color: var(--text-light);
+    }
+
+
+    /* ── DARK MODE ── */
+    html.dark {
+      --bg: #0F1923;
+      --surface: #162030;
+      --surface2: #1C2A3A;
+      --text: #E8F4FA;
+      --text-mid: #7EB0C4;
+      --text-light: #4A7080;
+      --border: rgba(0,180,216,0.15);
+      --border-input: #1E3A50;
+      --sky-pale: rgba(0,180,216,0.12);
+      --sky-xpale: rgba(0,180,216,0.07);
+      --teal-pale: rgba(26,147,111,0.12);
+      --coral-pale: rgba(255,107,107,0.1);
+      --yellow-pale: rgba(255,209,102,0.1);
+      --orange-pale: rgba(249,115,22,0.1);
+      --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
+      --shadow-md: 0 8px 24px rgba(0,0,0,0.4);
+      --shadow-lg: 0 20px 60px rgba(0,0,0,0.5);
+    }
+    html.dark body { background: var(--bg) !important; color: var(--text) !important; }
+    html.dark .top-nav,
+    html.dark nav { background: rgba(15,25,35,0.96) !important; border-bottom-color: rgba(0,180,216,0.15) !important; }
+    html.dark .mobile-menu { background: #0F1923 !important; }
+    html.dark .nav-link { color: var(--text-mid) !important; }
+    html.dark .nav-link:hover, html.dark .nav-link.active { background: rgba(0,180,216,0.12) !important; color: var(--sky) !important; }
+    html.dark .nav-user { color: var(--text-mid) !important; }
+    html.dark .nav-signout { border-color: var(--border-input) !important; color: var(--text-mid) !important; }
+    html.dark .hud { background: var(--surface) !important; border-bottom-color: rgba(0,180,216,0.15) !important; }
+    html.dark .hud-stat { background: var(--surface2) !important; border-color: var(--border-input) !important; }
+    html.dark .hud-prog-bg { background: var(--surface2) !important; border-color: var(--border-input) !important; }
+    html.dark .chapter-card { background: var(--surface) !important; border-color: var(--border-input) !important; }
+    html.dark .chapter-card.done { background: linear-gradient(135deg, rgba(26,147,111,0.18) 0%, var(--surface) 60%) !important; }
+    html.dark .chapter-card.locked { background: var(--surface2) !important; opacity: 0.35 !important; }
+    html.dark .chapter-card.unlocked-new { border-color: rgba(0,180,216,0.4) !important; }
+    html.dark .chapter-card:hover { background: var(--surface2) !important; }
+    html.dark .module-section .module-header { border-bottom-color: rgba(0,180,216,0.15) !important; }
+    html.dark .overlay { background: rgba(0,0,0,0.88) !important; }
+    html.dark .modal { background: var(--surface) !important; border-color: rgba(0,180,216,0.15) !important; }
+    html.dark .modal-header { background: var(--surface) !important; border-bottom-color: rgba(0,180,216,0.15) !important; }
+    html.dark .view-lesson .lesson-body,
+    html.dark .lesson-text p { color: var(--text-mid) !important; }
+    html.dark .lesson-tip { background: rgba(0,180,216,0.08) !important; }
+    html.dark .lesson-illustration { background: rgba(0,180,216,0.06) !important; }
+    html.dark .illus-caption { background: var(--surface2) !important; color: var(--text-mid) !important; }
+    html.dark .mission-hud { background: var(--surface2) !important; border-color: var(--border-input) !important; }
+    html.dark .mission-instruction { background: rgba(255,209,102,0.07) !important; border-color: rgba(255,209,102,0.15) !important; }
+    html.dark .drop-zone { background: var(--surface2) !important; border-color: var(--border-input) !important; }
+    html.dark .drop-zone:hover { background: rgba(0,180,216,0.10) !important; border-color: var(--sky) !important; }
+    html.dark .result-score-card { background: rgba(0,180,216,0.08) !important; border-color: rgba(0,180,216,0.15) !important; }
+    html.dark .result-feedback { background: var(--surface2) !important; }
+    html.dark .result-col { background: var(--surface2) !important; }
+    html.dark .result-progress-note { background: var(--surface2) !important; }
+    html.dark .complete-view { background: linear-gradient(135deg, rgba(0,180,216,0.1) 0%, rgba(26,147,111,0.08) 50%, var(--surface) 100%) !important; }
+    html.dark .lesson-footer,
+    html.dark .mission-footer,
+    html.dark .result-footer,
+    html.dark .complete-footer,
+    html.dark .s-footer { background: var(--surface) !important; border-top-color: rgba(0,180,216,0.15) !important; }
+    html.dark .unlock-overlay { background: linear-gradient(135deg, #0F1F2F 0%, #0A1A20 100%) !important; }
+    html.dark .unlock-next-card { background: var(--surface) !important; border-color: rgba(0,180,216,0.2) !important; }
+    html.dark .feed-card { background: var(--surface) !important; border-color: var(--border-input) !important; }
+    html.dark .feed-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.4) !important; border-color: var(--sky-light) !important; }
+    html.dark .card-summary { color: var(--text-mid) !important; }
+    html.dark .like-btn { border-color: var(--border-input) !important; color: var(--text-mid) !important; }
+    html.dark .like-btn.liked { background: rgba(255,107,107,0.1) !important; }
+    html.dark .modal-score-row { background: rgba(0,180,216,0.08) !important; }
+    html.dark .modal-summary { background: var(--surface2) !important; }
+    html.dark .s-modal, html.dark .s-header { background: var(--surface) !important; border-color: rgba(0,180,216,0.15) !important; }
+    html.dark .s-body { background: var(--surface) !important; }
+    html.dark input, html.dark .form-input, html.dark .name-input {
+      background: var(--surface2) !important; color: var(--text) !important; border-color: var(--border-input) !important;
+    }
+    html.dark .auth-card { background: var(--surface) !important; border-color: rgba(0,180,216,0.15) !important; }
+    html.dark .chapter1-preview { background: rgba(0,180,216,0.08) !important; border-color: rgba(0,180,216,0.15) !important; }
+    html.dark .level-btn { background: var(--surface2) !important; border-color: var(--border-input) !important; }
+    html.dark .level-btn.selected { background: rgba(0,180,216,0.12) !important; }
+    html.dark .profile-hero { background: linear-gradient(135deg, rgba(0,180,216,0.1) 0%, rgba(26,147,111,0.07) 100%) !important; }
+    html.dark .hero-stats { border-top-color: rgba(0,180,216,0.15) !important; }
+    html.dark .card { background: var(--surface) !important; border-color: var(--border-input) !important; }
+    html.dark .card-hdr { border-bottom-color: rgba(0,180,216,0.15) !important; }
+    html.dark .sw-box.strength { background: rgba(26,147,111,0.12) !important; }
+    html.dark .sw-box.weakness { background: rgba(255,107,107,0.1) !important; }
+    html.dark .breakdown-row { border-bottom-color: rgba(0,180,216,0.1) !important; }
+    html.dark .chart-bar-wrap .chart-label { color: var(--text-light) !important; }
+    html.dark .best-photo-card { border-color: var(--border-input) !important; background: var(--surface) !important; }
+    html.dark .emoji-box { background: var(--surface) !important; }
+    html.dark .challenge-hero { background: linear-gradient(135deg, rgba(0,180,216,0.08) 0%, rgba(26,147,111,0.05) 100%) !important; }
+    html.dark .timer-chip { background: var(--surface) !important; border-color: var(--border-input) !important; }
+    html.dark .sort-bar { border-bottom-color: rgba(0,180,216,0.12) !important; }
+    html.dark .sort-btn { border-color: var(--border-input) !important; color: var(--text-mid) !important; }
+    html.dark .sort-btn.active, html.dark .sort-btn:hover { background: rgba(0,180,216,0.12) !important; color: var(--sky) !important; border-color: var(--sky) !important; }
+    html.dark .grid-card { background: var(--surface) !important; border-color: var(--border-input) !important; }
+    html.dark .grid-card:hover { background: var(--surface2) !important; }
+    html.dark .card-header { color: var(--text) !important; }
+    html.dark .coming-card { background: var(--surface) !important; border-color: var(--border-input) !important; }
+    html.dark .past-list { background: var(--border-input) !important; }
+    html.dark .past-row { background: var(--surface) !important; }
+    html.dark .past-row:hover { background: rgba(0,180,216,0.08) !important; }
+    html.dark .past-panel { background: var(--surface2) !important; }
+    html.dark .winner-banner { background: rgba(26,147,111,0.1) !important; border-color: rgba(26,147,111,0.15) !important; }
+    html.dark .modal-bg { background: rgba(0,0,0,0.88) !important; }
+    html.dark .modal-bg .modal { background: var(--surface) !important; border-color: rgba(0,180,216,0.15) !important; }
+    html.dark .modal-close:hover { background: var(--surface2) !important; }
+    html.dark .lb-hero { color: var(--text) !important; }
+    html.dark .lb-stat { background: var(--surface) !important; border-color: var(--border-input) !important; }
+    html.dark .your-rank-banner { background: linear-gradient(135deg, rgba(0,180,216,0.1) 0%, rgba(26,147,111,0.08) 100%) !important; border-color: rgba(0,180,216,0.15) !important; }
+    html.dark .podium-card { background: var(--surface) !important; border-color: var(--border-input) !important; }
+    html.dark .p1 { background: linear-gradient(135deg, rgba(255,209,102,0.08) 0%, var(--surface) 60%) !important; }
+    html.dark .tabs { border-bottom-color: rgba(0,180,216,0.15) !important; }
+    html.dark .tab-btn { color: var(--text-mid) !important; }
+    html.dark .tab-btn.active { color: var(--sky) !important; border-bottom-color: var(--sky) !important; }
+    html.dark .lb-table { background: var(--surface) !important; border-color: var(--border-input) !important; }
+    html.dark .lb-table-header { background: var(--surface2) !important; border-bottom-color: rgba(0,180,216,0.1) !important; }
+    html.dark .lb-row { border-bottom-color: rgba(0,180,216,0.08) !important; }
+    html.dark .lb-row:hover { background: rgba(0,180,216,0.08) !important; }
+    html.dark .lb-row.is-you { background: rgba(0,180,216,0.08) !important; }
+    html.dark .dash-card { background: var(--surface) !important; border-color: var(--border-input) !important; }
+    html.dark .card-header { border-bottom-color: rgba(0,180,216,0.1) !important; }
+    html.dark .next-chapter-card { background: linear-gradient(135deg, rgba(0,180,216,0.1) 0%, rgba(26,147,111,0.08) 100%) !important; border-color: rgba(0,180,216,0.2) !important; }
+    html.dark .journey-bar { background: var(--surface) !important; border-color: var(--border-input) !important; }
+    html.dark .prog-bg { background: var(--surface2) !important; }
+    html.dark .welcome-banner { background: linear-gradient(135deg, rgba(0,180,216,0.1) 0%, rgba(255,209,102,0.05) 100%) !important; border-color: rgba(0,180,216,0.15) !important; }
+    html.dark .achievement-toast { background: var(--surface) !important; border-color: rgba(0,180,216,0.15) !important; }
+    html.dark .feed-bar { background: var(--surface) !important; border-bottom-color: rgba(0,180,216,0.12) !important; }
+    html.dark .chapter-row { border-bottom-color: rgba(0,180,216,0.08) !important; }
+    html.dark .feed-item { border-bottom-color: rgba(0,180,216,0.08) !important; }
+    html.dark .lb-row { border-bottom-color: rgba(0,180,216,0.08) !important; }
+    html.dark .lb-name { color: var(--text) !important; }
+    html.dark .badges-row .badge-chip { color: var(--text) !important; }
+    html.dark .stat-pill { background: var(--surface) !important; border-color: var(--border-input) !important; }
+
   </style>
 </head>
 <body>
@@ -540,6 +687,11 @@
     <a href="leaderboard.html" class="nav-link">🏆 Ranks</a>
     <a href="profile.html" class="nav-link">👤 Profile</a>
   </div>
+  <div class="dark-toggle-wrap">
+      <span id="darkIcon">☀️</span>
+      <button class="dark-toggle" onclick="toggleDark()" title="Toggle dark mode" aria-label="Toggle dark mode"></button>
+      <span>🌙</span>
+    </div>
   <div class="nav-auth" id="navAuthArea"></div>
   <button class="nav-burger" onclick="openMobileMenu()"><span></span><span></span><span></span></button>
 </nav>
@@ -713,13 +865,10 @@
         <div class="complete-title">Chapter Complete!</div>
         <div class="complete-sub" id="cSub"></div>
         <div class="complete-score" id="cScore"></div>
-        <div class="canvas-wrap" id="canvasWrap">
-          <canvas id="shareCanvas" width="800" height="400"></canvas>
-        </div>
       </div>
       <div class="complete-footer">
         <button class="btn-ghost" onclick="downloadCard()">⬇ Download Badge</button>
-        <button class="btn-primary btn-teal" onclick="closeModal()">Continue Learning →</button>
+        <button class="btn-primary btn-teal" onclick="closeUnlock()">Continue Learning →</button>
       </div>
     </div>
 
@@ -961,7 +1110,8 @@ const CHAPTERS = [
 function getIllustration(chId) {
   const sky = '#00B4D8', teal = '#1A936F', coral = '#FF6B6B',
         yellow = '#FFD166', pale = '#EAF8FC', mid = '#5A7080',
-        dark = '#1A2B3C', surf = '#FFFFFF', surf2 = '#F4F8FA';
+        dark = '#1A2B3C', surf = '#FFFFFF', surf2 = '#F4F8FA',
+        purple = '#7C3AED', orange = '#F97316';
   const W = 360, H = 200;
 
   const base = (content, caption) =>
@@ -1229,7 +1379,8 @@ function getIllustration(chId) {
       `<path d="M 165 88 Q 180 100 195 88" fill="none" stroke="#c07040" stroke-width="2"/>` +
       `<text x="230" y="68" fill="${dark}" font-size="9" font-family="DM Sans,sans-serif">What happened</text>` +
       `<text x="230" y="80" fill="${dark}" font-size="9" font-family="DM Sans,sans-serif">before? After?</text>` +
-      `<path d="M 200 72 L 228 72" stroke="${coral}" stroke-width="1.5" marker-end="url(#arr)"/>` +
+      `<path d="M 200 72 L 228 72" stroke="${coral}" stroke-width="1.5"/>` +
+      `<polygon points="226,69 232,72 226,75" fill="${coral}"/>` +
       `<text x="${W/2}" y="155" text-anchor="middle" fill="${mid}" font-size="9" font-family="DM Sans,sans-serif" font-style="italic">The shot raises a question the viewer wants answered</text>`,
       'Action + expression + environment = story in one frame'
     ),
@@ -1765,11 +1916,16 @@ function openChapter(id){
 
   // Illustration
   const diag = document.getElementById('lessonDiagram');
-  const illus = getIllustration(ch.id);
-  if (illus) {
-    diag.style.display = 'block';
-    diag.innerHTML = illus;
-  } else {
+  try {
+    const illus = getIllustration(ch.id);
+    if (illus) {
+      diag.style.display = 'block';
+      diag.innerHTML = illus;
+    } else {
+      diag.style.display = 'none';
+    }
+  } catch(e) {
+    console.warn('Illustration failed for ch', ch.id, e);
     diag.style.display = 'none';
   }
 
@@ -2121,6 +2277,17 @@ async function init(){
 }
 
 init();
+
+  // ── DARK MODE ──
+  (function() {
+    const saved = localStorage.getItem('lensup_dark');
+    if (saved === 'true') document.documentElement.classList.add('dark');
+  })();
+  function toggleDark() {
+    const isDark = document.documentElement.classList.toggle('dark');
+    localStorage.setItem('lensup_dark', isDark);
+  }
+
 </script>
 </body>
 </html>
