@@ -222,7 +222,7 @@
     .tip-icon { font-size: 0.9rem; flex-shrink: 0; margin-top: 0.05rem; }
     .tip-text { font-size: 0.8rem; line-height: 1.6; color: var(--text-mid); }
     .tip-text strong { color: var(--text); font-weight: 600; }
-    .lesson-diagram { margin: 1.2rem 0; background: var(--surface2); border-radius: var(--radius-sm); overflow: hidden; border: 1.5px solid var(--border); }
+    .lesson-diagram { margin: 1.2rem 0; background: var(--sky-xpale); border-radius: var(--radius-sm); overflow: hidden; border: 1.5px solid var(--border); }
     .lesson-diagram svg { display: block; width: 100%; }
     .mission-box {
       background: linear-gradient(135deg, var(--sky-pale) 0%, var(--teal-pale) 100%);
@@ -367,6 +367,164 @@
       .overlay { padding: 0; align-items: flex-end; }
       .modal { border-radius: var(--radius-lg) var(--radius-lg) 0 0; max-height: 92vh; overflow-y: auto; }
     }
+
+    /* LOCK STATES */
+    .chapter-card.locked {
+      opacity: 0.45; cursor: not-allowed;
+      background: var(--surface2);
+    }
+    .chapter-card.locked::before { background: var(--border-input) !important; }
+    .chapter-card.locked:hover { transform: none; box-shadow: none; border-color: var(--border); }
+    .chapter-card.unlocked-new {
+      border-color: rgba(0,180,216,0.45);
+      box-shadow: 0 0 0 3px rgba(0,180,216,0.12), var(--shadow-md);
+      animation: newPulse 2.5s ease-in-out infinite;
+    }
+    @keyframes newPulse {
+      0%,100% { box-shadow: 0 0 0 3px rgba(0,180,216,0.12), var(--shadow-md); }
+      50%      { box-shadow: 0 0 0 6px rgba(0,180,216,0.06), var(--shadow-md); }
+    }
+    .badge-unlocked {
+      background: var(--sky-pale); color: var(--sky-dark);
+      border: 1.5px solid rgba(0,180,216,0.3);
+      animation: badgePop 0.4s ease both;
+    }
+    @keyframes badgePop { from{transform:scale(0.8);opacity:0} to{transform:scale(1);opacity:1} }
+    .badge-locked { background: var(--surface2); color: var(--text-light); border: 1.5px solid var(--border-input); }
+    .ch-lock-icon { position: absolute; top: 0.6rem; right: 0.6rem; font-size: 0.9rem; opacity: 0.5; }
+
+    /* LESSON ILLUSTRATION */
+    .lesson-illustration {
+      margin: 1.2rem 0;
+      background: var(--sky-xpale);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+    .lesson-illustration svg { display: block; width: 100%; }
+    .illus-caption {
+      font-size: 0.72rem; color: var(--text-mid);
+      text-align: center; padding: 0.5rem;
+      background: var(--surface2); font-style: italic;
+    }
+
+    /* FULL-PAGE UNLOCK OVERLAY */
+    .unlock-overlay {
+      display: none; position: fixed; inset: 0;
+      background: linear-gradient(135deg, #EAF8FC 0%, #E8F6F1 100%);
+      z-index: 500;
+      flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; padding: 2rem;
+    }
+    .unlock-overlay.show { display: flex; animation: fadeIn 0.4s ease both; }
+    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+    .unlock-confetti-bar {
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, var(--sky), var(--teal), var(--yellow), var(--coral), var(--purple,#7C3AED), var(--sky));
+      background-size: 200% 100%;
+      animation: shimmer 2s linear infinite;
+    }
+    @keyframes shimmer { from{background-position:0% 0%} to{background-position:200% 0%} }
+
+    .unlock-complete-badge {
+      width: 100px; height: 100px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--sky), var(--teal));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 3rem; margin-bottom: 1.5rem;
+      box-shadow: 0 8px 32px rgba(0,180,216,0.35);
+      animation: badgeBounce 0.6s ease both;
+    }
+    @keyframes badgeBounce {
+      0%{transform:scale(0);opacity:0}
+      60%{transform:scale(1.15)}
+      100%{transform:scale(1);opacity:1}
+    }
+    .unlock-complete-label {
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--teal);
+      margin-bottom: 0.4rem;
+    }
+    .unlock-complete-title {
+      font-family: 'Nunito', sans-serif; font-weight: 900;
+      font-size: clamp(1.8rem, 5vw, 2.8rem);
+      color: var(--text); letter-spacing: -0.02em; line-height: 1.1;
+      margin-bottom: 0.4rem;
+    }
+    .unlock-complete-score {
+      font-family: 'Nunito', sans-serif; font-weight: 900;
+      font-size: 1.2rem; color: var(--sky); margin-bottom: 2rem;
+    }
+
+    /* Module complete banner */
+    .unlock-module-badge {
+      background: linear-gradient(135deg, var(--yellow-pale), var(--orange-pale));
+      border: 2px solid rgba(249,115,22,0.2);
+      border-radius: var(--radius-md);
+      padding: 0.8rem 1.5rem; margin-bottom: 2rem;
+      font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.9rem;
+      color: var(--orange); display: none;
+    }
+
+    /* Next chapter card */
+    .unlock-next-card {
+      background: var(--surface);
+      border: 2px solid rgba(0,180,216,0.25);
+      border-radius: var(--radius-lg);
+      padding: 1.4rem 1.8rem; max-width: 400px; width: 100%;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow-md);
+      position: relative; overflow: hidden;
+    }
+    .unlock-next-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+      background: linear-gradient(90deg, var(--sky), var(--teal));
+    }
+    .unlock-next-label {
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--sky); margin-bottom: 0.5rem;
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+    .unlock-next-badge {
+      width: 44px; height: 44px; border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 0.85rem;
+      color: #fff; flex-shrink: 0; margin-bottom: 0.6rem;
+    }
+    .unlock-next-name {
+      font-family: 'Nunito', sans-serif; font-weight: 900;
+      font-size: 1.2rem; color: var(--text); margin-bottom: 0.25rem;
+    }
+    .unlock-next-desc {
+      font-size: 0.78rem; color: var(--text-mid); line-height: 1.6;
+    }
+    .unlock-actions { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+    .btn-unlock-primary {
+      background: var(--sky); color: #fff;
+      font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1rem;
+      border: none; padding: 0.85rem 2rem; border-radius: var(--radius-md);
+      cursor: pointer; transition: all 0.2s;
+      box-shadow: 0 4px 14px rgba(0,180,216,0.35);
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .btn-unlock-primary:hover { background: var(--sky-dark); transform: translateY(-2px); }
+    .btn-unlock-ghost {
+      background: none; color: var(--text-mid);
+      font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.9rem;
+      border: 1.5px solid var(--border-input); padding: 0.85rem 1.5rem;
+      border-radius: var(--radius-md); cursor: pointer; transition: all 0.2s;
+    }
+    .btn-unlock-ghost:hover { border-color: var(--sky); color: var(--sky); }
+
+    /* SCORECARD in unlock overlay */
+    .unlock-score-card {
+      background: var(--surface2); border-radius: var(--radius-sm);
+      padding: 0.6rem 1.2rem; margin-bottom: 1.5rem;
+      display: inline-flex; align-items: center; gap: 0.8rem;
+    }
+    .unlock-canvas-wrap { margin-bottom: 1.2rem; border-radius: var(--radius-sm); overflow: hidden; border: 1.5px solid var(--border); }
+    .unlock-canvas-wrap canvas { max-width: 100%; display: block; }
+
   </style>
 </head>
 <body>
@@ -568,6 +726,38 @@
   </div>
 </div>
 
+<!-- FULL-PAGE UNLOCK OVERLAY -->
+<div class="unlock-overlay" id="unlockOverlay">
+  <div class="unlock-confetti-bar"></div>
+  <div class="unlock-complete-badge" id="unlockBadgeIcon">🎓</div>
+  <div class="unlock-complete-label">Chapter Complete</div>
+  <div class="unlock-complete-title" id="unlockTitle">Chapter 1 Done!</div>
+  <div class="unlock-complete-score" id="unlockScore"></div>
+
+  <div class="unlock-module-badge" id="unlockModuleBadge"></div>
+
+  <div class="unlock-canvas-wrap" id="unlockCanvasWrap" style="display:none">
+    <canvas id="shareCanvas" width="800" height="400"></canvas>
+  </div>
+
+  <div class="unlock-next-card" id="unlockNextCard">
+    <div class="unlock-next-label">⚡ Just Unlocked</div>
+    <div class="unlock-next-badge" id="unlockNextBadge">02</div>
+    <div class="unlock-next-name" id="unlockNextName">Leading Lines</div>
+    <div class="unlock-next-desc" id="unlockNextDesc"></div>
+  </div>
+
+  <div class="unlock-actions">
+    <button class="btn-unlock-primary" id="unlockStartNext" onclick="startNextChapter()">
+      Start Chapter <span id="unlockNextNum">2</span> →
+    </button>
+    <button class="btn-unlock-ghost" onclick="closeUnlock()">Back to Catalogue</button>
+  </div>
+  <div style="margin-top:1rem">
+    <button onclick="downloadCard()" style="background:none;border:none;color:var(--text-light);font-size:0.78rem;cursor:pointer;font-weight:600;">⬇ Download Badge</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -764,6 +954,596 @@ const CHAPTERS = [
     mission:'Photograph three images that best represent your personal photographic style — the shots that most feel like YOU. Write a one-sentence description in your mind: "My photography is about…" Let that guide your selection.' }
 ];
 
+
+// ═══════════════════════════════════════════
+// ILLUSTRATIONS — SVG for all 36 chapters
+// ═══════════════════════════════════════════
+function getIllustration(chId) {
+  const sky = '#00B4D8', teal = '#1A936F', coral = '#FF6B6B',
+        yellow = '#FFD166', pale = '#EAF8FC', mid = '#5A7080',
+        dark = '#1A2B3C', surf = '#FFFFFF', surf2 = '#F4F8FA';
+  const W = 360, H = 200;
+
+  const base = (content, caption) =>
+    `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%">` +
+    `<rect width="${W}" height="${H}" fill="${pale}"/>` +
+    content +
+    (caption ? `<rect x="0" y="${H-24}" width="${W}" height="24" fill="${surf2}"/>` +
+    `<text x="${W/2}" y="${H-8}" text-anchor="middle" fill="${mid}" font-size="11" font-family="DM Sans,sans-serif" font-style="italic">${caption}</text>` : '') +
+    `</svg>`;
+
+  const illustrations = {
+    // Ch1 Rule of Thirds
+    1: base(
+      `<rect x="0" y="0" width="${W}" height="${H-24}" fill="#d4eef5"/>` +
+      `<rect x="0" y="110" width="${W}" height="66" fill="#a8d5a2"/>` +
+      `<line x1="120" y1="0" x2="120" y2="${H-24}" stroke="${sky}" stroke-width="1.5" stroke-dasharray="5,3"/>` +
+      `<line x1="240" y1="0" x2="240" y2="${H-24}" stroke="${sky}" stroke-width="1.5" stroke-dasharray="5,3"/>` +
+      `<line x1="0" y1="58" x2="${W}" y2="58" stroke="${sky}" stroke-width="1.5" stroke-dasharray="5,3"/>` +
+      `<line x1="0" y1="116" x2="${W}" y2="116" stroke="${sky}" stroke-width="1.5" stroke-dasharray="5,3"/>` +
+      `<circle cx="240" cy="58" r="10" fill="${coral}" opacity="0.9"/>` +
+      `<circle cx="120" cy="58" r="6" fill="${sky}" opacity="0.4"/>` +
+      `<circle cx="120" cy="116" r="6" fill="${sky}" opacity="0.4"/>` +
+      `<circle cx="240" cy="116" r="6" fill="${sky}" opacity="0.4"/>` +
+      `<text x="252" y="38" fill="${coral}" font-size="9" font-family="DM Sans,sans-serif" font-weight="700">Subject here</text>`,
+      'Place subject at a power point — not dead centre'
+    ),
+
+    // Ch2 Leading Lines
+    2: base(
+      `<rect x="0" y="0" width="${W}" height="${H-24}" fill="#e8f4f0"/>` +
+      `<polygon points="0,${H-24} ${W},${H-24} ${W/2+20},70 ${W/2-20},70" fill="#b8d9d0"/>` +
+      `<line x1="0" y1="${H-24}" x2="${W/2}" y2="65" stroke="${teal}" stroke-width="2.5"/>` +
+      `<line x1="${W}" y1="${H-24}" x2="${W/2}" y2="65" stroke="${teal}" stroke-width="2.5"/>` +
+      `<line x1="60" y1="${H-24}" x2="${W/2}" y2="65" stroke="${teal}" stroke-width="1" opacity="0.5"/>` +
+      `<line x1="${W-60}" y1="${H-24}" x2="${W/2}" y2="65" stroke="${teal}" stroke-width="1" opacity="0.5"/>` +
+      `<circle cx="${W/2}" cy="55" r="14" fill="${coral}" opacity="0.85"/>` +
+      `<path d="M ${W/2} 41 l 0 28" stroke="white" stroke-width="2"/>` +
+      `<path d="M ${W/2-7} 55 l 7 0 l 0 8" stroke="white" stroke-width="2" fill="none"/>`,
+      'Lines converge toward the subject — eye follows naturally'
+    ),
+
+    // Ch3 Framing
+    3: base(
+      `<rect x="0" y="0" width="${W}" height="${H-24}" fill="#c8e6ea"/>` +
+      `<rect x="0" y="0" width="70" height="${H-24}" fill="#7a9a8a" opacity="0.7"/>` +
+      `<rect x="${W-70}" y="0" width="70" height="${H-24}" fill="#7a9a8a" opacity="0.7"/>` +
+      `<rect x="0" y="0" width="${W}" height="30" fill="#7a9a8a" opacity="0.7"/>` +
+      `<rect x="0" y="${H-54}" width="${W}" height="30" fill="#7a9a8a" opacity="0.7"/>` +
+      `<rect x="70" y="30" width="${W-140}" height="${H-84}" fill="#d4eef5"/>` +
+      `<ellipse cx="${W/2}" cy="${(H-24)/2+5}" rx="28" ry="35" fill="#f5d0b0" opacity="0.9"/>` +
+      `<circle cx="${W/2}" cy="${(H-24)/2-10}" r="18" fill="#e8b090"/>` +
+      `<rect x="70" y="30" width="${W-140}" height="${H-84}" fill="none" stroke="${sky}" stroke-width="1.5" stroke-dasharray="4,3"/>`,
+      'Arch, doorway or branches frame the subject inside'
+    ),
+
+    // Ch4 Symmetry
+    4: base(
+      `<rect x="0" y="0" width="${W}" height="${H-24}" fill="#e4f0f8"/>` +
+      `<rect x="60" y="20" width="${W-120}" height="${H-64}" fill="${surf2}" rx="4"/>` +
+      `<rect x="80" y="35" width="40" height="50" fill="#b8d4e8" rx="2"/>` +
+      `<rect x="160" y="35" width="40" height="50" fill="#b8d4e8" rx="2"/>` +
+      `<rect x="240" y="35" width="40" height="50" fill="#b8d4e8" rx="2"/>` +
+      `<rect x="80" y="95" width="40" height="40" fill="#b8d4e8" rx="2"/>` +
+      `<rect x="160" y="95" width="40" height="40" fill="#b8d4e8" rx="2"/>` +
+      `<rect x="240" y="95" width="40" height="40" fill="#b8d4e8" rx="2"/>` +
+      `<line x1="${W/2}" y1="20" x2="${W/2}" y2="${H-44}" stroke="${coral}" stroke-width="1.5" stroke-dasharray="4,3"/>` +
+      `<text x="${W/2}" y="155" text-anchor="middle" fill="${coral}" font-size="9" font-family="DM Sans,sans-serif" font-weight="700">← Mirror axis →</text>`,
+      'Shoot the axis dead-centre — any tilt breaks symmetry'
+    ),
+
+    // Ch5 Negative Space
+    5: base(
+      `<rect x="0" y="0" width="${W}" height="${H-24}" fill="#c8e8f4"/>` +
+      `<rect x="0" y="100" width="${W}" height="76" fill="#a0c8b8"/>` +
+      `<circle cx="280" cy="70" r="22" fill="${coral}" opacity="0.85"/>` +
+      `<text x="150" y="72" text-anchor="middle" fill="${sky}" font-size="11" font-family="DM Sans,sans-serif" opacity="0.4">vast empty sky</text>` +
+      `<text x="150" y="92" text-anchor="middle" fill="${sky}" font-size="11" font-family="DM Sans,sans-serif" opacity="0.3">negative space</text>`,
+      'Subject small but dominant — surrounded by intentional emptiness'
+    ),
+
+    // Ch6 Foreground Interest
+    6: base(
+      `<rect x="0" y="0" width="${W}" height="${H-24}" fill="#b8d8e8"/>` +
+      `<rect x="0" y="80" width="${W}" height="96" fill="#8ab890"/>` +
+      `<rect x="0" y="120" width="${W}" height="56" fill="#6a9870"/>` +
+      `<ellipse cx="60" cy="145" rx="50" ry="25" fill="#4a7850"/>` +
+      `<ellipse cx="90" cy="135" rx="30" ry="18" fill="#5a8860"/>` +
+      `<rect x="145" y="60" width="70" height="60" fill="#c8a870" rx="2"/>` +
+      `<rect x="160" y="70" width="16" height="20" fill="#a88850" rx="1"/>` +
+      `<rect x="184" y="70" width="16" height="20" fill="#a88850" rx="1"/>` +
+      `<text x="60" y="160" text-anchor="middle" fill="white" font-size="9" font-family="DM Sans,sans-serif" font-weight="700">FOREGROUND</text>` +
+      `<text x="185" y="55" text-anchor="middle" fill="${dark}" font-size="9" font-family="DM Sans,sans-serif" font-weight="700">SUBJECT</text>`,
+      'Three layers: close foreground → subject → background'
+    ),
+
+    // Ch7 Golden Ratio
+    7: base(
+      `<rect x="0" y="0" width="${W}" height="${H-24}" fill="#eaf4f0"/>` +
+      `<path d="M 0,0 Q 360,0 360,176 Q 360,176 0,176 Z" fill="none" stroke="${sky}" stroke-width="1" opacity="0.3"/>` +
+      `<path d="M 0,${H-24} C 0,20 360,20 360,${H-24}" fill="none" stroke="${teal}" stroke-width="1.5" stroke-dasharray="5,3"/>` +
+      `<path d="M 0,${H-24} C 60,80 200,60 222,88 C 244,116 230,140 222,88" fill="none" stroke="${sky}" stroke-width="2"/>` +
+      `<circle cx="222" cy="88" r="12" fill="${coral}" opacity="0.9"/>` +
+      `<text x="222" y="55" text-anchor="middle" fill="${coral}" font-size="9" font-family="DM Sans,sans-serif" font-weight="700">Focal point</text>` +
+      `<text x="80" y="140" fill="${sky}" font-size="10" font-family="DM Sans,sans-serif" opacity="0.6">Spiral enters →</text>`,
+      'Eye follows the spiral — subject sits at the tight centre'
+    ),
+
+    // Ch8 Golden Hour
+    8: base(
+      `<rect x="0" y="0" width="${W}" height="${H-24}" fill="#ffe8c0"/>` +
+      `<rect x="0" y="90" width="${W}" height="86" fill="#c8a860"/>` +
+      `<circle cx="300" cy="88" r="35" fill="#ffb830" opacity="0.9"/>` +
+      `<ellipse cx="300" cy="88" rx="45" ry="45" fill="#ffcc60" opacity="0.3"/>` +
+      `<rect x="0" y="100" width="${W}" height="76" fill="#8a7040"/>` +
+      `<line x1="300" y1="88" x2="0" y2="130" stroke="#ff9020" stroke-width="60" opacity="0.15"/>` +
+      `<rect x="150" y="60" width="12" height="90" fill="#4a3820"/>` +
+      `<ellipse cx="156" cy="55" rx="20" ry="15" fill="#3a6830"/>` +
+      `<text x="180" y="50" fill="#ff8800" font-size="10" font-family="DM Sans,sans-serif" font-weight="700">Warm directional light</text>`,
+      '1 hour after sunrise or before sunset — shoot toward or across the light'
+    ),
+
+    // Ch9 Blue Hour
+    9: base(
+      `<rect x="0" y="0" width="${W}" height="${H-24}" fill="#1a3060"/>` +
+      `<rect x="0" y="0" width="${W}" height="90" fill="#2040a0" opacity="0.7"/>` +
+      `<rect x="0" y="90" width="${W}" height="86" fill="#101828"/>` +
+      `<rect x="30" y="50" width="40" height="80" fill="#203050"/>` +
+      `<rect x="35" y="55" width="8" height="10" fill="#ffee88" opacity="0.9"/>` +
+      `<rect x="47" y="55" width="8" height="10" fill="#ffee88" opacity="0.9"/>` +
+      `<rect x="35" y="70" width="8" height="10" fill="#ffee88" opacity="0.6"/>` +
+      `<rect x="80" y="35" width="60" height="95" fill="#1a2840"/>` +
+      `<rect x="85" y="40" width="12" height="12" fill="#ffee88" opacity="0.8"/>` +
+      `<rect x="102" y="40" width="12" height="12" fill="#ffee88" opacity="0.5"/>` +
+      `<rect x="180" y="60" width="30" height="70" fill="#1e3050"/>` +
+      `<rect x="250" y="40" width="80" height="90" fill="#162030"/>` +
+      `<rect x="255" y="45" width="15" height="18" fill="#ff9930" opacity="0.8"/>` +
+      `<rect x="275" y="45" width="15" height="18" fill="#ffee88" opacity="0.7"/>`,
+      'After sunset — sky deep blue, city lights balance perfectly'
+    ),
+
+    // Ch10 Window Light
+    10: base(
+      `<rect x="0" y="0" width="${W}" height="${H-24}" fill="#f0f4f8"/>` +
+      `<rect x="0" y="0" width="100" height="${H-24}" fill="#e0ecf8"/>` +
+      `<rect x="20" y="20" width="60" height="136" fill="#b8dcf8" rx="2"/>` +
+      `<rect x="20" y="20" width="60" height="4" fill="#8898a8"/>` +
+      `<rect x="20" y="86" width="60" height="4" fill="#8898a8"/>` +
+      `<line x1="50" y1="20" x2="50" y2="156" stroke="#8898a8" stroke-width="2"/>` +
+      `<polygon points="80,20 250,50 250,130 80,156" fill="#ffe8c0" opacity="0.25"/>` +
+      `<ellipse cx="200" cy="88" rx="28" ry="38" fill="#f0c090" opacity="0.9"/>` +
+      `<circle cx="200" cy="65" rx="22" fill="#e0a870"/>` +
+      `<ellipse cx="175" cy="78" rx="8" ry="4" fill="#c07040" opacity="0.5"/>` +
+      `<text x="200" y="148" text-anchor="middle" fill="${mid}" font-size="9" font-family="DM Sans,sans-serif">Light side</text>` +
+      `<text x="290" y="148" text-anchor="middle" fill="${mid}" font-size="9" font-family="DM Sans,sans-serif">Shadow side</text>`,
+      'Subject at 45° to window — one side lit, one in shadow'
+    ),
+
+    // Ch11 Shadows
+    11: base(
+      `<rect x="0" y="0" width="${W}" height="${H-24}" fill="#f8f0e4"/>` +
+      `<line x1="0" y1="${H-24}" x2="${W}" y2="${H-24}" stroke="#d8c8a8" stroke-width="1"/>` +
+      `<rect x="0" y="90" width="${W}" height="86" fill="#e8dcc8"/>` +
+      `<polygon points="80,0 100,0 300,176 280,176" fill="#c0a870" opacity="0.6"/>` +
+      `<polygon points="140,0 160,0 300,176 280,176" fill="#c0a870" opacity="0.4"/>` +
+      `<polygon points="200,0 220,0 300,176 280,176" fill="#c0a870" opacity="0.3"/>` +
+      `<rect x="75" y="0" width="18" height="80" fill="#a09078"/>` +
+      `<rect x="135" y="0" width="18" height="80" fill="#a09078"/>` +
+      `<rect x="195" y="0" width="18" height="80" fill="#a09078"/>` +
+      `<text x="${W/2}" y="60" text-anchor="middle" fill="${coral}" font-size="10" font-family="DM Sans,sans-serif" font-weight="700">Shadow IS the subject</text>`,
+      'Hard light creates graphic shadow patterns — shoot the shadow itself'
+    ),
+
+    // Ch12 Silhouettes
+    12: base(
+      `<rect x="0" y="0" width="${W}" height="${H-24}" fill="#ff9030"/>` +
+      `<rect x="0" y="0" width="${W}" height="80" fill="#ffb840" opacity="0.7"/>` +
+      `<circle cx="180" cy="88" r="50" fill="#ffcc60" opacity="0.8"/>` +
+      `<rect x="0" y="120" width="${W}" height="56" fill="#201810"/>` +
+      `<polygon points="155,120 175,40 195,120" fill="#100c08"/>` +
+      `<rect x="162" y="95" width="4" height="25" fill="#100c08"/>` +
+      `<circle cx="164" cy="90" r="8" fill="#100c08"/>` +
+      `<line x1="154" y1="100" x2="164" y2="108" stroke="#100c08" stroke-width="3"/>` +
+      `<line x1="174" y1="100" x2="164" y2="108" stroke="#100c08" stroke-width="3"/>` +
+      `<text x="${W/2}" y="155" text-anchor="middle" fill="${yellow}" font-size="10" font-family="DM Sans,sans-serif" font-weight="700">Expose for bright background</text>`,
+      'Meter on bright sky — subject goes pure black silhouette'
+    ),
+
+    // Ch13 Colour Temperature
+    13: base(
+      `<rect x="0" y="0" width="${W/2}" height="${H-24}" fill="#fff4e0"/>` +
+      `<rect x="${W/2}" y="0" width="${W/2}" height="${H-24}" fill="#e0f0ff"/>` +
+      `<line x1="${W/2}" y1="0" x2="${W/2}" y2="${H-24}" stroke="white" stroke-width="3"/>` +
+      `<circle cx="90" cy="${(H-24)/2}" r="30" fill="#f5d090" opacity="0.9"/>` +
+      `<rect x="60" y="80" width="60" height="50" fill="#e8c080" rx="3"/>` +
+      `<circle cx="270" cy="${(H-24)/2}" r="30" fill="#d0e8f5" opacity="0.9"/>` +
+      `<rect x="240" y="80" width="60" height="50" fill="#c0d8f0" rx="3"/>` +
+      `<text x="90" y="155" text-anchor="middle" fill="#cc7700" font-size="10" font-family="DM Sans,sans-serif" font-weight="700">Warm ~3000K</text>` +
+      `<text x="270" y="155" text-anchor="middle" fill="#0066aa" font-size="10" font-family="DM Sans,sans-serif" font-weight="700">Cool ~6500K</text>` +
+      `<text x="${W/2}" y="30" text-anchor="middle" fill="${mid}" font-size="9" font-family="DM Sans,sans-serif">Tungsten / Candle</text>` +
+      `<text x="270" y="30" text-anchor="middle" fill="${mid}" font-size="9" font-family="DM Sans,sans-serif">Daylight / Open sky</text>`,
+      'Warm = emotional/intimate · Cool = calm/distant'
+    ),
+
+    // Ch14 Portrait Basics
+    14: base(
+      `<rect x="0" y="0" width="${W}" height="${H-24}" fill="#f0e8e0"/>` +
+      `<rect x="0" y="100" width="${W}" height="76" fill="#d4c8b8" opacity="0.5"/>` +
+      `<ellipse cx="${W/2}" cy="80" rx="50" ry="65" fill="#f5d0b0"/>` +
+      `<circle cx="${W/2}" cy="55" r="38" fill="#e8b890"/>` +
+      `<ellipse cx="${W/2-14}" cy="48" rx="8" ry="9" fill="white"/>` +
+      `<circle cx="${W/2-14}" cy="49" r="5" fill="#4a3428"/>` +
+      `<circle cx="${W/2-11}" cy="47" r="2" fill="white"/>` +
+      `<ellipse cx="${W/2+14}" cy="48" rx="8" ry="9" fill="white"/>` +
+      `<circle cx="${W/2+14}" cy="49" r="5" fill="#4a3428"/>` +
+      `<circle cx="${W/2+17}" cy="47" r="2" fill="white"/>` +
+      `<circle cx="${W/2-14}" cy="49" r="2" fill="${sky}" opacity="0.6"/>` +
+      `<text x="${W/2-14}" y="30" text-anchor="middle" fill="${coral}" font-size="9" font-family="DM Sans,sans-serif" font-weight="700">Focus here</text>` +
+      `<line x1="${W/2-14}" y1="33" x2="${W/2-14}" y2="41" stroke="${coral}" stroke-width="1.5"/>`,
+      'Always focus on the nearest eye — if it is soft, the portrait fails'
+    ),
+
+    // Ch15 Candid
+    15: base(
+      `<rect x="0" y="0" width="${W}" height="${H-24}" fill="#eef4f0"/>` +
+      `<rect x="0" y="110" width="${W}" height="66" fill="#c8d8c8"/>` +
+      `<rect x="30" y="50" width="25" height="60" fill="#a0b8a0"/>` +
+      `<circle cx="42" cy="45" r="12" fill="#e8c090"/>` +
+      `<rect x="100" y="60" width="28" height="55" fill="#8898b0"/>` +
+      `<circle cx="114" cy="55" r="13" fill="#e8b880"/>` +
+      `<rect x="180" y="40" width="22" height="70" fill="#b0a888"/>` +
+      `<circle cx="191" cy="35" r="11" fill="#f0c090"/>` +
+      `<rect x="250" y="55" width="26" height="60" fill="#c0a890"/>` +
+      `<circle cx="263" cy="50" r="12" fill="#e8b890"/>` +
+      `<rect x="310" y="0" width="50" height="60" fill="#1a2830" opacity="0.85" rx="4"/>` +
+      `<circle cx="335" cy="30" r="15" fill="#304050"/>` +
+      `<ellipse cx="335" cy="30" rx="8" ry="8" fill="#101820"/>` +
+      `<circle cx="338" cy="27" r="3" fill="white" opacity="0.8"/>` +
+      `<text x="335" y="55" text-anchor="middle" fill="white" font-size="7" font-family="DM Sans,sans-serif">Camera far away</text>`,
+      'Shoot from distance — subjects behave naturally when unaware'
+    ),
+
+    // Ch16 Environmental Portrait
+    16: base(
+      `<rect x="0" y="0" width="${W}" height="${H-24}" fill="#e8f0e8"/>` +
+      `<rect x="0" y="0" width="80" height="${H-24}" fill="#d0dcd0"/>` +
+      `<rect x="280" y="0" width="80" height="${H-24}" fill="#d0dcd0"/>` +
+      `<rect x="10" y="20" width="60" height="${H-44}" fill="#c0d0c0"/>` +
+      `<rect x="290" y="20" width="60" height="${H-44}" fill="#c0d0c0"/>` +
+      `<rect x="100" y="30" width="160" height="20" fill="#b0c8b0"/>` +
+      `<rect x="130" y="50" width="100" height="126" fill="#d8e8d8"/>` +
+      `<ellipse cx="${W/2}" cy="110" rx="22" ry="35" fill="#f0c090"/>` +
+      `<circle cx="${W/2}" cy="80" r="18" fill="#e0a870"/>` +
+      `<text x="${W/2}" y="155" text-anchor="middle" fill="${teal}" font-size="9" font-family="DM Sans,sans-serif" font-weight="700">Person + environment = story</text>`,
+      'Environment should fill at least 40% of frame and tell the story'
+    ),
+
+    // Ch17 Storytelling
+    17: base(
+      `<rect x="0" y="0" width="${W}" height="${H-24}" fill="#f4f0e8"/>` +
+      `<rect x="0" y="100" width="${W}" height="76" fill="#c8c0a8"/>` +
+      `<rect x="20" y="40" width="40" height="60" fill="#a09078"/>` +
+      `<rect x="70" y="55" width="30" height="45" fill="#b0a888"/>` +
+      `<ellipse cx="180" cy="88" rx="18" ry="28" fill="#f0c090"/>` +
+      `<circle cx="180" cy="65" r="15" fill="#e0a870"/>` +
+      `<path d="M 165 88 Q 180 100 195 88" fill="none" stroke="#c07040" stroke-width="2"/>` +
+      `<text x="230" y="68" fill="${dark}" font-size="9" font-family="DM Sans,sans-serif">What happened</text>` +
+      `<text x="230" y="80" fill="${dark}" font-size="9" font-family="DM Sans,sans-serif">before? After?</text>` +
+      `<path d="M 200 72 L 228 72" stroke="${coral}" stroke-width="1.5" marker-end="url(#arr)"/>` +
+      `<text x="${W/2}" y="155" text-anchor="middle" fill="${mid}" font-size="9" font-family="DM Sans,sans-serif" font-style="italic">The shot raises a question the viewer wants answered</text>`,
+      'Action + expression + environment = story in one frame'
+    ),
+
+    // Ch18 Architecture
+    18: base(
+      `<rect x="0" y="0" width="${W}" height="${H-24}" fill="#e4eef4"/>` +
+      `<polygon points="180,10 10,176 350,176" fill="#d0dce8"/>` +
+      `<rect x="80" y="60" width="200" height="116" fill="#c8d8e8"/>` +
+      `<rect x="90" y="70" width="30" height="40" fill="#b0c4d8"/>` +
+      `<rect x="130" y="70" width="30" height="40" fill="#b0c4d8"/>` +
+      `<rect x="200" y="70" width="30" height="40" fill="#b0c4d8"/>` +
+      `<rect x="240" y="70" width="30" height="40" fill="#b0c4d8"/>` +
+      `<rect x="90" y="118" width="30" height="40" fill="#b0c4d8"/>` +
+      `<rect x="200" y="118" width="30" height="40" fill="#b0c4d8"/>` +
+      `<rect x="240" y="118" width="30" height="40" fill="#b0c4d8"/>` +
+      `<rect x="148" y="118" width="30" height="58" fill="#a0b8cc"/>` +
+      `<line x1="${W/2}" y1="0" x2="${W/2}" y2="${H-24}" stroke="${sky}" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.6"/>`,
+      'Shoot dead-on for symmetry, or from below for dramatic scale'
+    ),
+
+    // Ch19 Urban Geometry
+    19: base(
+      `<rect x="0" y="0" width="${W}" height="${H-24}" fill="#e8f0f4"/>` +
+      `<rect x="0" y="0" width="60" height="${H-24}" fill="#c8d8e0"/>` +
+      `<rect x="70" y="0" width="60" height="${H-24}" fill="#d0dce4"/>` +
+      `<rect x="140" y="0" width="60" height="${H-24}" fill="#c0ccd8"/>` +
+      `<rect x="210" y="0" width="60" height="${H-24}" fill="#d0dce4"/>` +
+      `<rect x="280" y="0" width="80" height="${H-24}" fill="#c8d8e0"/>` +
+      `<rect x="0" y="0" width="${W}" height="40" fill="#d4e0e8"/>` +
+      `<rect x="0" y="50" width="${W}" height="40" fill="#c8d4de"/>` +
+      `<rect x="0" y="100" width="${W}" height="40" fill="#d0dce4"/>` +
+      `<rect x="0" y="150" width="${W}" height="26" fill="#c4d0d8"/>` +
+      `<text x="${W/2}" y="${(H-24)/2}" text-anchor="middle" fill="${sky}" font-size="13" font-family="DM Sans,sans-serif" font-weight="700" opacity="0.7">PURE GEOMETRY</text>`,
+      'Look up, down, and close — lines and grids are everywhere'
+    ),
+
+    // Ch20 Landscapes
+    20: base(
+      `<rect x="0" y="0" width="${W}" height="80" fill="#c0d8f0"/>` +
+      `<rect x="0" y="80" width="${W}" height="96" fill="#8ab890"/>` +
+      `<rect x="0" y="120" width="${W}" height="56" fill="#608860"/>` +
+      `<ellipse cx="60" cy="140" rx="55" ry="30" fill="#405840"/>` +
+      `<ellipse cx="40" cy="130" rx="30" ry="20" fill="#506850"/>` +
+      `<rect x="150" y="50" width="3" height="50" fill="#806840"/>` +
+      `<ellipse cx="151" cy="45" rx="15" ry="12" fill="#508050"/>` +
+      `<line x1="0" y1="80" x2="${W}" y2="80" stroke="${sky}" stroke-width="1" stroke-dasharray="4,3" opacity="0.5"/>` +
+      `<text x="${W/2}" y="74" text-anchor="middle" fill="${sky}" font-size="8" font-family="DM Sans,sans-serif">Horizon on lower third</text>` +
+      `<text x="60" y="155" text-anchor="middle" fill="white" font-size="8" font-family="DM Sans,sans-serif" font-weight="700">FOREGROUND</text>`,
+      'Strong foreground + interesting horizon + sky with clouds'
+    ),
+
+    // Ch21 Macro
+    21: base(
+      `<rect x="0" y="0" width="${W}" height="${H-24}" fill="#e8f4e8"/>` +
+      `<ellipse cx="${W/2}" cy="95" rx="110" ry="80" fill="#90c870"/>` +
+      `<ellipse cx="${W/2}" cy="95" rx="80" ry="55" fill="#a8d880"/>` +
+      `<line x1="${W/2-90}" y1="95" x2="${W/2+90}" y2="95" stroke="#60a040" stroke-width="1.5"/>` +
+      `<line x1="${W/2}" y1="15" x2="${W/2}" y2="175" stroke="#60a040" stroke-width="1.5"/>` +
+      `<circle cx="${W/2+30}" cy="75" r="6" fill="#e04040" opacity="0.8"/>` +
+      `<circle cx="${W/2-20}" cy="110" r="4" fill="#e04040" opacity="0.6"/>` +
+      `<circle cx="${W/2+50}" cy="115" r="3" fill="#e04040" opacity="0.5"/>` +
+      `<rect x="290" y="20" width="2" height="${H-44}" fill="${mid}" opacity="0.3"/>` +
+      `<rect x="280" y="20" width="20" height="${H-44}" fill="${sky}" opacity="0.06"/>` +
+      `<text x="300" y="100" text-anchor="middle" fill="${sky}" font-size="9" font-family="DM Sans,sans-serif" font-weight="700">Sharp</text>` +
+      `<text x="160" y="100" text-anchor="middle" fill="${mid}" font-size="9" font-family="DM Sans,sans-serif" opacity="0.5">Soft</text>`,
+      'Depth of field is razor-thin — stabilise completely, take many shots'
+    ),
+
+    // Ch22 Reflections
+    22: base(
+      `<rect x="0" y="0" width="${W}" height="88" fill="#b8d0e8"/>` +
+      `<rect x="0" y="88" width="${W}" height="88" fill="#90b8d4"/>` +
+      `<line x1="0" y1="88" x2="${W}" y2="88" stroke="white" stroke-width="2"/>` +
+      `<rect x="40" y="20" width="50" height="68" fill="#8090b0"/>` +
+      `<rect x="50" y="28" width="12" height="16" fill="#d0e8f8"/>` +
+      `<rect x="68" y="28" width="12" height="16" fill="#d0e8f8"/>` +
+      `<rect x="130" y="10" width="80" height="78" fill="#6878a0"/>` +
+      `<rect x="138" y="18" width="16" height="22" fill="#c8e0f4"/>` +
+      `<rect x="160" y="18" width="16" height="22" fill="#c8e0f4"/>` +
+      `<rect x="40" y="96" width="50" height="68" fill="#8090b0" opacity="0.7" transform="scale(1,-1) translate(0,-176)"/>` +
+      `<rect x="130" y="88" width="80" height="78" fill="#6878a0" opacity="0.6" transform="scale(1,-1) translate(0,-${H-24})"/>` +
+      `<text x="${W/2}" y="155" text-anchor="middle" fill="${sky}" font-size="9" font-family="DM Sans,sans-serif" font-weight="700">Mirror image — shoot low to maximise</text>`,
+      'Shoot low for puddle reflections — golden hour makes them magical'
+    ),
+
+    // Ch23 Exposure Triangle
+    23: base(
+      `<rect x="0" y="0" width="${W}" height="${H-24}" fill="#f0f4f8"/>` +
+      `<polygon points="${W/2},15 30,${H-40} ${W-30},${H-40}" fill="none" stroke="${sky}" stroke-width="2"/>` +
+      `<circle cx="${W/2}" cy="22" r="18" fill="${sky}" opacity="0.15"/>` +
+      `<text x="${W/2}" y="28" text-anchor="middle" fill="${sky}" font-size="10" font-family="DM Sans,sans-serif" font-weight="800">ISO</text>` +
+      `<circle cx="45" cy="${H-46}" r="22" fill="${coral}" opacity="0.15"/>` +
+      `<text x="45" y="${H-42}" text-anchor="middle" fill="${coral}" font-size="10" font-family="DM Sans,sans-serif" font-weight="800">Aperture</text>` +
+      `<circle cx="${W-45}" cy="${H-46}" r="22" fill="${teal}" opacity="0.15"/>` +
+      `<text x="${W-45}" y="${H-42}" text-anchor="middle" fill="${teal}" font-size="10" font-family="DM Sans,sans-serif" font-weight="800">Shutter</text>` +
+      `<text x="${W/2}" y="${H-60}" text-anchor="middle" fill="${dark}" font-size="9" font-family="DM Sans,sans-serif">Change one → compensate another</text>` +
+      `<circle cx="${W/2}" cy="${H-70}" r="25" fill="${yellow}" opacity="0.2"/>` +
+      `<text x="${W/2}" y="${H-64}" text-anchor="middle" fill="#aa8800" font-size="9" font-family="DM Sans,sans-serif" font-weight="700">EXPOSURE</text>`,
+      'ISO · Aperture · Shutter Speed — the three-way trade-off'
+    ),
+
+    // Ch24 Depth of Field
+    24: base(
+      `<rect x="0" y="0" width="${W}" height="${H-24}" fill="#e8f0f8"/>` +
+      `<rect x="0" y="70" width="80" height="106" fill="#b8c8d8" opacity="0.4"/>` +
+      `<rect x="140" y="50" width="80" height="126" fill="#7090b0" opacity="0.8"/>` +
+      `<rect x="280" y="70" width="80" height="106" fill="#b8c8d8" opacity="0.4"/>` +
+      `<rect x="0" y="65" width="80" height="10" fill="${sky}" opacity="0.2"/>` +
+      `<rect x="140" y="45" width="80" height="10" fill="${sky}" opacity="0.9"/>` +
+      `<rect x="280" y="65" width="80" height="10" fill="${sky}" opacity="0.2"/>` +
+      `<text x="40" y="155" text-anchor="middle" fill="${mid}" font-size="9" font-family="DM Sans,sans-serif" opacity="0.6">Soft</text>` +
+      `<text x="180" y="155" text-anchor="middle" fill="${sky}" font-size="9" font-family="DM Sans,sans-serif" font-weight="700">Sharp</text>` +
+      `<text x="320" y="155" text-anchor="middle" fill="${mid}" font-size="9" font-family="DM Sans,sans-serif" opacity="0.6">Soft</text>` +
+      `<text x="${W/2}" y="35" text-anchor="middle" fill="${dark}" font-size="9" font-family="DM Sans,sans-serif">f/1.8 — wide aperture = shallow depth of field</text>`,
+      'Wide aperture (f/1.8) = subject sharp, background blurred'
+    ),
+
+    // Ch25 Freezing Motion
+    25: base(
+      `<rect x="0" y="0" width="${W}" height="${H-24}" fill="#e8f4f0"/>` +
+      `<text x="30" y="30" fill="${mid}" font-size="9" font-family="DM Sans,sans-serif">1/30s</text>` +
+      `<text x="200" y="30" fill="${sky}" font-size="9" font-family="DM Sans,sans-serif" font-weight="700">1/1000s</text>` +
+      `<ellipse cx="80" cy="105" rx="35" ry="35" fill="${coral}" opacity="0.3"/>` +
+      `<ellipse cx="95" cy="100" rx="30" ry="30" fill="${coral}" opacity="0.2"/>` +
+      `<ellipse cx="110" cy="95" rx="25" ry="25" fill="${coral}" opacity="0.15"/>` +
+      `<circle cx="80" cy="105" r="22" fill="${coral}" opacity="0.4"/>` +
+      `<text x="80" y="155" text-anchor="middle" fill="${mid}" font-size="9" font-family="DM Sans,sans-serif">Blurred</text>` +
+      `<line x1="155" y1="0" x2="155" y2="${H-24}" stroke="${mid}" stroke-width="1" stroke-dasharray="3,3" opacity="0.3"/>` +
+      `<circle cx="250" cy="95" r="25" fill="${teal}" opacity="0.9"/>` +
+      `<line x1="230" y1="92" x2="225" y2="95" stroke="white" stroke-width="2"/>` +
+      `<line x1="230" y1="98" x2="225" y2="95" stroke="white" stroke-width="2"/>` +
+      `<text x="250" y="155" text-anchor="middle" fill="${teal}" font-size="9" font-family="DM Sans,sans-serif" font-weight="700">Frozen sharp</text>`,
+      'Fast shutter (1/500s+) freezes motion — use burst mode'
+    ),
+
+    // Ch26 Motion Blur
+    26: base(
+      `<rect x="0" y="0" width="${W}" height="${H-24}" fill="#e4eef8"/>` +
+      `<rect x="0" y="110" width="${W}" height="66" fill="#c4cede"/>` +
+      `<rect x="0" y="118" width="${W}" height="8" fill="#8898b0" opacity="0.5"/>` +
+      `<rect x="0" y="130" width="${W}" height="8" fill="#8898b0" opacity="0.3"/>` +
+      `<ellipse cx="180" cy="95" rx="55" ry="30" fill="#d0a860" opacity="0.3"/>` +
+      `<ellipse cx="195" cy="95" rx="45" ry="28" fill="#d0a860" opacity="0.3"/>` +
+      `<ellipse cx="210" cy="95" rx="35" ry="26" fill="#d0a860" opacity="0.4"/>` +
+      `<ellipse cx="220" cy="95" rx="25" ry="22" fill="#d0a860" opacity="0.6"/>` +
+      `<rect x="218" y="78" width="45" height="35" fill="#a08040" rx="4"/>` +
+      `<circle cx="228" cy="114" r="8" fill="#404040"/>` +
+      `<circle cx="253" cy="114" r="8" fill="#404040"/>` +
+      `<text x="${W/2}" y="155" text-anchor="middle" fill="${sky}" font-size="9" font-family="DM Sans,sans-serif" font-weight="700">Pan with subject — background blurs, subject sharp</text>`,
+      'Follow the subject smoothly at 1/30–1/60s — practice 20+ times'
+    ),
+
+    // Ch27 Low Light
+    27: base(
+      `<rect x="0" y="0" width="${W}" height="${H-24}" fill="#101828"/>` +
+      `<circle cx="180" cy="50" r="30" fill="#ffee80" opacity="0.15"/>` +
+      `<line x1="180" y1="20" x2="180" y2="${H-24}" stroke="#ffee80" stroke-width="1" opacity="0.3"/>` +
+      `<rect x="160" y="30" width="4" height="80" fill="#c0a840"/>` +
+      `<ellipse cx="162" cy="25" rx="12" ry="8" fill="#ffee60" opacity="0.8"/>` +
+      `<circle cx="162" cy="25" r="5" fill="white" opacity="0.9"/>` +
+      `<rect x="50" y="60" width="60" height="116" fill="#202838"/>` +
+      `<rect x="58" y="68" width="15" height="20" fill="#ffee88" opacity="0.7"/>` +
+      `<rect x="78" y="68" width="15" height="20" fill="#ffee88" opacity="0.4"/>` +
+      `<rect x="58" y="95" width="15" height="20" fill="#ffee88" opacity="0.5"/>` +
+      `<rect x="250" y="80" width="80" height="96" fill="#181e28"/>` +
+      `<rect x="258" y="88" width="20" height="28" fill="#ff8020" opacity="0.9"/>` +
+      `<text x="${W/2}" y="155" text-anchor="middle" fill="#ffee80" font-size="9" font-family="DM Sans,sans-serif" font-weight="700">Press against wall — high ISO is fine</text>`,
+      'Stabilise against any surface — grain is better than no shot'
+    ),
+
+    // Ch28 Black & White
+    28: base(
+      `<rect x="0" y="0" width="${W}" height="${H-24}" fill="#f0f0f0"/>` +
+      `<rect x="0" y="88" width="${W}" height="88" fill="#202020"/>` +
+      `<rect x="60" y="20" width="80" height="156" fill="#606060"/>` +
+      `<rect x="220" y="40" width="100" height="136" fill="#909090"/>` +
+      `<ellipse cx="100" cy="90" rx="40" ry="55" fill="#d0d0d0"/>` +
+      `<circle cx="100" cy="62" rx="30" fill="#c0c0c0"/>` +
+      `<polygon points="50,176 150,0 160,0 160,176" fill="white" opacity="0.15"/>` +
+      `<text x="${W/2}" y="155" text-anchor="middle" fill="#808080" font-size="9" font-family="DM Sans,sans-serif" font-weight="700">Strong contrast — deep blacks, bright whites</text>`,
+      'Tonal contrast matters most — look for light vs dark relationships'
+    ),
+
+    // Ch29 Colour as Subject
+    29: base(
+      `<rect x="0" y="0" width="${W/2}" height="${H-24}" fill="#1a3a80"/>` +
+      `<rect x="${W/2}" y="0" width="${W/2}" height="${H-24}" fill="#ff6020"/>` +
+      `<circle cx="${W/4}" cy="${(H-24)/2}" r="40" fill="#2050c0" opacity="0.8"/>` +
+      `<circle cx="${W*3/4}" cy="${(H-24)/2}" r="40" fill="#ff8040" opacity="0.8"/>` +
+      `<text x="${W/4}" y="${(H-24)/2+4}" text-anchor="middle" fill="white" font-size="11" font-family="DM Sans,sans-serif" font-weight="800">BLUE</text>` +
+      `<text x="${W*3/4}" y="${(H-24)/2+4}" text-anchor="middle" fill="white" font-size="11" font-family="DM Sans,sans-serif" font-weight="800">ORANGE</text>` +
+      `<line x1="${W/2}" y1="0" x2="${W/2}" y2="${H-24}" stroke="white" stroke-width="3"/>`,
+      'Complementary pairs (blue/orange) create maximum visual tension'
+    ),
+
+    // Ch30 Abstracts
+    30: base(
+      `<rect x="0" y="0" width="${W}" height="${H-24}" fill="#f0e8f0"/>` +
+      `<circle cx="80" cy="80" r="60" fill="${sky}" opacity="0.3"/>` +
+      `<circle cx="180" cy="100" r="70" fill="${coral}" opacity="0.25"/>` +
+      `<circle cx="280" cy="70" r="55" fill="${teal}" opacity="0.3"/>` +
+      `<circle cx="130" cy="50" r="40" fill="${yellow}" opacity="0.3"/>` +
+      `<rect x="150" y="60" width="80" height="80" fill="${purple||'#7C3AED'}" opacity="0.15" rx="8"/>` +
+      `<text x="${W/2}" y="155" text-anchor="middle" fill="${mid}" font-size="9" font-family="DM Sans,sans-serif" font-style="italic">Form · Colour · Texture — not subject</text>`,
+      'Remove the subject — what remains must stand on its own'
+    ),
+
+    // Ch31 Street
+    31: base(
+      `<rect x="0" y="0" width="${W}" height="${H-24}" fill="#e8e4dc"/>` +
+      `<rect x="0" y="110" width="${W}" height="66" fill="#c8c0b0"/>` +
+      `<rect x="0" y="110" width="${W}" height="10" fill="#a09080"/>` +
+      `<rect x="20" y="30" width="50" height="80" fill="#b0a890"/>` +
+      `<rect x="100" y="10" width="70" height="100" fill="#a09880"/>` +
+      `<rect x="200" y="20" width="60" height="90" fill="#b0a888"/>` +
+      `<rect x="290" y="35" width="70" height="75" fill="#a09070"/>` +
+      `<ellipse cx="155" cy="108" rx="12" ry="22" fill="#708090"/>` +
+      `<circle cx="155" cy="88" r="10" fill="#c0b090"/>` +
+      `<ellipse cx="230" cy="108" rx="10" ry="20" fill="#606870"/>` +
+      `<circle cx="230" cy="90" r="9" fill="#d0c0a0"/>` +
+      `<text x="155" y="155" text-anchor="middle" fill="${coral}" font-size="9" font-family="DM Sans,sans-serif" font-weight="700">Be present · Pre-focus · Wait</text>`,
+      'Pre-focus at 3–5 metres, wait for someone to walk into the frame'
+    ),
+
+    // Ch32 Food
+    32: base(
+      `<rect x="0" y="0" width="${W}" height="${H-24}" fill="#f8f0e8"/>` +
+      `<rect x="0" y="0" width="80" height="${H-24}" fill="#d0e8f8" opacity="0.6"/>` +
+      `<rect x="20" y="20" width="40" height="156" fill="#b8d8f8" opacity="0.8"/>` +
+      `<rect x="20" y="20" width="40" height="4" fill="#8098a8"/>` +
+      `<polygon points="60,20 240,60 240,140 60,156" fill="#ffe8b0" opacity="0.2"/>` +
+      `<circle cx="200" cy="95" r="55" fill="#e8d8b8"/>` +
+      `<circle cx="200" cy="95" r="45" fill="#f0e0c0"/>` +
+      `<ellipse cx="185" cy="88" rx="18" ry="12" fill="#c08040" opacity="0.8"/>` +
+      `<circle cx="205" cy="100" r="8" fill="#d04030" opacity="0.9"/>` +
+      `<ellipse cx="215" cy="85" rx="12" ry="8" fill="#60a040" opacity="0.7"/>` +
+      `<text x="200" y="155" text-anchor="middle" fill="${mid}" font-size="9" font-family="DM Sans,sans-serif" font-weight="700">Side-light reveals texture</text>`,
+      'Natural side window light · 45° angle · White card reflector opposite'
+    ),
+
+    // Ch33 Nature
+    33: base(
+      `<rect x="0" y="0" width="${W}" height="${H-24}" fill="#e8f4e0"/>` +
+      `<ellipse cx="${W/2}" cy="95" rx="90" ry="75" fill="#60a840" opacity="0.9"/>` +
+      `<ellipse cx="${W/2}" cy="88" rx="65" ry="55" fill="#78c050" opacity="0.8"/>` +
+      `<ellipse cx="${W/2}" cy="82" rx="45" ry="40" fill="#90d860" opacity="0.8"/>` +
+      `<line x1="${W/2-80}" y1="95" x2="${W/2+80}" y2="95" stroke="#508030" stroke-width="1" opacity="0.5"/>` +
+      `<line x1="${W/2}" y1="20" x2="${W/2}" y2="170" stroke="#508030" stroke-width="1" opacity="0.5"/>` +
+      `<circle cx="${W/2+20}" cy="78" r="7" fill="#f04040" opacity="0.9"/>` +
+      `<circle cx="${W/2-25}" cy="88" r="5" fill="#f04040" opacity="0.8"/>` +
+      `<text x="${W/2}" y="155" text-anchor="middle" fill="${teal}" font-size="9" font-family="DM Sans,sans-serif" font-weight="700">Get closer than feels natural</text>`,
+      'Fill the frame — detail invisible from normal distance becomes the subject'
+    ),
+
+    // Ch34 Night
+    34: base(
+      `<rect x="0" y="0" width="${W}" height="${H-24}" fill="#080c14"/>` +
+      `<rect x="0" y="100" width="${W}" height="76" fill="#101820"/>` +
+      `<rect x="0" y="100" width="${W}" height="6" fill="#181e2a"/>` +
+      `<line x1="0" y1="108" x2="80" y2="108" stroke="#ff9020" stroke-width="3" opacity="0.8"/>` +
+      `<line x1="80" y1="108" x2="150" y2="108" stroke="#ffcc40" stroke-width="4" opacity="0.9"/>` +
+      `<line x1="150" y1="108" x2="280" y2="108" stroke="#ff8020" stroke-width="3" opacity="0.7"/>` +
+      `<line x1="280" y1="108" x2="${W}" y2="108" stroke="#ffaa30" stroke-width="2" opacity="0.6"/>` +
+      `<line x1="0" y1="116" x2="${W}" y2="116" stroke="#ff6010" stroke-width="1" opacity="0.4"/>` +
+      `<circle cx="40" cy="40" r="2" fill="white" opacity="0.8"/>` +
+      `<circle cx="100" cy="20" r="1.5" fill="white" opacity="0.7"/>` +
+      `<circle cx="200" cy="35" r="2" fill="white" opacity="0.9"/>` +
+      `<circle cx="300" cy="15" r="1.5" fill="white" opacity="0.6"/>` +
+      `<rect x="30" y="50" width="4" height="50" fill="#cc8820"/>` +
+      `<circle cx="32" cy="45" r="10" fill="#ffaa00" opacity="0.6"/>` +
+      `<text x="${W/2}" y="155" text-anchor="middle" fill="#ff9030" font-size="9" font-family="DM Sans,sans-serif" font-weight="700">Light trails need 5–30s exposure on solid surface</text>`,
+      'City at night after full dark — rest camera on surface, long exposure'
+    ),
+
+    // Ch35 Mobile
+    35: base(
+      `<rect x="0" y="0" width="${W}" height="${H-24}" fill="#f0f4f8"/>` +
+      `<rect x="130" y="10" width="100" height="${H-44}" fill="#2030a0" rx="12"/>` +
+      `<rect x="138" y="20" width="84" height="110" fill="#101828" rx="6"/>` +
+      `<rect x="148" y="25" width="64" height="100" fill="#1a3060" rx="4"/>` +
+      `<circle cx="180" cy="18" r="4" fill="#101828"/>` +
+      `<rect x="165" y="138" width="30" height="6" fill="#404080" rx="3"/>` +
+      `<text x="180" y="65" text-anchor="middle" fill="${sky}" font-size="8" font-family="DM Sans,sans-serif" font-weight="700">ISO 100</text>` +
+      `<text x="180" y="80" text-anchor="middle" fill="${teal}" font-size="8" font-family="DM Sans,sans-serif" font-weight="700">1/250s</text>` +
+      `<text x="180" y="95" text-anchor="middle" fill="${coral}" font-size="8" font-family="DM Sans,sans-serif" font-weight="700">WB: Auto</text>` +
+      `<text x="180" y="110" text-anchor="middle" fill="${yellow}" font-size="8" font-family="DM Sans,sans-serif" font-weight="700">PRO MODE</text>` +
+      `<text x="60" y="100" text-anchor="middle" fill="${mid}" font-size="9" font-family="DM Sans,sans-serif">Use Pro/</text>` +
+      `<text x="60" y="113" text-anchor="middle" fill="${mid}" font-size="9" font-family="DM Sans,sans-serif">Manual mode</text>` +
+      `<text x="300" y="100" text-anchor="middle" fill="${mid}" font-size="9" font-family="DM Sans,sans-serif">Control all</text>` +
+      `<text x="300" y="113" text-anchor="middle" fill="${mid}" font-size="9" font-family="DM Sans,sans-serif">three axes</text>`,
+      'Pro mode unlocks ISO, shutter speed and white balance control'
+    ),
+
+    // Ch36 Signature Style
+    36: base(
+      `<rect x="0" y="0" width="${W}" height="${H-24}" fill="#f4f0ec"/>` +
+      `<rect x="10" y="15" width="90" height="65" fill="${sky}" opacity="0.3" rx="4"/>` +
+      `<rect x="15" y="20" width="80" height="55" fill="${sky}" opacity="0.4" rx="3"/>` +
+      `<rect x="115" y="25" width="75" height="55" fill="${coral}" opacity="0.3" rx="4"/>` +
+      `<rect x="205" y="10" width="90" height="70" fill="${teal}" opacity="0.3" rx="4"/>` +
+      `<rect x="25" y="95" width="70" height="55" fill="${yellow}" opacity="0.4" rx="4"/>` +
+      `<rect x="110" y="90" width="80" height="60" fill="${sky}" opacity="0.35" rx="4"/>` +
+      `<rect x="205" y="88" width="85" height="62" fill="${coral}" opacity="0.3" rx="4"/>` +
+      `<rect x="10" y="158" width="90" height="16" fill="${teal}" opacity="0.3" rx="3"/>` +
+      `<circle cx="${W/2}" cy="${(H-24)/2}" r="20" fill="${sky}" opacity="0.15"/>` +
+      `<text x="${W/2}" y="${(H-24)/2+4}" text-anchor="middle" fill="${sky}" font-size="9" font-family="DM Sans,sans-serif" font-weight="700">YOUR EYE</text>`,
+      'Look at your 10 best photos — the pattern that emerges is your style'
+    ),
+  };
+
+  return illustrations[chId] || null;
+}
+
 const MODULES = ['Composition','Light','People & Storytelling','Urban & Environment','Technical','Creative'];
 
 // ═══════════════════════════════════════════
@@ -805,7 +1585,7 @@ function openMobileMenu(){
   if(el) el.textContent = 'Hi, '+(currentUser?.user_metadata?.display_name||currentUser?.email?.split('@')[0]||'');
 }
 function closeMobileMenu(){ document.getElementById('mobileMenu').classList.remove('open'); document.body.style.overflow=''; }
-document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal(); closeMobileMenu(); }});
+document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal(); closeMobileMenu(); closeUnlock(); }});
 
 // ═══════════════════════════════════════════
 // PROGRESS
@@ -824,6 +1604,25 @@ async function loadProgress(){
       progress[k].avgScore = s.length ? Math.round(s.reduce((a,b)=>a+b,0)/s.length) : 0;
     });
   } catch(e){ console.warn('Progress load failed', e); }
+}
+
+
+function getExperienceLevel(){
+  return currentUser?.user_metadata?.experience_level || 'beginner';
+}
+
+function isUnlocked(chId){
+  // Experience-based pre-unlock
+  const level = getExperienceLevel();
+  const preUnlock = level === 'beginner' ? 1 : level === 'some' ? 3 : 3;
+  if(chId <= preUnlock) return true;
+  // Previous chapter must be complete
+  return isComplete(chId - 1);
+}
+
+function isNextToUnlock(chId){
+  if(isComplete(chId)) return false;
+  return isUnlocked(chId);
 }
 
 function getChProg(chId){ return progress['ch-'+chId] || { count:0, scores:[], avgScore:0 }; }
@@ -889,22 +1688,31 @@ function renderCatalogue(){
       <div class="chapter-grid">`;
 
     chs.forEach(ch => {
-      const prog = getChProg(ch.id);
-      const done3 = prog.count >= 3;
+      const prog   = getChProg(ch.id);
+      const done3  = prog.count >= 3;
       const started = prog.count > 0;
+      const unlocked = isUnlocked(ch.id);
+      const isNew  = isNextToUnlock(ch.id) && !started;
+
+      let cardClass = done3 ? 'done' : started ? 'in-progress' : unlocked ? (isNew ? 'unlocked-new' : '') : 'locked';
       const dots = [0,1,2].map(i =>
         `<div class="ch-dot ${i < prog.count ? 'done' : (i === prog.count && !done3 ? 'active' : '')}"></div>`
       ).join('');
-      const badge = done3
-        ? `<span class="ch-badge badge-done">✓ ${prog.avgScore}/10</span>`
-        : started
-          ? `<span class="ch-badge badge-progress">${prog.count}/3</span>`
-          : `<span class="ch-badge badge-new">New</span>`;
-      const doneCheck = done3 ? `<div class="ch-done-check">✓</div>` : '';
+      let badge;
+      if(done3)         badge = `<span class="ch-badge badge-done">✓ ${prog.avgScore}/10</span>`;
+      else if(started)  badge = `<span class="ch-badge badge-progress">${prog.count}/3</span>`;
+      else if(isNew)    badge = `<span class="ch-badge badge-unlocked">⚡ New</span>`;
+      else if(!unlocked) badge = `<span class="ch-badge badge-locked">🔒</span>`;
+      else              badge = `<span class="ch-badge badge-new">Start</span>`;
 
-      html += `<div class="chapter-card ${done3?'done':started?'in-progress':''}" onclick="openChapter(${ch.id})" id="ch-card-${ch.id}"
-        style="--mod-color:${meta.color}">
-        ${doneCheck}
+      const doneCheck = done3 ? `<div class="ch-done-check">✓</div>` : '';
+      const lockIcon  = !unlocked ? `<div class="ch-lock-icon">🔒</div>` : '';
+      const prevName  = ch.id > 1 ? CHAPTERS.find(x=>x.id===ch.id-1)?.name : '';
+      const lockedTitle = !unlocked ? ` title="Complete '${prevName}' to unlock"` : '';
+
+      html += `<div class="chapter-card ${cardClass}" onclick="openChapter(${ch.id})" id="ch-card-${ch.id}"
+        style="--mod-color:${meta.color}"${lockedTitle}>
+        ${doneCheck}${lockIcon}
         <div class="ch-number">Ch ${String(ch.id).padStart(2,'0')}</div>
         <div class="ch-name">${esc(ch.name)}</div>
         <div class="ch-desc">${esc(ch.lesson.slice(0,80))}…</div>
@@ -924,6 +1732,17 @@ function setView(v){ document.getElementById('modal').dataset.view = v; }
 function openChapter(id){
   const ch = CHAPTERS.find(c => c.id === id);
   if(!ch) return;
+
+  // Handle locked chapters
+  if(!isUnlocked(id)){
+    const prevCh = CHAPTERS.find(c => c.id === id - 1);
+    showToast('Complete "' + (prevCh?.name || 'Chapter '+(id-1)) + '" first to unlock this! 🔒');
+    // Scroll to and highlight the previous chapter
+    const prevCard = document.getElementById('ch-card-' + (id-1));
+    if(prevCard){ prevCard.scrollIntoView({behavior:'smooth',block:'center'}); prevCard.style.outline='3px solid var(--sky)'; setTimeout(()=>prevCard.style.outline='',2000); }
+    return;
+  }
+
   activeChapter = ch;
   sessionCount = 0;
   sessionScores = [];
@@ -944,36 +1763,12 @@ function openChapter(id){
   ).join('');
   document.getElementById('missionPreview').textContent = ch.mission;
 
-  // Diagram
+  // Illustration
   const diag = document.getElementById('lessonDiagram');
-  if(ch.diagram === 'thirds'){
+  const illus = getIllustration(ch.id);
+  if (illus) {
     diag.style.display = 'block';
-    diag.innerHTML = `<svg viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg">
-      <rect width="360" height="240" fill="#0d1a20"/>
-      <line x1="120" y1="0" x2="120" y2="240" stroke="rgba(232,184,75,0.35)" stroke-width="1" stroke-dasharray="4,3"/>
-      <line x1="240" y1="0" x2="240" y2="240" stroke="rgba(232,184,75,0.35)" stroke-width="1" stroke-dasharray="4,3"/>
-      <line x1="0" y1="80"  x2="360" y2="80"  stroke="rgba(232,184,75,0.35)" stroke-width="1" stroke-dasharray="4,3"/>
-      <line x1="0" y1="160" x2="360" y2="160" stroke="rgba(232,184,75,0.35)" stroke-width="1" stroke-dasharray="4,3"/>
-      <circle cx="120" cy="80"  r="6" fill="rgba(232,184,75,0.9)"/>
-      <circle cx="240" cy="80"  r="6" fill="rgba(232,184,75,0.9)"/>
-      <circle cx="120" cy="160" r="6" fill="rgba(232,184,75,0.9)"/>
-      <circle cx="240" cy="160" r="6" fill="rgba(232,184,75,0.9)"/>
-      <text x="180" y="228" text-anchor="middle" fill="rgba(232,184,75,0.4)" font-size="10" font-family="DM Sans, sans-serif">Place subject on any power point — not dead centre</text>
-    </svg>`;
-  } else if(ch.diagram === 'framing'){
-    diag.style.display = 'block';
-    diag.innerHTML = `<svg viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg">
-      <rect width="360" height="240" fill="#0a1015"/>
-      <rect x="60" y="30" width="240" height="180" fill="#0d2030"/>
-      <rect x="0"   y="0" width="60"  height="240" fill="#1a1208"/>
-      <rect x="300" y="0" width="60"  height="240" fill="#1a1208"/>
-      <rect x="0"   y="0" width="360" height="30"  fill="#1a1208"/>
-      <path d="M60,30 Q180,5 300,30" fill="#1a1208"/>
-      <circle cx="180" cy="130" r="22" fill="rgba(232,184,75,0.6)"/>
-      <rect x="168" y="152" width="24" height="38" fill="#1e3050" rx="2"/>
-      <rect x="60" y="30" width="240" height="180" fill="none" stroke="rgba(232,184,75,0.2)" stroke-width="1" stroke-dasharray="4,3"/>
-      <text x="180" y="228" text-anchor="middle" fill="rgba(232,184,75,0.4)" font-size="10" font-family="DM Sans, sans-serif">Arch creates a frame — eye goes to subject</text>
-    </svg>`;
+    diag.innerHTML = illus;
   } else {
     diag.style.display = 'none';
   }
@@ -1175,94 +1970,106 @@ function nextShot(){
 function showComplete(){
   const ch = activeChapter;
   const prog = getChProg(ch.id);
-  const avg = prog.avgScore;
-  document.getElementById('cSub').textContent = ch.name + ' · ' + ch.module;
-  document.getElementById('cScore').textContent = '⭐ Average Score: ' + avg + '/10';
+  const avg = prog.avgScore || Math.round(sessionScores.reduce((a,b)=>a+b,0)/Math.max(sessionScores.length,1));
 
-  // Confetti!
-  launchConfetti();
+  // Close chapter modal
+  document.getElementById('overlay').classList.remove('open');
+  document.body.style.overflow = '';
+
+  // Update progress cache if needed
+  const chKey = 'ch-' + ch.id;
+  if(!progress[chKey]) progress[chKey] = { count:3, scores:sessionScores, avgScore:avg };
+  progress[chKey].avgScore = avg;
 
   // Update streak
   updateLearningStreak();
 
-  // Generate share card in new theme
-  const wrap = document.getElementById('canvasWrap');
-  wrap.style.display = 'block';
+  // Draw share card
   const canvas = document.getElementById('shareCanvas');
   const ctx = canvas.getContext('2d');
   const W=800, H=400;
-
-  // Background
   const bg = ctx.createLinearGradient(0,0,W,H);
   bg.addColorStop(0,'#EAF8FC'); bg.addColorStop(1,'#E8F6F1');
   ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
-
-  // Dot pattern
-  ctx.fillStyle='rgba(0,180,216,0.08)';
-  for(let x=20;x<W;x+=32) for(let y=20;y<H;y+=32) { ctx.beginPath(); ctx.arc(x,y,2,0,Math.PI*2); ctx.fill(); }
-
-  // Top accent bar
-  const bar = ctx.createLinearGradient(0,0,W,0);
-  bar.addColorStop(0,'#00B4D8'); bar.addColorStop(1,'#1A936F');
+  ctx.fillStyle='rgba(0,180,216,0.06)';
+  for(let x=20;x<W;x+=32) for(let y=20;y<H;y+=32){ctx.beginPath();ctx.arc(x,y,2,0,Math.PI*2);ctx.fill();}
+  const bar=ctx.createLinearGradient(0,0,W,0); bar.addColorStop(0,'#00B4D8'); bar.addColorStop(1,'#1A936F');
   ctx.fillStyle=bar; ctx.fillRect(0,0,W,6);
-
-  // Logo
-  ctx.font='bold 18px sans-serif';
-  ctx.fillStyle='#00B4D8'; ctx.fillText('LensUp', 50, 55);
-
-  // Chapter complete
-  ctx.fillStyle='#1A2B3C'; ctx.font='bold 48px sans-serif'; ctx.fillText('Chapter Complete!', 50,130);
-
-  // Chapter name
-  ctx.fillStyle='#00B4D8'; ctx.font='bold 26px sans-serif'; ctx.fillText(ch.name, 50,170);
-  ctx.fillStyle='#5A7080'; ctx.font='18px sans-serif'; ctx.fillText(ch.module, 50,198);
-
-  // Divider
+  ctx.fillStyle='#00B4D8'; ctx.font='bold 18px sans-serif'; ctx.fillText('LensUp',50,55);
+  ctx.fillStyle='#1A2B3C'; ctx.font='bold 48px sans-serif'; ctx.fillText('Chapter Complete!',50,130);
+  ctx.fillStyle='#00B4D8'; ctx.font='bold 26px sans-serif'; ctx.fillText(ch.name,50,170);
+  ctx.fillStyle='#5A7080'; ctx.font='18px sans-serif'; ctx.fillText(ch.module,50,198);
   ctx.strokeStyle='rgba(0,180,216,0.25)'; ctx.lineWidth=1.5;
   ctx.beginPath(); ctx.moveTo(50,218); ctx.lineTo(W-50,218); ctx.stroke();
+  ctx.fillStyle='#1A936F'; ctx.font='bold 80px sans-serif'; ctx.fillText(avg,50,318);
+  ctx.fillStyle='#5A7080'; ctx.font='22px sans-serif'; ctx.fillText(' / 10  average score',50+ctx.measureText(String(avg)).width,312);
+  const uname=currentUser?.user_metadata?.display_name||currentUser?.email?.split('@')[0]||'Photographer';
+  const dateStr=new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+  ctx.fillStyle='#5A7080'; ctx.font='16px sans-serif'; ctx.fillText('Completed by '+uname,50,358);
+  ctx.fillStyle='#9BB0BC'; ctx.font='13px sans-serif'; ctx.fillText(dateStr+'  ·  lensup.vercel.app',50,380);
 
-  // Score
-  ctx.fillStyle='#1A936F'; ctx.font='bold 80px sans-serif'; ctx.fillText(avg, 50,318);
-  ctx.fillStyle='#5A7080'; ctx.font='22px sans-serif'; ctx.fillText(' / 10  average score', 50+ctx.measureText(avg).width, 312);
+  // Show scorecard in overlay
+  document.getElementById('unlockCanvasWrap').style.display = 'block';
 
-  // Name + date
-  const uname = currentUser?.user_metadata?.display_name || currentUser?.email?.split('@')[0] || 'Photographer';
-  const dateStr = new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
-  ctx.fillStyle='#5A7080'; ctx.font='16px sans-serif'; ctx.fillText('Completed by ' + uname, 50, 358);
-  ctx.fillStyle='#9BB0BC'; ctx.font='13px sans-serif'; ctx.fillText(dateStr + '  ·  lensup.vercel.app', 50, 380);
+  // Fill overlay content
+  document.getElementById('unlockTitle').textContent = ch.name + ' ✓';
+  document.getElementById('unlockScore').textContent = '⭐ Average Score: ' + avg + ' / 10';
 
-  setView('complete');
-
-  // Pop the card on catalogue
-  setTimeout(() => {
-    const card = document.getElementById('ch-card-' + ch.id);
-    if(card) card.classList.add('just-completed');
-    renderCatalogue();
-  }, 500);
-}
-
-function launchConfetti(){
-  const container = document.getElementById('confettiContainer');
-  container.innerHTML = '';
-  const colors = ['#00B4D8','#1A936F','#FFD166','#FF6B6B','#7C3AED','#F97316'];
-  for(let i=0;i<80;i++){
-    const el = document.createElement('div');
-    el.className = 'confetti-piece';
-    el.style.cssText = [
-      'left:'+Math.random()*100+'%',
-      'background:'+colors[Math.floor(Math.random()*colors.length)],
-      'width:'+(6+Math.random()*8)+'px',
-      'height:'+(6+Math.random()*8)+'px',
-      'border-radius:'+(Math.random()>0.5?'50%':'2px'),
-      'animation-duration:'+(1.5+Math.random()*2)+'s',
-      'animation-delay:'+(Math.random()*0.8)+'s',
-      'transform:rotate('+Math.floor(Math.random()*360)+'deg)',
-    ].join(';');
-    container.appendChild(el);
+  // Module complete check
+  const modChs = CHAPTERS.filter(x => x.module === ch.module);
+  const modAllDone = modChs.every(x => isComplete(x.id) || x.id === ch.id);
+  const modBadge = document.getElementById('unlockModuleBadge');
+  if(modAllDone){
+    modBadge.style.display = 'block';
+    modBadge.textContent = '🏆 Module Complete: ' + ch.module + '!';
+  } else {
+    modBadge.style.display = 'none';
   }
-  setTimeout(()=>{ container.innerHTML=''; }, 4000);
+
+  // Next chapter info
+  const nextCh = CHAPTERS.find(x => x.id === ch.id + 1);
+  const modColors = {'Composition':'#00B4D8','Light':'#FFD166','People & Storytelling':'#FF6B6B','Urban & Environment':'#1A936F','Technical':'#7C3AED','Creative':'#F97316'};
+  if(nextCh){
+    document.getElementById('unlockNextCard').style.display = 'block';
+    document.getElementById('unlockNextBadge').textContent = String(nextCh.id).padStart(2,'0');
+    document.getElementById('unlockNextBadge').style.background = modColors[nextCh.module] || '#00B4D8';
+    document.getElementById('unlockNextName').textContent = nextCh.name;
+    document.getElementById('unlockNextDesc').textContent = nextCh.lesson.slice(0,100) + '…';
+    document.getElementById('unlockNextNum').textContent = nextCh.id;
+    document.getElementById('unlockStartNext').style.display = 'inline-flex';
+  } else {
+    // Chapter 36 — final completion
+    document.getElementById('unlockNextCard').style.display = 'none';
+    document.getElementById('unlockStartNext').style.display = 'none';
+    document.getElementById('unlockBadgeIcon').textContent = '👑';
+  }
+
+  // Launch confetti
+  launchConfetti();
+
+  // Show overlay
+  document.getElementById('unlockOverlay').classList.add('show');
+  document.body.style.overflow = 'hidden';
+
+  // Refresh catalogue (new unlocked chapter should show)
+  setTimeout(renderCatalogue, 800);
 }
 
+function closeUnlock(){
+  document.getElementById('unlockOverlay').classList.remove('show');
+  document.body.style.overflow = '';
+  document.getElementById('unlockCanvasWrap').style.display = 'none';
+  renderCatalogue();
+}
+
+function startNextChapter(){
+  closeUnlock();
+  const ch = activeChapter;
+  const nextCh = CHAPTERS.find(x => x.id === ch.id + 1);
+  if(nextCh){
+    setTimeout(() => openChapter(nextCh.id), 300);
+  }
+}
 
 
 function downloadCard(){
