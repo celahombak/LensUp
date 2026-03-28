@@ -23,6 +23,85 @@
       --shadow-lg:0 20px 60px rgba(0,100,140,0.14);
       --radius-sm:10px;--radius-md:16px;--radius-lg:24px;
     }
+
+    /* ── DARK MODE ── */
+    html.dark {
+      --bg: #0F1923;
+      --surface: #162030;
+      --surface2: #1C2A3A;
+      --text: #E8F4FA;
+      --text-mid: #7EB0C4;
+      --text-light: #4A7080;
+      --border: rgba(0,180,216,0.15);
+      --border-input: #1E3A50;
+      --sky-pale: rgba(0,180,216,0.12);
+      --sky-xpale: rgba(0,180,216,0.07);
+      --teal-pale: rgba(26,147,111,0.12);
+      --coral-pale: rgba(255,107,107,0.1);
+      --yellow-pale: rgba(255,209,102,0.1);
+      --orange-pale: rgba(249,115,22,0.1);
+      --purple-pale: rgba(124,58,237,0.1);
+      --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
+      --shadow-md: 0 8px 24px rgba(0,0,0,0.4);
+      --shadow-lg: 0 20px 60px rgba(0,0,0,0.5);
+    }
+    html.dark .top-nav,
+    html.dark .nav { background: rgba(15,25,35,0.95) !important; }
+    html.dark .mobile-menu { background: rgba(15,25,35,0.99) !important; }
+    html.dark .feed-card,
+    html.dark .dash-card,
+    html.dark .card,
+    html.dark .module-card,
+    html.dark .chapter-card,
+    html.dark .modal,
+    html.dark .s-modal { background: var(--surface) !important; }
+    html.dark .chapter-card.done {
+      background: linear-gradient(135deg, rgba(26,147,111,0.15) 0%, var(--surface) 60%) !important;
+    }
+    html.dark .chapter-card.locked { background: var(--surface2) !important; }
+    html.dark .hud { background: var(--surface) !important; }
+    html.dark .profile-hero { background: linear-gradient(135deg, rgba(0,180,216,0.08) 0%, rgba(26,147,111,0.05) 100%) !important; }
+    html.dark .lb-table { background: var(--surface) !important; }
+    html.dark .lb-table-header { background: var(--surface2) !important; }
+    html.dark .lb-row:hover { background: rgba(0,180,216,0.08) !important; }
+    html.dark .unlock-overlay {
+      background: linear-gradient(135deg, #0F1F2F 0%, #0A1A20 100%) !important;
+    }
+    html.dark .unlock-next-card { background: var(--surface) !important; }
+    html.dark .welcome-banner {
+      background: linear-gradient(135deg, rgba(0,180,216,0.12) 0%, rgba(255,209,102,0.06) 100%) !important;
+    }
+    html.dark .auth-card { background: var(--surface) !important; }
+    html.dark .drop-zone { background: var(--surface2) !important; }
+    html.dark .drop-zone:hover { background: rgba(0,180,216,0.12) !important; }
+    html.dark input, html.dark .form-input, html.dark .name-input {
+      background: var(--surface2) !important;
+      color: var(--text) !important;
+      border-color: var(--border-input) !important;
+    }
+    html.dark .challenge-hero { background: linear-gradient(135deg, rgba(0,180,216,0.08) 0%, rgba(26,147,111,0.05) 100%) !important; }
+    html.dark .sort-btn.active, html.dark .sort-btn:hover { background: rgba(0,180,216,0.15) !important; }
+    html.dark .tab-btn.active { color: var(--sky) !important; }
+    html.dark .podium-card { background: var(--surface) !important; }
+    html.dark .p1 { background: linear-gradient(135deg, rgba(255,209,102,0.1) 0%, var(--surface) 60%) !important; }
+    html.dark .coming-card { background: var(--surface) !important; }
+    html.dark .past-row { background: var(--surface) !important; }
+    html.dark .past-row:hover { background: rgba(0,180,216,0.08) !important; }
+    html.dark .past-panel { background: var(--surface2) !important; }
+    html.dark .lesson-illustration { background: rgba(0,180,216,0.06) !important; }
+    html.dark .illus-caption { background: var(--surface2) !important; }
+    html.dark .step-card, html.dark .streak-card, html.dark .lb-stat { background: var(--surface) !important; }
+    html.dark .module-card { background: var(--surface) !important; }
+    html.dark .feedback-phone { background: var(--surface) !important; }
+    html.dark .phone-body { background: var(--surface) !important; }
+    html.dark .cta-card { background: var(--surface) !important; }
+    html.dark .hero-badge { background: rgba(0,180,216,0.12) !important; }
+    html.dark .hero::before {
+      background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(0,180,216,0.08) 0%, transparent 70%),
+                  radial-gradient(ellipse 60% 40% at 10% 80%, rgba(26,147,111,0.05) 0%, transparent 60%),
+                  radial-gradient(ellipse 50% 50% at 90% 70%, rgba(255,209,102,0.05) 0%, transparent 60%) !important;
+    }
+
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
     body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:400;min-height:100vh;visibility:hidden;}
     body.auth-ready{visibility:visible;}
@@ -513,23 +592,23 @@ function showWelcomeBack(name, streak) {
   if (daysSince === 1) {
     // Came back next day — encourage streak
     icon.textContent  = '🔥';
-    title.textContent = 'You're on a ' + streak + '-day streak!';
+    title.textContent = 'You are on a ' + streak + '-day streak!';
     sub.textContent   = 'Keep it going — submit one photo today to maintain your streak.';
   } else if (daysSince <= 3) {
     // Missed a day or two — gentle nudge
     icon.textContent  = '👋';
     title.textContent = 'Welcome back, ' + name + '!';
-    sub.textContent   = 'You've been away ' + daysSince + ' days.' + (lastStreak > 0 ? ' Your streak reset — start a new one today.' : ' Your next chapter is waiting.');
+    sub.textContent   = 'You have been away ' + daysSince + ' days.' + (lastStreak > 0 ? ' Your streak reset — start a new one today.' : ' Your next chapter is waiting.');
   } else if (daysSince <= 7) {
     // A week away — re-engage
     icon.textContent  = '📷';
-    title.textContent = 'It's been a while!';
+    title.textContent = 'Been a while!';
     sub.textContent   = daysSince + ' days since your last visit. Pick up where you left off — your progress is saved.';
   } else {
     // Long time away — full re-engagement
     icon.textContent  = '🌟';
     title.textContent = 'Great to see you again!';
-    sub.textContent   = 'You've been away ' + daysSince + ' days. Your chapters and progress are all still here — let's continue!';
+    sub.textContent   = 'You have been away ' + daysSince + ' days. Your chapters and progress are all still here — let us continue!';
   }
 
   banner.classList.add('show');
