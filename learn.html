@@ -713,13 +713,10 @@
         <div class="complete-title">Chapter Complete!</div>
         <div class="complete-sub" id="cSub"></div>
         <div class="complete-score" id="cScore"></div>
-        <div class="canvas-wrap" id="canvasWrap">
-          <canvas id="shareCanvas" width="800" height="400"></canvas>
-        </div>
       </div>
       <div class="complete-footer">
         <button class="btn-ghost" onclick="downloadCard()">⬇ Download Badge</button>
-        <button class="btn-primary btn-teal" onclick="closeModal()">Continue Learning →</button>
+        <button class="btn-primary btn-teal" onclick="closeUnlock()">Continue Learning →</button>
       </div>
     </div>
 
@@ -961,7 +958,8 @@ const CHAPTERS = [
 function getIllustration(chId) {
   const sky = '#00B4D8', teal = '#1A936F', coral = '#FF6B6B',
         yellow = '#FFD166', pale = '#EAF8FC', mid = '#5A7080',
-        dark = '#1A2B3C', surf = '#FFFFFF', surf2 = '#F4F8FA';
+        dark = '#1A2B3C', surf = '#FFFFFF', surf2 = '#F4F8FA',
+        purple = '#7C3AED', orange = '#F97316';
   const W = 360, H = 200;
 
   const base = (content, caption) =>
@@ -1229,7 +1227,8 @@ function getIllustration(chId) {
       `<path d="M 165 88 Q 180 100 195 88" fill="none" stroke="#c07040" stroke-width="2"/>` +
       `<text x="230" y="68" fill="${dark}" font-size="9" font-family="DM Sans,sans-serif">What happened</text>` +
       `<text x="230" y="80" fill="${dark}" font-size="9" font-family="DM Sans,sans-serif">before? After?</text>` +
-      `<path d="M 200 72 L 228 72" stroke="${coral}" stroke-width="1.5" marker-end="url(#arr)"/>` +
+      `<path d="M 200 72 L 228 72" stroke="${coral}" stroke-width="1.5"/>` +
+      `<polygon points="226,69 232,72 226,75" fill="${coral}"/>` +
       `<text x="${W/2}" y="155" text-anchor="middle" fill="${mid}" font-size="9" font-family="DM Sans,sans-serif" font-style="italic">The shot raises a question the viewer wants answered</text>`,
       'Action + expression + environment = story in one frame'
     ),
@@ -1765,11 +1764,16 @@ function openChapter(id){
 
   // Illustration
   const diag = document.getElementById('lessonDiagram');
-  const illus = getIllustration(ch.id);
-  if (illus) {
-    diag.style.display = 'block';
-    diag.innerHTML = illus;
-  } else {
+  try {
+    const illus = getIllustration(ch.id);
+    if (illus) {
+      diag.style.display = 'block';
+      diag.innerHTML = illus;
+    } else {
+      diag.style.display = 'none';
+    }
+  } catch(e) {
+    console.warn('Illustration failed for ch', ch.id, e);
     diag.style.display = 'none';
   }
 
