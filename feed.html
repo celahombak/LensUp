@@ -156,6 +156,32 @@
     .limit-note{font-size:0.72rem;color:var(--text-light);text-align:center;margin-top:0.8rem;line-height:1.6;}
     .limit-note strong{color:var(--sky-dark);font-weight:700;}
 
+
+    /* ACHIEVEMENT TOAST */
+    .achievement-toast {
+      position: fixed; bottom: 5rem; left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 0.8rem 1.2rem;
+      display: flex; align-items: center; gap: 0.8rem;
+      box-shadow: var(--shadow-lg);
+      opacity: 0; transition: all 0.35s;
+      z-index: 998; pointer-events: none;
+      max-width: 320px; min-width: 240px;
+    }
+    .achievement-toast.show {
+      opacity: 1; transform: translateX(-50%) translateY(0);
+    }
+    .achievement-icon { font-size: 1.6rem; flex-shrink: 0; }
+    .achievement-text {}
+    .achievement-title { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.88rem; color: var(--text); }
+    .achievement-sub { font-size: 0.72rem; color: var(--text-mid); margin-top: 0.1rem; }
+
+    /* LIKE COUNT visible */
+    .like-count { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.85rem; }
+
     .toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(16px);background:var(--text);color:#fff;padding:0.7rem 1.4rem;border-radius:var(--radius-sm);font-size:0.82rem;font-weight:600;opacity:0;transition:all 0.3s;z-index:999;pointer-events:none;white-space:nowrap;box-shadow:var(--shadow-md);}
     .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
@@ -167,6 +193,27 @@
       .overlay,.s-overlay{padding:0;align-items:flex-end;}
       .modal,.s-modal{border-radius:var(--radius-lg) var(--radius-lg) 0 0;max-height:92vh;overflow-y:auto;}
     }
+
+    /* DARK MODE TOGGLE */
+    .dark-toggle {
+      width: 40px; height: 22px; border-radius: 11px;
+      background: var(--border-input); border: none;
+      cursor: pointer; position: relative;
+      transition: background 0.3s; flex-shrink: 0;
+      display: flex; align-items: center; padding: 2px;
+    }
+    .dark-toggle::after {
+      content: ''; width: 18px; height: 18px; border-radius: 50%;
+      background: var(--surface); transition: transform 0.3s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    html.dark .dark-toggle { background: var(--sky); }
+    html.dark .dark-toggle::after { transform: translateX(18px); }
+    .dark-toggle-wrap {
+      display: flex; align-items: center; gap: 0.4rem;
+      font-size: 0.72rem; color: var(--text-light);
+    }
+
   </style>
 </head>
 <body>
@@ -181,6 +228,11 @@
     <a href="leaderboard.html" class="nav-link">🏆 Ranks</a>
     <a href="profile.html" class="nav-link">👤 Profile</a>
   </div>
+  <div class="dark-toggle-wrap">
+      <span id="darkIcon">☀️</span>
+      <button class="dark-toggle" onclick="toggleDark()" title="Toggle dark mode" aria-label="Toggle dark mode"></button>
+      <span>🌙</span>
+    </div>
   <div class="nav-auth" id="navAuthArea"></div>
   <button class="nav-burger" onclick="openMobileMenu()"><span></span><span></span><span></span></button>
 </nav>
@@ -278,6 +330,14 @@
   </div>
 </div>
 
+<div class="achievement-toast" id="achievementToast">
+  <div class="achievement-icon" id="achIcon">🎉</div>
+  <div class="achievement-text">
+    <div class="achievement-title" id="achTitle"></div>
+    <div class="achievement-sub" id="achSub"></div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -315,8 +375,18 @@
     setTimeout(() => t.classList.remove('show'), 3000);
   }
   function parseImps(raw) {
-    if(typeof raw==='string'){try{raw=JSON.parse(raw);}catch{return[];}}
-    return Array.isArray(raw)?raw.map(i=>typeof i==='object'?i:{title:String(i),desc:''}):[]; 
+    if(!raw) return [];
+    if(typeof raw==='string'){
+      // Strip markdown code fences if present
+      raw = raw.replace(/```json|```/g,'').trim();
+      try{ raw=JSON.parse(raw); }catch{ return []; }
+    }
+    if(!Array.isArray(raw)) return [];
+    return raw.map(i => {
+      if(typeof i === 'string') return {title: i, desc: ''};
+      if(typeof i === 'object' && i !== null) return {title: i.title||i.name||String(i), desc: i.desc||i.description||''};
+      return {title: String(i), desc: ''};
+    }).filter(i => i.title && i.title.length > 0);
   }
 
   // ── NAV AUTH ──
@@ -438,7 +508,7 @@
       ${catPills ? `<div class="card-cats">${catPills}</div>` : ''}
       <div class="card-actions">
         <button class="like-btn${liked?' liked':''}" id="lb-${esc(item.id)}" onclick="toggleLike('${esc(item.id)}')">
-          ${liked?'❤️':'🤍'} <span id="lc-${esc(item.id)}">—</span>
+          ${liked?'❤️':'🤍'} <span class="like-count" id="lc-${esc(item.id)}">—</span>
         </button>
         <button class="see-more-btn" onclick="openDetail('${esc(item.id)}')">See full analysis →</button>
       </div>
@@ -448,19 +518,48 @@
   function loadMore() { loadFeed(false); }
 
   // ── LIKE ──
+  let achTimeout = null;
+  function showAchievement(icon, title, sub) {
+    const el = document.getElementById('achievementToast');
+    document.getElementById('achIcon').textContent = icon;
+    document.getElementById('achTitle').textContent = title;
+    document.getElementById('achSub').textContent = sub;
+    el.classList.add('show');
+    clearTimeout(achTimeout);
+    achTimeout = setTimeout(() => el.classList.remove('show'), 3500);
+  }
+
   async function toggleLike(id) {
     const liked = likedSet.has(id);
     const btn   = document.getElementById('lb-'+id);
     const cnt   = document.getElementById('lc-'+id);
-    const n     = parseInt(cnt?.textContent)||0;
+    const n     = parseInt(cnt?.textContent) || 0;
+
     if(liked) {
       likedSet.delete(id);
-      if(btn) { btn.classList.remove('liked'); btn.innerHTML=`🤍 <span id="lc-${id}">${Math.max(0,n-1)}</span>`; }
+      const newN = Math.max(0, n-1);
+      if(btn) {
+        btn.classList.remove('liked');
+        btn.innerHTML = '🤍 <span class="like-count" id="lc-'+id+'">' + newN + '</span>';
+      }
       await sb.from('likes').delete().eq('user_id',currentUser.id).eq('analysis_id',id);
     } else {
       likedSet.add(id);
-      if(btn) { btn.classList.add('liked'); btn.innerHTML=`❤️ <span id="lc-${id}">${n+1}</span>`; }
+      const newN = n + 1;
+      if(btn) {
+        btn.classList.add('liked');
+        btn.innerHTML = '❤️ <span class="like-count" id="lc-'+id+'">' + newN + '</span>';
+      }
       await sb.from('likes').upsert({user_id:currentUser.id,analysis_id:id},{onConflict:'user_id,analysis_id'});
+
+      // Check if this is the user's OWN photo getting liked
+      const item = feedItems.find(d => d.id === id);
+      if(item && item.user_id === currentUser.id) {
+        if(newN === 1)  showAchievement('👀', 'Someone noticed!', 'Your photo got its first like');
+        if(newN === 3)  showAchievement('📸', 'Popular shot!', '3 people liked your photo');
+        if(newN === 5)  showAchievement('🔥', 'Getting attention!', '5 likes on this photo');
+        if(newN === 10) showAchievement('🏆', 'Community favourite!', '10 people liked your shot');
+      }
     }
   }
 
@@ -643,6 +742,17 @@
   }
 
   init();
+
+  // ── DARK MODE ──
+  (function() {
+    const saved = localStorage.getItem('lensup_dark');
+    if (saved === 'true') document.documentElement.classList.add('dark');
+  })();
+  function toggleDark() {
+    const isDark = document.documentElement.classList.toggle('dark');
+    localStorage.setItem('lensup_dark', isDark);
+  }
+
 </script>
 </body>
 </html>

@@ -525,6 +525,27 @@
     .unlock-canvas-wrap { margin-bottom: 1.2rem; border-radius: var(--radius-sm); overflow: hidden; border: 1.5px solid var(--border); }
     .unlock-canvas-wrap canvas { max-width: 100%; display: block; }
 
+
+    /* DARK MODE TOGGLE */
+    .dark-toggle {
+      width: 40px; height: 22px; border-radius: 11px;
+      background: var(--border-input); border: none;
+      cursor: pointer; position: relative;
+      transition: background 0.3s; flex-shrink: 0;
+      display: flex; align-items: center; padding: 2px;
+    }
+    .dark-toggle::after {
+      content: ''; width: 18px; height: 18px; border-radius: 50%;
+      background: var(--surface); transition: transform 0.3s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    html.dark .dark-toggle { background: var(--sky); }
+    html.dark .dark-toggle::after { transform: translateX(18px); }
+    .dark-toggle-wrap {
+      display: flex; align-items: center; gap: 0.4rem;
+      font-size: 0.72rem; color: var(--text-light);
+    }
+
   </style>
 </head>
 <body>
@@ -540,6 +561,11 @@
     <a href="leaderboard.html" class="nav-link">🏆 Ranks</a>
     <a href="profile.html" class="nav-link">👤 Profile</a>
   </div>
+  <div class="dark-toggle-wrap">
+      <span id="darkIcon">☀️</span>
+      <button class="dark-toggle" onclick="toggleDark()" title="Toggle dark mode" aria-label="Toggle dark mode"></button>
+      <span>🌙</span>
+    </div>
   <div class="nav-auth" id="navAuthArea"></div>
   <button class="nav-burger" onclick="openMobileMenu()"><span></span><span></span><span></span></button>
 </nav>
@@ -2125,6 +2151,17 @@ async function init(){
 }
 
 init();
+
+  // ── DARK MODE ──
+  (function() {
+    const saved = localStorage.getItem('lensup_dark');
+    if (saved === 'true') document.documentElement.classList.add('dark');
+  })();
+  function toggleDark() {
+    const isDark = document.documentElement.classList.toggle('dark');
+    localStorage.setItem('lensup_dark', isDark);
+  }
+
 </script>
 </body>
 </html>
