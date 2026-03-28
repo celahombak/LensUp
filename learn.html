@@ -1918,7 +1918,7 @@ function renderCatalogue(){
         ? `<div class="ch-done-check">✓</div>`
         : `${badge}`;
 
-      const lockIcon = !unlocked ? `<div class="ch-lock-icon">🔒</div>` : '';
+      // const lockIcon = !unlocked ? `<div class="ch-lock-icon">🔒</div>` : '';
       const prevName = ch.id > 1 ? CHAPTERS.find(x=>x.id===ch.id-1)?.name : '';
       const lockedTitle = !unlocked ? ` title="Complete '${prevName}' to unlock"` : '';
 
@@ -1945,7 +1945,7 @@ function renderCatalogue(){
         <div class="ch-right">
           ${rightIcon}
         </div>
-        ${lockIcon}
+        
       </div>`;
     });
     html += `</div></div>`;
