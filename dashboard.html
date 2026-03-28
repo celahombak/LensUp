@@ -23,6 +23,85 @@
       --shadow-lg:0 20px 60px rgba(0,100,140,0.14);
       --radius-sm:10px;--radius-md:16px;--radius-lg:24px;
     }
+
+    /* ── DARK MODE ── */
+    html.dark {
+      --bg: #0F1923;
+      --surface: #162030;
+      --surface2: #1C2A3A;
+      --text: #E8F4FA;
+      --text-mid: #7EB0C4;
+      --text-light: #4A7080;
+      --border: rgba(0,180,216,0.15);
+      --border-input: #1E3A50;
+      --sky-pale: rgba(0,180,216,0.12);
+      --sky-xpale: rgba(0,180,216,0.07);
+      --teal-pale: rgba(26,147,111,0.12);
+      --coral-pale: rgba(255,107,107,0.1);
+      --yellow-pale: rgba(255,209,102,0.1);
+      --orange-pale: rgba(249,115,22,0.1);
+      --purple-pale: rgba(124,58,237,0.1);
+      --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
+      --shadow-md: 0 8px 24px rgba(0,0,0,0.4);
+      --shadow-lg: 0 20px 60px rgba(0,0,0,0.5);
+    }
+    html.dark .top-nav,
+    html.dark .nav { background: rgba(15,25,35,0.95) !important; }
+    html.dark .mobile-menu { background: rgba(15,25,35,0.99) !important; }
+    html.dark .feed-card,
+    html.dark .dash-card,
+    html.dark .card,
+    html.dark .module-card,
+    html.dark .chapter-card,
+    html.dark .modal,
+    html.dark .s-modal { background: var(--surface) !important; }
+    html.dark .chapter-card.done {
+      background: linear-gradient(135deg, rgba(26,147,111,0.15) 0%, var(--surface) 60%) !important;
+    }
+    html.dark .chapter-card.locked { background: var(--surface2) !important; }
+    html.dark .hud { background: var(--surface) !important; }
+    html.dark .profile-hero { background: linear-gradient(135deg, rgba(0,180,216,0.08) 0%, rgba(26,147,111,0.05) 100%) !important; }
+    html.dark .lb-table { background: var(--surface) !important; }
+    html.dark .lb-table-header { background: var(--surface2) !important; }
+    html.dark .lb-row:hover { background: rgba(0,180,216,0.08) !important; }
+    html.dark .unlock-overlay {
+      background: linear-gradient(135deg, #0F1F2F 0%, #0A1A20 100%) !important;
+    }
+    html.dark .unlock-next-card { background: var(--surface) !important; }
+    html.dark .welcome-banner {
+      background: linear-gradient(135deg, rgba(0,180,216,0.12) 0%, rgba(255,209,102,0.06) 100%) !important;
+    }
+    html.dark .auth-card { background: var(--surface) !important; }
+    html.dark .drop-zone { background: var(--surface2) !important; }
+    html.dark .drop-zone:hover { background: rgba(0,180,216,0.12) !important; }
+    html.dark input, html.dark .form-input, html.dark .name-input {
+      background: var(--surface2) !important;
+      color: var(--text) !important;
+      border-color: var(--border-input) !important;
+    }
+    html.dark .challenge-hero { background: linear-gradient(135deg, rgba(0,180,216,0.08) 0%, rgba(26,147,111,0.05) 100%) !important; }
+    html.dark .sort-btn.active, html.dark .sort-btn:hover { background: rgba(0,180,216,0.15) !important; }
+    html.dark .tab-btn.active { color: var(--sky) !important; }
+    html.dark .podium-card { background: var(--surface) !important; }
+    html.dark .p1 { background: linear-gradient(135deg, rgba(255,209,102,0.1) 0%, var(--surface) 60%) !important; }
+    html.dark .coming-card { background: var(--surface) !important; }
+    html.dark .past-row { background: var(--surface) !important; }
+    html.dark .past-row:hover { background: rgba(0,180,216,0.08) !important; }
+    html.dark .past-panel { background: var(--surface2) !important; }
+    html.dark .lesson-illustration { background: rgba(0,180,216,0.06) !important; }
+    html.dark .illus-caption { background: var(--surface2) !important; }
+    html.dark .step-card, html.dark .streak-card, html.dark .lb-stat { background: var(--surface) !important; }
+    html.dark .module-card { background: var(--surface) !important; }
+    html.dark .feedback-phone { background: var(--surface) !important; }
+    html.dark .phone-body { background: var(--surface) !important; }
+    html.dark .cta-card { background: var(--surface) !important; }
+    html.dark .hero-badge { background: rgba(0,180,216,0.12) !important; }
+    html.dark .hero::before {
+      background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(0,180,216,0.08) 0%, transparent 70%),
+                  radial-gradient(ellipse 60% 40% at 10% 80%, rgba(26,147,111,0.05) 0%, transparent 60%),
+                  radial-gradient(ellipse 50% 50% at 90% 70%, rgba(255,209,102,0.05) 0%, transparent 60%) !important;
+    }
+
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
     body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:400;min-height:100vh;visibility:hidden;}
     body.auth-ready{visibility:visible;}
@@ -174,6 +253,28 @@
     .badge-green{background:var(--teal-pale);color:var(--teal);border:1.5px solid rgba(26,147,111,0.2);}
     .no-badges{font-size:0.8rem;color:var(--text-light);font-style:italic;}
 
+
+    /* WELCOME BACK BANNER */
+    .welcome-banner {
+      background: linear-gradient(135deg, var(--sky-pale) 0%, var(--yellow-pale) 100%);
+      border: 1.5px solid rgba(0,180,216,0.2);
+      border-radius: var(--radius-md);
+      padding: 1.1rem 1.4rem;
+      margin-bottom: 1.5rem;
+      display: none;
+      align-items: center;
+      gap: 1rem;
+      animation: slideDown 0.4s ease both;
+    }
+    .welcome-banner.show { display: flex; }
+    @keyframes slideDown { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
+    .wb-icon { font-size: 2rem; flex-shrink: 0; }
+    .wb-text { flex: 1; }
+    .wb-title { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.95rem; color: var(--text); margin-bottom: 0.2rem; }
+    .wb-sub { font-size: 0.8rem; color: var(--text-mid); line-height: 1.5; }
+    .wb-cta { background: var(--sky); color: #fff; border: none; padding: 0.55rem 1.1rem; border-radius: var(--radius-sm); font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.82rem; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 0.3rem; transition: all 0.2s; flex-shrink: 0; }
+    .wb-cta:hover { background: var(--sky-dark); }
+
     /* TOAST */
     .toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(16px);background:var(--text);color:#fff;padding:0.7rem 1.4rem;border-radius:var(--radius-sm);font-size:0.82rem;font-weight:600;opacity:0;transition:all 0.3s;z-index:999;pointer-events:none;white-space:nowrap;box-shadow:var(--shadow-md);}
     .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
@@ -195,6 +296,27 @@
     @media(max-width:480px){
       .dash-grid-3{grid-template-columns:1fr;}
     }
+
+    /* DARK MODE TOGGLE */
+    .dark-toggle {
+      width: 40px; height: 22px; border-radius: 11px;
+      background: var(--border-input); border: none;
+      cursor: pointer; position: relative;
+      transition: background 0.3s; flex-shrink: 0;
+      display: flex; align-items: center; padding: 2px;
+    }
+    .dark-toggle::after {
+      content: ''; width: 18px; height: 18px; border-radius: 50%;
+      background: var(--surface); transition: transform 0.3s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    html.dark .dark-toggle { background: var(--sky); }
+    html.dark .dark-toggle::after { transform: translateX(18px); }
+    .dark-toggle-wrap {
+      display: flex; align-items: center; gap: 0.4rem;
+      font-size: 0.72rem; color: var(--text-light);
+    }
+
   </style>
 </head>
 <body>
@@ -209,6 +331,11 @@
     <a href="leaderboard.html" class="nav-link">🏆 Ranks</a>
     <a href="profile.html" class="nav-link">👤 Profile</a>
   </div>
+  <div class="dark-toggle-wrap">
+      <span id="darkIcon">☀️</span>
+      <button class="dark-toggle" onclick="toggleDark()" title="Toggle dark mode" aria-label="Toggle dark mode"></button>
+      <span>🌙</span>
+    </div>
   <div class="nav-auth" id="navAuthArea"></div>
   <button class="nav-burger" onclick="openMobileMenu()"><span></span><span></span><span></span></button>
 </nav>
@@ -230,6 +357,17 @@
 </div>
 
 <div class="page">
+
+
+  <!-- WELCOME BACK BANNER -->
+  <div class="welcome-banner" id="welcomeBanner">
+    <span class="wb-icon" id="wbIcon">👋</span>
+    <div class="wb-text">
+      <div class="wb-title" id="wbTitle">Welcome back!</div>
+      <div class="wb-sub" id="wbSub"></div>
+    </div>
+    <a href="learn.html" class="wb-cta" id="wbCta">Continue →</a>
+  </div>
 
   <!-- GREETING + STREAK -->
   <div class="greeting-row anim">
@@ -419,14 +557,61 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMobileMenu();})
 async function loadDashboard(){
   const name = currentUser.user_metadata?.display_name || currentUser.email.split('@')[0];
   const hour = new Date().getHours();
-  const greeting = hour<12?'Good morning':'Good afternoon';
+  const greeting = hour<12?'Good morning':hour<18?'Good afternoon':'Good evening';
   document.getElementById('greetName').textContent = greeting+', '+name+' 👋';
   document.getElementById('greetDate').textContent = new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
 
   const streak = parseInt(localStorage.getItem('lensup_streak')||'0');
   document.getElementById('statStreak').textContent = streak;
 
+  // Welcome back state
+  showWelcomeBack(name, streak);
+
   await Promise.all([loadProgress(), loadChallenge(), loadLeaderboard(), loadCommunityFeed()]);
+}
+
+function showWelcomeBack(name, streak) {
+  const today     = new Date().toDateString();
+  const lastVisit = localStorage.getItem('lensup_last_visit');
+  const lastStreak = parseInt(localStorage.getItem('lensup_last_streak') || '0');
+
+  // Save today as last visit
+  localStorage.setItem('lensup_last_visit', today);
+  localStorage.setItem('lensup_last_streak', streak);
+
+  if (!lastVisit || lastVisit === today) return; // first ever visit or same day — no banner
+
+  const daysSince = Math.round((new Date(today) - new Date(lastVisit)) / 86400000);
+  if (daysSince < 1) return;
+
+  const banner = document.getElementById('welcomeBanner');
+  const icon   = document.getElementById('wbIcon');
+  const title  = document.getElementById('wbTitle');
+  const sub    = document.getElementById('wbSub');
+
+  if (daysSince === 1) {
+    // Came back next day — encourage streak
+    icon.textContent  = '🔥';
+    title.textContent = 'You are on a ' + streak + '-day streak!';
+    sub.textContent   = 'Keep it going — submit one photo today to maintain your streak.';
+  } else if (daysSince <= 3) {
+    // Missed a day or two — gentle nudge
+    icon.textContent  = '👋';
+    title.textContent = 'Welcome back, ' + name + '!';
+    sub.textContent   = 'You have been away ' + daysSince + ' days.' + (lastStreak > 0 ? ' Your streak reset — start a new one today.' : ' Your next chapter is waiting.');
+  } else if (daysSince <= 7) {
+    // A week away — re-engage
+    icon.textContent  = '📷';
+    title.textContent = 'Been a while!';
+    sub.textContent   = daysSince + ' days since your last visit. Pick up where you left off — your progress is saved.';
+  } else {
+    // Long time away — full re-engagement
+    icon.textContent  = '🌟';
+    title.textContent = 'Great to see you again!';
+    sub.textContent   = 'You have been away ' + daysSince + ' days. Your chapters and progress are all still here — let us continue!';
+  }
+
+  banner.classList.add('show');
 }
 
 async function loadProgress(){
@@ -639,6 +824,17 @@ async function init(){
   }
 }
 init();
+
+  // ── DARK MODE ──
+  (function() {
+    const saved = localStorage.getItem('lensup_dark');
+    if (saved === 'true') document.documentElement.classList.add('dark');
+  })();
+  function toggleDark() {
+    const isDark = document.documentElement.classList.toggle('dark');
+    localStorage.setItem('lensup_dark', isDark);
+  }
+
 </script>
 </body>
 </html>

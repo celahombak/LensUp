@@ -490,6 +490,27 @@
       .steps-grid { grid-template-columns: 1fr; }
       .hero-social-proof { gap: 1rem; }
     }
+
+    /* DARK MODE TOGGLE */
+    .dark-toggle {
+      width: 40px; height: 22px; border-radius: 11px;
+      background: var(--border-input); border: none;
+      cursor: pointer; position: relative;
+      transition: background 0.3s; flex-shrink: 0;
+      display: flex; align-items: center; padding: 2px;
+    }
+    .dark-toggle::after {
+      content: ''; width: 18px; height: 18px; border-radius: 50%;
+      background: var(--surface); transition: transform 0.3s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    html.dark .dark-toggle { background: var(--sky); }
+    html.dark .dark-toggle::after { transform: translateX(18px); }
+    .dark-toggle-wrap {
+      display: flex; align-items: center; gap: 0.4rem;
+      font-size: 0.72rem; color: var(--text-light);
+    }
+
   </style>
 </head>
 <body>
@@ -502,6 +523,11 @@
     <a href="#modules" class="nav-link">36 Chapters</a>
     <a href="#challenge" class="nav-link">Weekly Challenge</a>
   </div>
+  <div class="dark-toggle-wrap">
+      <span id="darkIcon">☀️</span>
+      <button class="dark-toggle" onclick="toggleDark()" title="Toggle dark mode" aria-label="Toggle dark mode"></button>
+      <span>🌙</span>
+    </div>
   <div class="nav-actions">
     <a href="login.html" class="nav-signin">Sign In</a>
     <a href="register.html" class="btn-nav-cta">Start Chapter 1 — Free</a>
@@ -910,6 +936,17 @@
   }
 
   loadChallenge();
+
+  // ── DARK MODE ──
+  (function() {
+    const saved = localStorage.getItem('lensup_dark');
+    if (saved === 'true') document.documentElement.classList.add('dark');
+  })();
+  function toggleDark() {
+    const isDark = document.documentElement.classList.toggle('dark');
+    localStorage.setItem('lensup_dark', isDark);
+  }
+
 </script>
 </body>
 </html>
