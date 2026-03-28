@@ -27,6 +27,9 @@
       --m1: #00B4D8; --m2: #FFD166; --m3: #FF6B6B;
       --m4: #1A936F; --m5: #7C3AED; --m6: #F97316;
     }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-weight: 400; min-height: 100vh; }
+    body.auth-ready { visibility: visible; }
+
 
     
     /* ── NAV ── */
@@ -2121,6 +2124,29 @@ function nextShot(){
   document.getElementById('missionError').classList.remove('show');
   updateMissionDots();
   setView('mission');
+}
+
+function launchConfetti(){
+  const container = document.getElementById('confettiContainer');
+  if(!container) return;
+  container.innerHTML = '';
+  const colors = ['#00B4D8','#1A936F','#FFD166','#FF6B6B','#7C3AED','#F97316','#ffffff'];
+  for(let i=0;i<80;i++){
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    el.style.cssText = [
+      'left:'+Math.random()*100+'%',
+      'width:'+(6+Math.random()*8)+'px',
+      'height:'+(10+Math.random()*14)+'px',
+      'background:'+colors[Math.floor(Math.random()*colors.length)],
+      'animation-duration:'+(2+Math.random()*2)+'s',
+      'animation-delay:'+(Math.random()*0.8)+'s',
+      'border-radius:'+(Math.random()>0.5?'50%':'2px'),
+      'opacity:'+(0.7+Math.random()*0.3)
+    ].join(';');
+    container.appendChild(el);
+  }
+  setTimeout(()=>{ if(container) container.innerHTML=''; }, 4000);
 }
 
 function showComplete(){
