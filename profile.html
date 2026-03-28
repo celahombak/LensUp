@@ -184,6 +184,61 @@
     }
 
 
+    /* PROFILE TABS */
+    .profile-tabs { display: flex; gap: 0; border-bottom: 2px solid var(--border); margin-bottom: 1.4rem; }
+    .profile-tab-btn { background: none; border: none; padding: 0.75rem 1.4rem; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.88rem; color: var(--text-mid); cursor: pointer; border-bottom: 2.5px solid transparent; margin-bottom: -2px; transition: all 0.2s; display: flex; align-items: center; gap: 0.4rem; }
+    .profile-tab-btn:hover { color: var(--sky); }
+    .profile-tab-btn.active { color: var(--sky); border-bottom-color: var(--sky); }
+    .profile-tab-panel { display: none; }
+    .profile-tab-panel.active { display: block; }
+
+    /* MY PHOTOS GRID */
+    .photos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.75rem; }
+    .photo-tile { background: var(--surface2); border-radius: var(--radius-sm); overflow: hidden; cursor: pointer; transition: all 0.2s; border: 1.5px solid var(--border); position: relative; }
+    .photo-tile:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); border-color: var(--sky-light); }
+    .photo-tile-img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }
+    .photo-tile-ph { width: 100%; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: var(--text-light); background: var(--surface2); }
+    .photo-tile-footer { padding: 0.4rem 0.5rem; display: flex; align-items: center; justify-content: space-between; }
+    .photo-tile-score { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 0.88rem; }
+    .photo-tile-date { font-size: 0.65rem; color: var(--text-light); }
+    .photo-tile-source { position: absolute; top: 0.35rem; left: 0.35rem; font-size: 0.6rem; font-weight: 700; padding: 0.15rem 0.4rem; border-radius: 4px; letter-spacing: 0.04em; }
+    .source-feed { background: rgba(0,180,216,0.85); color: #fff; }
+    .source-challenge { background: rgba(255,107,107,0.85); color: #fff; }
+    .source-learn { background: rgba(26,147,111,0.85); color: #fff; }
+    .photos-empty { text-align: center; padding: 3rem 2rem; color: var(--text-light); }
+    .photos-empty-icon { font-size: 2.5rem; display: block; margin-bottom: 0.8rem; opacity: 0.4; }
+    .photos-filter { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+    .filter-btn { background: none; border: 1.5px solid var(--border-input); color: var(--text-mid); padding: 0.3rem 0.8rem; border-radius: 100px; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
+    .filter-btn:hover { border-color: var(--sky); color: var(--sky); }
+    .filter-btn.active { background: var(--sky-pale); border-color: var(--sky); color: var(--sky-dark); }
+
+    /* PHOTO DETAIL MODAL */
+    .photo-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(15,30,45,0.8); z-index: 400; align-items: center; justify-content: center; padding: 1.5rem; backdrop-filter: blur(4px); }
+    .photo-modal-overlay.open { display: flex; }
+    .photo-modal { background: var(--surface); border-radius: var(--radius-lg); width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-lg); }
+    .photo-modal-header { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.2rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--surface); z-index: 10; }
+    .photo-modal-title { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.95rem; color: var(--text); }
+    .photo-modal-close { background: none; border: none; font-size: 1.3rem; color: var(--text-light); cursor: pointer; padding: 0.3rem 0.5rem; border-radius: var(--radius-sm); transition: all 0.2s; }
+    .photo-modal-close:hover { background: var(--surface2); color: var(--text); }
+    .photo-modal-img { width: 100%; max-height: 350px; object-fit: contain; display: block; background: var(--surface2); }
+    .photo-modal-body { padding: 1.2rem; }
+    .photo-modal-score-row { display: flex; align-items: center; gap: 1rem; padding: 1rem; background: var(--sky-pale); border-radius: var(--radius-sm); margin-bottom: 1rem; }
+    .photo-modal-score { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 3.5rem; line-height: 1; }
+    .photo-modal-summary { font-size: 0.85rem; line-height: 1.8; color: var(--text-mid); background: var(--surface2); border-radius: var(--radius-sm); padding: 0.8rem; border-left: 3px solid var(--sky); margin-bottom: 1rem; }
+    .photo-modal-bars { display: flex; flex-direction: column; gap: 0.5rem; }
+    .pm-bar-row { display: flex; align-items: center; gap: 0.6rem; }
+    .pm-bar-lbl { font-size: 0.72rem; color: var(--text-mid); width: 100px; flex-shrink: 0; font-weight: 500; }
+    .pm-bar-track { flex: 1; height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+    .pm-bar-fill { height: 100%; border-radius: 3px; transition: width 0.7s ease; }
+    .pm-bar-val { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.78rem; width: 18px; text-align: right; flex-shrink: 0; }
+
+    html.dark .photo-tile { background: var(--surface) !important; }
+    html.dark .photo-tile:hover { background: var(--surface2) !important; }
+    html.dark .photo-modal { background: var(--surface) !important; }
+    html.dark .photo-modal-header { background: var(--surface) !important; }
+    html.dark .photo-modal-score-row { background: rgba(0,180,216,0.08) !important; }
+    html.dark .photo-modal-summary { background: var(--surface2) !important; }
+
     /* ── DARK MODE ── */
     html.dark {
       --bg: #0F1923;
@@ -388,67 +443,93 @@
 <!-- PAGE BODY -->
 <div class="page">
 
-  <!-- STRENGTHS & WEAKNESSES -->
-  <div class="card" style="margin-bottom:1.2rem">
-    <div class="card-hdr">
-      <span class="card-title">🧠 Your Strengths & Weaknesses</span>
-    </div>
-    <div class="card-body">
-      <div class="sw-grid" id="swGrid">
-        <div class="no-data">Submit photos to see your strengths and weaknesses.</div>
-      </div>
-    </div>
+  <!-- TABS -->
+  <div class="profile-tabs">
+    <button class="profile-tab-btn active" id="tab-stats" onclick="switchProfileTab('stats')">📊 Stats</button>
+    <button class="profile-tab-btn" id="tab-photos" onclick="switchProfileTab('photos')">📷 My Photos</button>
   </div>
 
-  <div class="section-grid">
+  <!-- STATS TAB -->
+  <div class="profile-tab-panel active" id="panel-stats">
 
-    <!-- SCORE BREAKDOWN -->
-    <div class="card">
+    <!-- STRENGTHS & WEAKNESSES -->
+    <div class="card" style="margin-bottom:1.2rem">
       <div class="card-hdr">
-        <span class="card-title">📊 Score Breakdown</span>
+        <span class="card-title">🧠 Strengths & Weaknesses</span>
       </div>
       <div class="card-body">
-        <div id="scoreBreakdown"><div class="no-data">No data yet.</div></div>
+        <div class="sw-grid" id="swGrid">
+          <div class="no-data">Submit photos to see your strengths and weaknesses.</div>
+        </div>
       </div>
     </div>
 
-    <!-- CHAPTER PROGRESS -->
-    <div class="card">
-      <div class="card-hdr">
-        <span class="card-title">📚 Chapter Progress</span>
-        <a href="learn.html" style="font-size:0.75rem;font-weight:700;color:var(--sky);text-decoration:none">Open →</a>
+    <div class="section-grid">
+      <div class="card">
+        <div class="card-hdr"><span class="card-title">📊 Score Breakdown</span></div>
+        <div class="card-body"><div id="scoreBreakdown"><div class="no-data">No data yet.</div></div></div>
       </div>
-      <div class="card-body">
-        <div id="chapterProgress"><div class="no-data">No chapters started yet.</div></div>
+      <div class="card">
+        <div class="card-hdr">
+          <span class="card-title">📚 Chapter Progress</span>
+          <a href="learn.html" style="font-size:0.75rem;font-weight:700;color:var(--sky);text-decoration:none">Open →</a>
+        </div>
+        <div class="card-body"><div id="chapterProgress"><div class="no-data">No chapters started yet.</div></div></div>
       </div>
     </div>
 
+    <div class="section-grid">
+      <div class="card">
+        <div class="card-hdr"><span class="card-title">📈 Score History</span></div>
+        <div class="card-body" style="padding-top:0.5rem">
+          <div class="chart-area" id="chartArea"><div class="chart-empty">No history yet.</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-hdr"><span class="card-title">🏆 Best Shot</span></div>
+        <div class="card-body" style="padding:0.8rem">
+          <div id="bestPhotoWrap"><div class="no-data">No photos yet.</div></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /panel-stats -->
+
+  <!-- MY PHOTOS TAB -->
+  <div class="profile-tab-panel" id="panel-photos">
+    <div class="photos-filter">
+      <button class="filter-btn active" id="filter-all" onclick="setPhotoFilter('all')">All</button>
+      <button class="filter-btn" id="filter-feed" onclick="setPhotoFilter('feed')">🖼️ Feed</button>
+      <button class="filter-btn" id="filter-challenge" onclick="setPhotoFilter('challenge')">⚔️ Challenge</button>
+      <button class="filter-btn" id="filter-learn" onclick="setPhotoFilter('learn')">📚 Learn</button>
+    </div>
+    <div class="photos-grid" id="photosGrid">
+      <div class="no-data" style="grid-column:1/-1;padding:2rem;text-align:center">Loading your photos…</div>
+    </div>
+  </div><!-- /panel-photos -->
+
+</div>
+
+<!-- PHOTO DETAIL MODAL -->
+<div class="photo-modal-overlay" id="photoModalOverlay" onclick="if(event.target===this)closePhotoModal()">
+  <div class="photo-modal">
+    <div class="photo-modal-header">
+      <div class="photo-modal-title" id="photoModalTitle">Photo</div>
+      <button class="photo-modal-close" onclick="closePhotoModal()">✕</button>
+    </div>
+    <img class="photo-modal-img" id="photoModalImg" alt="" style="display:none"/>
+    <div class="photo-modal-body">
+      <div class="photo-modal-score-row">
+        <div class="photo-modal-score" id="photoModalScore">—</div>
+        <div>
+          <div style="font-size:0.65rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--sky)">Overall Score</div>
+          <div style="font-size:0.78rem;color:var(--text-mid);margin-top:0.2rem" id="photoModalMeta"></div>
+        </div>
+      </div>
+      <div class="photo-modal-summary" id="photoModalSummary" style="display:none"></div>
+      <div class="photo-modal-bars" id="photoModalBars"></div>
+    </div>
   </div>
-
-  <div class="section-grid">
-
-    <!-- SCORE HISTORY CHART -->
-    <div class="card">
-      <div class="card-hdr">
-        <span class="card-title">📈 Score History</span>
-      </div>
-      <div class="card-body" style="padding-top:0.5rem">
-        <div class="chart-area" id="chartArea"><div class="chart-empty">No history yet.</div></div>
-      </div>
-    </div>
-
-    <!-- BEST PHOTO -->
-    <div class="card">
-      <div class="card-hdr">
-        <span class="card-title">🏆 Best Shot</span>
-      </div>
-      <div class="card-body" style="padding:0.8rem">
-        <div id="bestPhotoWrap"><div class="no-data">No photos yet.</div></div>
-      </div>
-    </div>
-
-  </div>
-
 </div>
 
 <!-- EMOJI PICKER -->
@@ -495,7 +576,7 @@
     if(el) el.textContent='Hi, '+(currentUser?.user_metadata?.display_name||currentUser?.email?.split('@')[0]||'');
   }
   function closeMobileMenu(){document.getElementById('mobileMenu').classList.remove('open');document.body.style.overflow='';}
-  document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeMobileMenu();closeEmojiPicker();}});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeMobileMenu();closeEmojiPicker();closePhotoModal();}});
 
   async function loadProfileData(userId){
     const {data,error}=await sb.from('analyses').select('*').eq('user_id',userId).order('created_at',{ascending:false});
@@ -709,6 +790,131 @@
     showToast('Avatar updated! ✓');
   }
   function closeEmojiPicker(){document.getElementById('emojiPicker').classList.remove('open');}
+
+  // ── PROFILE TABS ──
+  let allPhotos = [];
+  let currentFilter = 'all';
+
+  function switchProfileTab(tab) {
+    document.querySelectorAll('.profile-tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.profile-tab-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+    document.getElementById('panel-' + tab).classList.add('active');
+    if (tab === 'photos' && !allPhotos.length) loadMyPhotos();
+  }
+
+  async function loadMyPhotos() {
+    const grid = document.getElementById('photosGrid');
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--text-light)">Loading…</div>';
+    try {
+      const { data } = await sb.from('analyses')
+        .select('id,overall,subject_focus,color_contrast,composition,lighting,background_blur,framing,theme_relevance,summary,thumbnail,image_url,created_at,source,theme_name')
+        .eq('user_id', currentUser.id)
+        .order('created_at', { ascending: false });
+      allPhotos = data || [];
+      renderPhotosGrid();
+    } catch(e) {
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--text-light)">Could not load photos.</div>';
+    }
+  }
+
+  function setPhotoFilter(filter) {
+    currentFilter = filter;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('filter-' + filter).classList.add('active');
+    renderPhotosGrid();
+  }
+
+  function renderPhotosGrid() {
+    const grid = document.getElementById('photosGrid');
+    const filtered = currentFilter === 'all'
+      ? allPhotos
+      : allPhotos.filter(p => p.source === currentFilter);
+
+    if (!filtered.length) {
+      const msg = currentFilter === 'all'
+        ? 'No photos yet. Post to the feed or complete a chapter!'
+        : 'No ' + currentFilter + ' photos yet.';
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem 2rem">' +
+        '<span style="font-size:2.5rem;display:block;margin-bottom:0.8rem;opacity:0.3">📷</span>' +
+        '<div style="color:var(--text-light);font-size:0.88rem">' + msg + '</div></div>';
+      return;
+    }
+
+    const CAT_COLORS = {
+      subject_focus:'#00B4D8', color_contrast:'#FF6B6B', composition:'#1A936F',
+      lighting:'#FFD166', background_blur:'#7C3AED', framing:'#F97316', theme_relevance:'#00B4D8'
+    };
+
+    grid.innerHTML = filtered.map(p => {
+      const src = p.thumbnail
+        ? 'data:image/jpeg;base64,' + p.thumbnail
+        : (p.image_url || null);
+      const score = p.overall || 0;
+      const color = score >= 8 ? 'var(--teal)' : score >= 6 ? 'var(--sky)' : 'var(--text-light)';
+      const date = new Date(p.created_at).toLocaleDateString('en-GB', {day:'numeric',month:'short'});
+      const sourceLabel = p.source === 'challenge' ? 'Challenge' : p.source === 'learn' ? 'Learn' : 'Feed';
+      const sourceClass = 'source-' + (p.source || 'feed');
+      const imgEl = src
+        ? '<img class="photo-tile-img" src="' + src + '" loading="lazy" alt=""/>'
+        : '<div class="photo-tile-ph">📷</div>';
+
+      return '<div class="photo-tile" onclick="openPhotoModal(\'' + p.id + '\')">' +
+        imgEl +
+        '<div class="photo-tile-source ' + sourceClass + '">' + sourceLabel + '</div>' +
+        '<div class="photo-tile-footer">' +
+          '<span class="photo-tile-score" style="color:' + color + '">' + score + '/10</span>' +
+          '<span class="photo-tile-date">' + date + '</span>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function openPhotoModal(id) {
+    const p = allPhotos.find(x => x.id === id);
+    if (!p) return;
+
+    const src = p.thumbnail ? 'data:image/jpeg;base64,' + p.thumbnail : (p.image_url || null);
+    const imgEl = document.getElementById('photoModalImg');
+    if (src) { imgEl.src = src; imgEl.style.display = 'block'; }
+    else { imgEl.style.display = 'none'; }
+
+    const score = p.overall || 0;
+    const scoreEl = document.getElementById('photoModalScore');
+    scoreEl.textContent = score;
+    scoreEl.style.color = score >= 8 ? 'var(--teal)' : score >= 6 ? 'var(--sky)' : 'var(--text-light)';
+
+    const date = new Date(p.created_at).toLocaleDateString('en-GB', {day:'numeric',month:'long',year:'numeric'});
+    const sourceLabel = p.source === 'challenge' ? '⚔️ Challenge' + (p.theme_name ? ' · ' + p.theme_name : '') : p.source === 'learn' ? '📚 Learn' : '🖼️ Feed';
+    document.getElementById('photoModalTitle').textContent = sourceLabel;
+    document.getElementById('photoModalMeta').textContent = date;
+
+    const sumEl = document.getElementById('photoModalSummary');
+    if (p.summary) { sumEl.textContent = p.summary; sumEl.style.display = 'block'; }
+    else { sumEl.style.display = 'none'; }
+
+    const CAT_KEYS = ['subject_focus','color_contrast','composition','lighting','background_blur','framing'];
+    const CAT_LABELS = {subject_focus:'Subject',color_contrast:'Color',composition:'Composition',lighting:'Lighting',background_blur:'BG Blur',framing:'Framing',theme_relevance:'Theme'};
+    const CAT_COLORS = {subject_focus:'#00B4D8',color_contrast:'#FF6B6B',composition:'#1A936F',lighting:'#FFD166',background_blur:'#7C3AED',framing:'#F97316',theme_relevance:'#00B4D8'};
+    if (p.theme_relevance) CAT_KEYS.push('theme_relevance');
+
+    document.getElementById('photoModalBars').innerHTML = CAT_KEYS.map(k => {
+      const v = p[k] || 0;
+      return '<div class="pm-bar-row">' +
+        '<div class="pm-bar-lbl">' + (CAT_LABELS[k]||k) + '</div>' +
+        '<div class="pm-bar-track"><div class="pm-bar-fill" style="background:' + CAT_COLORS[k] + ';width:' + (v*10) + '%"></div></div>' +
+        '<div class="pm-bar-val" style="color:' + CAT_COLORS[k] + '">' + v + '</div>' +
+      '</div>';
+    }).join('');
+
+    document.getElementById('photoModalOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closePhotoModal() {
+    document.getElementById('photoModalOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
 
   async function init(){
     try {
