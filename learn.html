@@ -98,7 +98,7 @@
     .hud-prog-label { font-size: 0.72rem; font-weight: 700; color: var(--text-mid); white-space: nowrap; }
 
     /* ── CATALOGUE ── */
-    .catalogue { max-width: 1100px; margin: 0 auto; padding: 2rem 2rem 5rem; }
+    .catalogue { max-width: 780px; margin: 0 auto; padding: 2rem 2rem 5rem; }
     .module-section { margin-bottom: 2.5rem; }
     .module-header {
       display: flex; align-items: center; gap: 0.8rem;
@@ -110,61 +110,112 @@
     .module-title { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1rem; color: var(--text); }
     .module-progress-text { font-size: 0.75rem; color: var(--text-light); margin-left: auto; font-weight: 600; }
 
-    /* Chapter grid */
-    .chapter-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.75rem; }
+    /* Chapter list — horizontal cards */
+    .chapter-grid { display: flex; flex-direction: column; gap: 0.65rem; }
 
-    /* Chapter card — the game level tile */
     .chapter-card {
       background: var(--surface);
-      border: 2px solid var(--border);
+      border: 1.5px solid var(--border);
       border-radius: var(--radius-md);
-      padding: 1.1rem;
       cursor: pointer;
       transition: all 0.2s;
       position: relative; overflow: hidden;
-      display: flex; flex-direction: column; gap: 0.5rem;
+      display: flex; align-items: center; gap: 0; /* no gap — children handle spacing */
+      box-shadow: var(--shadow-sm);
     }
-    .chapter-card::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-      border-radius: var(--radius-md) var(--radius-md) 0 0;
-      background: var(--border-input); transition: background 0.3s;
-    }
-    .chapter-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); border-color: var(--sky-light); }
-    .chapter-card:hover::before { background: var(--sky-light); }
-    .chapter-card.done { border-color: rgba(26,147,111,0.3); background: linear-gradient(135deg, rgba(26,147,111,0.04) 0%, var(--surface) 60%); }
-    .chapter-card.done::before { background: var(--teal); }
+    .chapter-card:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); border-color: rgba(0,180,216,0.3); }
+    .chapter-card.done { border-color: rgba(26,147,111,0.25); }
+    .chapter-card.done:hover { border-color: rgba(26,147,111,0.5); }
     .chapter-card.in-progress { border-color: rgba(0,180,216,0.35); }
-    .chapter-card.in-progress::before { background: var(--sky); }
     .chapter-card.just-completed { animation: completedPop 0.6s ease both; }
-    @keyframes completedPop { 0%{transform:scale(1)} 40%{transform:scale(1.06)} 70%{transform:scale(0.97)} 100%{transform:scale(1)} }
+    @keyframes completedPop { 0%{transform:scale(1)} 40%{transform:scale(1.02)} 70%{transform:scale(0.99)} 100%{transform:scale(1)} }
 
-    .ch-number {
-      font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 0.65rem;
-      letter-spacing: 0.08em; color: var(--text-light); text-transform: uppercase;
+    /* Left accent stripe */
+    .ch-stripe {
+      width: 5px; align-self: stretch; flex-shrink: 0;
+      border-radius: var(--radius-md) 0 0 var(--radius-md);
+      transition: opacity 0.3s;
+    }
+    .chapter-card.locked .ch-stripe { opacity: 0.35; }
+
+    /* Illustration circle */
+    .ch-illus-wrap {
+      width: 60px; height: 60px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin: 0.85rem 0.85rem 0.85rem 1rem;
+      overflow: hidden; position: relative;
+    }
+    .ch-illus-wrap svg { width: 54px; height: 54px; }
+    .ch-illus-emoji {
+      font-size: 1.6rem; line-height: 1;
+    }
+    .chapter-card.locked .ch-illus-wrap { opacity: 0.4; filter: grayscale(1); }
+
+    /* Card text content */
+    .ch-content {
+      flex: 1; min-width: 0; padding: 0.85rem 0.5rem 0.85rem 0;
+    }
+    .ch-meta-row {
+      display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.2rem;
+    }
+    .ch-num-tag {
+      font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--text-light);
     }
     .ch-name {
       font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.95rem;
-      color: var(--text); line-height: 1.2;
+      color: var(--text); line-height: 1.25; margin-bottom: 0.25rem;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
-    .ch-desc { font-size: 0.72rem; color: var(--text-light); line-height: 1.5; flex: 1; }
-    .ch-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 0.2rem; }
+    .chapter-card.locked .ch-name { color: var(--text-light); }
+    .ch-desc {
+      font-size: 0.72rem; color: var(--text-light); line-height: 1.5;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .ch-progress-row {
+      display: flex; align-items: center; gap: 0.5rem; margin-top: 0.4rem;
+    }
     .ch-dots { display: flex; gap: 4px; align-items: center; }
-    .ch-dot { width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid var(--border-input); background: transparent; transition: all 0.3s; }
+    .ch-dot { width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid var(--border-input); background: transparent; transition: all 0.3s; }
     .ch-dot.done { background: var(--teal); border-color: var(--teal); }
     .ch-dot.active { background: var(--sky); border-color: var(--sky); box-shadow: 0 0 0 2px rgba(0,180,216,0.2); }
-    .ch-badge { font-size: 0.62rem; font-weight: 700; padding: 0.18rem 0.5rem; border-radius: 6px; }
+
+    /* Right section — badge + status */
+    .ch-right {
+      display: flex; flex-direction: column; align-items: flex-end;
+      gap: 0.4rem; padding: 0.85rem 1rem 0.85rem 0.5rem;
+      flex-shrink: 0; min-width: 68px;
+    }
+    .ch-badge { font-size: 0.65rem; font-weight: 700; padding: 0.22rem 0.55rem; border-radius: 100px; white-space: nowrap; }
     .badge-done { background: var(--teal-pale); color: var(--teal); }
     .badge-progress { background: var(--sky-pale); color: var(--sky-dark); }
     .badge-new { background: var(--surface2); color: var(--text-light); }
+    .badge-unlocked { background: var(--sky-pale); color: var(--sky-dark); border: 1.5px solid rgba(0,180,216,0.3); }
+    .badge-locked { background: var(--surface2); color: var(--text-light); font-size: 0.8rem; }
 
-    /* Done check overlay on card */
+    /* Done checkmark */
     .ch-done-check {
-      position: absolute; top: 0.6rem; right: 0.6rem;
       width: 22px; height: 22px; border-radius: 50%;
       background: var(--teal); color: #fff;
       font-size: 0.7rem; display: flex; align-items: center; justify-content: center;
-      font-weight: 900;
+      font-weight: 900; flex-shrink: 0;
     }
+
+    /* Lock state */
+    .chapter-card.locked { opacity: 0.6; cursor: not-allowed; }
+    .chapter-card.locked:hover { transform: none; box-shadow: var(--shadow-sm); border-color: var(--border); }
+
+    /* New chapter pulse */
+    .chapter-card.unlocked-new {
+      border-color: rgba(0,180,216,0.45);
+      box-shadow: 0 0 0 3px rgba(0,180,216,0.1), var(--shadow-md);
+      animation: newPulse 2.5s ease-in-out infinite;
+    }
+    @keyframes newPulse {
+      0%,100%{ box-shadow: 0 0 0 3px rgba(0,180,216,0.1), var(--shadow-md); }
+      50%    { box-shadow: 0 0 0 6px rgba(0,180,216,0.05), var(--shadow-md); }
+    }
+    .ch-lock-icon { position: absolute; top: 0.5rem; right: 0.5rem; font-size: 0.75rem; opacity: 0.4; }
 
     /* ── MODAL OVERLAY ── */
     .overlay {
@@ -575,10 +626,12 @@
     html.dark .hud-stat { background: var(--surface2) !important; border-color: var(--border-input) !important; }
     html.dark .hud-prog-bg { background: var(--surface2) !important; border-color: var(--border-input) !important; }
     html.dark .chapter-card { background: var(--surface) !important; border-color: var(--border-input) !important; }
-    html.dark .chapter-card.done { background: linear-gradient(135deg, rgba(26,147,111,0.18) 0%, var(--surface) 60%) !important; }
+    html.dark .chapter-card.done { background: var(--surface) !important; border-color: rgba(26,147,111,0.2) !important; }
     html.dark .chapter-card.locked { background: var(--surface2) !important; opacity: 0.35 !important; }
     html.dark .chapter-card.unlocked-new { border-color: rgba(0,180,216,0.4) !important; }
     html.dark .chapter-card:hover { background: var(--surface2) !important; }
+    html.dark .ch-name { color: var(--text) !important; }
+    html.dark .ch-illus-wrap { opacity: 0.9; }
     html.dark .module-section .module-header { border-bottom-color: rgba(0,180,216,0.15) !important; }
     html.dark .overlay { background: rgba(0,0,0,0.88) !important; }
     html.dark .modal { background: var(--surface) !important; border-color: rgba(0,180,216,0.15) !important; }
@@ -1842,35 +1895,57 @@ function renderCatalogue(){
       <div class="chapter-grid">`;
 
     chs.forEach(ch => {
-      const prog   = getChProg(ch.id);
-      const done3  = prog.count >= 3;
+      const prog    = getChProg(ch.id);
+      const done3   = prog.count >= 3;
       const started = prog.count > 0;
       const unlocked = isUnlocked(ch.id);
-      const isNew  = isNextToUnlock(ch.id) && !started;
+      const isNew   = isNextToUnlock(ch.id) && !started;
 
       let cardClass = done3 ? 'done' : started ? 'in-progress' : unlocked ? (isNew ? 'unlocked-new' : '') : 'locked';
+
       const dots = [0,1,2].map(i =>
         `<div class="ch-dot ${i < prog.count ? 'done' : (i === prog.count && !done3 ? 'active' : '')}"></div>`
       ).join('');
-      let badge;
-      if(done3)         badge = `<span class="ch-badge badge-done">✓ ${prog.avgScore}/10</span>`;
-      else if(started)  badge = `<span class="ch-badge badge-progress">${prog.count}/3</span>`;
-      else if(isNew)    badge = `<span class="ch-badge badge-unlocked">⚡ New</span>`;
-      else if(!unlocked) badge = `<span class="ch-badge badge-locked">🔒</span>`;
-      else              badge = `<span class="ch-badge badge-new">Start</span>`;
 
-      const doneCheck = done3 ? `<div class="ch-done-check">✓</div>` : '';
-      const lockIcon  = !unlocked ? `<div class="ch-lock-icon">🔒</div>` : '';
-      const prevName  = ch.id > 1 ? CHAPTERS.find(x=>x.id===ch.id-1)?.name : '';
+      let badge;
+      if(done3)          badge = `<span class="ch-badge badge-done">✓ ${prog.avgScore}/10</span>`;
+      else if(started)   badge = `<span class="ch-badge badge-progress">${prog.count}/3</span>`;
+      else if(isNew)     badge = `<span class="ch-badge badge-unlocked">⚡ New</span>`;
+      else if(!unlocked) badge = `<span class="ch-badge badge-locked">🔒</span>`;
+      else               badge = `<span class="ch-badge badge-new">Start</span>`;
+
+      const rightIcon = done3
+        ? `<div class="ch-done-check">✓</div>`
+        : `${badge}`;
+
+      const lockIcon = !unlocked ? `<div class="ch-lock-icon">🔒</div>` : '';
+      const prevName = ch.id > 1 ? CHAPTERS.find(x=>x.id===ch.id-1)?.name : '';
       const lockedTitle = !unlocked ? ` title="Complete '${prevName}' to unlock"` : '';
 
-      html += `<div class="chapter-card ${cardClass}" onclick="openChapter(${ch.id})" id="ch-card-${ch.id}"
-        style="--mod-color:${meta.color}"${lockedTitle}>
-        ${doneCheck}${lockIcon}
-        <div class="ch-number">Ch ${String(ch.id).padStart(2,'0')}</div>
-        <div class="ch-name">${esc(ch.name)}</div>
-        <div class="ch-desc">${esc(ch.lesson.slice(0,80))}…</div>
-        <div class="ch-footer"><div class="ch-dots">${dots}</div>${badge}</div>
+      // Get a small emoji icon for the module
+      const modEmojis = {'Composition':'🎯','Light':'💡','People & Storytelling':'👤','Urban & Environment':'🏙️','Technical':'⚙️','Creative':'🎨'};
+      const modEmoji = modEmojis[ch.module] || '📷';
+      const colorStr = meta.color.replace('var(', '').replace(')', '');
+
+      html += `<div class="chapter-card ${cardClass}" onclick="openChapter(${ch.id})" id="ch-card-${ch.id}"${lockedTitle}>
+        <div class="ch-stripe" style="background:${meta.color}"></div>
+        <div class="ch-illus-wrap" style="background:${meta.color}18">
+          <span class="ch-illus-emoji">${modEmoji}</span>
+        </div>
+        <div class="ch-content">
+          <div class="ch-meta-row">
+            <span class="ch-num-tag">Ch ${String(ch.id).padStart(2,'0')} · ${ch.module}</span>
+          </div>
+          <div class="ch-name">${esc(ch.name)}</div>
+          <div class="ch-desc">${esc(ch.lesson.slice(0,72))}…</div>
+          <div class="ch-progress-row">
+            <div class="ch-dots">${dots}</div>
+          </div>
+        </div>
+        <div class="ch-right">
+          ${rightIcon}
+        </div>
+        ${lockIcon}
       </div>`;
     });
     html += `</div></div>`;
