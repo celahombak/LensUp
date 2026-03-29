@@ -48,9 +48,22 @@ module.exports = async (req, res) => {
     ? `This week's theme is "${themeName}". Add a theme_relevance score (1-10) for how well the photo matches the theme.`
     : '';
 
-  const prompt = `Rate this photo. Not a real photo? Return: {"rejected":true,"reason":"x"}
-Real photo: {"rejected":false,"overall":N,"scores":{"subject_focus":N,"color_contrast":N,"composition":N,"lighting":N,"background_blur":N,"framing":N${themeName ? ',"theme_relevance":N' : ''}},"category_notes":{"subject_focus":"x","color_contrast":"x","composition":"x","lighting":"x","background_blur":"x","framing":"x"${themeName ? ',"theme_relevance":"x"' : ''}},"summary":"x","improvements":[{"title":"x","desc":"x"},{"title":"x","desc":"x"},{"title":"x","desc":"x"}],"technical":"x"}
-N=1-10. Keep all text under 10 words. ${themeLine}`;
+  const prompt = `Analyse this photo and return ONLY valid JSON, no markdown, no backticks.
+
+If not a real photograph: {"rejected":true,"reason":"brief reason"}
+
+If real photograph:
+{
+  "rejected": false,
+  "overall": N,
+  "scores": {"subject_focus":N,"color_contrast":N,"composition":N,"lighting":N,"background_blur":N,"framing":N${themeName ? ',"theme_relevance":N' : ''}},
+  "category_notes": {"subject_focus":"one phrase","color_contrast":"one phrase","composition":"one phrase","lighting":"one phrase","background_blur":"one phrase","framing":"one phrase"${themeName ? ',"theme_relevance":"one phrase"' : ''}},
+  "summary": "one sentence describing the overall photo",
+  "improvements": [{"title":"short title","desc":"one actionable sentence"},{"title":"short title","desc":"one actionable sentence"},{"title":"short title","desc":"one actionable sentence"}],
+  "technical": "one sentence on technical quality"
+}
+
+Rules: N=1-10. summary must be a plain sentence, not JSON. Each improvements desc must be a plain sentence. ${themeLine}`;
 
   try {
     // Retry up to 3 times on rate limit
@@ -65,7 +78,7 @@ N=1-10. Keep all text under 10 words. ${themeLine}`;
         },
         body: JSON.stringify({
           model: 'claude-haiku-4-5-20251001',
-          max_tokens: 500,
+          max_tokens: 600,
           messages: [{ role: 'user', content: [imageContent, { type: 'text', text: prompt }] }]
         })
       });
