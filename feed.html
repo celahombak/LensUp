@@ -616,6 +616,16 @@
     container.innerHTML = feedItems.map((item,i) => renderCard(item,i)).join('');
   }
 
+  function isBadSummary(s) {
+    if(!s) return true;
+    const t = s.trim();
+    // Looks like a JSON object or array — don't show it
+    if(t.startsWith('{') || t.startsWith('[')) return true;
+    // Contains raw JSON keys
+    if(t.includes('"title"') || t.includes('"desc"') || t.includes('"score"')) return true;
+    return false;
+  }
+
   function renderCard(item, i) {
     const init = (item.display_name||'A').charAt(0).toUpperCase();
     const src  = item.thumbnail ? 'data:image/jpeg;base64,'+item.thumbnail : (item.image_url||null);
@@ -638,7 +648,7 @@
       ${src
         ? `<div class="card-photo" onclick="openDetail('${esc(item.id)}')"><img src="${esc(src)}" loading="lazy" alt="" onerror="this.parentElement.innerHTML='<div class=\\'card-photo-empty\\'>📷</div>'"></div>`
         : `<div class="card-photo-empty">📷</div>`}
-      ${item.summary ? `<div class="card-summary">${esc(item.summary)}</div>` : ''}
+      ${!isBadSummary(item.summary) ? `<div class="card-summary">${esc(item.summary)}</div>` : ''}
       ${catPills ? `<div class="card-cats">${catPills}</div>` : ''}
       <div class="card-actions">
         <button class="like-btn${liked?' liked':''}" id="lb-${esc(item.id)}" onclick="toggleLike('${esc(item.id)}')">
@@ -712,7 +722,7 @@
     document.getElementById('mTime').textContent = timeAgo(item.created_at);
     const scoreEl = document.getElementById('mScore');
     scoreEl.textContent = score; scoreEl.style.color = scoreColor(score);
-    document.getElementById('mSummary').textContent = item.summary||'';
+    document.getElementById('mSummary').textContent = !isBadSummary(item.summary) ? item.summary : '';
 
     document.getElementById('mBars').innerHTML = CATS.map(c => {
       const v = item[c.key]||0;
@@ -726,10 +736,15 @@
     const imps = parseImps(item.improvements);
     document.getElementById('mImps').innerHTML = imps.length
       ? `<div class="modal-section-label" style="margin-top:1rem">How to Improve</div>`
-        + imps.map((imp,i)=>`<div class="imp-item">
-            <div class="imp-num">${i+1}</div>
-            <div><div class="imp-title">${esc(imp.title||imp)}</div>${imp.desc?`<div class="imp-desc">${esc(imp.desc)}</div>`:''}</div>
-          </div>`).join('')
+        + imps.map((imp,i) => {
+            const title = typeof imp === 'object' ? (imp.title||'') : String(imp);
+            const desc  = typeof imp === 'object' ? (imp.desc||imp.description||'') : '';
+            if(!title || title.startsWith('{')) return '';
+            return `<div class="imp-item">
+              <div class="imp-num">${i+1}</div>
+              <div><div class="imp-title">${esc(title)}</div>${desc ? `<div class="imp-desc">${esc(desc)}</div>` : ''}</div>
+            </div>`;
+          }).join('')
       : '';
 
     document.getElementById('detailOverlay').classList.add('open');
