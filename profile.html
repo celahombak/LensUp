@@ -196,7 +196,7 @@
     .profile-tab-panel.active { display: block; }
 
     /* MY PHOTOS GRID */
-    .photos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.75rem; }
+    .photos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
     .photo-tile { background: var(--surface2); border-radius: var(--radius-sm); overflow: hidden; cursor: pointer; transition: all 0.2s; border: 1.5px solid var(--border); position: relative; }
     .photo-tile:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); border-color: var(--sky-light); }
     .photo-tile-img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }
@@ -504,7 +504,6 @@
       <button class="filter-btn active" id="filter-all" onclick="setPhotoFilter('all')">All</button>
       <button class="filter-btn" id="filter-feed" onclick="setPhotoFilter('feed')">🖼️ Feed</button>
       <button class="filter-btn" id="filter-challenge" onclick="setPhotoFilter('challenge')">⚔️ Challenge</button>
-      <button class="filter-btn" id="filter-learn" onclick="setPhotoFilter('learn')">📚 Learn</button>
     </div>
     <div class="photos-grid" id="photosGrid">
       <div class="no-data" style="grid-column:1/-1;padding:2rem;text-align:center">Loading your photos…</div>
@@ -810,11 +809,23 @@
     const grid = document.getElementById('photosGrid');
     grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--text-light)">Loading…</div>';
     try {
+      // Load photos (exclude learn — those are practice shots not portfolio)
       const { data } = await sb.from('analyses')
         .select('id,overall,subject_focus,color_contrast,composition,lighting,background_blur,framing,theme_relevance,summary,thumbnail,image_url,created_at,source,theme_name')
         .eq('user_id', currentUser.id)
+        .neq('source', 'learn')
         .order('created_at', { ascending: false });
       allPhotos = data || [];
+
+      // Load like counts for all photos
+      if(allPhotos.length) {
+        const ids = allPhotos.map(p => p.id);
+        const { data: likesData } = await sb.from('likes').select('analysis_id').in('analysis_id', ids);
+        const likeCounts = {};
+        (likesData || []).forEach(r => { likeCounts[r.analysis_id] = (likeCounts[r.analysis_id]||0)+1; });
+        allPhotos = allPhotos.map(p => ({ ...p, likeCount: likeCounts[p.id] || 0 }));
+      }
+
       renderPhotosGrid();
     } catch(e) {
       grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--text-light)">Could not load photos.</div>';
@@ -856,8 +867,9 @@
       const score = p.overall || 0;
       const color = score >= 8 ? 'var(--teal)' : score >= 6 ? 'var(--sky)' : 'var(--text-light)';
       const date = new Date(p.created_at).toLocaleDateString('en-GB', {day:'numeric',month:'short'});
-      const sourceLabel = p.source === 'challenge' ? 'Challenge' : p.source === 'learn' ? 'Learn' : 'Feed';
+      const sourceLabel = p.source === 'challenge' ? 'Challenge' : 'Feed';
       const sourceClass = 'source-' + (p.source || 'feed');
+      const likes = p.likeCount || 0;
       const imgEl = src
         ? '<img class="photo-tile-img" src="' + src + '" loading="lazy" alt=""/>'
         : '<div class="photo-tile-ph">📷</div>';
@@ -867,7 +879,7 @@
         '<div class="photo-tile-source ' + sourceClass + '">' + sourceLabel + '</div>' +
         '<div class="photo-tile-footer">' +
           '<span class="photo-tile-score" style="color:' + color + '">' + score + '/10</span>' +
-          '<span class="photo-tile-date">' + date + '</span>' +
+          '<span class="photo-tile-likes" style="font-size:0.68rem;color:var(--text-light)">' + (likes > 0 ? '❤️ ' + likes : date) + '</span>' +
         '</div>' +
       '</div>';
     }).join('');
