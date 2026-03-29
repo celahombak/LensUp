@@ -510,17 +510,24 @@
   }
   function parseImps(raw) {
     if(!raw) return [];
-    if(typeof raw==='string'){
-      // Strip markdown code fences if present
+    // Keep parsing until we get a non-string
+    let attempts = 0;
+    while(typeof raw === 'string' && attempts < 3) {
       raw = raw.replace(/```json|```/g,'').trim();
-      try{ raw=JSON.parse(raw); }catch{ return []; }
+      try{ raw = JSON.parse(raw); }catch{ return []; }
+      attempts++;
     }
+    // Single object — wrap in array
+    if(raw && typeof raw === 'object' && !Array.isArray(raw)) raw = [raw];
     if(!Array.isArray(raw)) return [];
     return raw.map(i => {
       if(typeof i === 'string') return {title: i, desc: ''};
-      if(typeof i === 'object' && i !== null) return {title: i.title||i.name||String(i), desc: i.desc||i.description||''};
-      return {title: String(i), desc: ''};
-    }).filter(i => i.title && i.title.length > 0);
+      if(typeof i === 'object' && i !== null) return {
+        title: i.title || i.name || '',
+        desc:  i.desc  || i.description || ''
+      };
+      return null;
+    }).filter(i => i && i.title && !i.title.startsWith('{'));
   }
 
   // ── NAV AUTH ──
@@ -736,15 +743,15 @@
     const imps = parseImps(item.improvements);
     document.getElementById('mImps').innerHTML = imps.length
       ? `<div class="modal-section-label" style="margin-top:1rem">How to Improve</div>`
-        + imps.map((imp,i) => {
-            const title = typeof imp === 'object' ? (imp.title||'') : String(imp);
-            const desc  = typeof imp === 'object' ? (imp.desc||imp.description||'') : '';
-            if(!title || title.startsWith('{')) return '';
-            return `<div class="imp-item">
+        + imps.map((imp, i) =>
+            `<div class="imp-item">
               <div class="imp-num">${i+1}</div>
-              <div><div class="imp-title">${esc(title)}</div>${desc ? `<div class="imp-desc">${esc(desc)}</div>` : ''}</div>
-            </div>`;
-          }).join('')
+              <div>
+                <div class="imp-title">${esc(imp.title)}</div>
+                ${imp.desc ? `<div class="imp-desc">${esc(imp.desc)}</div>` : ''}
+              </div>
+            </div>`
+          ).join('')
       : '';
 
     document.getElementById('detailOverlay').classList.add('open');
