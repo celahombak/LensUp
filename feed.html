@@ -75,7 +75,7 @@
     .card-score{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.4rem;flex-shrink:0;}
     .card-score span{font-size:0.7rem;color:var(--text-light);font-weight:600;}
     .card-photo{cursor:pointer;overflow:hidden;background:var(--surface2);max-height:360px;display:flex;align-items:center;justify-content:center;}
-    .card-photo img{width:100%;object-fit:cover;display:block;transition:transform 0.3s;}
+    .card-photo img{width:100%;object-fit:contain;display:block;transition:transform 0.3s;background:var(--surface2);}
     .card-photo:hover img{transform:scale(1.02);}
     .card-photo-empty{height:160px;display:flex;align-items:center;justify-content:center;font-size:2.5rem;color:var(--text-light);background:var(--surface2);}
     .card-summary{padding:0.8rem 1rem;font-size:0.82rem;line-height:1.7;color:var(--text-mid);}
@@ -510,24 +510,39 @@
   }
   function parseImps(raw) {
     if(!raw) return [];
-    // Keep parsing until we get a non-string
+    // Parse string — handle single and double encoded
     let attempts = 0;
     while(typeof raw === 'string' && attempts < 3) {
-      raw = raw.replace(/```json|```/g,'').trim();
-      try{ raw = JSON.parse(raw); }catch{ return []; }
+      const trimmed = raw.replace(/```json|```/g,'').trim();
+      // If it looks like JSON, parse it
+      if(trimmed.startsWith('[') || trimmed.startsWith('{')) {
+        try{ raw = JSON.parse(trimmed); break; }catch{ return []; }
+      } else {
+        // Plain string — treat as single improvement title
+        return [{title: trimmed, desc: ''}];
+      }
       attempts++;
     }
-    // Single object — wrap in array
-    if(raw && typeof raw === 'object' && !Array.isArray(raw)) raw = [raw];
+    // Single object not in array
+    if(raw && typeof raw === 'object' && !Array.isArray(raw)) {
+      raw = [raw];
+    }
     if(!Array.isArray(raw)) return [];
     return raw.map(i => {
-      if(typeof i === 'string') return {title: i, desc: ''};
-      if(typeof i === 'object' && i !== null) return {
-        title: i.title || i.name || '',
-        desc:  i.desc  || i.description || ''
-      };
+      if(!i) return null;
+      if(typeof i === 'string') {
+        // Skip if it looks like raw JSON
+        if(i.startsWith('{') || i.startsWith('[')) return null;
+        return {title: i, desc: ''};
+      }
+      if(typeof i === 'object') {
+        const title = i.title || i.name || i.text || '';
+        const desc  = i.desc  || i.description || i.suggestion || '';
+        if(!title || title.startsWith('{')) return null;
+        return {title, desc};
+      }
       return null;
-    }).filter(i => i && i.title && !i.title.startsWith('{'));
+    }).filter(Boolean);
   }
 
   // ── NAV AUTH ──
@@ -722,7 +737,7 @@
     const score = item.overall||0;
 
     document.getElementById('mPhoto').innerHTML = src
-      ? `<img src="${esc(src)}" style="width:100%;object-fit:cover;display:block;max-height:280px" alt="">`
+      ? `<img src="${esc(src)}" style="width:100%;object-fit:contain;display:block;max-height:360px;background:var(--surface2)" alt="">`
       : '';
     document.getElementById('mAv').textContent  = (item.display_name||'A').charAt(0).toUpperCase();
     document.getElementById('mName').textContent = item.display_name||'Photographer';
