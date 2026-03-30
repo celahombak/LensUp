@@ -784,7 +784,7 @@
       // Bars
       const catKeys = ['subject_focus','color_contrast','composition','lighting','background_blur','framing'];
       if(e.theme_relevance) catKeys.push('theme_relevance');
-      const TIPS = {"subject_focus": "Is the main subject sharp, clear and easy to identify?", "color_contrast": "Are colours balanced and vibrant with good tonal range?", "composition": "Is the frame arranged well — rule of thirds, balance, visual flow?", "lighting": "Is the light quality good — direction, softness, no blown highlights?", "background_blur": "Does this photo create an immediate emotional or visual response? Would a viewer stop scrolling?", "framing": "Does the crop serve the subject — no distracting edges, tight where needed?", "theme_relevance": "How well does this photo match the weekly challenge theme?"};
+      const TIPS = {"subject_focus": "Is the main subject sharp, clear and easy to identify?", "color_contrast": "Are colours balanced and vibrant with good tonal range?", "composition": "Is the frame arranged well - rule of thirds, balance and visual flow?", "lighting": "Is the light quality good - direction, softness, no blown highlights?", "background_blur": "Does this photo create an immediate emotional or visual response? Would a viewer stop scrolling?", "framing": "Does the crop serve the subject - no distracting edges, tight where needed?", "theme_relevance": "How well does this photo match the weekly challenge theme?"};
       document.getElementById('modalBars').innerHTML = catKeys.map(k => {
         const v = e[k] || 0;
         const tip = TIPS[k] || '';
@@ -804,12 +804,13 @@
       requestAnimationFrame(() => requestAnimationFrame(() => {
         document.querySelectorAll('.modal-bar-fill').forEach(el => { el.style.width = el.dataset.w; });
       }));
-    }
+    }}
 
     function openModal(id) {
       const e = allEntries.find(x => x.id === id);
       if(!e) return;
       populateModal(e);
+    }
 
     function closeModal(e) { if (e.target === document.getElementById('modalBg')) closeModalDirect(); }
     function closeModalDirect() { document.getElementById('modalBg').classList.remove('open'); document.body.style.overflow = ''; }
@@ -1109,18 +1110,17 @@
     }
 
 
-  // ── SCORE TOOLTIPS ──
-  function toggleTip(el) {
-    const wasActive = el.classList.contains('active');
-    // Close all open tooltips first
-    document.querySelectorAll('.tip-icon.active').forEach(t => t.classList.remove('active'));
-    if(!wasActive) el.classList.add('active');
-  }
-  document.addEventListener('click', function(e) {
-    if(!e.target.classList.contains('tip-icon')) {
+    // ── SCORE TOOLTIPS ──
+    function toggleTip(el) {
+      const wasActive = el.classList.contains('active');
       document.querySelectorAll('.tip-icon.active').forEach(t => t.classList.remove('active'));
+      if(!wasActive) el.classList.add('active');
     }
-  });
+    document.addEventListener('click', function(e) {
+      if(!e.target.classList.contains('tip-icon')) {
+        document.querySelectorAll('.tip-icon.active').forEach(t => t.classList.remove('active'));
+      }
+    });
 
     async function init() {
       try {
