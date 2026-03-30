@@ -48,6 +48,7 @@ module.exports = async (req, res) => {
     ? `This week's theme is "${themeName}". Add a theme_relevance score (1-10) for how well the photo matches the theme.`
     : '';
 
+  // background_blur column is now used for "Impact" scoring
   const prompt = `Analyse this photo and return ONLY valid JSON, no markdown, no backticks.
 
 If not a real photograph: {"rejected":true,"reason":"brief reason"}
@@ -63,7 +64,8 @@ If real photograph:
   "technical": "one sentence on technical quality"
 }
 
-Rules: N=1-10. summary must be a plain sentence, not JSON. Each improvements desc must be a plain sentence. ${themeLine}`;
+Rules: N=1-10. summary must be a plain sentence, not JSON. Each improvements desc must be a plain sentence.
+For background_blur score: rate IMPACT (1-10) — does this photo create an immediate emotional or visual response? Would a viewer stop scrolling? Consider: strength of subject, mood, uniqueness of moment, overall memorability. NOT background blur. ${themeLine}`;
 
   try {
     // Retry up to 3 times on rate limit
