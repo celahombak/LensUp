@@ -805,11 +805,13 @@
         document.querySelectorAll('.modal-bar-fill').forEach(el => { el.style.width = el.dataset.w; });
       }));
     }
+    }
 
     function openModal(id) {
       const e = allEntries.find(x => x.id === id);
       if(!e) return;
       populateModal(e);
+    }
 
     function closeModal(e) { if (e.target === document.getElementById('modalBg')) closeModalDirect(); }
     function closeModalDirect() { document.getElementById('modalBg').classList.remove('open'); document.body.style.overflow = ''; }
@@ -1109,18 +1111,17 @@
     }
 
 
-  // ── SCORE TOOLTIPS ──
-  function toggleTip(el) {
-    const wasActive = el.classList.contains('active');
-    // Close all open tooltips first
-    document.querySelectorAll('.tip-icon.active').forEach(t => t.classList.remove('active'));
-    if(!wasActive) el.classList.add('active');
-  }
-  document.addEventListener('click', function(e) {
-    if(!e.target.classList.contains('tip-icon')) {
+    // ── SCORE TOOLTIPS ──
+    function toggleTip(el) {
+      const wasActive = el.classList.contains('active');
       document.querySelectorAll('.tip-icon.active').forEach(t => t.classList.remove('active'));
+      if(!wasActive) el.classList.add('active');
     }
-  });
+    document.addEventListener('click', function(e) {
+      if(!e.target.classList.contains('tip-icon')) {
+        document.querySelectorAll('.tip-icon.active').forEach(t => t.classList.remove('active'));
+      }
+    });
 
     async function init() {
       try {
