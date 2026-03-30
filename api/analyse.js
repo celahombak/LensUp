@@ -53,19 +53,11 @@ module.exports = async (req, res) => {
 
 If not a real photograph: {"rejected":true,"reason":"brief reason"}
 
-If real photograph:
-{
-  "rejected": false,
-  "overall": N,
-  "scores": {"subject_focus":N,"color_contrast":N,"composition":N,"lighting":N,"background_blur":N,"framing":N${themeName ? ',"theme_relevance":N' : ''}},
-  "category_notes": {"subject_focus":"one phrase","color_contrast":"one phrase","composition":"one phrase","lighting":"one phrase","background_blur":"one phrase","framing":"one phrase"${themeName ? ',"theme_relevance":"one phrase"' : ''}},
-  "summary": "one sentence describing the overall photo",
-  "improvements": [{"title":"short title","desc":"one actionable sentence"},{"title":"short title","desc":"one actionable sentence"},{"title":"short title","desc":"one actionable sentence"}],
-  "technical": "one sentence on technical quality"
-}
+If real photograph, return this exact structure:
+{"rejected":false,"overall":N,"scores":{"subject_focus":N,"color_contrast":N,"composition":N,"lighting":N,"background_blur":N,"framing":N${themeName ? ',"theme_relevance":N' : ''}},"category_notes":{"subject_focus":"phrase","color_contrast":"phrase","composition":"phrase","lighting":"phrase","background_blur":"phrase","framing":"phrase"${themeName ? ',"theme_relevance":"phrase"' : ''}},"summary":"one sentence","improvements":[{"title":"title1","desc":"sentence1"},{"title":"title2","desc":"sentence2"},{"title":"title3","desc":"sentence3"}],"technical":"one sentence"}
 
-Rules: N=1-10. summary must be a plain sentence, not JSON. Each improvements desc must be a plain sentence.
-For background_blur score: rate IMPACT (1-10) — does this photo create an immediate emotional or visual response? Would a viewer stop scrolling? Consider: strength of subject, mood, uniqueness of moment, overall memorability. NOT background blur. ${themeLine}`;
+CRITICAL: improvements must be an array of 3 plain objects. Each object has exactly two string keys: "title" and "desc". Do NOT wrap the objects in quotes. Do NOT escape the objects.
+N=1-10. For background_blur: rate IMPACT — does this photo stop a viewer scrolling? Consider subject strength, mood, memorability. ${themeLine}`;
 
   try {
     // Retry up to 3 times on rate limit
