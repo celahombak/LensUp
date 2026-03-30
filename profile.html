@@ -532,6 +532,7 @@
       <button class="filter-btn active" id="filter-all" onclick="setPhotoFilter('all')">All</button>
       <button class="filter-btn" id="filter-feed" onclick="setPhotoFilter('feed')">🖼️ Feed</button>
       <button class="filter-btn" id="filter-challenge" onclick="setPhotoFilter('challenge')">⚔️ Challenge</button>
+      <button class="filter-btn" id="filter-learn" onclick="setPhotoFilter('learn')">📚 Learn</button>
     </div>
     <div class="photos-grid" id="photosGrid">
       <div class="no-data" style="grid-column:1/-1;padding:2rem;text-align:center">Loading your photos…</div>
@@ -842,25 +843,66 @@
     const grid = document.getElementById('photosGrid');
     grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--text-light)">Loading…</div>';
     try {
-      // Load photos (exclude learn — those are practice shots not portfolio)
-      const { data } = await sb.from('analyses')
+      // Load feed + challenge photos
+      const { data: analysesData } = await sb.from('analyses')
         .select('id,overall,subject_focus,color_contrast,composition,lighting,background_blur,framing,theme_relevance,summary,thumbnail,image_url,created_at,source,theme_name')
         .eq('user_id', currentUser.id)
         .neq('source', 'learn')
         .order('created_at', { ascending: false });
-      allPhotos = data || [];
 
-      // Load like counts for all photos
-      if(allPhotos.length) {
-        const ids = allPhotos.map(p => p.id);
+      // Load chapter submissions (learn photos)
+      const { data: chapterData } = await sb.from('chapter_submissions')
+        .select('id,chapter_id,score,feedback,thumbnail,created_at')
+        .eq('user_id', currentUser.id)
+        .not('thumbnail', 'is', null)
+        .order('created_at', { ascending: false });
+
+      const CHAPTER_NAMES = {
+        'ch-1':'Rule of Thirds','ch-2':'Leading Lines','ch-3':'Framing',
+        'ch-4':'Symmetry & Patterns','ch-5':'Negative Space','ch-6':'Foreground Interest',
+        'ch-7':'The Golden Ratio','ch-8':'Golden Hour','ch-9':'Blue Hour',
+        'ch-10':'Window Light','ch-11':'Shadows as Subject','ch-12':'Silhouettes',
+        'ch-13':'Colour Temperature','ch-14':'Portrait Basics','ch-15':'Candid Photography',
+        'ch-16':'Environmental Portraits','ch-17':'Storytelling in One Frame',
+        'ch-18':'Architecture','ch-19':'Urban Geometry','ch-20':'Landscapes',
+        'ch-21':'Macro & Close-Up','ch-22':'Reflections','ch-23':'Exposure Triangle',
+        'ch-24':'Depth of Field','ch-25':'Freezing Motion','ch-26':'Motion Blur',
+        'ch-27':'Low Light Photography','ch-28':'Black & White','ch-29':'Colour as Subject',
+        'ch-30':'Abstracts','ch-31':'Street Photography','ch-32':'Food Photography',
+        'ch-33':'Nature & Details','ch-34':'Night Photography','ch-35':'Mobile Photography',
+        'ch-36':'Your Signature Style'
+      };
+
+      // Normalise chapter submissions to same shape as analyses
+      const learnPhotos = (chapterData || []).map(r => ({
+        id: r.id,
+        overall: r.score,
+        thumbnail: r.thumbnail,
+        created_at: r.created_at,
+        source: 'learn',
+        summary: r.feedback || '',
+        theme_name: CHAPTER_NAMES[r.chapter_id] || r.chapter_id,
+        likeCount: 0
+      }));
+
+      let allFeedChallenge = analysesData || [];
+
+      // Load like counts for feed/challenge photos
+      if(allFeedChallenge.length) {
+        const ids = allFeedChallenge.map(p => p.id);
         const { data: likesData } = await sb.from('likes').select('analysis_id').in('analysis_id', ids);
         const likeCounts = {};
         (likesData || []).forEach(r => { likeCounts[r.analysis_id] = (likeCounts[r.analysis_id]||0)+1; });
-        allPhotos = allPhotos.map(p => ({ ...p, likeCount: likeCounts[p.id] || 0 }));
+        allFeedChallenge = allFeedChallenge.map(p => ({ ...p, likeCount: likeCounts[p.id] || 0 }));
       }
+
+      // Merge and sort by date
+      allPhotos = [...allFeedChallenge, ...learnPhotos]
+        .sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
 
       renderPhotosGrid();
     } catch(e) {
+      console.warn('loadMyPhotos error', e);
       grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--text-light)">Could not load photos.</div>';
     }
   }

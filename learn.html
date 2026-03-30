@@ -217,7 +217,52 @@
     }
     .ch-lock-icon { position: absolute; top: 0.5rem; right: 0.5rem; font-size: 0.75rem; opacity: 0.4; }
 
-    /* ── MODAL OVERLAY ── */
+    /* Chapter photo strip — shows submitted photos on completed cards */
+    .ch-photos { display: flex; gap: 3px; margin-top: 0.5rem; }
+    .ch-photo-thumb {
+      width: 38px; height: 38px; border-radius: 5px;
+      object-fit: cover; display: block;
+      border: 1.5px solid var(--border);
+      cursor: pointer; transition: all 0.2s;
+      flex-shrink: 0;
+    }
+    .ch-photo-thumb:hover { transform: scale(1.08); border-color: var(--sky); box-shadow: var(--shadow-sm); }
+    .ch-photo-ph {
+      width: 38px; height: 38px; border-radius: 5px;
+      background: var(--surface2); border: 1.5px dashed var(--border-input);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem; color: var(--text-light); flex-shrink: 0;
+    }
+
+    /* Chapter photo lightbox */
+    .ch-lightbox {
+      display: none; position: fixed; inset: 0;
+      background: rgba(15,30,45,0.92); z-index: 600;
+      align-items: center; justify-content: center;
+      backdrop-filter: blur(8px);
+    }
+    .ch-lightbox.open { display: flex; }
+    .ch-lightbox-inner {
+      background: var(--surface); border-radius: var(--radius-lg);
+      max-width: 480px; width: 100%; overflow: hidden;
+      box-shadow: var(--shadow-lg); margin: 1rem;
+    }
+    .ch-lightbox-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.9rem 1.2rem; border-bottom: 1px solid var(--border);
+    }
+    .ch-lightbox-title { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.95rem; color: var(--text); }
+    .ch-lightbox-close { background: none; border: none; font-size: 1.3rem; color: var(--text-light); cursor: pointer; padding: 0.3rem; border-radius: var(--radius-sm); transition: all 0.2s; }
+    .ch-lightbox-close:hover { background: var(--surface2); color: var(--text); }
+    .ch-lightbox-img { width: 100%; max-height: 400px; object-fit: contain; display: block; background: var(--surface2); }
+    .ch-lightbox-footer { padding: 0.8rem 1.2rem; display: flex; align-items: center; justify-content: space-between; }
+    .ch-lightbox-score { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.4rem; color: var(--teal); }
+    .ch-lightbox-feedback { font-size: 0.78rem; color: var(--text-mid); line-height: 1.6; flex: 1; margin-left: 1rem; }
+    .ch-lightbox-nav { display: flex; gap: 0.5rem; }
+    .ch-lightbox-nav button { background: var(--surface2); border: 1.5px solid var(--border-input); color: var(--text-mid); width: 30px; height: 30px; border-radius: var(--radius-sm); cursor: pointer; font-size: 0.9rem; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+    .ch-lightbox-nav button:hover { border-color: var(--sky); color: var(--sky); }
+    html.dark .ch-lightbox-inner { background: var(--surface) !important; }
+    html.dark .ch-lightbox-header { border-bottom-color: rgba(0,180,216,0.15) !important; }
     .overlay {
       display: none; position: fixed; inset: 0;
       background: rgba(15,30,45,0.75); z-index: 300;
@@ -960,6 +1005,25 @@
   </div>
   <div style="margin-top:1rem">
     <button onclick="downloadCard()" style="background:none;border:none;color:var(--text-light);font-size:0.78rem;cursor:pointer;font-weight:600;">⬇ Download Badge</button>
+  </div>
+</div>
+
+<!-- CHAPTER PHOTO LIGHTBOX -->
+<div class="ch-lightbox" id="chLightbox" onclick="if(event.target===this)closeLightbox()">
+  <div class="ch-lightbox-inner">
+    <div class="ch-lightbox-header">
+      <span class="ch-lightbox-title" id="lbTitle">Chapter 1 · Photo 1</span>
+      <button class="ch-lightbox-close" onclick="closeLightbox()">✕</button>
+    </div>
+    <img class="ch-lightbox-img" id="lbImg" alt=""/>
+    <div class="ch-lightbox-footer">
+      <div class="ch-lightbox-score" id="lbScore"></div>
+      <div class="ch-lightbox-feedback" id="lbFeedback"></div>
+      <div class="ch-lightbox-nav">
+        <button onclick="lbNav(-1)">‹</button>
+        <button onclick="lbNav(1)">›</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1792,19 +1856,23 @@ function openMobileMenu(){
   if(el) el.textContent = 'Hi, '+(currentUser?.user_metadata?.display_name||currentUser?.email?.split('@')[0]||'');
 }
 function closeMobileMenu(){ document.getElementById('mobileMenu').classList.remove('open'); document.body.style.overflow=''; }
-document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal(); closeMobileMenu(); closeUnlock(); }});
+document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal(); closeMobileMenu(); closeUnlock(); closeLightbox(); }});
 
 // ═══════════════════════════════════════════
 // PROGRESS
 // ═══════════════════════════════════════════
 async function loadProgress(){
   try {
-    const { data } = await sb.from('chapter_submissions').select('chapter_id,score,passed').eq('user_id', currentUser.id);
+    const { data } = await sb.from('chapter_submissions')
+      .select('chapter_id,score,passed,thumbnail')
+      .eq('user_id', currentUser.id)
+      .order('created_at', { ascending: true });
     progress = {};
     (data||[]).forEach(r => {
-      if(!progress[r.chapter_id]) progress[r.chapter_id] = { count:0, scores:[] };
+      if(!progress[r.chapter_id]) progress[r.chapter_id] = { count:0, scores:[], thumbnails:[] };
       progress[r.chapter_id].count++;
       if(r.score) progress[r.chapter_id].scores.push(r.score);
+      if(r.thumbnail) progress[r.chapter_id].thumbnails.push(r.thumbnail);
     });
     Object.keys(progress).forEach(k => {
       const s = progress[k].scores;
@@ -1918,7 +1986,7 @@ function renderCatalogue(){
         ? `<div class="ch-done-check">✓</div>`
         : `${badge}`;
 
-      // const lockIcon = !unlocked ? `<div class="ch-lock-icon">🔒</div>` : '';
+      const lockIcon = !unlocked ? `<div class="ch-lock-icon">🔒</div>` : '';
       const prevName = ch.id > 1 ? CHAPTERS.find(x=>x.id===ch.id-1)?.name : '';
       const lockedTitle = !unlocked ? ` title="Complete '${prevName}' to unlock"` : '';
 
@@ -1926,6 +1994,23 @@ function renderCatalogue(){
       const modEmojis = {'Composition':'🎯','Light':'💡','People & Storytelling':'👤','Urban & Environment':'🏙️','Technical':'⚙️','Creative':'🎨'};
       const modEmoji = modEmojis[ch.module] || '📷';
       const colorStr = meta.color.replace('var(', '').replace(')', '');
+
+      // Photo thumbnails strip for completed/started chapters
+      let photosHtml = '';
+      if(done3 || started) {
+        const thumbs = prog.thumbnails || [];
+        const slots = [0,1,2].map(i => {
+          if(thumbs[i]) {
+            return `<img class="ch-photo-thumb" src="data:image/jpeg;base64,${thumbs[i]}"
+              onclick="event.stopPropagation();openLightbox('ch-${ch.id}',${i})"
+              title="Photo ${i+1}"/>`;
+          }
+          return i < prog.count
+            ? `<div class="ch-photo-ph">📷</div>` // submitted but no thumbnail yet
+            : `<div class="ch-photo-ph" style="opacity:0.3">${i+1}</div>`;
+        }).join('');
+        photosHtml = `<div class="ch-photos">${slots}</div>`;
+      }
 
       html += `<div class="chapter-card ${cardClass}" onclick="openChapter(${ch.id})" id="ch-card-${ch.id}"${lockedTitle}>
         <div class="ch-stripe" style="background:${meta.color}"></div>
@@ -1941,11 +2026,12 @@ function renderCatalogue(){
           <div class="ch-progress-row">
             <div class="ch-dots">${dots}</div>
           </div>
+          ${photosHtml}
         </div>
         <div class="ch-right">
           ${rightIcon}
         </div>
-        
+        ${lockIcon}
       </div>`;
     });
     html += `</div></div>`;
@@ -2114,6 +2200,9 @@ async function analysePhoto(){
   document.getElementById('dropZone').style.display = 'none';
 
   try {
+    // Generate thumbnail before sending
+    const thumb = await generateChapterThumb(previewUrl);
+
     const { data:{ session } } = await sb.auth.getSession();
     const token = session?.access_token;
     const resp = await fetch(window.location.origin+'/api/chapter', {
@@ -2123,7 +2212,8 @@ async function analysePhoto(){
         imageContent: { type:'image', source:{ type:'base64', media_type:uploadMime, data:uploadB64 } },
         chapterId: 'ch-'+activeChapter.id,
         chapterName: activeChapter.name,
-        chapterMission: activeChapter.mission
+        chapterMission: activeChapter.mission,
+        thumbnail: thumb
       })
     });
 
@@ -2149,9 +2239,14 @@ async function analysePhoto(){
     // API already saved to DB — update local progress cache from API response
     const totalNow = result.total_submitted || 1;
     const chKey = 'ch-' + activeChapter.id;
-    if (!progress[chKey]) progress[chKey] = { count: 0, scores: [], avgScore: 0 };
+    if (!progress[chKey]) progress[chKey] = { count: 0, scores: [], avgScore: 0, thumbnails: [] };
     progress[chKey].count = totalNow;
     progress[chKey].scores.push(score);
+    if (thumb) progress[chKey].thumbnails.push(thumb);
+    // Also sync thumbnails from API response if available
+    if (result.submissions) {
+      progress[chKey].thumbnails = result.submissions.map(s => s.thumbnail).filter(Boolean);
+    }
     const allScores = progress[chKey].scores;
     progress[chKey].avgScore = Math.round(allScores.reduce((a,b) => a+b, 0) / allScores.length);
     sessionCount++;
@@ -2188,6 +2283,26 @@ async function analysePhoto(){
     document.getElementById('dropZone').style.display = 'flex';
     document.getElementById('analyseBtn').disabled = false;
   }
+}
+
+async function generateChapterThumb(dataUrl) {
+  if(!dataUrl) return null;
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => {
+      const SIZE = 300;
+      const cv = document.createElement('canvas');
+      // Square crop from centre
+      const min = Math.min(img.width, img.height);
+      const sx = (img.width - min) / 2;
+      const sy = (img.height - min) / 2;
+      cv.width = SIZE; cv.height = SIZE;
+      cv.getContext('2d').drawImage(img, sx, sy, min, min, 0, 0, SIZE, SIZE);
+      resolve(cv.toDataURL('image/jpeg', 0.80).split(',')[1]);
+    };
+    img.onerror = () => resolve(null);
+    img.src = dataUrl;
+  });
 }
 
 function nextShot(){
@@ -2336,6 +2451,66 @@ function downloadCard(){
   a.download = 'lensup-ch' + ch.id + '-' + ch.name.toLowerCase().replace(/\s+/g,'-') + '.jpg';
   a.href = canvas.toDataURL('image/jpeg', 0.92);
   a.click();
+}
+
+// ═══════════════════════════════════════════
+// CHAPTER PHOTO LIGHTBOX
+// ═══════════════════════════════════════════
+let lbChapterId = null;
+let lbPhotoIdx  = 0;
+let lbSubmissions = []; // [{thumbnail, score, feedback}]
+
+async function openLightbox(chId, idx) {
+  lbChapterId = chId;
+  lbPhotoIdx  = idx;
+
+  // Load submissions with thumbnails + feedback from DB
+  try {
+    const { data } = await sb.from('chapter_submissions')
+      .select('thumbnail,score,feedback')
+      .eq('user_id', currentUser.id)
+      .eq('chapter_id', chId)
+      .order('created_at', { ascending: true });
+    lbSubmissions = data || [];
+  } catch(e) {
+    lbSubmissions = [];
+  }
+
+  renderLightbox();
+  document.getElementById('chLightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function renderLightbox() {
+  const ch  = CHAPTERS.find(c => 'ch-'+c.id === lbChapterId);
+  const sub = lbSubmissions[lbPhotoIdx];
+  if(!sub) return;
+
+  document.getElementById('lbTitle').textContent =
+    (ch ? ch.name : lbChapterId) + ' · Photo ' + (lbPhotoIdx+1) + ' of ' + lbSubmissions.length;
+
+  const img = document.getElementById('lbImg');
+  if(sub.thumbnail) {
+    img.src = 'data:image/jpeg;base64,' + sub.thumbnail;
+    img.style.display = 'block';
+  } else {
+    img.style.display = 'none';
+  }
+
+  const scoreEl = document.getElementById('lbScore');
+  scoreEl.textContent = sub.score ? sub.score + '/10' : '—';
+  scoreEl.style.color = sub.score >= 8 ? 'var(--teal)' : sub.score >= 6 ? 'var(--sky)' : 'var(--text-light)';
+  document.getElementById('lbFeedback').textContent = sub.feedback || '';
+}
+
+function lbNav(dir) {
+  lbPhotoIdx = Math.max(0, Math.min(lbSubmissions.length - 1, lbPhotoIdx + dir));
+  renderLightbox();
+}
+
+function closeLightbox() {
+  document.getElementById('chLightbox').classList.remove('open');
+  document.body.style.overflow = '';
 }
 
 function updateLearningStreak(){
