@@ -542,26 +542,31 @@
     let attempts = 0;
     while(typeof raw === 'string' && attempts < 3) {
       const trimmed = raw.replace(/```json|```/g,'').trim();
-      // If it looks like JSON, parse it
       if(trimmed.startsWith('[') || trimmed.startsWith('{')) {
         try{ raw = JSON.parse(trimmed); break; }catch{ return []; }
       } else {
-        // Plain string — treat as single improvement title
         return [{title: trimmed, desc: ''}];
       }
       attempts++;
     }
     // Single object not in array
-    if(raw && typeof raw === 'object' && !Array.isArray(raw)) {
-      raw = [raw];
-    }
+    if(raw && typeof raw === 'object' && !Array.isArray(raw)) raw = [raw];
     if(!Array.isArray(raw)) return [];
     return raw.map(i => {
       if(!i) return null;
+      // Item is a string — might be a JSON-encoded object like "{\"title\":\"...\"}"
       if(typeof i === 'string') {
-        // Skip if it looks like raw JSON
-        if(i.startsWith('{') || i.startsWith('[')) return null;
-        return {title: i, desc: ''};
+        const t = i.trim();
+        if(t.startsWith('{')) {
+          try {
+            const parsed = JSON.parse(t);
+            return {
+              title: parsed.title || parsed.name || '',
+              desc:  parsed.desc  || parsed.description || ''
+            };
+          } catch { return null; }
+        }
+        return {title: t, desc: ''};
       }
       if(typeof i === 'object') {
         const title = i.title || i.name || i.text || '';
@@ -774,7 +779,7 @@
     scoreEl.textContent = score; scoreEl.style.color = scoreColor(score);
     document.getElementById('mSummary').textContent = !isBadSummary(item.summary) ? item.summary : '';
 
-    const TIPS = {"subject_focus": "Is the main subject sharp, clear and easy to identify?", "color_contrast": "Are colours balanced and vibrant with good tonal range?", "composition": "Is the frame arranged well — rule of thirds, balance, visual flow?", "lighting": "Is the light quality good — direction, softness, no blown highlights?", "background_blur": "Does this photo create an immediate emotional or visual response? Would a viewer stop scrolling?", "framing": "Does the crop serve the subject — no distracting edges, tight where needed?", "theme_relevance": "How well does this photo match the weekly challenge theme?"};
+    const TIPS = {"subject_focus": "Is the main subject sharp, clear and easy to identify?", "color_contrast": "Are colours balanced and vibrant with good tonal range?", "composition": "Is the frame arranged well - rule of thirds, balance and visual flow?", "lighting": "Is the light quality good - direction, softness, no blown highlights?", "background_blur": "Does this photo create an immediate emotional or visual response? Would a viewer stop scrolling?", "framing": "Does the crop serve the subject - no distracting edges, tight where needed?", "theme_relevance": "How well does this photo match the weekly challenge theme?"};
     document.getElementById('mBars').innerHTML = CATS.map(c => {
       const v = item[c.key]||0;
       const tip = TIPS[c.key] || '';

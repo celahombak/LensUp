@@ -728,7 +728,7 @@
       const vals=data.map(r=>r[cat.key]).filter(v=>v!=null);
       avgs[cat.key]=vals.length?(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1):'—';
     });
-    const TIPS = {"subject_focus": "Is the main subject sharp, clear and easy to identify?", "color_contrast": "Are colours balanced and vibrant with good tonal range?", "composition": "Is the frame arranged well — rule of thirds, balance, visual flow?", "lighting": "Is the light quality good — direction, softness, no blown highlights?", "background_blur": "Does this photo create an immediate emotional or visual response? Would a viewer stop scrolling?", "framing": "Does the crop serve the subject — no distracting edges, tight where needed?", "theme_relevance": "How well does this photo match the weekly challenge theme?"};
+    const TIPS = {"subject_focus": "Is the main subject sharp, clear and easy to identify?", "color_contrast": "Are colours balanced and vibrant with good tonal range?", "composition": "Is the frame arranged well - rule of thirds, balance and visual flow?", "lighting": "Is the light quality good - direction, softness, no blown highlights?", "background_blur": "Does this photo create an immediate emotional or visual response? Would a viewer stop scrolling?", "framing": "Does the crop serve the subject - no distracting edges, tight where needed?", "theme_relevance": "How well does this photo match the weekly challenge theme?"};
     el.innerHTML=CATEGORIES.map(cat=>
       '<div class="breakdown-row">'+
         '<span class="breakdown-icon">'+cat.icon+'</span>'+
