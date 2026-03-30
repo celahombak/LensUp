@@ -109,7 +109,7 @@
     .breakdown-row{display:flex;align-items:center;gap:0.8rem;padding:0.5rem 0;border-bottom:1px solid var(--border);}
     .breakdown-row:last-child{border-bottom:none;}
     .breakdown-icon{font-size:1rem;width:22px;text-align:center;flex-shrink:0;}
-    .breakdown-label{font-size:0.8rem;font-weight:500;color:var(--text-mid);width:110px;flex-shrink:0;}
+    .breakdown-label-wrap{display:flex;align-items:center;gap:0.3rem;width:120px;flex-shrink:0;}.breakdown-label{font-size:0.8rem;font-weight:500;color:var(--text-mid);}
     .breakdown-bar-wrap{flex:1;height:7px;background:var(--surface2);border-radius:4px;overflow:hidden;}
     .breakdown-bar{height:100%;border-radius:4px;transition:width 0.8s ease;}
     .breakdown-val{font-family:'Nunito',sans-serif;font-weight:900;font-size:0.88rem;width:28px;text-align:right;flex-shrink:0;}
@@ -241,6 +241,34 @@
     html.dark .photo-modal-header { background: var(--surface) !important; }
     html.dark .photo-modal-score-row { background: rgba(0,180,216,0.08) !important; }
     html.dark .photo-modal-summary { background: var(--surface2) !important; }
+
+
+    /* ── SCORE TOOLTIPS ── */
+    .bar-lbl-wrap, .modal-bar-lbl-wrap {
+      display: flex; align-items: center; gap: 0.35rem; position: relative;
+    }
+    .tip-icon {
+      width: 14px; height: 14px; border-radius: 50%;
+      background: var(--border-input); color: var(--text-light);
+      font-size: 0.6rem; font-weight: 900; display: inline-flex;
+      align-items: center; justify-content: center; cursor: pointer;
+      flex-shrink: 0; transition: background 0.2s; line-height: 1;
+      font-style: normal; user-select: none;
+    }
+    .tip-icon:hover, .tip-icon.active { background: var(--sky); color: #fff; }
+    .tip-bubble {
+      display: none; position: absolute; bottom: calc(100% + 6px); left: 0;
+      background: var(--text); color: #fff;
+      font-size: 0.7rem; line-height: 1.5; font-weight: 400;
+      padding: 0.4rem 0.7rem; border-radius: var(--radius-sm);
+      white-space: normal; width: 180px; z-index: 100;
+      box-shadow: var(--shadow-md); pointer-events: none;
+    }
+    .tip-bubble::after {
+      content: ''; position: absolute; top: 100%; left: 12px;
+      border: 5px solid transparent; border-top-color: var(--text);
+    }
+    .tip-icon.active + .tip-bubble { display: block; }
 
     /* ── DARK MODE ── */
     html.dark {
@@ -551,7 +579,7 @@
     { key:'color_contrast',  label:'Color & Contrast', icon:'🎨', color:'var(--c2)' },
     { key:'composition',     label:'Composition',      icon:'📐', color:'var(--c3)' },
     { key:'lighting',        label:'Lighting',         icon:'💡', color:'var(--c4)' },
-    { key:'background_blur', label:'Background Blur',  icon:'✨', color:'var(--c5)' },
+    { key:'background_blur', label:'Impact',           icon:'⚡', color:'var(--c5)' },
     { key:'framing',         label:'Framing',          icon:'✂️', color:'var(--c6)' },
   ];
   const EMOJIS = ['📷','🌅','🏔️','🌊','🦋','🌸','🔥','⚡','🎯','🌿','🐦','🌙'];
@@ -699,10 +727,15 @@
       const vals=data.map(r=>r[cat.key]).filter(v=>v!=null);
       avgs[cat.key]=vals.length?(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1):'—';
     });
+    const TIPS = {"subject_focus": "Is the main subject sharp, clear and easy to identify?", "color_contrast": "Are colours balanced and vibrant with good tonal range?", "composition": "Is the frame arranged well — rule of thirds, balance, visual flow?", "lighting": "Is the light quality good — direction, softness, no blown highlights?", "background_blur": "Does this photo create an immediate emotional or visual response? Would a viewer stop scrolling?", "framing": "Does the crop serve the subject — no distracting edges, tight where needed?", "theme_relevance": "How well does this photo match the weekly challenge theme?"};
     el.innerHTML=CATEGORIES.map(cat=>
       '<div class="breakdown-row">'+
         '<span class="breakdown-icon">'+cat.icon+'</span>'+
-        '<div class="breakdown-label">'+cat.label+'</div>'+
+        '<div class="breakdown-label-wrap">'+
+          '<span class="breakdown-label">'+cat.label+'</span>'+
+          '<i class="tip-icon" onclick="toggleTip(this)">i</i>'+
+          '<div class="tip-bubble">'+(TIPS[cat.key]||'')+'</div>'+
+        '</div>'+
         '<div class="breakdown-bar-wrap"><div class="breakdown-bar" style="width:'+(avgs[cat.key]!=='—'?avgs[cat.key]*10:0)+'%;background:'+cat.color+'"></div></div>'+
         '<div class="breakdown-val" style="color:'+cat.color+'">'+avgs[cat.key]+'</div>'+
       '</div>'
@@ -909,7 +942,7 @@
     else { sumEl.style.display = 'none'; }
 
     const CAT_KEYS = ['subject_focus','color_contrast','composition','lighting','background_blur','framing'];
-    const CAT_LABELS = {subject_focus:'Subject',color_contrast:'Color',composition:'Composition',lighting:'Lighting',background_blur:'BG Blur',framing:'Framing',theme_relevance:'Theme'};
+    const CAT_LABELS = {subject_focus:'Subject',color_contrast:'Color',composition:'Composition',lighting:'Lighting',background_blur:'Impact',framing:'Framing',theme_relevance:'Theme'};
     const CAT_COLORS = {subject_focus:'#00B4D8',color_contrast:'#FF6B6B',composition:'#1A936F',lighting:'#FFD166',background_blur:'#7C3AED',framing:'#F97316',theme_relevance:'#00B4D8'};
     if (p.theme_relevance) CAT_KEYS.push('theme_relevance');
 
@@ -930,6 +963,20 @@
     document.getElementById('photoModalOverlay').classList.remove('open');
     document.body.style.overflow = '';
   }
+
+
+  // ── SCORE TOOLTIPS ──
+  function toggleTip(el) {
+    const wasActive = el.classList.contains('active');
+    // Close all open tooltips first
+    document.querySelectorAll('.tip-icon.active').forEach(t => t.classList.remove('active'));
+    if(!wasActive) el.classList.add('active');
+  }
+  document.addEventListener('click', function(e) {
+    if(!e.target.classList.contains('tip-icon')) {
+      document.querySelectorAll('.tip-icon.active').forEach(t => t.classList.remove('active'));
+    }
+  });
 
   async function init(){
     try {

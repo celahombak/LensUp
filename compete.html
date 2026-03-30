@@ -166,27 +166,29 @@
     /* ENTRY MODAL — view entries */
     .modal-bg{position:fixed;inset:0;background:rgba(15,30,45,0.75);z-index:300;display:flex;align-items:center;justify-content:center;padding:1.5rem;opacity:0;pointer-events:none;transition:opacity 0.2s;backdrop-filter:blur(4px);}
     .modal-bg.open{opacity:1;pointer-events:all;}
-    .modal{background:var(--surface);border-radius:var(--radius-lg);width:100%;max-width:760px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg);}
-    .modal-header{padding:1rem 1.4rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--surface);z-index:10;}
-    .modal-name{font-size:0.88rem;font-weight:700;color:var(--text);}
+    .modal{background:var(--surface);border-radius:var(--radius-lg);width:100%;max-width:540px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg);}
+    .modal-header{padding:1rem 1.2rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0.8rem;position:sticky;top:0;background:var(--surface);z-index:10;}
+    .modal-av{width:38px;height:38px;border-radius:50%;background:var(--sky-pale);color:var(--sky);font-family:'Nunito',sans-serif;font-weight:900;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .modal-name{font-size:0.88rem;font-weight:700;color:var(--text);flex:1;}
     .modal-close{background:none;border:none;color:var(--text-light);font-size:1.3rem;cursor:pointer;padding:0.3rem 0.5rem;border-radius:var(--radius-sm);transition:all 0.2s;}
     .modal-close:hover{background:var(--surface2);color:var(--text);}
-    .modal-body{display:grid;grid-template-columns:1fr 1fr;gap:0;}
-    .modal-photo{background:var(--surface2);aspect-ratio:1;display:flex;align-items:center;justify-content:center;}
-    .modal-photo-placeholder{font-size:3rem;color:var(--text-light);}
-    .modal-scores{padding:1.4rem;display:flex;flex-direction:column;gap:0.8rem;border-left:1px solid var(--border);}
-    .modal-overall{display:flex;align-items:baseline;gap:0.3rem;}
+    .modal-photo{overflow:hidden;background:var(--surface2);max-height:380px;display:flex;align-items:center;justify-content:center;}
+    .modal-photo img{width:100%;object-fit:cover;display:block;}
+    .modal-photo-placeholder{height:200px;width:100%;display:flex;align-items:center;justify-content:center;font-size:3rem;color:var(--text-light);}
+    .modal-body{padding:1.2rem;}
+    .modal-score-row{display:flex;align-items:center;gap:1rem;padding:1rem;background:var(--sky-pale);border-radius:var(--radius-sm);margin-bottom:1rem;}
     .modal-overall-num{font-family:'Nunito',sans-serif;font-weight:900;font-size:3.5rem;line-height:1;}
-    .modal-overall-denom{font-size:1rem;color:var(--text-light);}
+    .modal-overall-denom{font-size:0.9rem;color:var(--text-light);}
     .modal-verdict{font-size:0.88rem;font-weight:600;color:var(--text-mid);}
-    .modal-summary{font-size:0.82rem;line-height:1.7;color:var(--text-mid);background:var(--sky-pale);border-radius:var(--radius-sm);padding:0.7rem 0.9rem;border-left:3px solid var(--sky);}
+    .modal-summary{font-size:0.85rem;line-height:1.8;color:var(--text-mid);background:var(--surface2);border-radius:var(--radius-sm);padding:0.8rem;border-left:3px solid var(--sky);margin-bottom:1rem;}
+    .modal-section-label{font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--sky);margin-bottom:0.6rem;margin-top:1rem;}
     .modal-bars{display:flex;flex-direction:column;gap:0.5rem;}
     .modal-bar-row{display:flex;align-items:center;gap:0.6rem;}
-    .modal-bar-label{font-size:0.68rem;color:var(--text-mid);width:88px;flex-shrink:0;font-weight:500;}
+    .modal-bar-label{font-size:0.72rem;color:var(--text-mid);width:100px;flex-shrink:0;font-weight:500;}
     .modal-bar-track{flex:1;height:6px;background:var(--surface2);border-radius:3px;overflow:hidden;}
     .modal-bar-fill{height:100%;border-radius:3px;transition:width 0.7s ease;}
     .modal-bar-val{font-family:'Nunito',sans-serif;font-weight:800;font-size:0.78rem;width:18px;text-align:right;flex-shrink:0;}
-    .modal-date{font-size:0.7rem;color:var(--text-light);}
+    .modal-date{font-size:0.7rem;color:var(--text-light);margin-top:0.8rem;}
 
     /* SUBMIT MODAL */
     .s-overlay{display:none;position:fixed;inset:0;background:rgba(15,30,45,0.75);z-index:400;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(4px);}
@@ -227,8 +229,6 @@
       .hero-inner{grid-template-columns:1fr;gap:1rem;}
       .hero-right{align-items:flex-start;}
       .coming-grid{grid-template-columns:1fr;}
-      .modal-body{grid-template-columns:1fr;}
-      .modal-scores{border-left:none;border-top:1px solid var(--border);}
       .modal-bg{padding:0;align-items:flex-end;}
       .modal{border-radius:var(--radius-lg) var(--radius-lg) 0 0;max-height:92vh;}
       .s-overlay{padding:0;align-items:flex-end;}
@@ -256,6 +256,34 @@
       font-size: 0.72rem; color: var(--text-light);
     }
 
+
+
+    /* ── SCORE TOOLTIPS ── */
+    .bar-lbl-wrap, .modal-bar-lbl-wrap {
+      display: flex; align-items: center; gap: 0.35rem; position: relative;
+    }
+    .tip-icon {
+      width: 14px; height: 14px; border-radius: 50%;
+      background: var(--border-input); color: var(--text-light);
+      font-size: 0.6rem; font-weight: 900; display: inline-flex;
+      align-items: center; justify-content: center; cursor: pointer;
+      flex-shrink: 0; transition: background 0.2s; line-height: 1;
+      font-style: normal; user-select: none;
+    }
+    .tip-icon:hover, .tip-icon.active { background: var(--sky); color: #fff; }
+    .tip-bubble {
+      display: none; position: absolute; bottom: calc(100% + 6px); left: 0;
+      background: var(--text); color: #fff;
+      font-size: 0.7rem; line-height: 1.5; font-weight: 400;
+      padding: 0.4rem 0.7rem; border-radius: var(--radius-sm);
+      white-space: normal; width: 180px; z-index: 100;
+      box-shadow: var(--shadow-md); pointer-events: none;
+    }
+    .tip-bubble::after {
+      content: ''; position: absolute; top: 100%; left: 12px;
+      border: 5px solid transparent; border-top-color: var(--text);
+    }
+    .tip-icon.active + .tip-bubble { display: block; }
 
     /* ── DARK MODE ── */
     html.dark {
@@ -493,21 +521,25 @@
 <div class="modal-bg" id="modalBg" onclick="closeModal(event)">
   <div class="modal" id="modal">
     <div class="modal-header">
+      <div class="modal-av" id="modalAv">📷</div>
       <span class="modal-name" id="modalName"></span>
       <button class="modal-close" onclick="closeModalDirect()">✕</button>
     </div>
+    <div class="modal-photo" id="modalPhoto"></div>
     <div class="modal-body">
-      <div class="modal-photo" id="modalPhoto"></div>
-      <div class="modal-scores">
-        <div class="modal-overall">
+      <div class="modal-score-row">
+        <div>
           <span class="modal-overall-num" id="modalScore">—</span>
           <span class="modal-overall-denom">/10</span>
         </div>
-        <div class="modal-verdict" id="modalVerdict"></div>
-        <div class="modal-summary" id="modalSummary"></div>
-        <div class="modal-bars" id="modalBars"></div>
-        <div class="modal-date" id="modalDate"></div>
+        <div style="flex:1">
+          <div class="modal-verdict" id="modalVerdict"></div>
+          <div class="modal-date" id="modalDate"></div>
+        </div>
       </div>
+      <div class="modal-summary" id="modalSummary" style="display:none"></div>
+      <div class="modal-section-label">Category Breakdown</div>
+      <div class="modal-bars" id="modalBars"></div>
     </div>
   </div>
 </div>
@@ -554,13 +586,13 @@
     const CAT_COLORS = {
       subject_focus: '#60a5fa', color_contrast: '#f472b6',
       composition: '#34d399',   lighting: '#fbbf24',
-      background_blur: '#a78bfa', framing: '#fb923c',
+      background_blur: 'var(--c5)', framing: '#fb923c',
       theme_relevance: '#e8b84b'
     };
     const CAT_LABELS = {
       subject_focus: 'Subject Focus', color_contrast: 'Color & Contrast',
       composition: 'Composition',     lighting: 'Lighting',
-      background_blur: 'BG Blur',     framing: 'Framing',
+      background_blur: 'Impact',     framing: 'Framing',
       theme_relevance: 'Theme'
     };
 
@@ -714,50 +746,73 @@
       }).join('');
     }
 
-    function openModal(id) {
-      const e = allEntries.find(x => x.id === id);
-      if (!e) return;
+    function populateModal(e) {
       const isYou = currentUser && e.user_id === currentUser.id;
       const name  = e.display_name || 'Anonymous';
+      const date  = new Date(e.created_at).toLocaleDateString('en-GB', {day:'numeric', month:'long', year:'numeric'});
 
+      // Avatar initial
+      document.getElementById('modalAv').textContent = name.charAt(0).toUpperCase();
+
+      // Header: name + you badge
       document.getElementById('modalName').innerHTML =
-        `${name}${isYou ? ' <span style="font-size:0.65rem;color:var(--gold);background:rgba(232,184,75,0.1);padding:0.1rem 0.5rem;">YOU</span>' : ''} — ${new Date(e.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' })}`;
+        name + (isYou ? ' <span style="font-size:0.6rem;font-weight:700;background:var(--sky-pale);color:var(--sky);padding:0.1rem 0.4rem;border-radius:4px;margin-left:0.3rem">you</span>' : '');
 
+      // Photo
       document.getElementById('modalPhoto').innerHTML = e.thumbnail
-        ? `<img src="data:image/jpeg;base64,${e.thumbnail}" alt="${name}" style="width:100%;height:100%;object-fit:contain;display:block;"/>`
+        ? `<img src="data:image/jpeg;base64,${e.thumbnail}" alt="${name}"/>`
         : `<div class="modal-photo-placeholder">📷</div>`;
 
+      // Score
+      const score = e.overall || 0;
       const scoreEl = document.getElementById('modalScore');
-      scoreEl.textContent = e.overall;
-      scoreEl.style.color = e.overall >= 7 ? 'var(--gold)' : e.overall >= 5 ? '#60a5fa' : '#fb923c';
-      document.getElementById('modalVerdict').textContent = getVerdict(e.overall);
-      document.getElementById('modalSummary').textContent = e.summary || '';
+      scoreEl.textContent = score;
+      scoreEl.style.color = score >= 8 ? 'var(--teal)' : score >= 6 ? 'var(--sky)' : 'var(--text-light)';
 
+      document.getElementById('modalVerdict').textContent = getVerdict(score);
+      document.getElementById('modalDate').textContent = date;
+
+      // Summary
+      const sumEl = document.getElementById('modalSummary');
+      if(e.summary && !e.summary.startsWith('{')) {
+        sumEl.textContent = e.summary;
+        sumEl.style.display = 'block';
+      } else {
+        sumEl.style.display = 'none';
+      }
+
+      // Bars
       const catKeys = ['subject_focus','color_contrast','composition','lighting','background_blur','framing'];
-      if (e.theme_relevance) catKeys.push('theme_relevance');
-
+      if(e.theme_relevance) catKeys.push('theme_relevance');
+      const TIPS = {"subject_focus": "Is the main subject sharp, clear and easy to identify?", "color_contrast": "Are colours balanced and vibrant with good tonal range?", "composition": "Is the frame arranged well — rule of thirds, balance, visual flow?", "lighting": "Is the light quality good — direction, softness, no blown highlights?", "background_blur": "Does this photo create an immediate emotional or visual response? Would a viewer stop scrolling?", "framing": "Does the crop serve the subject — no distracting edges, tight where needed?", "theme_relevance": "How well does this photo match the weekly challenge theme?"};
       document.getElementById('modalBars').innerHTML = catKeys.map(k => {
-        const score = e[k] || 0;
-        const color = CAT_COLORS[k];
-        return `
-          <div class="modal-bar-row">
+        const v = e[k] || 0;
+        const tip = TIPS[k] || '';
+        return `<div class="modal-bar-row">
+          <div class="modal-bar-lbl-wrap">
             <div class="modal-bar-label">${CAT_LABELS[k]}</div>
-            <div class="modal-bar-track"><div class="modal-bar-fill" style="background:${color}" data-w="${score * 10}%"></div></div>
-            <div class="modal-bar-val" style="color:${color}">${score}</div>
-          </div>`;
+            <i class="tip-icon" onclick="toggleTip(this)">i</i>
+            <div class="tip-bubble">${tip}</div>
+          </div>
+          <div class="modal-bar-track"><div class="modal-bar-fill" style="background:${CAT_COLORS[k]}" data-w="${v*10}%"></div></div>
+          <div class="modal-bar-val" style="color:${CAT_COLORS[k]}">${v}</div>
+        </div>`;
       }).join('');
 
       document.getElementById('modalBg').classList.add('open');
-
+      document.body.style.overflow = 'hidden';
       requestAnimationFrame(() => requestAnimationFrame(() => {
-        document.querySelectorAll('.modal-bar-fill').forEach(el => {
-          el.style.width = el.dataset.w;
-        });
+        document.querySelectorAll('.modal-bar-fill').forEach(el => { el.style.width = el.dataset.w; });
       }));
     }
 
+    function openModal(id) {
+      const e = allEntries.find(x => x.id === id);
+      if(!e) return;
+      populateModal(e);
+
     function closeModal(e) { if (e.target === document.getElementById('modalBg')) closeModalDirect(); }
-    function closeModalDirect() { document.getElementById('modalBg').classList.remove('open'); }
+    function closeModalDirect() { document.getElementById('modalBg').classList.remove('open'); document.body.style.overflow = ''; }
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModalDirect(); });
 
     async function loadUpcoming() {
@@ -933,38 +988,7 @@
       });
       var e = entries[0];
       if (!e) return;
-
-      var isYou = currentUser && e.user_id === currentUser.id;
-      var name  = e.display_name || 'Anonymous';
-      document.getElementById('modalName').innerHTML =
-        name + (isYou ? ' <span style="font-size:0.65rem;color:var(--gold);background:rgba(232,184,75,0.1);padding:0.1rem 0.5rem;">YOU</span>' : '') +
-        ' &mdash; ' + new Date(e.created_at).toLocaleDateString('en-GB', {day:'numeric',month:'long',year:'numeric'});
-      document.getElementById('modalPhoto').innerHTML = e.thumbnail
-        ? '<img src="data:image/jpeg;base64,' + e.thumbnail + '" alt="' + name + '" style="width:100%;height:100%;object-fit:contain;display:block;"/>'
-        : '<div class="modal-photo-placeholder">📷</div>';
-      var scoreEl = document.getElementById('modalScore');
-      scoreEl.textContent = e.overall;
-      scoreEl.style.color = e.overall >= 7 ? 'var(--gold)' : e.overall >= 5 ? '#60a5fa' : '#fb923c';
-      document.getElementById('modalVerdict').textContent = getVerdict(e.overall);
-      document.getElementById('modalSummary').textContent = e.summary || '';
-      var catKeys = ['subject_focus','color_contrast','composition','lighting','background_blur','framing'];
-      if (e.theme_relevance) catKeys.push('theme_relevance');
-      document.getElementById('modalBars').innerHTML = catKeys.map(function(k) {
-        var score = e[k] || 0;
-        var color = CAT_COLORS[k];
-        return '<div class="modal-bar-row">' +
-          '<div class="modal-bar-label">' + CAT_LABELS[k] + '</div>' +
-          '<div class="modal-bar-track"><div class="modal-bar-fill" style="background:' + color + '" data-w="' + (score*10) + '%"></div></div>' +
-          '<div class="modal-bar-val" style="color:' + color + '">' + score + '</div>' +
-          '</div>';
-      }).join('');
-      document.getElementById('modalDate').textContent = '';
-      document.getElementById('modalBg').classList.add('open');
-      requestAnimationFrame(function() {
-        requestAnimationFrame(function() {
-          document.querySelectorAll('.modal-bar-fill').forEach(function(el) { el.style.width = el.dataset.w; });
-        });
-      });
+      populateModal(e);
     }
 
 
@@ -1083,6 +1107,20 @@
         document.getElementById('analyseBtn').style.display='block';
       }
     }
+
+
+  // ── SCORE TOOLTIPS ──
+  function toggleTip(el) {
+    const wasActive = el.classList.contains('active');
+    // Close all open tooltips first
+    document.querySelectorAll('.tip-icon.active').forEach(t => t.classList.remove('active'));
+    if(!wasActive) el.classList.add('active');
+  }
+  document.addEventListener('click', function(e) {
+    if(!e.target.classList.contains('tip-icon')) {
+      document.querySelectorAll('.tip-icon.active').forEach(t => t.classList.remove('active'));
+    }
+  });
 
     async function init() {
       try {
