@@ -14,7 +14,7 @@ module.exports = async (req, res) => {
   if (!CLAUDE_KEY)             return res.status(500).json({ error: 'API key not configured' });
   if (!SB_URL || !SB_ANON_KEY) return res.status(500).json({ error: 'Supabase env vars missing' });
 
-  const { imageContent, chapterId, chapterName, chapterMission } = req.body || {};
+  const { imageContent, chapterId, chapterName, chapterMission, thumbnail } = req.body || {};
   if (!imageContent)   return res.status(400).json({ error: 'No image provided' });
   if (!chapterId)      return res.status(400).json({ error: 'No chapter specified' });
   if (!chapterName)    return res.status(400).json({ error: 'No chapter name provided' });
@@ -48,20 +48,31 @@ module.exports = async (req, res) => {
   }
 
   // Dynamic prompt works for all 36 chapters
-  const prompt = `You are an expert photography coach evaluating a student photo.
+  const prompt = `You are an expert photography coach giving feedback to a student learning ${chapterName}.
 
-Chapter: "${chapterName}"
-Mission: "${chapterMission}"
+Chapter technique: "${chapterName}"
+Student mission: "${chapterMission}"
 
-Analyse this photo and return ONLY valid JSON, no markdown or backticks:
-{"rejected":false,"score":N,"feedback":"2-3 sentences on how well this executes the chapter technique","what_worked":"one sentence on the strongest aspect","improvement":"one sentence on the most important thing to improve"}
+Look carefully at this photo and return ONLY valid JSON, no markdown, no backticks, no preamble.
 
-Rules:
-- score: 1-10, based on how well the photo demonstrates the specific chapter technique
-- Be honest but encouraging — learning context
-- Focus entirely on the chapter technique, not general photography
-- If not a real photograph: return {"rejected":true,"reason":"brief reason"}
-- Keep all text fields under 20 words`;
+Required JSON format:
+{"rejected":false,"score":N,"feedback":"string","what_worked":"string","improvement":"string"}
+
+Scoring (score: 1-10):
+- 9-10: Technique executed masterfully and intentionally
+- 7-8: Technique clearly present, minor refinements possible
+- 5-6: Technique attempted, execution inconsistent or weak
+- 3-4: Technique barely visible, fundamental misunderstanding
+- 1-2: Technique absent entirely
+
+Feedback rules — THIS IS CRITICAL:
+- "feedback": 2 sentences. Sentence 1: describe SPECIFICALLY what you see in the photo relating to the technique (mention actual visual elements — where the subject sits, the direction of light, the actual lines visible, the actual colours present). Sentence 2: explain the direct effect this has on the viewer or the image.
+- "what_worked": 1 sentence. Name the single most successful specific element. Be concrete — not "good composition" but "the tree trunk enters from the bottom-left and pulls the eye directly to the subject at the upper-right intersection point".
+- "improvement": 1 sentence. Give ONE specific, actionable instruction the student can try on their NEXT shot. Start with a verb. Be precise — not "improve your lighting" but "position yourself so the light source is 45 degrees to your left, creating shadow on one side of the subject's face".
+
+Tone: direct coach, not cheerleader. Honest about what needs work. Specific over vague always.
+
+If the image is not a real photograph (illustration, screenshot, text, AI art): return {"rejected":true,"reason":"one sentence explanation"}`;
 
   try {
     let claudeRes, data;
@@ -75,7 +86,7 @@ Rules:
         },
         body: JSON.stringify({
           model: 'claude-haiku-4-5-20251001',
-          max_tokens: 350,
+          max_tokens: 600,
           messages: [{ role: 'user', content: [imageContent, { type: 'text', text: prompt }] }]
         })
       });
@@ -105,18 +116,20 @@ Rules:
         chapter_id: chapterId,
         score:      result.score,
         passed:     true,
-        feedback:   result.feedback
+        feedback:   result.feedback,
+        thumbnail:  thumbnail || null
       })
     });
 
     // Return updated count
     const checkRes = await fetch(
-      `${SB_URL}/rest/v1/chapter_submissions?user_id=eq.${userId}&chapter_id=eq.${encodeURIComponent(chapterId)}&select=id`,
+      `${SB_URL}/rest/v1/chapter_submissions?user_id=eq.${userId}&chapter_id=eq.${encodeURIComponent(chapterId)}&select=id,score,thumbnail&order=created_at.asc`,
       { headers: { 'Authorization': authHeader, 'apikey': SB_ANON_KEY } }
     );
     const allSubs = await checkRes.json();
     result.total_submitted  = Array.isArray(allSubs) ? allSubs.length : 1;
     result.chapter_complete = result.total_submitted >= 3;
+    result.submissions      = Array.isArray(allSubs) ? allSubs : [];
 
     return res.status(200).json(result);
 
