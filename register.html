@@ -243,15 +243,15 @@
     const email    = document.getElementById('emailInput').value.trim();
     const password = document.getElementById('passwordInput').value;
     const confirm  = document.getElementById('confirmInput').value;
-    const invite   = document.getElementById('inviteInput').value.trim().toUpperCase();
+    // const invite   = document.getElementById('inviteInput').value.trim().toUpperCase();
     const btn      = document.getElementById('submitBtn');
 
     if (!name)               { showError('Please enter your name.'); return; }
     if (!email)              { showError('Please enter your email address.'); return; }
     if (password.length < 6) { showError('Password must be at least 6 characters.'); return; }
     if (password !== confirm) { showError('Passwords do not match.'); return; }
-    if (!invite)             { showError('Please enter your invite code.'); return; }
-    if (invite !== INVITE_CODE) { showError('Invalid invite code. Request one from the app owner.'); return; }
+    // if (!invite)             { showError('Please enter your invite code.'); return; }
+    // if (invite !== INVITE_CODE) { showError('Invalid invite code. Request one from the app owner.'); return; }
 
     btn.disabled = true; btn.classList.add('loading');
 
