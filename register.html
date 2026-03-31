@@ -83,7 +83,7 @@
     .level-desc { font-size: 0.62rem; color: var(--text-light); margin-top: 0.1rem; }
 
     /* Invite code */
-    .invite-input { letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; text-align: center; font-size: 1.1rem; }
+    /* .invite-input { letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; text-align: center; font-size: 1.1rem; } */
 
     /* Submit */
     .btn-submit { width: 100%; background: var(--sky); color: #fff; border: none; padding: 0.9rem; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1rem; border-radius: var(--radius-sm); cursor: pointer; transition: all 0.2s; margin-top: 0.5rem; box-shadow: 0 4px 14px rgba(0,180,216,0.35); display: flex; align-items: center; justify-content: center; gap: 0.4rem; }
@@ -169,11 +169,11 @@
     </div>
   </div>
 
-  <div class="form-group">
+  <!-- <div class="form-group">
     <label class="form-label" for="inviteInput">Invite code</label>
     <input type="text" class="form-input invite-input" id="inviteInput" placeholder="XXXXXXXX" onkeydown="if(event.key==='Enter') register()" autocomplete="off"/>
     <div class="form-hint">Don't have a code? Request one from the app owner.</div>
-  </div>
+  </div> -->
 
   <button class="btn-submit" id="submitBtn" onclick="register()">
     <div class="spinner"></div>
